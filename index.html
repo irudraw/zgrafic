@@ -25,61 +25,27 @@
 	
 	
 	
-	
-	
 <style type="text/css">
- 
-/* Full Width Progress Bar */
- 
-#preloader { 
-    width:100%; 
-    height:5px;  
-    background:#000;
-    top:50%;
-    position:absolute;
+body {
+    overflow: hidden;
 }
- 
-.expand { 
-    width:100%; 
-    height:1px; 
-    margin:2px 0; 
-    background:#2187e7; 
-    position:absolute;
-    box-shadow:0px 0px 10px 1px rgba(0,198,255,0.7);
-    -moz-animation:fullexpand 2000ms cubic-bezier(1.000, 0.610, 0.970, 0.000); /* Set the duration of the animation */
-    -webkit-animation:fullexpand 2000ms cubic-bezier(1.000, 0.610, 0.970, 0.000);
+/* preloader */
+#preloader {
+    position: fixed;
+    top:0; left:0;
+    right:0; bottom:0;
+    background: #000;
+    z-index: 100;
 }
- 
-@-moz-keyframes fullexpand {
-    0%  { width:0px;}
-    100%{ width:100%;}  
-}
-@-webkit-keyframes fullexpand {
-    0%  { width:0px;}
-    100%{ width:100%;}  
+#loader {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    left:50%; top:50%;
+    background: url(img/loader.gif) no-repeat center 0;
+    margin:-50px 0 0 -50px;
 }
 </style>
-<script src="http://code.jquery.com/jquery-1.6.4.min.js" type="text/javascript"></script>
-<script>
-$(document).ready(function(){
-    var ua = $.browser; /* Create a variable for browser info */
-    $('.loadzg').hide(); /* Hide the content */
-    
-    /* If the Version or Firefox is < or = 5.0 the preloader not display, the same function applies to old Version Safari and Chrome and finally Opera and IE they don't support CSS3 Animation */
-    if (ua.mozilla && ua.version <='5.0' || ua.safari && (navigator.appVersion.indexOf('3.') != -1) || ua.opera || ua.msie){
-        /* If the condition is true the content will be displayed immediately */
-        $('.loadzg').show();
-    }
-    else { /* Otherwise appears the preloader */
-        /* Insert the markup preloader usign jQuery */
-        $('body').append('<div id="preloader"><span class="expand"></span></div>');
-        /* The animation during 2sec, change the delay parameter to extend or decrase the animation, remember to change the duration of the animation also in CSS */
-        $('#preloader').delay(2000).fadeOut('slow', function() {
-        $('.loadzg').fadeIn('fast');  
-    });     
-    }
-});
-</script>
 	
 	
 	
@@ -87,8 +53,10 @@ $(document).ready(function(){
 </head>
 
 <body>
-<div class="loadzg">
-	
+
+<div id="preloader">
+    <div id="loader">&nbsp;</div>
+</div>
 	
 	
     
@@ -358,7 +326,14 @@ $(document).ready(function(){
     <script src="js/main.js"></script>
 
    
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(window).load(function() {
+	$('#preloader').fadeOut('slow');
+	$('body').css({'overflow':'visible'});
+})
+</script>
 	
-    </div>
+  
     </body>
 </html>
