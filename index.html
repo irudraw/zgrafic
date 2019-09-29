@@ -335,8 +335,7 @@ body {
 		    <textarea class="form-control" v-model="message" placeholder="Mensaje"></textarea>
 		    
                   </div>
-                  <button type="submit" class="btn btn-primary btn-lg">Request Invite</button>
-		  <button @click="enviar" class="btn btn-success">Enviar</button>
+		  <button @click="enviar" class="btn btn-primary btn-lg btn-success">Enviar</button>
                 </form>
 		      
 		      
@@ -370,7 +369,7 @@ body {
                         };
                         
                         emailjs.send("gmail","zgrafic", data)
-                        .then(function(response) {
+				.then(function(response) {
                             if(response.text === 'OK'){
                                 alert('El correo se ha enviado de forma exitosa');
                             }
