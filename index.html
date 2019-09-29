@@ -327,7 +327,7 @@ body {
 		      
 		      
 		
-<form id="myform" onsubmit="emailjs.sendForm('default_service', 'zgrafic', this); return limpiar();" method="post">
+<form id="myform" onsubmit="emailjs.sendForm('default_service', 'zgrafic', this); return false;" method="post">
 	
 <input type="text" name="from_name" class="form-control" placeholder="Nombres"/>
 
@@ -337,7 +337,7 @@ body {
 
 <input type="text" name="message" class="form-control" placeholder="Mensaje"/>
 <br><br>
-<button class="btn btn-primary btn-lg">
+<button class="btn btn-primary btn-lg" onclick="limpiarFormulario()" value="Limpiar formulario">
 Enviar
 </button>
 </form>
@@ -350,12 +350,11 @@ Enviar
 </script>
 
 		      
-<SCRIPT LANGUAGE=JAVASCRIPT>
-function limpiar() {
-    setTimeout('document.formulario.reset()',2000);
-    return false;
-}
-</SCRIPT>
+<script>
+  function limpiarFormulario() {
+    document.getElementById("myform").reset();
+  }
+</script>
 		      
 		      
 		
