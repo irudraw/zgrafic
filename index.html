@@ -327,7 +327,7 @@ body {
 		      
 		      
 		
-<form id="myform" onsubmit="emailjs.sendForm('default_service', 'zgrafic', this); return false; return limpiar();" method="post">
+<form id="myform" onsubmit="emailjs.sendForm('default_service', 'zgrafic', this); return limpiar();" method="post">
 	
 <input type="text" name="from_name" class="form-control" placeholder="Nombres"/>
 
@@ -350,7 +350,7 @@ Enviar
 </script>
 
 		      
-<SCRIPT LANGUAGE=JAVASCRIPT><!--
+<SCRIPT LANGUAGE=JAVASCRIPT>
 function limpiar() {
     setTimeout('document.formulario.reset()',2000);
     return false;
