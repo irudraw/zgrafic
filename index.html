@@ -325,7 +325,7 @@ body {
 -->
 		      
 		<form role="form">
-                  <div class="col-sm-6 col-sm-offset-3 form-group">
+                  <div class="form-group">
                     <input class="form-control" type="text" v-model="from_name" placeholder="Nombres"></input>
                     		    
 		    <input class="form-control" type="text" v-model="subject" placeholder="Asunto"></input>
@@ -341,8 +341,54 @@ body {
 		      
 		      
 		      
+		
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js">
+        </script>
+        <script src="https://cdn.emailjs.com/dist/email.min.js" type="text/javascript">
+        </script>
+        <script>
+            (function(){
+                emailjs.init("user_kwLsos2jUCpBs8ktfEkqI");
+             })();
+            const vue = new Vue({
+                el: '#app',
+                data(){
+                    return {
+                        from_name: '',
+                        from_email: '',
+                        message: '',
+                        subject: '',
+                    }
+                },
+                methods: {
+                    enviar(){
+                        let data = {
+                            from_name: this.from_name,
+                            from_email: this.from_email,
+                            message: this.message,
+                            subject: this.subject,
+                        };
+                        
+                        emailjs.send("gmail","zgrafic", data)
+                        .then(function(response) {
+                            if(response.text === 'OK'){
+                                alert('El correo se ha enviado de forma exitosa');
+                            }
+                           console.log("SUCCESS. status=%d, text=%s", response.status, response.text);
+                        }, function(err) {
+                            alert('Ocurrió un problema al enviar el correo');
+                           console.log("FAILED. error=", err);
+                        });
+                    }
+                }
+            });
+        </script>
 		      
 		      
+		
+		
+		
+		
 		      
               </div>
             </div><!--End Form row-->
