@@ -324,64 +324,38 @@ body {
                 </form>
 -->
 		      
-		<form role="form">
-                  <div class="form-group">
-                    <input class="form-control" type="text" v-model="from_name" placeholder="Nombres"></input>
-                    		    
-		    <input class="form-control" type="text" v-model="subject" placeholder="Asunto"></input>
-		      
-		    <input class="form-control" type="email" v-model="from_email" placeholder="Email"></input>
-		    
-		    <textarea class="form-control" v-model="message" placeholder="Mensaje"></textarea>
-		    
-                  </div>
-		  <button @click="enviar" class="btn btn-primary btn-lg btn-success">Enviar</button>
-                </form>
-		      
 		      
 		      
 		
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js">
-        </script>
-        <script src="https://cdn.emailjs.com/dist/email.min.js" type="text/javascript">
-        </script>
-        <script>
-            (function(){
-                emailjs.init("user_kwLsos2jUCpBs8ktfEkqI");
-             })();
-            const vue = new Vue({
-                el: '#app',
-                data(){
-                    return {
-                        from_name: '',
-                        from_email: '',
-                        message: '',
-                        subject: '',
-                    }
-                },
-                methods: {
-                    enviar(){
-                        let data = {
-                            from_name: this.from_name,
-                            from_email: this.from_email,
-                            message: this.message,
-                            subject: this.subject,
-                        };
-                        
-                        emailjs.send("gmail","zgrafic", data)
-				.then(function(response) {
-                            if(response.text === 'OK'){
-                                alert('El correo se ha enviado de forma exitosa');
-                            }
-                           console.log("SUCCESS. status=%d, text=%s", response.status, response.text);
-                        }, function(err) {
-                            alert('Ocurrió un problema al enviar el correo');
-                           console.log("FAILED. error=", err);
-                        });
-                    }
-                }
-            });
-        </script>
+	<form role="form">
+      <input class="form-control" type="text" name="name" id="name" placeholder="Name" />
+      <textarea class="form-control" name="message" id="message" placeholder="Message" rows="7"></textarea>
+      <button id="send" class="btn btn-primary btn-lg btn-success">Send message</button>
+    </form>
+    <script src="assets/js/jquery.min.js"></script>
+    // Load emailJS SDK
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+    // Initialize your client
+    <script type="text/javascript">
+      (function(){
+        emailjs.init("user_kwLsos2jUCpBs8ktfEkqI");
+      })();
+    </script>
+    // Add listeners
+    <script>
+      $('#button').click( () => {
+        var payload = {
+          "from_name": $('#name').val(),
+          "message": $('#message').val()
+        }
+        // Your email service name if you just have one, you can use this one.
+        var service_id = "gmail";
+        // Template you will use
+        var template_id = "zgrafic";
+        // Send message using your client
+        emailjs.send(service_id, template_id, payload);
+      });
+    </script>
 		      
 		      
 		
