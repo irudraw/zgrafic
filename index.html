@@ -327,35 +327,28 @@ body {
 		      
 		      
 		
-	<form role="form">
-      <input class="form-control" type="text" name="name" id="name" placeholder="Name" />
-      <textarea class="form-control" name="message" id="message" placeholder="Message" rows="7"></textarea>
-      <button id="send" class="btn btn-primary btn-lg btn-success">Send message</button>
-    </form>
-    <script src="assets/js/jquery.min.js"></script>
-    // Load emailJS SDK
-    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
-    // Initialize your client
-    <script type="text/javascript">
-      (function(){
-        emailjs.init("user_kwLsos2jUCpBs8ktfEkqI");
-      })();
-    </script>
-    // Add listeners
-    <script>
-      $('#button').click( () => {
-        var payload = {
-          "from_name": $('#name').val(),
-          "message": $('#message').val()
-        }
-        // Your email service name if you just have one, you can use this one.
-        var service_id = "gmail";
-        // Template you will use
-        var template_id = "zgrafic";
-        // Send message using your client
-        emailjs.send(service_id, template_id, payload);
-      });
-    </script>
+<form id="myform" onsubmit="emailjs.sendForm('default_service', 'zgrafic', this); return false;" method="post">
+<label>from_name</label>
+<input type="text" name="from_name" />
+<label>from_email</label>
+<input type="text" name="from_email" />
+<label>subject</label>
+<input type="text" name="subject" />
+<label>message</label>
+<input type="text" name="message" />
+<br><br>
+<button>
+Send
+</button>
+</form>
+
+<script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+<script type="text/javascript">
+   (function(){
+      emailjs.init("user_kwLsos2jUCpBs8ktfEkqI");
+   })();
+</script>
+
 		      
 		      
 		
