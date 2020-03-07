@@ -387,8 +387,10 @@ export const putLocale = async function (givenParam, goodLangs, conf) {
   if (!goodLangs.includes(langParam) && langParam !== 'test') {
     langParam = 'es';
   }
+  
+  //const url = conf.langPath + 'lang.' + langParam + '.js';
 
-  const url = conf.langPath + 'lang.' + langParam + '.js';
+  const url = conf.langPath + 'lang.' + 'es' + '.js';
   return readLang(
     // Todo: Replace this with `return import(url);` when
     //   `import()` widely supported
