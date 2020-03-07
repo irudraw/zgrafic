@@ -385,7 +385,7 @@ export const putLocale = async function (givenParam, goodLangs, conf) {
 
   // Set to English if language is not in list of good langs
   if (!goodLangs.includes(langParam) && langParam !== 'test') {
-    langParam = 'en';
+    langParam = 'es';
   }
 
   const url = conf.langPath + 'lang.' + langParam + '.js';
