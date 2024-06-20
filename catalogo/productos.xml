@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<productos>
+    <producto>
+        <nombre>Producto 1</nombre>
+        <precio>100.00</precio>
+        <imagen>imagen1.jpg</imagen>
+    </producto>
+    <!-- Agrega más productos aquí -->
+</productos>
