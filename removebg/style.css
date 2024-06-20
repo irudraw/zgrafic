@@ -1,0 +1,76 @@
+h1, h2{
+    text-align: center;
+    font-family: "Poppins", sans-serif;
+}
+h2{
+    margin-top: -15px;
+}
+main{
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: max-content;
+    height: fit-content;
+    border: 2px dashed rgb(0, 0, 0);
+    border-radius: 20px;
+    padding: 40px;
+    font-family: "Poppins", sans-serif;
+}
+
+.main-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.context{
+    display: flex;
+    gap: 10px;
+}
+
+form input[type="file"]{
+    width: 100%;
+    background-color: rgba(208, 210, 224, 0.137);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid rgb(128, 128, 128);
+}
+
+input[type="file"]::file-selector-button{
+    margin-right: 25px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgb(39, 76, 241);
+    color: white;
+
+    cursor: pointer;
+}
+input[type="file"]::file-selector-button::hover{
+    background-color: rgb(15, 47, 189);
+}
+
+button{
+    max-width: 100%;
+    background-color: rgb(39, 76, 241);
+    border: none;
+    color: white;
+    border-radius: 10px;
+    padding: 0 15px;
+    cursor: pointer;
+}
+
+.title, .or{
+    font-size: 20px;
+    text-transform: capitalize;
+    margin-bottom: 5px;
+}
+
+#result{
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 20px;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0);
+}

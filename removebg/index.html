@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap"
+      rel="stylesheet" />
+    <title>Remove</title>
+  </head>
+  <body>
+    <h1>ELIMINAR FONDO</h1>
+    <h2>WITH REMOVE.BG API</h2>
+
+    <main>
+      <form id="form">
+        <div class="main-content">
+          <span class="title">Abre tu <u>IMAGEN</u></span>
+     
+          <div class="context">
+            <input type="file" id="input" />
+            <button type="submit" id="button">Eliminar</button>
+          </div>
+        </div>
+      </form>
+      <img src="" id="result" alt="" />
+    </main>
+
+    <script>
+      const apiKey = "oJQFVyReoosqExRThHR2h8tX";
+
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+      const button = document.getElementById("button");
+      const result = document.getElementById("result");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("image_file", input.files[0]);
+
+        button.disabled = true;
+        button.textContent = "Removeing...";
+
+        fetch("https://api.remove.bg/v1.0/removebg", {
+          method: "post",
+          headers: {
+            "X-Api-Key": apiKey,
+          },
+          body: formData,
+        })
+          .then((res) => res.blob())
+          .then((data) => {
+            const url = URL.createObjectURL(data);
+            result.src = url;
+
+            button.disabled = false;
+            button.textContent = "Remove";
+          });
+      });
+    </script>
+
+    <!-- <script>
+      const apiKey = "oJQFVyReoosqExRThHR2h8tX";
+
+      fetch("https://api.remove.bg/v1.0/removebg", {
+        method: "POST",
+        headers: {
+          "X-Api-Key": apiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image_url:
+            "https://www.gimp.org/tutorials/Changing_Background_Color_2/img1_initial.jpg",
+          size: "auto",
+        }),
+      })
+        .then((res) => {
+          return res.blob();
+        })
+        .then((data) => {
+          const url = URL.createObjectURL(data);
+          const img = new Image();
+          img.src = url;
+
+          document.body.appendChild(img);
+        });
+    </script> -->
+  </body>
+</html>
