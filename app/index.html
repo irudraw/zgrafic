@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <title>Image Editor</title>
+        <title>Imagen Editor</title>
         <style type="text/css">[ng-cloak]#splash{display:block!important}[ng-cloak]{display:none}#splash{display:none;position:absolute;top:45%;left:50%;width:6em;height:6em;overflow:hidden;border-radius:100%;z-index:0}@-webkit-keyframes fade{from{opacity:1}to{opacity:.2}}@keyframes fade{from{opacity:1}to{opacity:.2}}@-webkit-keyframes rotate{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}#splash::after,#splash::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%}#splash::before{background:linear-gradient(to right,green,#ff0);-webkit-animation:rotate 2.5s linear infinite;animation:rotate 2.5s linear infinite}#splash::after{background:linear-gradient(to bottom,red,#00f);-webkit-animation:fade 2s infinite alternate,rotate 2.5s linear reverse infinite;animation:fade 2s infinite alternate,rotate 2.5s linear reverse infinite}#splash-spinner{position:absolute;width:100%;height:100%;z-index:1;border-radius:100%;box-sizing:border-box;border-left:.5em solid transparent;border-right:.5em solid transparent;border-bottom:.5em solid rgba(255,255,255,.3);border-top:.5em solid rgba(255,255,255,.3);-webkit-animation:rotate .8s linear infinite;animation:rotate .8s linear infinite}</style>
         <link rel="stylesheet" href="assets/css/main.css?v23">
         <link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
@@ -19,7 +19,7 @@
         <div ng-controller="MainController" ng-cloak style="height: 100%">
             <section id="right-panels">
                 <section id="objects" class="md-whiteframe-z1" ng-controller="ObjectsPanelController">
-                    <h3 ed-toggle-panel-visibility="objects"><span>Layers</span><i class="mdi mdi-expand-less"></i></h3>
+                    <h3 ed-toggle-panel-visibility="objects"><span>Capas</span><i class="mdi mdi-expand-less"></i></h3>
                     <div class="scrollbar-wrapper" ed-pretty-scrollbar ed-scroll-axis="y">
                         <ul class="objects-panel list-unstyled" ui-sortable="sortableOptions" ng-model="objects">
                             <li class="object panel-item" ng-repeat="object in objects" ng-click="setAsActive(object)" ng-if="!object.ignore">
@@ -28,19 +28,19 @@
                                 <i class="mdi mdi-lock-outline lock-object" ng-class="{ 'not-locked': !object.locked }" ng-click="toggleLock(object); $event.stopPropagation();"></i>
                                 {{ spacify(object.name) || spacify(object.type) }}
                             </li>
-                            <li ng-if="!canvas.fabric._objects.length" class="text-center"><h4>No layers yet.</h4></li>
+                            <li ng-if="!canvas.fabric._objects.length" class="text-center"><h4>Sin capas.</h4></li>
                         </ul>
                     </div>
                 </section>
 
                 <section id="history" class="md-whiteframe-z1 panel-hidden">
-                    <h3 ed-toggle-panel-visibility="history"><span>History</span><i class="mdi mdi-expand-less"></i></h3>
+                    <h3 ed-toggle-panel-visibility="history"><span>Historial</span><i class="mdi mdi-expand-less"></i></h3>
                     <ul class="history-panel list-unstyled" ed-pretty-scrollbar ed-scroll-axis="y">
                         <li class="history-item panel-item" ng-click="history.load(item)" ng-repeat="item in history.all">
                             <i class="mdi mdi-{{ item.icon }} main-icon"></i>
                             {{ spacify(item.name) }}
                         </li>
-                        <li ng-if="history.all.length === 0" class="text-center"><h4>No history items yet.</h4></li>
+                        <li ng-if="history.all.length === 0" class="text-center"><h4>Sin elementos del historial.</h4></li>
                     </ul>
                 </section>
             </section>
