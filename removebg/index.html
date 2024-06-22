@@ -14,16 +14,16 @@
   </head>
   <body>
     <h1>ELIMINAR FONDO</h1>
-    <h2>WITH REMOVE.BG API</h2>
+    <h2>Elimina Fondo a tu Foto</h2>
 
     <main>
       <form id="form">
         <div class="main-content">
-          <span class="title">Abre tu <u>IMAGEN</u></span>
+          <span class="title">Selecciona <u>IMAGEN</u></span>
      
           <div class="context">
             <input type="file" id="input" />
-            <button type="submit" id="button">Eliminar</button>
+            <button type="submit" id="button">Remover Fondo</button>
           </div>
         </div>
       </form>
@@ -45,7 +45,7 @@
         formData.append("image_file", input.files[0]);
 
         button.disabled = true;
-        button.textContent = "Removeing...";
+        button.textContent = "Removiendo Fondo...";
 
         fetch("https://api.remove.bg/v1.0/removebg", {
           method: "post",
