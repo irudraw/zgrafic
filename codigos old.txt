@@ -1,0 +1,95 @@
+<!-- Slide 2 (#60) -->
+<!--
+<section class="slide fade-6 kenBurns" data-name="videos">
+  <div class="content">
+    <div class="container">
+      <div class="wrap">
+        <div class="fix-12-12">
+          <ul class="grid">
+            <li class="col-6-12 left">
+              <h1 class="ae-2 fromLeft">La Publicidad</h1>
+              <p class="ae-3 fromLeft"><span class="opacity-8">La publicidad ha dejado de ser opcional para un negocio, y ha pasado a ser un elemento indispensable a la hora de competir en el mercado</span></p>
+              <ul class="tabs controller uppercase bold ae-4 fromCenter" data-slider-id="60-1">
+                <li class="selected">Publicidad Física</li>
+                <li>Publicidad Digital</li>
+                <li>Páginas Web</li>
+              </ul>
+            </li>
+            <li class="col-6-12 left ae-5 fromCenter">
+              <ul class="slider animated margin-top-4" data-slider-id="60-1">
+                <li class="selected fromCenter">
+                  <div class="popupTrigger videoThumbnail shadow rounded" data-popup-id="60-1">
+                    <img class="wide" src="assets/img/gallery-60-1.jpg" alt="Video Thumbnail"/>
+                  </div>
+                </li>
+                <li class="fromCenter">
+                  <div class="popupTrigger videoThumbnail shadow rounded" data-popup-id="60-2">
+                    <img class="wide" src="assets/img/gallery-60-2.jpg" alt="Video Thumbnail"/>
+                  </div>
+                </li>
+                <li class="fromCenter">
+                  <div class="popupTrigger videoThumbnail shadow rounded" data-popup-id="60-3">
+                    <img class="wide" src="assets/img/gallery-60-3.jpg" alt="Video Thumbnail"/>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="background" style="background-image:url(assets/img/background/img-60.jpg)"></div>
+</section>
+-->
+
+<!--
+<div class="popup autoplay" data-popup-id="60-1">
+  <div class="close"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg></div>
+  <div class="content">
+    <div class="container">
+      <div class="wrap">
+        <div class="fix-10-12">
+          <div class="embedVideo popupContent">
+            <iframe src="https://player.vimeo.com/video/101231747?color=ff0179&portrait=0" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+ 
+<div class="popup autoplay" data-popup-id="60-2">
+  <div class="close"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg></div>
+  <div class="content">
+    <div class="container">
+      <div class="wrap">
+        <div class="fix-10-12">
+          <div class="embedVideo popupContent">
+            <iframe src="https://player.vimeo.com/video/101231747?color=ff0179&portrait=0" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Popup Video 
+<div class="popup autoplay" data-popup-id="60-3">
+  <div class="close"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"></use></svg></div>
+  <div class="content">
+    <div class="container">
+      <div class="wrap">
+        <div class="fix-10-12">
+          <div class="embedVideo popupContent">
+            <iframe src="https://player.vimeo.com/video/101231747?color=ff0179&portrait=0" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+-->
