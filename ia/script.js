@@ -15,7 +15,8 @@ function mostrarProductos() {
         divProducto.innerHTML = `
             <img src="${producto.imagen}" alt="${producto.nombre}">
             <h3>${producto.nombre}</h3>
-            <p>$${producto.precio}</p>
+            <p class="precio">$${producto.precio}</p>
+            <p class="descripcion">${producto.descripcion}</p>
             <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
         `;
         contenedor.appendChild(divProducto);
