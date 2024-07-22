@@ -32,17 +32,6 @@ function toggleDescripcion(button) {
     button.textContent = descripcion.classList.contains('visible') ? 'Ocultar descripción' : 'Ver descripción';
 }
 
-// ... (resto de las funciones del carrito) ...
-
-function toggleCarritoLateral() {
-    const carritoLateral = document.getElementById('carrito-lateral');
-    const overlay = document.getElementById('overlay');
-    carritoLateral.classList.toggle('abierto');
-    overlay.classList.toggle('abierto');
-}
-
-// ... (resto del código) ...
-
 function agregarAlCarrito(id) {
     const producto = productos.find(p => p.id === id);
     const itemEnCarrito = carrito.find(item => item.id === id);
@@ -73,8 +62,8 @@ function eliminarDelCarrito(id) {
 }
 
 function actualizarCarrito() {
-    const listaCarrito = document.getElementById('lista-carrito-lateral');
-    const total = document.getElementById('total-lateral');
+    const listaCarrito = document.getElementById('lista-carrito-flotante');
+    const total = document.getElementById('total-flotante');
     
     listaCarrito.innerHTML = '';
     let suma = 0;
@@ -99,11 +88,9 @@ function actualizarContadorCarrito() {
     contador.textContent = totalItems;
 }
 
-function toggleCarritoLateral() {
-    const carritoLateral = document.getElementById('carrito-lateral');
-    const overlay = document.getElementById('overlay');
-    carritoLateral.classList.toggle('abierto');
-    overlay.classList.toggle('abierto');
+function toggleCarritoFlotante() {
+    const carritoFlotante = document.getElementById('carrito-flotante');
+    carritoFlotante.classList.toggle('oculto');
 }
 
 function guardarCarritoEnLocalStorage() {
@@ -123,9 +110,17 @@ function irACarrito() {
     window.location.href = 'carrito.html';
 }
 
-document.getElementById('carrito-contador').addEventListener('click', toggleCarritoLateral);
-document.getElementById('ver-carrito').addEventListener('click', irACarrito);
-document.getElementById('overlay').addEventListener('click', toggleCarritoLateral);
+document.getElementById('carrito-contador').addEventListener('click', toggleCarritoFlotante);
+document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
+
+// Cerrar el carrito flotante si se hace clic fuera de él
+document.addEventListener('click', (event) => {
+    const carritoFlotante = document.getElementById('carrito-flotante');
+    const carritoContador = document.getElementById('carrito-contador');
+    if (!carritoContador.contains(event.target) && !carritoFlotante.contains(event.target)) {
+        carritoFlotante.classList.add('oculto');
+    }
+});
 
 cargarProductos();
 cargarCarritoDesdeLocalStorage();

@@ -3,28 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda en línea</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <title>TiendA en línea</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
         <div id="carrito-contador">
-            <i class="fas fa-shopping-cart"></i>
             <span id="contador">0</span>
         </div>
         <h1>TiendA en línea</h1>
     </header>
-    <div id="carrito-lateral" class="carrito-lateral">
+
+    <div id="carrito-flotante" class="carrito-flotante oculto">
         <h3>Resumen del Carrito</h3>
-        <ul id="lista-carrito-lateral"></ul>
-        <p>Total: $<span id="total-lateral">0</span></p>
-        <button id="ver-carrito">Ver Carrito Completo</button>
+        <ul id="lista-carrito-flotante"></ul>
+        <p>Total: $<span id="total-flotante">0</span></p>
+        <button id="ver-carrito-completo">Ver Carrito Completo</button>
     </div>
-    <div id="overlay" class="overlay"></div>
+
     <main>
-        <section id="productos"></section>
+        <section id="productos" class="section">
+            <!-- Los productos se cargarán dinámicamente aquí -->
+        </section>
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>

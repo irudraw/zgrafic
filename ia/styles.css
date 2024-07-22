@@ -15,26 +15,25 @@ header {
     align-items: center;
 }
 
-.btn-volver {
-    background-color: #4CAF50;
-    color: white;
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-volver:hover {
-    background-color: #45a049;
-}
-
 #carrito-contador {
+    position: relative;
     font-size: 1.2rem;
     cursor: pointer;
 }
 
+#contador {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+}
+
 #carrito-flotante {
-    position: fixed;
+    position: absolute;
     top: 60px;
     right: 10px;
     background-color: white;
@@ -56,20 +55,24 @@ header {
     padding: 0;
 }
 
-#lista-carrito-flotante li, #lista-carrito li {
+#lista-carrito-flotante li {
     display: flex;
     align-items: center;
     margin-bottom: 0.5rem;
-    background-color: white;
     padding: 0.5rem;
-    border-radius: 5px;
+    border-bottom: 1px solid #ddd;
 }
 
-#lista-carrito-flotante img, #lista-carrito img {
+#lista-carrito-flotante img {
     width: 50px;
     height: 50px;
     object-fit: cover;
     margin-right: 0.5rem;
+}
+
+#ver-carrito-completo {
+    width: 100%;
+    margin-top: 1rem;
 }
 
 main {
@@ -83,235 +86,6 @@ main {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
 }
-
-.producto {
-    border: 1px solid #ddd;
-    padding: 1rem;
-    text-align: center;
-    background-color: white;
-    border-radius: 5px;
-    transition: box-shadow 0.3s ease;
-}
-
-.producto:hover {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.producto img {
-    max-width: 100%;
-    height: auto;
-}
-
-button {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 0.5rem 1rem;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-.eliminar {
-    background-color: transparent;
-    border: none;
-    color: #f44336;
-    cursor: pointer;
-}
-
-.eliminar:hover {
-    color: #d32f2f;
-}
-
-#carrito {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.carrito-encabezado {
-    display: grid;
-    grid-template-columns: 3fr 1fr 1fr 1fr;
-    font-weight: bold;
-    padding: 0.5rem;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    margin-bottom: 0.5rem;
-}
-
-#lista-carrito {
-    list-style-type: none;
-    padding: 0;
-}
-
-#lista-carrito li {
-    display: grid;
-    grid-template-columns: 3fr 1fr 1fr 1fr;
-    align-items: center;
-    padding: 0.5rem;
-    border-bottom: 1px solid #ddd;
-}
-
-#lista-carrito li:last-child {
-    border-bottom: none;
-}
-
-#total {
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-
-
-/* ... (estilos anteriores) ... */
-
-.carrito-lateral {
-    position: fixed;
-    top: 0;
-    right: -300px;
-    width: 300px;
-    height: 100%;
-    background-color: white;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-    transition: right 0.3s ease-in-out;
-    z-index: 1001;
-    overflow-y: auto;
-    padding: 1rem;
-}
-
-.carrito-lateral.abierto {
-    right: 0;
-}
-
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: none;
-    z-index: 1000;
-}
-
-.overlay.abierto {
-    display: block;
-}
-
-#lista-carrito-lateral {
-    list-style-type: none;
-    padding: 0;
-}
-
-#lista-carrito-lateral li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    padding: 0.5rem;
-    border-bottom: 1px solid #ddd;
-}
-
-#lista-carrito-lateral img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    margin-right: 0.5rem;
-}
-
-/* Estilos responsivos para el menú lateral */
-@media (max-width: 768px) {
-    .carrito-lateral {
-        width: 100%;
-        right: -100%;
-    }
-}
-
-
-/* ... (estilos anteriores) ... */
-
-#carrito-contador {
-    position: relative;
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
-#contador {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 0.8rem;
-}
-
-.carrito-lateral {
-    position: fixed;
-    top: 0;
-    right: -300px;
-    width: 300px;
-    height: 100%;
-    background-color: white;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-    transition: right 0.3s ease-in-out;
-    z-index: 1001;
-    overflow-y: auto;
-    padding: 1rem;
-}
-
-.carrito-lateral.abierto {
-    right: 0;
-}
-
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: none;
-    z-index: 1000;
-}
-
-.overlay.abierto {
-    display: block;
-}
-
-/* ... (estilos posteriores) ... */
-
-/* ... (estilos anteriores) ... */
-
-.carrito-lateral {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 300px;
-    height: 100%;
-    background-color: white;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    transition: left 0.3s ease-in-out;
-    z-index: 1001;
-    overflow-y: auto;
-    padding: 1rem;
-}
-
-.carrito-lateral.abierto {
-    left: 0;
-}
-
-/* ... (otros estilos) ... */
 
 .producto {
     border: 1px solid #ddd;
@@ -359,4 +133,32 @@ button:hover {
     cursor: pointer;
 }
 
-/* ... (otros estilos) ... */
+button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.eliminar {
+    background-color: transparent;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
+}
+
+.eliminar:hover {
+    color: #d32f2f;
+}
