@@ -44,7 +44,7 @@ function actualizarCarrito() {
         const li = document.createElement('li');
         li.innerHTML = `
             ${producto.nombre} - $${producto.precio}
-            <button class="eliminar" onclick="eliminarDelCarrito(${index})">Eliminar</button>
+            <button class="eliminar" onclick="eliminarDelCarrito(${index})"><i class="fas fa-trash"></i></button>
         `;
         listaCarrito.appendChild(li);
         suma += producto.precio;
@@ -54,15 +54,8 @@ function actualizarCarrito() {
 }
 
 function realizarPedido() {
-    let mensaje = 'Hola, quisiera realizar el siguiente pedido:\n\n';
-    carrito.forEach(producto => {
-        mensaje += `${producto.nombre} - $${producto.precio}\n`;
-    });
-    mensaje += `\nTotal: $${document.getElementById('total').textContent}`;
-
-    const numeroWhatsApp = '1234567890'; // Reemplaza con el número de WhatsApp correcto
-    const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
-    window.open(urlWhatsApp, '_blank');
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    window.location.href = 'pedido.html';
 }
 
 document.getElementById('realizar-pedido').addEventListener('click', realizarPedido);

@@ -53,8 +53,11 @@ button {
     cursor: pointer;
 }
 
-button.eliminar {
-    background-color: #f44336;
+.eliminar {
+    background-color: transparent;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
 }
 
 @media (min-width: 768px) {
