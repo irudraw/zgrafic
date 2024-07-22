@@ -30,6 +30,18 @@ function actualizarCarrito() {
     });
 
     total.textContent = `$${suma.toFixed(2)}`;
+    actualizarBotonPedido();
+}
+
+function actualizarBotonPedido() {
+    const botonPedido = document.getElementById('realizar-pedido');
+    if (carrito.length === 0) {
+        botonPedido.disabled = true;
+        botonPedido.classList.add('disabled');
+    } else {
+        botonPedido.disabled = false;
+        botonPedido.classList.remove('disabled');
+    }
 }
 
 function eliminarDelCarrito(id) {
@@ -50,6 +62,11 @@ function guardarCarritoEnLocalStorage() {
 }
 
 function enviarPedidoPorWhatsApp() {
+    if (carrito.length === 0) {
+        alert('No hay productos en el carrito');
+        return;
+    }
+
     let mensaje = "Hola, me gustaría hacer el siguiente pedido:\n\n";
     carrito.forEach(item => {
         mensaje += `${item.nombre} x ${item.cantidad} - $${(item.precio * item.cantidad).toFixed(2)}\n`;
