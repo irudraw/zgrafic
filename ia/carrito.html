@@ -5,29 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito de Compras</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
     <header>
         <h1>Carrito de Compras</h1>
-        <a href="index.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
+        <a href="index.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver a la Tienda</a>
     </header>
 
     <main>
-        <section id="carrito" class="section">
-            <div class="carrito-encabezado">
-                <span>Producto</span>
-                <span>Precio</span>
-                <span>Cantidad</span>
-                <span>Acciones</span>
-            </div>
-            <ul id="lista-carrito"></ul>
-            <div class="carrito-total">
-                <span>Total:</span>
-                <span>$<span id="total">0</span></span>
-            </div>
-            <button id="realizar-pedido" class="btn-realizar-pedido">Realizar Pedido</button>
-        </section>
+        <div class="carrito-encabezado">
+            <span>Producto</span>
+            <span>Precio</span>
+            <span>Cantidad</span>
+            <span>Acciones</span>
+        </div>
+        <ul id="lista-carrito"></ul>
+        <div class="carrito-total">
+            <span>Total:</span>
+            <span id="total">$0</span>
+        </div>
+        <button id="realizar-pedido" class="btn-realizar-pedido">Realizar Pedido por WhatsApp</button>
     </main>
 
     <script src="carrito.js"></script>

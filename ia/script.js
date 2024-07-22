@@ -9,6 +9,7 @@ async function cargarProductos() {
 
 function mostrarProductos() {
     const contenedor = document.getElementById('productos');
+    contenedor.innerHTML = '';
     productos.forEach(producto => {
         const divProducto = document.createElement('div');
         divProducto.className = 'producto';
@@ -41,11 +42,7 @@ function agregarAlCarrito(id) {
 function eliminarDelCarrito(id) {
     const index = carrito.findIndex(item => item.id === id);
     if (index !== -1) {
-        if (carrito[index].cantidad > 1) {
-            carrito[index].cantidad--;
-        } else {
-            carrito.splice(index, 1);
-        }
+        carrito.splice(index, 1);
     }
     actualizarCarrito();
     actualizarContadorCarrito();
@@ -99,6 +96,19 @@ function cargarCarritoDesdeLocalStorage() {
 
 function irACarrito() {
     window.location.href = 'carrito.html';
+}
+
+function enviarPedidoPorWhatsApp() {
+    let mensaje = "Hola, me gustaría hacer el siguiente pedido:\n\n";
+    carrito.forEach(item => {
+        mensaje += `${item.nombre} x ${item.cantidad} - $${(item.precio * item.cantidad).toFixed(2)}\n`;
+    });
+    const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+    mensaje += `\nTotal: $${total.toFixed(2)}`;
+    
+    const numeroWhatsApp = "51955486170";
+    const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
 }
 
 document.getElementById('carrito-contador').addEventListener('click', toggleCarritoFlotante);
