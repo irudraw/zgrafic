@@ -35,7 +35,11 @@ function actualizarCarrito() {
 function eliminarDelCarrito(id) {
     const index = carrito.findIndex(item => item.id === id);
     if (index !== -1) {
-        carrito.splice(index, 1);
+        if (carrito[index].cantidad > 1) {
+            carrito[index].cantidad--;
+        } else {
+            carrito.splice(index, 1);
+        }
     }
     actualizarCarrito();
     guardarCarritoEnLocalStorage();
