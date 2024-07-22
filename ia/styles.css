@@ -56,8 +56,6 @@ header {
 }
 
 main {
-    display: flex;
-    flex-direction: column;
     padding: 1rem;
 }
 
@@ -65,12 +63,6 @@ main {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
-}
-
-#carrito {
-    background-color: #f0f0f0;
-    padding: 1rem;
-    margin-top: 1rem;
 }
 
 .producto {
@@ -102,20 +94,4 @@ button {
     border: none;
     color: #f44336;
     cursor: pointer;
-}
-
-@media (min-width: 768px) {
-    main {
-        flex-direction: row;
-    }
-
-    #productos {
-        flex: 2;
-    }
-
-    #carrito {
-        flex: 1;
-        margin-top: 0;
-        margin-left: 1rem;
-    }
 }

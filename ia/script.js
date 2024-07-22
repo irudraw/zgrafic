@@ -24,62 +24,69 @@ function mostrarProductos() {
 
 function agregarAlCarrito(id) {
     const producto = productos.find(p => p.id === id);
-    carrito.push(producto);
+    const itemEnCarrito = carrito.find(item => item.id === id);
+
+    if (itemEnCarrito) {
+        itemEnCarrito.cantidad++;
+    } else {
+        carrito.push({ ...producto, cantidad: 1 });
+    }
+
     actualizarCarrito();
     actualizarContadorCarrito();
     actualizarCarritoFlotante();
+    guardarCarritoEnLocalStorage();
 }
 
-function eliminarDelCarrito(index) {
-    carrito.splice(index, 1);
+function eliminarDelCarrito(id) {
+    const index = carrito.findIndex(item => item.id === id);
+    if (index !== -1) {
+        if (carrito[index].cantidad > 1) {
+            carrito[index].cantidad--;
+        } else {
+            carrito.splice(index, 1);
+        }
+    }
     actualizarCarrito();
     actualizarContadorCarrito();
     actualizarCarritoFlotante();
+    guardarCarritoEnLocalStorage();
 }
 
 function actualizarCarrito() {
-    const listaCarrito = document.getElementById('lista-carrito');
-    const total = document.getElementById('total');
+    const listaCarrito = document.getElementById('lista-carrito-flotante');
+    const total = document.getElementById('total-flotante');
     
     listaCarrito.innerHTML = '';
     let suma = 0;
 
-    carrito.forEach((producto, index) => {
+    carrito.forEach(item => {
         const li = document.createElement('li');
         li.innerHTML = `
-            ${producto.nombre} - $${producto.precio}
-            <button class="eliminar" onclick="eliminarDelCarrito(${index})"><i class="fas fa-trash"></i></button>
+            <img src="${item.imagen}" alt="${item.nombre}">
+            <span>${item.nombre} - $${item.precio} x ${item.cantidad}</span>
+            <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
         `;
         listaCarrito.appendChild(li);
-        suma += producto.precio;
+        suma += item.precio * item.cantidad;
     });
 
-    total.textContent = suma;
+    total.textContent = suma.toFixed(2);
 }
 
 function actualizarContadorCarrito() {
     const contador = document.getElementById('contador');
-    contador.textContent = carrito.length;
+    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+    contador.textContent = totalItems;
 }
 
 function actualizarCarritoFlotante() {
-    const listaCarritoFlotante = document.getElementById('lista-carrito-flotante');
-    const totalFlotante = document.getElementById('total-flotante');
-    
-    listaCarritoFlotante.innerHTML = '';
-    let suma = 0;
-
-    carrito.forEach(producto => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <img src="${producto.imagen}" alt="${producto.nombre}">
-            <span>${producto.nombre} - $${producto.precio}</span>
-        `;
-        listaCarritoFlotante.appendChild(li);
-        suma += producto.precio;
-    });
-
-    totalFlotante.textContent = suma;
+    const carritoFlotante = document.getElementById('carrito-flotante');
+    if (carrito.length > 0) {
+        carritoFlotante.classList.remove('oculto');
+    } else {
+        carritoFlotante.classList.add('oculto');
+    }
 }
 
 function toggleCarritoFlotante() {
@@ -87,16 +94,26 @@ function toggleCarritoFlotante() {
     carritoFlotante.classList.toggle('oculto');
 }
 
-function realizarPedido() {
+function guardarCarritoEnLocalStorage() {
     localStorage.setItem('carrito', JSON.stringify(carrito));
-    window.location.href = 'pedido.html';
 }
 
-document.getElementById('realizar-pedido').addEventListener('click', realizarPedido);
+function cargarCarritoDesdeLocalStorage() {
+    const carritoGuardado = localStorage.getItem('carrito');
+    if (carritoGuardado) {
+        carrito = JSON.parse(carritoGuardado);
+        actualizarCarrito();
+        actualizarContadorCarrito();
+        actualizarCarritoFlotante();
+    }
+}
+
+function irACarrito() {
+    window.location.href = 'carrito.html';
+}
+
 document.getElementById('carrito-contador').addEventListener('click', toggleCarritoFlotante);
-document.getElementById('ver-carrito').addEventListener('click', () => {
-    document.getElementById('carrito').scrollIntoView({ behavior: 'smooth' });
-    toggleCarritoFlotante();
-});
+document.getElementById('ver-carrito').addEventListener('click', irACarrito);
 
 cargarProductos();
+cargarCarritoDesdeLocalStorage();
