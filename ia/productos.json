@@ -3,28 +3,24 @@
         "id": 1,
         "nombre": "Producto 1",
         "precio": 10,
-        "imagen": "https://via.placeholder.com/150?text=Producto+1",
-        "descripcion": "Este es el Producto 1. Una descripción detallada del producto iría aquí."
+        "imagen": "https://via.placeholder.com/150?text=Producto+1"
     },
     {
         "id": 2,
         "nombre": "Producto 2",
         "precio": 15,
-        "imagen": "https://via.placeholder.com/150?text=Producto+2",
-        "descripcion": "Este es el Producto 2. Una descripción detallada del producto iría aquí."
+        "imagen": "https://via.placeholder.com/150?text=Producto+2"
     },
     {
         "id": 3,
         "nombre": "Producto 3",
         "precio": 20,
-        "imagen": "https://via.placeholder.com/150?text=Producto+3",
-        "descripcion": "Este es el Producto 3. Una descripción detallada del producto iría aquí."
+        "imagen": "https://via.placeholder.com/150?text=Producto+3"
     },
     {
         "id": 4,
         "nombre": "Producto 4",
         "precio": 25,
-        "imagen": "https://via.placeholder.com/150?text=Producto+4",
-        "descripcion": "Este es el Producto 4. Una descripción detallada del producto iría aquí."
+        "imagen": "https://via.placeholder.com/150?text=Producto+4"
     }
 ]

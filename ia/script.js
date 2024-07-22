@@ -17,19 +17,9 @@ function mostrarProductos() {
             <h3>${producto.nombre}</h3>
             <p>$${producto.precio}</p>
             <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
-            <button class="btn-descripcion" onclick="toggleDescripcion(this)">Ver descripción</button>
-            <div class="descripcion">
-                <p>${producto.descripcion}</p>
-            </div>
         `;
         contenedor.appendChild(divProducto);
     });
-}
-
-function toggleDescripcion(button) {
-    const descripcion = button.nextElementSibling;
-    descripcion.classList.toggle('visible');
-    button.textContent = descripcion.classList.contains('visible') ? 'Ocultar descripción' : 'Ver descripción';
 }
 
 function agregarAlCarrito(id) {
@@ -44,6 +34,7 @@ function agregarAlCarrito(id) {
 
     actualizarCarrito();
     actualizarContadorCarrito();
+    actualizarCarritoFlotante();
     guardarCarritoEnLocalStorage();
 }
 
@@ -58,6 +49,7 @@ function eliminarDelCarrito(id) {
     }
     actualizarCarrito();
     actualizarContadorCarrito();
+    actualizarCarritoFlotante();
     guardarCarritoEnLocalStorage();
 }
 
@@ -88,6 +80,15 @@ function actualizarContadorCarrito() {
     contador.textContent = totalItems;
 }
 
+function actualizarCarritoFlotante() {
+    const carritoFlotante = document.getElementById('carrito-flotante');
+    if (carrito.length > 0) {
+        carritoFlotante.classList.remove('oculto');
+    } else {
+        carritoFlotante.classList.add('oculto');
+    }
+}
+
 function toggleCarritoFlotante() {
     const carritoFlotante = document.getElementById('carrito-flotante');
     carritoFlotante.classList.toggle('oculto');
@@ -103,6 +104,7 @@ function cargarCarritoDesdeLocalStorage() {
         carrito = JSON.parse(carritoGuardado);
         actualizarCarrito();
         actualizarContadorCarrito();
+        actualizarCarritoFlotante();
     }
 }
 
@@ -111,16 +113,7 @@ function irACarrito() {
 }
 
 document.getElementById('carrito-contador').addEventListener('click', toggleCarritoFlotante);
-document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
-
-// Cerrar el carrito flotante si se hace clic fuera de él
-document.addEventListener('click', (event) => {
-    const carritoFlotante = document.getElementById('carrito-flotante');
-    const carritoContador = document.getElementById('carrito-contador');
-    if (!carritoContador.contains(event.target) && !carritoFlotante.contains(event.target)) {
-        carritoFlotante.classList.add('oculto');
-    }
-});
+document.getElementById('ver-carrito').addEventListener('click', irACarrito);
 
 cargarProductos();
 cargarCarritoDesdeLocalStorage();
