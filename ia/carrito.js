@@ -18,9 +18,15 @@ function actualizarCarrito() {
     carrito.forEach(item => {
         const li = document.createElement('li');
         li.innerHTML = `
-            <img src="${item.imagen}" alt="${item.nombre}">
-            <span>${item.nombre} - $${item.precio} x ${item.cantidad}</span>
-            <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
+            <span>
+                <img src="${item.imagen}" alt="${item.nombre}" width="50">
+                ${item.nombre}
+            </span>
+            <span>$${item.precio.toFixed(2)}</span>
+            <span>${item.cantidad}</span>
+            <span>
+                <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
+            </span>
         `;
         listaCarrito.appendChild(li);
         suma += item.precio * item.cantidad;
@@ -49,7 +55,7 @@ function guardarCarritoEnLocalStorage() {
 function realizarPedido() {
     let mensaje = 'Hola, quisiera realizar el siguiente pedido:\n\n';
     carrito.forEach(item => {
-        mensaje += `${item.nombre} - $${item.precio} x ${item.cantidad}\n`;
+        mensaje += `${item.nombre} - $${item.precio.toFixed(2)} x ${item.cantidad}\n`;
     });
     mensaje += `\nTotal: $${document.getElementById('total').textContent}`;
 

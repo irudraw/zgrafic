@@ -2,6 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f4f4f4;
 }
 
 header {
@@ -12,6 +13,19 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.btn-volver {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-volver:hover {
+    background-color: #45a049;
 }
 
 #carrito-contador {
@@ -42,13 +56,16 @@ header {
     padding: 0;
 }
 
-#lista-carrito-flotante li {
+#lista-carrito-flotante li, #lista-carrito li {
     display: flex;
     align-items: center;
     margin-bottom: 0.5rem;
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 5px;
 }
 
-#lista-carrito-flotante img {
+#lista-carrito-flotante img, #lista-carrito img {
     width: 50px;
     height: 50px;
     object-fit: cover;
@@ -57,6 +74,8 @@ header {
 
 main {
     padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 #productos {
@@ -69,6 +88,13 @@ main {
     border: 1px solid #ddd;
     padding: 1rem;
     text-align: center;
+    background-color: white;
+    border-radius: 5px;
+    transition: box-shadow 0.3s ease;
+}
+
+.producto:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .producto img {
@@ -87,6 +113,12 @@ button {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
 }
 
 .eliminar {
@@ -94,4 +126,47 @@ button {
     border: none;
     color: #f44336;
     cursor: pointer;
+}
+
+.eliminar:hover {
+    color: #d32f2f;
+}
+
+#carrito {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.carrito-encabezado {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    font-weight: bold;
+    padding: 0.5rem;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+}
+
+#lista-carrito {
+    list-style-type: none;
+    padding: 0;
+}
+
+#lista-carrito li {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+#lista-carrito li:last-child {
+    border-bottom: none;
+}
+
+#total {
+    font-weight: bold;
+    font-size: 1.2rem;
 }
