@@ -18,8 +18,11 @@ function actualizarCarrito() {
     carrito.forEach(item => {
         const li = document.createElement('li');
         li.innerHTML = `
-            <span>${item.nombre}</span>
-            <span>$${item.precio}</span>
+            <div class="producto-info">
+                <img src="${item.imagen}" alt="${item.nombre}" class="producto-miniatura">
+                <span>${item.nombre}</span>
+            </div>
+            <span>$${item.precio.toFixed(2)}</span>
             <span>${item.cantidad}</span>
             <span>
                 <button onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
@@ -29,9 +32,11 @@ function actualizarCarrito() {
         suma += item.precio * item.cantidad;
     });
 
-    total.textContent = `$${suma.toFixed(2)}`;
+    total.textContent = suma.toFixed(2);
     actualizarBotonPedido();
 }
+
+// ... (rest of the code remains the same)
 
 function actualizarBotonPedido() {
     const botonPedido = document.getElementById('realizar-pedido');
