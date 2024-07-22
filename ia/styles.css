@@ -170,3 +170,68 @@ button:hover {
     font-weight: bold;
     font-size: 1.2rem;
 }
+
+
+
+/* ... (estilos anteriores) ... */
+
+.carrito-lateral {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    transition: right 0.3s ease-in-out;
+    z-index: 1001;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.carrito-lateral.abierto {
+    right: 0;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 1000;
+}
+
+.overlay.abierto {
+    display: block;
+}
+
+#lista-carrito-lateral {
+    list-style-type: none;
+    padding: 0;
+}
+
+#lista-carrito-lateral li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+#lista-carrito-lateral img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 0.5rem;
+}
+
+/* Estilos responsivos para el menú lateral */
+@media (max-width: 768px) {
+    .carrito-lateral {
+        width: 100%;
+        right: -100%;
+    }
+}
