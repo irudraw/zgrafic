@@ -34,7 +34,6 @@ function agregarAlCarrito(id) {
 
     actualizarCarrito();
     actualizarContadorCarrito();
-    actualizarCarritoFlotante();
     guardarCarritoEnLocalStorage();
 }
 
@@ -49,13 +48,12 @@ function eliminarDelCarrito(id) {
     }
     actualizarCarrito();
     actualizarContadorCarrito();
-    actualizarCarritoFlotante();
     guardarCarritoEnLocalStorage();
 }
 
 function actualizarCarrito() {
-    const listaCarrito = document.getElementById('lista-carrito-flotante');
-    const total = document.getElementById('total-flotante');
+    const listaCarrito = document.getElementById('lista-carrito-lateral');
+    const total = document.getElementById('total-lateral');
     
     listaCarrito.innerHTML = '';
     let suma = 0;
@@ -80,18 +78,11 @@ function actualizarContadorCarrito() {
     contador.textContent = totalItems;
 }
 
-function actualizarCarritoFlotante() {
-    const carritoFlotante = document.getElementById('carrito-flotante');
-    if (carrito.length > 0) {
-        carritoFlotante.classList.remove('oculto');
-    } else {
-        carritoFlotante.classList.add('oculto');
-    }
-}
-
-function toggleCarritoFlotante() {
-    const carritoFlotante = document.getElementById('carrito-flotante');
-    carritoFlotante.classList.toggle('oculto');
+function toggleCarritoLateral() {
+    const carritoLateral = document.getElementById('carrito-lateral');
+    const overlay = document.getElementById('overlay');
+    carritoLateral.classList.toggle('abierto');
+    overlay.classList.toggle('abierto');
 }
 
 function guardarCarritoEnLocalStorage() {
@@ -104,7 +95,6 @@ function cargarCarritoDesdeLocalStorage() {
         carrito = JSON.parse(carritoGuardado);
         actualizarCarrito();
         actualizarContadorCarrito();
-        actualizarCarritoFlotante();
     }
 }
 
@@ -112,8 +102,9 @@ function irACarrito() {
     window.location.href = 'carrito.html';
 }
 
-document.getElementById('carrito-contador').addEventListener('click', toggleCarritoFlotante);
+document.getElementById('carrito-contador').addEventListener('click', toggleCarritoLateral);
 document.getElementById('ver-carrito').addEventListener('click', irACarrito);
+document.getElementById('overlay').addEventListener('click', toggleCarritoLateral);
 
 cargarProductos();
 cargarCarritoDesdeLocalStorage();
