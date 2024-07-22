@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda en línea</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
@@ -15,15 +15,20 @@
             <span id="contador">0</span>
         </div>
     </header>
+
     <div id="carrito-flotante" class="oculto">
         <h3>Resumen del Carrito</h3>
         <ul id="lista-carrito-flotante"></ul>
         <p>Total: $<span id="total-flotante">0</span></p>
-        <button id="ver-carrito">Ver Carrito Completo</button>
+        <button id="ver-carrito-completo">Ver Carrito Completo</button>
     </div>
+
     <main>
-        <section id="productos"></section>
+        <section id="productos" class="section">
+            <!-- Los productos se cargarán dinámicamente aquí -->
+        </section>
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>
