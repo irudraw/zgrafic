@@ -235,3 +235,58 @@ button:hover {
         right: -100%;
     }
 }
+
+
+/* ... (estilos anteriores) ... */
+
+#carrito-contador {
+    position: relative;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+#contador {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+}
+
+.carrito-lateral {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    transition: right 0.3s ease-in-out;
+    z-index: 1001;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.carrito-lateral.abierto {
+    right: 0;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 1000;
+}
+
+.overlay.abierto {
+    display: block;
+}
+
+/* ... (estilos posteriores) ... */
