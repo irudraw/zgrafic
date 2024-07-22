@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito de Compras</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
         <h1>Carrito de Compras</h1>
-        <a href="index.html" class="btn-volver">Volver a la tienda</a>
+        <a href="index.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
     </header>
+
     <main>
-        <section id="carrito">
+        <section id="carrito" class="section">
             <div class="carrito-encabezado">
                 <span>Producto</span>
                 <span>Precio</span>
@@ -21,10 +22,14 @@
                 <span>Acciones</span>
             </div>
             <ul id="lista-carrito"></ul>
-            <p>Total: $<span id="total">0</span></p>
-            <button id="realizar-pedido">Realizar Pedido</button>
+            <div class="carrito-total">
+                <span>Total:</span>
+                <span>$<span id="total">0</span></span>
+            </div>
+            <button id="realizar-pedido" class="btn-realizar-pedido">Realizar Pedido</button>
         </section>
     </main>
+
     <script src="carrito.js"></script>
 </body>
 </html>

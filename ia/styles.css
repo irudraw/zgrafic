@@ -150,3 +150,83 @@ button:hover {
         max-width: none;
     }
 }
+
+
+/* Estilos para la página del carrito */
+.btn-volver {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-volver:hover {
+    background-color: #45a049;
+}
+
+.btn-volver i {
+    margin-right: 5px;
+}
+
+.carrito-encabezado {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    font-weight: bold;
+    padding: 0.5rem;
+    background-color: #f0f0f0;
+    border-radius: 5px 5px 0 0;
+    margin-bottom: 0.5rem;
+}
+
+#lista-carrito {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#lista-carrito li {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+#lista-carrito li:last-child {
+    border-bottom: none;
+}
+
+.carrito-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #f0f0f0;
+    border-radius: 0 0 5px 5px;
+}
+
+.btn-realizar-pedido {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    font-size: 1.1rem;
+}
+
+/* Ajusta el estilo del icono del carrito en la página principal */
+#carrito-contador {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+#carrito-contador i {
+    margin-right: 5px;
+}
