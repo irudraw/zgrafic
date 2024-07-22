@@ -17,10 +17,31 @@ function mostrarProductos() {
             <h3>${producto.nombre}</h3>
             <p>$${producto.precio}</p>
             <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
+            <button class="btn-descripcion" onclick="toggleDescripcion(this)">Ver descripción</button>
+            <div class="descripcion">
+                <p>${producto.descripcion}</p>
+            </div>
         `;
         contenedor.appendChild(divProducto);
     });
 }
+
+function toggleDescripcion(button) {
+    const descripcion = button.nextElementSibling;
+    descripcion.classList.toggle('visible');
+    button.textContent = descripcion.classList.contains('visible') ? 'Ocultar descripción' : 'Ver descripción';
+}
+
+// ... (resto de las funciones del carrito) ...
+
+function toggleCarritoLateral() {
+    const carritoLateral = document.getElementById('carrito-lateral');
+    const overlay = document.getElementById('overlay');
+    carritoLateral.classList.toggle('abierto');
+    overlay.classList.toggle('abierto');
+}
+
+// ... (resto del código) ...
 
 function agregarAlCarrito(id) {
     const producto = productos.find(p => p.id === id);
