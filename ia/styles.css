@@ -54,6 +54,9 @@ header {
     scrollbar-width: none;
     -ms-overflow-style: none;
     transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-20px);
 }
 
 #carrito-flotante::-webkit-scrollbar {
@@ -64,6 +67,12 @@ header {
     opacity: 0;
     visibility: hidden;
     transform: translateY(-20px);
+}
+
+#carrito-flotante:not(.oculto) {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 #lista-carrito-flotante {
@@ -180,20 +189,29 @@ button:hover {
 .btn-volver {
     background-color: #4CAF50;
     color: white;
-    padding: 0.5rem 1rem;
+    padding: 0.7rem 1.2rem;
     text-decoration: none;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .btn-volver:hover {
     background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
 }
 
 .btn-volver i {
-    margin-right: 5px;
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+.btn-volver span {
+    font-size: 1em;
 }
 
 .carrito-encabezado {

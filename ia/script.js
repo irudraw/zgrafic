@@ -80,11 +80,6 @@ function actualizarContadorCarrito() {
     contador.textContent = totalItems;
 }
 
-function toggleCarritoFlotante() {
-    const carritoFlotante = document.getElementById('carrito-flotante');
-    carritoFlotante.classList.toggle('oculto');
-}
-
 function guardarCarritoEnLocalStorage() {
     localStorage.setItem('carrito', JSON.stringify(carrito));
 }
@@ -102,17 +97,19 @@ function irACarrito() {
     window.location.href = 'carrito.html';
 }
 
-document.getElementById('carrito-contador').addEventListener('click', toggleCarritoFlotante);
-document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
+// Eventos para mostrar/ocultar el carrito flotante
+const carritoFlotante = document.getElementById('carrito-flotante');
+const carritoContador = document.getElementById('carrito-contador');
 
-// Cerrar el carrito flotante si se hace clic fuera de él
-document.addEventListener('click', (event) => {
-    const carritoFlotante = document.getElementById('carrito-flotante');
-    const carritoContador = document.getElementById('carrito-contador');
-    if (!carritoContador.contains(event.target) && !carritoFlotante.contains(event.target)) {
-        carritoFlotante.classList.add('oculto');
-    }
+carritoContador.addEventListener('mouseenter', () => {
+    carritoFlotante.classList.remove('oculto');
 });
+
+carritoFlotante.addEventListener('mouseleave', () => {
+    carritoFlotante.classList.add('oculto');
+});
+
+document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
 
 cargarProductos();
 cargarCarritoDesdeLocalStorage();
