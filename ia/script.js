@@ -13,6 +13,7 @@ function mostrarProductos() {
         const divProducto = document.createElement('div');
         divProducto.className = 'producto';
         divProducto.innerHTML = `
+            <img src="${producto.imagen}" alt="${producto.nombre}">
             <h3>${producto.nombre}</h3>
             <p>$${producto.precio}</p>
             <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
@@ -27,6 +28,11 @@ function agregarAlCarrito(id) {
     actualizarCarrito();
 }
 
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    actualizarCarrito();
+}
+
 function actualizarCarrito() {
     const listaCarrito = document.getElementById('lista-carrito');
     const total = document.getElementById('total');
@@ -34,9 +40,12 @@ function actualizarCarrito() {
     listaCarrito.innerHTML = '';
     let suma = 0;
 
-    carrito.forEach(producto => {
+    carrito.forEach((producto, index) => {
         const li = document.createElement('li');
-        li.textContent = `${producto.nombre} - $${producto.precio}`;
+        li.innerHTML = `
+            ${producto.nombre} - $${producto.precio}
+            <button class="eliminar" onclick="eliminarDelCarrito(${index})">Eliminar</button>
+        `;
         listaCarrito.appendChild(li);
         suma += producto.precio;
     });

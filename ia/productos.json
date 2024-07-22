@@ -2,21 +2,25 @@
     {
         "id": 1,
         "nombre": "Producto 1",
-        "precio": 10
+        "precio": 10,
+        "imagen": "https://via.placeholder.com/150?text=Producto+1"
     },
     {
         "id": 2,
         "nombre": "Producto 2",
-        "precio": 15
+        "precio": 15,
+        "imagen": "https://via.placeholder.com/150?text=Producto+2"
     },
     {
         "id": 3,
         "nombre": "Producto 3",
-        "precio": 20
+        "precio": 20,
+        "imagen": "https://via.placeholder.com/150?text=Producto+3"
     },
     {
         "id": 4,
         "nombre": "Producto 4",
-        "precio": 25
+        "precio": 25,
+        "imagen": "https://via.placeholder.com/150?text=Producto+4"
     }
 ]

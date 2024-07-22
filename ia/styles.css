@@ -13,27 +13,31 @@ header {
 
 main {
     display: flex;
+    flex-direction: column;
     padding: 1rem;
 }
 
 #productos {
-    flex: 2;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
 }
 
 #carrito {
-    flex: 1;
     background-color: #f0f0f0;
     padding: 1rem;
-    margin-left: 1rem;
+    margin-top: 1rem;
 }
 
 .producto {
     border: 1px solid #ddd;
     padding: 1rem;
     text-align: center;
+}
+
+.producto img {
+    max-width: 100%;
+    height: auto;
 }
 
 button {
@@ -47,4 +51,24 @@ button {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+}
+
+button.eliminar {
+    background-color: #f44336;
+}
+
+@media (min-width: 768px) {
+    main {
+        flex-direction: row;
+    }
+
+    #productos {
+        flex: 2;
+    }
+
+    #carrito {
+        flex: 1;
+        margin-top: 0;
+        margin-left: 1rem;
+    }
 }
