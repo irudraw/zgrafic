@@ -1,0 +1,50 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+}
+
+main {
+    display: flex;
+    padding: 1rem;
+}
+
+#productos {
+    flex: 2;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+#carrito {
+    flex: 1;
+    background-color: #f0f0f0;
+    padding: 1rem;
+    margin-left: 1rem;
+}
+
+.producto {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    text-align: center;
+}
+
+button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
