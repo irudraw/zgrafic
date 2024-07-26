@@ -7,10 +7,10 @@ async function cargarProductos() {
     mostrarProductos();
 }
 
-function mostrarProductos() {
+function mostrarProductos(productosAMostrar = productos) {
     const contenedor = document.getElementById('productos');
     contenedor.innerHTML = '';
-    productos.forEach(producto => {
+    productosAMostrar.forEach(producto => {
         const divProducto = document.createElement('div');
         divProducto.className = 'producto';
         divProducto.innerHTML = `
@@ -97,6 +97,15 @@ function irACarrito() {
     window.location.href = 'carrito.html';
 }
 
+function buscarProductos() {
+    const textoBusqueda = document.getElementById('buscar-producto').value.toLowerCase();
+    const productosFiltrados = productos.filter(producto => 
+        producto.nombre.toLowerCase().includes(textoBusqueda) ||
+        producto.descripcion.toLowerCase().includes(textoBusqueda)
+    );
+    mostrarProductos(productosFiltrados);
+}
+
 // Eventos para mostrar/ocultar el carrito flotante
 const carritoFlotante = document.getElementById('carrito-flotante');
 const carritoContador = document.getElementById('carrito-contador');
@@ -110,6 +119,14 @@ carritoFlotante.addEventListener('mouseleave', () => {
 });
 
 document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
+
+// Agregar event listeners para la búsqueda
+document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
+document.getElementById('buscar-producto').addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+        buscarProductos();
+    }
+});
 
 cargarProductos();
 cargarCarritoDesdeLocalStorage();
