@@ -1,4 +1,4 @@
-const SIMBOLO_MONEDA = '$'; // Cambie esto para modificar el símbolo en toda la aplicación
+const SIMBOLO_MONEDA = 'S/.'; // Cambie esto para modificar el símbolo en toda la aplicación
 
 let productos = [];
 let productosFiltrados = [];
