@@ -1,3 +1,5 @@
+const SIMBOLO_MONEDA = '$'; // Asegúrese de que este valor sea el mismo que en script.js
+
 let carrito = [];
 
 function cargarCarrito() {
@@ -22,7 +24,7 @@ function actualizarCarrito() {
                 <img src="${item.imagen}" alt="${item.nombre}" class="producto-miniatura">
                 <span>${item.nombre}</span>
             </div>
-            <span>$${item.precio.toFixed(2)}</span>
+            <span>${SIMBOLO_MONEDA}${item.precio.toFixed(2)}</span>
             <span>${item.cantidad}</span>
             <span>
                 <button onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
@@ -32,11 +34,9 @@ function actualizarCarrito() {
         suma += item.precio * item.cantidad;
     });
 
-    total.textContent = suma.toFixed(2);
+    total.textContent = SIMBOLO_MONEDA + suma.toFixed(2);
     actualizarBotonPedido();
 }
-
-// ... (rest of the code remains the same)
 
 function actualizarBotonPedido() {
     const botonPedido = document.getElementById('realizar-pedido');
@@ -74,10 +74,10 @@ function enviarPedidoPorWhatsApp() {
 
     let mensaje = "Hola, me gustaría hacer el siguiente pedido:\n\n";
     carrito.forEach(item => {
-        mensaje += `${item.nombre} x ${item.cantidad} - $${(item.precio * item.cantidad).toFixed(2)}\n`;
+        mensaje += `${item.nombre} x ${item.cantidad} - ${SIMBOLO_MONEDA}${(item.precio * item.cantidad).toFixed(2)}\n`;
     });
     const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
-    mensaje += `\nTotal: $${total.toFixed(2)}`;
+    mensaje += `\nTotal: ${SIMBOLO_MONEDA}${total.toFixed(2)}`;
     
     const numeroWhatsApp = "51955486170";
     const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
