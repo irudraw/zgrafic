@@ -185,6 +185,36 @@ button:hover {
     }
 }
 
+/* Estilos para el buscador */
+#buscador {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+#buscar-producto {
+    flex-grow: 1;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+}
+
+#btn-buscar {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+#btn-buscar:hover {
+    background-color: #45a049;
+}
+
+/* El resto de los estilos permanecen igual */
+
 /* Estilos para la página del carrito */
 .btn-volver {
     background-color: #4CAF50;
