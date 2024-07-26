@@ -1,3 +1,5 @@
+const SIMBOLO_MONEDA = '$'; // Cambie esto para modificar el símbolo en toda la aplicación
+
 let productos = [];
 let productosFiltrados = [];
 let carrito = [];
@@ -26,7 +28,7 @@ function mostrarProductos() {
         divProducto.innerHTML = `
             <img src="${producto.imagen}" alt="${producto.nombre}">
             <h3>${producto.nombre}</h3>
-            <p class="precio">$${producto.precio}</p>
+            <p class="precio">${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}</p>
             <p class="descripcion">${producto.descripcion}</p>
             <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
         `;
@@ -100,14 +102,14 @@ function actualizarCarrito() {
         const li = document.createElement('li');
         li.innerHTML = `
             <img src="${item.imagen}" alt="${item.nombre}">
-            <span>${item.nombre} - $${item.precio} x ${item.cantidad}</span>
+            <span>${item.nombre} - ${SIMBOLO_MONEDA}${item.precio.toFixed(2)} x ${item.cantidad}</span>
             <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
         `;
         listaCarrito.appendChild(li);
         suma += item.precio * item.cantidad;
     });
 
-    total.textContent = suma.toFixed(2);
+    total.textContent = SIMBOLO_MONEDA + suma.toFixed(2);
 }
 
 function actualizarContadorCarrito() {
