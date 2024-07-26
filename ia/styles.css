@@ -418,3 +418,13 @@ button:hover {
     font-weight: bold;
     margin: 0 0.5rem;
 }
+
+.mensaje-confirmacion {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
