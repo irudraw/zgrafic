@@ -55,5 +55,35 @@
         "precio": 25,
         "imagen": "https://via.placeholder.com/150?text=Producto+4",
         "descripcion": "El Producto 4 es innovador y eficiente, diseñado para satisfacer tus expectativas."
+    },
+        {
+        "id": 9,
+        "nombre": "Producto 9",
+        "precio": 10,
+        "imagen": "https://via.placeholder.com/150?text=Producto+1",
+        "descripcion": "Este es el Producto 1, una excelente opción para tus necesidades diarias."
+    },
+    {
+        "id": 10,
+        "nombre": "Producto 10",
+        "precio": 15,
+        "imagen": "https://via.placeholder.com/150?text=Producto+2",
+        "descripcion": "El Producto 2 es versátil y duradero, perfecto para múltiples usos."
+    },
+    {
+        "id": 11,
+        "nombre": "Producto 11",
+        "precio": 20,
+        "imagen": "https://via.placeholder.com/150?text=Producto+3",
+        "descripcion": "Nuestro Producto 3 es de alta calidad y ofrece un rendimiento superior."
+    },
+    {
+        "id": 12,
+        "nombre": "Producto 12",
+        "precio": 25,
+        "imagen": "https://via.placeholder.com/150?text=Producto+4",
+        "descripcion": "El Producto 4 es innovador y eficiente, diseñado para satisfacer tus expectativas."
     }
+
+    
 ]
