@@ -1,4 +1,4 @@
-const SIMBOLO_MONEDA = '$'; // Asegúrese de que este valor sea el mismo que en script.js
+const SIMBOLO_MONEDA = 'S/.'; // Asegúrese de que este valor sea el mismo que en script.js
 
 let carrito = [];
 
