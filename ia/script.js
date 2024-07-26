@@ -1,16 +1,24 @@
 let productos = [];
 let carrito = [];
+let paginaActual = 1;
+const productosPorPagina = 8;
 
 async function cargarProductos() {
     const respuesta = await fetch('productos.json');
     productos = await respuesta.json();
+    actualizarPaginacion();
     mostrarProductos();
 }
 
-function mostrarProductos(productosAMostrar = productos) {
+function mostrarProductos() {
     const contenedor = document.getElementById('productos');
     contenedor.innerHTML = '';
-    productosAMostrar.forEach(producto => {
+    
+    const inicio = (paginaActual - 1) * productosPorPagina;
+    const fin = inicio + productosPorPagina;
+    const productosPagina = productos.slice(inicio, fin);
+    
+    productosPagina.forEach(producto => {
         const divProducto = document.createElement('div');
         divProducto.className = 'producto';
         divProducto.innerHTML = `
@@ -22,6 +30,26 @@ function mostrarProductos(productosAMostrar = productos) {
         `;
         contenedor.appendChild(divProducto);
     });
+}
+
+function actualizarPaginacion() {
+    const totalPaginas = Math.ceil(productos.length / productosPorPagina);
+    document.getElementById('pagina-actual').textContent = paginaActual;
+    document.getElementById('total-paginas').textContent = totalPaginas;
+    
+    document.getElementById('anterior').disabled = paginaActual === 1;
+    document.getElementById('siguiente').disabled = paginaActual === totalPaginas;
+}
+
+function cambiarPagina(direccion) {
+    const totalPaginas = Math.ceil(productos.length / productosPorPagina);
+    if (direccion === 'anterior' && paginaActual > 1) {
+        paginaActual--;
+    } else if (direccion === 'siguiente' && paginaActual < totalPaginas) {
+        paginaActual++;
+    }
+    actualizarPaginacion();
+    mostrarProductos();
 }
 
 function agregarAlCarrito(id) {
@@ -103,10 +131,23 @@ function buscarProductos() {
         producto.nombre.toLowerCase().includes(textoBusqueda) ||
         producto.descripcion.toLowerCase().includes(textoBusqueda)
     );
-    mostrarProductos(productosFiltrados);
+    paginaActual = 1;
+    productos = productosFiltrados;
+    actualizarPaginacion();
+    mostrarProductos();
 }
 
-// Eventos para mostrar/ocultar el carrito flotante
+// Eventos
+document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
+document.getElementById('buscar-producto').addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+        buscarProductos();
+    }
+});
+
+document.getElementById('anterior').addEventListener('click', () => cambiarPagina('anterior'));
+document.getElementById('siguiente').addEventListener('click', () => cambiarPagina('siguiente'));
+
 const carritoFlotante = document.getElementById('carrito-flotante');
 const carritoContador = document.getElementById('carrito-contador');
 
@@ -119,14 +160,6 @@ carritoFlotante.addEventListener('mouseleave', () => {
 });
 
 document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
-
-// Agregar event listeners para la búsqueda
-document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
-document.getElementById('buscar-producto').addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
-        buscarProductos();
-    }
-});
 
 cargarProductos();
 cargarCarritoDesdeLocalStorage();
