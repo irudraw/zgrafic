@@ -17,22 +17,28 @@ function actualizarCarrito() {
     listaCarrito.innerHTML = '';
     let suma = 0;
 
-    carrito.forEach(item => {
+    if (carrito.length === 0) {
         const li = document.createElement('li');
-        li.innerHTML = `
-            <div class="producto-info">
-                <img src="${item.imagen}" alt="${item.nombre}" class="producto-miniatura">
-                <span>${item.nombre}</span>
-            </div>
-            <span>${SIMBOLO_MONEDA}${item.precio.toFixed(2)}</span>
-            <span>${item.cantidad}</span>
-            <span>
-                <button onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
-            </span>
-        `;
+        li.textContent = 'El carrito está vacío';
         listaCarrito.appendChild(li);
-        suma += item.precio * item.cantidad;
-    });
+    } else {
+        carrito.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="producto-info">
+                    <img src="${item.imagen}" alt="${item.nombre}" class="producto-miniatura">
+                    <span>${item.nombre}</span>
+                </div>
+                <span>${SIMBOLO_MONEDA}${item.precio.toFixed(2)}</span>
+                <span>${item.cantidad}</span>
+                <span>
+                    <button onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
+                </span>
+            `;
+            listaCarrito.appendChild(li);
+            suma += item.precio * item.cantidad;
+        });
+    }
 
     total.textContent = SIMBOLO_MONEDA + suma.toFixed(2);
     actualizarBotonPedido();
