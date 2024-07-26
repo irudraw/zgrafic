@@ -81,7 +81,17 @@ function enviarPedidoPorWhatsApp() {
     
     const numeroWhatsApp = "51955486170";
     const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+    
+    // Abrir WhatsApp en una nueva ventana
     window.open(url, '_blank');
+    
+    // Limpiar el carrito
+    carrito = [];
+    actualizarCarrito();
+    guardarCarritoEnLocalStorage();
+    
+    // Mostrar un mensaje de confirmación
+    alert('¡Pedido enviado! El carrito ha sido limpiado.');
 }
 
 document.getElementById('realizar-pedido').addEventListener('click', enviarPedidoPorWhatsApp);
