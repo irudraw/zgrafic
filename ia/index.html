@@ -10,6 +10,12 @@
 <body>
     <header>
         <h1>Tienda en línea</h1>
+        
+        <div id="buscador">
+            <input type="text" id="buscar-producto" placeholder="Buscar productos...">
+            <button id="btn-buscar"><i class="fas fa-search"></i></button>
+        </div>
+
         <div id="carrito-contador">
             <i class="fas fa-shopping-cart"></i>
             <span id="contador">0</span>
@@ -24,7 +30,9 @@
     </div>
 
     <main>
-        <section id="productos"></section>
+        <section id="productos" class="section">
+            <!-- Los productos se cargarán aquí dinámicamente -->
+        </section>
     </main>
 
     <script src="script.js"></script>
