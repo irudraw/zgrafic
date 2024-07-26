@@ -1,4 +1,4 @@
-const SIMBOLO_MONEDA = 'S/.'; // Asegúrese de que este valor sea el mismo que en script.js
+const SIMBOLO_MONEDA = '$'; // Asegúrese de que este valor sea el mismo que en script.js
 
 let carrito = [];
 
@@ -74,7 +74,7 @@ function guardarCarritoEnLocalStorage() {
 
 function enviarPedidoPorWhatsApp() {
     if (carrito.length === 0) {
-        alert('No hay productos en el carrito');
+        mostrarMensaje('No hay productos en el carrito', 'error');
         return;
     }
 
@@ -97,7 +97,17 @@ function enviarPedidoPorWhatsApp() {
     guardarCarritoEnLocalStorage();
     
     // Mostrar un mensaje de confirmación
-    alert('¡Pedido enviado! El carrito ha sido limpiado.');
+    mostrarMensaje('¡Pedido enviado! El carrito ha sido limpiado.', 'exito');
+}
+
+function mostrarMensaje(texto, tipo) {
+    const mensajeElement = document.getElementById('mensaje-confirmacion');
+    mensajeElement.textContent = texto;
+    mensajeElement.style.display = 'block';
+    mensajeElement.style.backgroundColor = tipo === 'exito' ? '#4CAF50' : '#f44336';
+    
+    // Hacer scroll hacia arriba para asegurar que el mensaje sea visible
+    window.scrollTo(0, 0);
 }
 
 document.getElementById('realizar-pedido').addEventListener('click', enviarPedidoPorWhatsApp);
