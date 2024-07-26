@@ -39,8 +39,14 @@ function actualizarPaginacion() {
     document.getElementById('pagina-actual').textContent = paginaActual;
     document.getElementById('total-paginas').textContent = totalPaginas;
     
-    document.getElementById('anterior').disabled = paginaActual === 1;
-    document.getElementById('siguiente').disabled = paginaActual === totalPaginas;
+    const btnAnterior = document.getElementById('anterior');
+    const btnSiguiente = document.getElementById('siguiente');
+    
+    btnAnterior.disabled = paginaActual === 1;
+    btnSiguiente.disabled = paginaActual === totalPaginas;
+    
+    btnAnterior.style.opacity = paginaActual === 1 ? '0.5' : '1';
+    btnSiguiente.style.opacity = paginaActual === totalPaginas ? '0.5' : '1';
 }
 
 function cambiarPagina(direccion) {
