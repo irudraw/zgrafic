@@ -1,4 +1,5 @@
 let productos = [];
+let productosFiltrados = [];
 let carrito = [];
 let paginaActual = 1;
 const productosPorPagina = 8;
@@ -6,6 +7,7 @@ const productosPorPagina = 8;
 async function cargarProductos() {
     const respuesta = await fetch('productos.json');
     productos = await respuesta.json();
+    productosFiltrados = [...productos];
     actualizarPaginacion();
     mostrarProductos();
 }
@@ -16,7 +18,7 @@ function mostrarProductos() {
     
     const inicio = (paginaActual - 1) * productosPorPagina;
     const fin = inicio + productosPorPagina;
-    const productosPagina = productos.slice(inicio, fin);
+    const productosPagina = productosFiltrados.slice(inicio, fin);
     
     productosPagina.forEach(producto => {
         const divProducto = document.createElement('div');
@@ -33,7 +35,7 @@ function mostrarProductos() {
 }
 
 function actualizarPaginacion() {
-    const totalPaginas = Math.ceil(productos.length / productosPorPagina);
+    const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina);
     document.getElementById('pagina-actual').textContent = paginaActual;
     document.getElementById('total-paginas').textContent = totalPaginas;
     
@@ -42,7 +44,7 @@ function actualizarPaginacion() {
 }
 
 function cambiarPagina(direccion) {
-    const totalPaginas = Math.ceil(productos.length / productosPorPagina);
+    const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina);
     if (direccion === 'anterior' && paginaActual > 1) {
         paginaActual--;
     } else if (direccion === 'siguiente' && paginaActual < totalPaginas) {
@@ -127,12 +129,15 @@ function irACarrito() {
 
 function buscarProductos() {
     const textoBusqueda = document.getElementById('buscar-producto').value.toLowerCase();
-    const productosFiltrados = productos.filter(producto => 
-        producto.nombre.toLowerCase().includes(textoBusqueda) ||
-        producto.descripcion.toLowerCase().includes(textoBusqueda)
-    );
+    if (textoBusqueda.trim() === '') {
+        productosFiltrados = [...productos];
+    } else {
+        productosFiltrados = productos.filter(producto => 
+            producto.nombre.toLowerCase().includes(textoBusqueda) ||
+            producto.descripcion.toLowerCase().includes(textoBusqueda)
+        );
+    }
     paginaActual = 1;
-    productos = productosFiltrados;
     actualizarPaginacion();
     mostrarProductos();
 }
