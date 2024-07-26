@@ -382,3 +382,39 @@ button:hover {
 #pagina-actual, #total-paginas {
     font-weight: bold;
 }
+
+#paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.btn-pagina {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 1rem;
+}
+
+.btn-pagina:hover {
+    background-color: #45a049;
+}
+
+.btn-pagina:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#pagina-actual, #total-paginas {
+    font-weight: bold;
+    margin: 0 0.5rem;
+}
