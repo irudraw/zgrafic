@@ -6,6 +6,8 @@ let carrito = [];
 let paginaActual = 1;
 const productosPorPagina = 8;
 let isScrolling = false;
+let scrollAccumulator = 0;
+const scrollThreshold = 200;
 
 async function cargarProductos() {
     const respuesta = await fetch('productos.json');
@@ -204,15 +206,37 @@ window.addEventListener('wheel', (event) => {
     const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
     const isAtTop = window.scrollY === 0;
 
-    if (scrollDirection === 'down' && isAtBottom) {
-        isScrolling = true;
-        cambiarPagina('siguiente');
-        setTimeout(() => { isScrolling = false; }, 1000);
-    } else if (scrollDirection === 'up' && isAtTop) {
-        isScrolling = true;
-        cambiarPagina('anterior');
-        setTimeout(() => { isScrolling = false; }, 1000);
+    // Acumular el desplazamiento
+    scrollAccumulator += Math.abs(event.deltaY);
+
+    if (scrollAccumulator >= scrollThreshold) {
+        if (scrollDirection === 'down' && isAtBottom) {
+            isScrolling = true;
+            cambiarPagina('siguiente');
+            setTimeout(() => { 
+                isScrolling = false; 
+                scrollAccumulator = 0; // Reiniciar el acumulador
+            }, 1000);
+        } else if (scrollDirection === 'up' && isAtTop) {
+            isScrolling = true;
+            cambiarPagina('anterior');
+            setTimeout(() => { 
+                isScrolling = false; 
+                scrollAccumulator = 0; // Reiniciar el acumulador
+            }, 1000);
+        } else {
+            scrollAccumulator = 0; // Reiniciar si no estamos en el tope o fondo
+        }
     }
+});
+
+// Reiniciar el acumulador cuando el usuario deja de desplazarse
+let scrollTimeout;
+window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        scrollAccumulator = 0;
+    }, 200);
 });
 
 cargarProductos();
