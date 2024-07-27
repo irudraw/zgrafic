@@ -9,7 +9,7 @@ let isScrolling = false;
 let scrollAccumulator = 0;
 const scrollThreshold = 700;
 let lastPageChangeTime = 0;
-const pageChangeDelay = 2000;
+const pageChangeDelay = 1000;
 
 async function cargarProductos() {
     const respuesta = await fetch('productos.json');
