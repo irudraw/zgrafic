@@ -22,7 +22,7 @@ function mostrarProductos() {
     const fin = inicio + productosPorPagina;
     const productosPagina = productosFiltrados.slice(inicio, fin);
     
-    productosPagina.forEach(producto => {
+    productosPagina.forEach((producto, index) => {
         const divProducto = document.createElement('div');
         divProducto.className = 'producto';
         divProducto.innerHTML = `
@@ -33,6 +33,11 @@ function mostrarProductos() {
             <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
         `;
         contenedor.appendChild(divProducto);
+        
+        // Agregar la clase 'aparecer' con un retraso
+        setTimeout(() => {
+            divProducto.classList.add('aparecer');
+        }, index * 100); // 100ms de retraso entre cada producto
     });
 }
 
@@ -59,7 +64,13 @@ function cambiarPagina(direccion) {
         paginaActual++;
     }
     actualizarPaginacion();
-    mostrarProductos();
+    
+    // Eliminar la clase 'aparecer' de todos los productos
+    const productos = document.querySelectorAll('.producto');
+    productos.forEach(producto => producto.classList.remove('aparecer'));
+    
+    // Mostrar los nuevos productos con el efecto
+    setTimeout(mostrarProductos, 50); // Pequeño retraso para asegurar que los productos se han ocultado
 }
 
 function agregarAlCarrito(id) {
@@ -147,7 +158,13 @@ function buscarProductos() {
     }
     paginaActual = 1;
     actualizarPaginacion();
-    mostrarProductos();
+    
+    // Eliminar la clase 'aparecer' de todos los productos
+    const productosActuales = document.querySelectorAll('.producto');
+    productosActuales.forEach(producto => producto.classList.remove('aparecer'));
+    
+    // Mostrar los nuevos productos con el efecto
+    setTimeout(mostrarProductos, 50);
 }
 
 // Eventos
