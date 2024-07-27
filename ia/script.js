@@ -1,10 +1,11 @@
-const SIMBOLO_MONEDA = 'S/.'; // Cambie esto para modificar el símbolo en toda la aplicación
+const SIMBOLO_MONEDA = 'S/.';
 
 let productos = [];
 let productosFiltrados = [];
 let carrito = [];
 let paginaActual = 1;
 const productosPorPagina = 8;
+let isScrolling = false;
 
 async function cargarProductos() {
     const respuesta = await fetch('productos.json');
@@ -34,10 +35,9 @@ function mostrarProductos() {
         `;
         contenedor.appendChild(divProducto);
         
-        // Agregar la clase 'aparecer' con un retraso
         setTimeout(() => {
             divProducto.classList.add('aparecer');
-        }, index * 100); // 100ms de retraso entre cada producto
+        }, index * 100);
     });
 }
 
@@ -62,15 +62,23 @@ function cambiarPagina(direccion) {
         paginaActual--;
     } else if (direccion === 'siguiente' && paginaActual < totalPaginas) {
         paginaActual++;
+    } else {
+        return;
     }
     actualizarPaginacion();
     
-    // Eliminar la clase 'aparecer' de todos los productos
+    const pageTransition = document.querySelector('.page-transition');
+    pageTransition.classList.add('active');
+    
     const productos = document.querySelectorAll('.producto');
     productos.forEach(producto => producto.classList.remove('aparecer'));
     
-    // Mostrar los nuevos productos con el efecto
-    setTimeout(mostrarProductos, 50); // Pequeño retraso para asegurar que los productos se han ocultado
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    setTimeout(() => {
+        mostrarProductos();
+        pageTransition.classList.remove('active');
+    }, 500);
 }
 
 function agregarAlCarrito(id) {
@@ -159,11 +167,9 @@ function buscarProductos() {
     paginaActual = 1;
     actualizarPaginacion();
     
-    // Eliminar la clase 'aparecer' de todos los productos
     const productosActuales = document.querySelectorAll('.producto');
     productosActuales.forEach(producto => producto.classList.remove('aparecer'));
     
-    // Mostrar los nuevos productos con el efecto
     setTimeout(mostrarProductos, 50);
 }
 
@@ -190,6 +196,24 @@ carritoFlotante.addEventListener('mouseleave', () => {
 });
 
 document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
+
+window.addEventListener('wheel', (event) => {
+    if (isScrolling) return;
+
+    const scrollDirection = event.deltaY > 0 ? 'down' : 'up';
+    const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
+    const isAtTop = window.scrollY === 0;
+
+    if (scrollDirection === 'down' && isAtBottom) {
+        isScrolling = true;
+        cambiarPagina('siguiente');
+        setTimeout(() => { isScrolling = false; }, 1000);
+    } else if (scrollDirection === 'up' && isAtTop) {
+        isScrolling = true;
+        cambiarPagina('anterior');
+        setTimeout(() => { isScrolling = false; }, 1000);
+    }
+});
 
 cargarProductos();
 cargarCarritoDesdeLocalStorage();
