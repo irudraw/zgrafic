@@ -7,7 +7,7 @@ let paginaActual = 1;
 const productosPorPagina = 8;
 let isScrolling = false;
 let scrollAccumulator = 0;
-const scrollThreshold = 1000;
+const scrollThreshold = 700;
 let lastPageChangeTime = 0;
 const pageChangeDelay = 2000;
 
