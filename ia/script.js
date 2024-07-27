@@ -7,9 +7,9 @@ let paginaActual = 1;
 const productosPorPagina = 8;
 let isScrolling = false;
 let scrollAccumulator = 0;
-const scrollThreshold = 700;
+const scrollThreshold = 1000; // Esto significa que se necesitará mucho más desplazamiento antes de que se active un cambio de página
 let lastPageChangeTime = 0;
-const pageChangeDelay = 1000;
+const pageChangeDelay = 500; // lastPageChangeTime y pageChangeDelay. Esto asegura que debe pasar al menos (2000) 2 segundos entre cambios de página, sin importar cuánto se desplace el usuario.
 
 async function cargarProductos() {
     const respuesta = await fetch('productos.json');
