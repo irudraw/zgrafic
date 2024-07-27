@@ -56,14 +56,12 @@ header h1 {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 1rem;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     z-index: 1000;
-    max-width: 300px;
+    width: 300px;
     max-height: 400px;
-    overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    display: flex;
+    flex-direction: column;
     transition: all 0.3s ease;
     opacity: 0;
     visibility: hidden;
@@ -86,9 +84,23 @@ header h1 {
     transform: translateY(0);
 }
 
+.carrito-contenido {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.carrito-footer {
+    border-top: 1px solid #ddd;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 0 0 10px 10px;
+}
+
 #lista-carrito-flotante {
     list-style-type: none;
     padding: 0;
+    margin: 0;
 }
 
 #lista-carrito-flotante li {
@@ -106,6 +118,21 @@ header h1 {
     object-fit: cover;
     margin-right: 0.5rem;
     border-radius: 5px;
+}
+
+#ver-carrito-completo {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#ver-carrito-completo:hover {
+    background-color: #45a049;
 }
 
 main {
@@ -361,6 +388,8 @@ button:hover {
     padding: 0.5rem;
     border-bottom: 1px solid #ddd;
 }
+
+
 
 .producto-info {
     display: flex;
