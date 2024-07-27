@@ -509,3 +509,21 @@ button:hover {
 .page-transition.active {
     transform: scaleX(1);
 }
+
+.cantidad-input {
+    width: 50px;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.cantidad-input::-webkit-inner-spin-button, 
+.cantidad-input::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.cantidad-input {
+    -moz-appearance: textfield;
+}
