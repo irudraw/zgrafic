@@ -3,6 +3,8 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+
+    padding-top: 70px; /* Ajuste este valor según la altura de su header */
 }
 
 header {
@@ -12,6 +14,11 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: fixed; /* Añadir esta línea */
+    top: 0; /* Añadir esta línea */
+    left: 0; /* Añadir esta línea */
+    right: 0; /* Añadir esta línea */
+    z-index: 1000; /* Añadir esta línea */
 }
 
 header h1 {
