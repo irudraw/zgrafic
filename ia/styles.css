@@ -59,7 +59,7 @@ header h1 {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     z-index: 1000;
     width: 300px;
-    max-height: 400px;
+    height: 400px;
     display: flex;
     flex-direction: column;
     transition: all 0.3s ease;
@@ -84,10 +84,27 @@ header h1 {
     transform: translateY(0);
 }
 
+.carrito-header {
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    border-radius: 10px 10px 0 0;
+}
+
+.carrito-header h3 {
+    margin: 0;
+}
+
 .carrito-contenido {
     flex-grow: 1;
     overflow-y: auto;
     padding: 1rem;
+    scrollbar-width: none;  /* Para Firefox */
+    -ms-overflow-style: none;  /* Para Internet Explorer y Edge */
+}
+
+.carrito-contenido::-webkit-scrollbar {
+    display: none;  /* Para Chrome, Safari y Opera */
 }
 
 .carrito-footer {
