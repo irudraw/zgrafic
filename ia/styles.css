@@ -428,3 +428,14 @@ button:hover {
     text-align: center;
     font-weight: bold;
 }
+
+.producto {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.producto.aparecer {
+    opacity: 1;
+    transform: translateY(0);
+}
