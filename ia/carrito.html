@@ -20,21 +20,24 @@
     <div id="mensaje-confirmacion" class="mensaje-confirmacion" style="display: none;"></div>
 
 <div role="main">
-    <div class="carrito-encabezado">
-        <span>Producto</span>
-        <span>Precio</span>
-        <span>Cantidad</span>
-        <span>Acciones</span>
+    <div id="carrito-contenido">
+        <div class="carrito-encabezado">
+            <span>Producto</span>
+            <span>Precio</span>
+            <span>Cantidad</span>
+            <span>Acciones</span>
+        </div>
+        <ul id="lista-carrito">
+            <!-- Los items del carrito se insertarán aquí dinámicamente -->
+        </ul>
     </div>
-    <ul id="lista-carrito">
-        <!-- Los items del carrito se insertarán aquí dinámicamente -->
-    </ul>
-    <div class="carrito-total">
-        Total: <span id="total">0</span>
+    <div id="carrito-footer">
+        <div class="carrito-total">
+            Total: <span id="total">0</span>
+        </div>
+        <button id="realizar-pedido" class="btn-realizar-pedido">Realizar Pedido por WhatsApp</button>
     </div>
-    <button id="realizar-pedido" class="btn-realizar-pedido">Realizar Pedido por WhatsApp</button>
 </div>
-
 
     <script src="carrito.js"></script>
 </body>
