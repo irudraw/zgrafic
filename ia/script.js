@@ -7,7 +7,9 @@ let paginaActual = 1;
 const productosPorPagina = 8;
 let isScrolling = false;
 let scrollAccumulator = 0;
-const scrollThreshold = 200;
+const scrollThreshold = 1000;
+let lastPageChangeTime = 0;
+const pageChangeDelay = 2000;
 
 async function cargarProductos() {
     const respuesta = await fetch('productos.json');
@@ -202,6 +204,9 @@ document.getElementById('ver-carrito-completo').addEventListener('click', irACar
 window.addEventListener('wheel', (event) => {
     if (isScrolling) return;
 
+    const currentTime = new Date().getTime();
+    if (currentTime - lastPageChangeTime < pageChangeDelay) return;
+
     const scrollDirection = event.deltaY > 0 ? 'down' : 'up';
     const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
     const isAtTop = window.scrollY === 0;
@@ -213,6 +218,7 @@ window.addEventListener('wheel', (event) => {
         if (scrollDirection === 'down' && isAtBottom) {
             isScrolling = true;
             cambiarPagina('siguiente');
+            lastPageChangeTime = currentTime;
             setTimeout(() => { 
                 isScrolling = false; 
                 scrollAccumulator = 0; // Reiniciar el acumulador
@@ -220,6 +226,7 @@ window.addEventListener('wheel', (event) => {
         } else if (scrollDirection === 'up' && isAtTop) {
             isScrolling = true;
             cambiarPagina('anterior');
+            lastPageChangeTime = currentTime;
             setTimeout(() => { 
                 isScrolling = false; 
                 scrollAccumulator = 0; // Reiniciar el acumulador
@@ -236,7 +243,7 @@ window.addEventListener('scroll', () => {
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(() => {
         scrollAccumulator = 0;
-    }, 200);
+    }, 500);
 });
 
 cargarProductos();
