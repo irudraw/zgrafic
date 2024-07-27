@@ -30,7 +30,7 @@ function actualizarCarrito() {
                     <span>${item.nombre}</span>
                 </div>
                 <span>${SIMBOLO_MONEDA}${item.precio.toFixed(2)}</span>
-                <span>${item.cantidad}</span>
+                <input type="number" value="${item.cantidad}" min="1" class="cantidad-input" data-id="${item.id}">
                 <span>
                     <button onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
                 </span>
@@ -42,6 +42,28 @@ function actualizarCarrito() {
 
     total.textContent = SIMBOLO_MONEDA + suma.toFixed(2);
     actualizarBotonPedido();
+
+    // Agregar event listeners a los campos de entrada de cantidad
+    document.querySelectorAll('.cantidad-input').forEach(input => {
+        input.addEventListener('change', actualizarCantidad);
+    });
+}
+
+function actualizarCantidad(event) {
+    const id = parseInt(event.target.dataset.id);
+    const nuevaCantidad = parseInt(event.target.value);
+
+    if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
+        event.target.value = 1;
+        return;
+    }
+
+    const item = carrito.find(item => item.id === id);
+    if (item) {
+        item.cantidad = nuevaCantidad;
+        actualizarCarrito();
+        guardarCarritoEnLocalStorage();
+    }
 }
 
 function actualizarBotonPedido() {
