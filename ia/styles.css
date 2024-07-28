@@ -381,6 +381,19 @@ button:hover {
     border-bottom: 1px solid #ddd;
 }
 
+.carrito-encabezado, #lista-carrito li {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.carrito-encabezado {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
 .producto-info {
     display: flex;
     align-items: center;
@@ -394,13 +407,45 @@ button:hover {
     border-radius: 5px;
 }
 
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .cantidad-input {
-    width: 50px;
+    width: 40px;
     padding: 5px;
     text-align: center;
     border: 1px solid #ddd;
     border-radius: 5px;
+    margin: 0 5px;
 }
+
+.btn-cantidad {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.btn-eliminar {
+    background-color: transparent;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
+}
+
+.btn-eliminar:hover {
+    color: #d32f2f;
+}
+
+.precio-item {
+    text-align: right;
+    padding-right: 10px;
+}
+
 
 .cantidad-input::-webkit-inner-spin-button, 
 .cantidad-input::-webkit-outer-spin-button { 
