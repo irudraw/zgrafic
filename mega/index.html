@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor de Videos Mega.nz</title>
+    <style>
+        #videoPlayer {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="videoPlayer">
+        <video id="myVideo" controls>
+            Su navegador no soporta el elemento de video.
+        </video>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.0.0/dist/fetch.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/secureboot@2/secureboot.js"></script>
+    <script src="player.js"></script>
+</body>
+</html>
