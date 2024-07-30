@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadMegaScript() {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = 'https://eu.static.mega.co.nz/3/|mega.min.js';
+           // script.src = 'https://eu.static.mega.co.nz/3/|mega.min.js';
+            script.src = 'mega.js';
             script.onload = resolve;
             script.onerror = reject;
             document.body.appendChild(script);
