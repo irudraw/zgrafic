@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VectorizeIt - Avanzado</title>
+    <style>
+        /* Estilos básicos */
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        #dropzone { border: 2px dashed #ccc; padding: 20px; text-align: center; }
+        .progress-bar { width: 100%; background-color: #f0f0f0; }
+        .progress { height: 20px; background-color: #4CAF50; width: 0%; }
+        .image-container { display: inline-block; width: 45%; margin: 10px; }
+        .image-label { text-align: center; margin-top: 5px; }
+        #controls { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VectorizeIt - Avanzado</h1>
+
+        <div id="upload-container">
+            <div id="dropzone">
+                Arrastra y suelta una imagen aquí, o haz clic para seleccionar un archivo
+            </div>
+            <input type="file" id="fileInput" style="display: none;">
+            <div class="progress-bar">
+                <div id="uploadProgress" class="progress"></div>
+            </div>
+        </div>
+
+        <div id="loadingMessage" style="display: none;">
+            <p>Vectorizando imagen, por favor espera...</p>
+            <div class="progress-bar">
+                <div id="vectorizeProgress" class="progress"></div>
+            </div>
+        </div>
+
+        <div id="preview" style="display: none;">
+            <div class="image-container">
+                <img id="originalImage" alt="Imagen Original">
+                <div class="image-label">Imagen Original</div>
+            </div>
+
+            <div class="image-container">
+                <svg id="vectorImage"></svg>
+                <div class="image-label">Imagen Vectorizada</div>
+            </div>
+        </div>
+
+        <div id="controls" style="display: none;">
+            <label for="colorTolerance">Tolerancia de color:</label>
+            <input type="range" id="colorTolerance" min="0" max="100" value="50">
+            
+            <label for="detailLevel">Nivel de detalle:</label>
+            <select id="detailLevel">
+                <option value="low">Bajo</option>
+                <option value="medium" selected>Medio</option>
+                <option value="high">Alto</option>
+            </select>
+
+            <button id="reprocessButton">Reprocesar</button>
+            <button id="downloadSvg">Descargar SVG</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/potrace/1.16.0/potrace.min.js"></script>
+    <script>
+        // Variables globales
+        let originalImageData;
+        let worker;
+
+        // Elementos del DOM
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const vectorizeProgress = document.getElementById('vectorizeProgress');
+        const preview = document.getElementById('preview');
+        const originalImage = document.getElementById('originalImage');
+        const vectorImage = document.getElementById('vectorImage');
+        const controls = document.getElementById('controls');
+        const colorTolerance = document.getElementById('colorTolerance');
+        const detailLevel = document.getElementById('detailLevel');
+        const reprocessButton = document.getElementById('reprocessButton');
+        const downloadSvg = document.getElementById('downloadSvg');
+
+        // Event Listeners
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => e.preventDefault());
+        dropzone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        reprocessButton.addEventListener('click', reprocessImage);
+        downloadSvg.addEventListener('click', downloadSvgFile);
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            processFile(file);
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            processFile(file);
+        }
+
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                originalImage.src = event.target.result;
+                originalImageData = event.target.result;
+                vectorizeImage();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function vectorizeImage() {
+            loadingMessage.style.display = 'block';
+            preview.style.display = 'none';
+            controls.style.display = 'none';
+
+            if (worker) {
+                worker.terminate();
+            }
+
+            worker = new Worker('vectorize-worker.js');
+
+            worker.onmessage = function(e) {
+                if (e.data.progress) {
+                    vectorizeProgress.style.width = e.data.progress + '%';
+                } else if (e.data.svg) {
+                    vectorImage.innerHTML = e.data.svg;
+                    loadingMessage.style.display = 'none';
+                    preview.style.display = 'block';
+                    controls.style.display = 'block';
+                }
+            };
+
+            worker.postMessage({
+                image: originalImageData,
+                colorTolerance: colorTolerance.value,
+                detailLevel: detailLevel.value
+            });
+        }
+
+        function reprocessImage() {
+            vectorizeImage();
+        }
+
+        function downloadSvgFile() {
+            const svgData = new XMLSerializer().serializeToString(vectorImage);
+            const svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+            const svgUrl = URL.createObjectURL(svgBlob);
+            const downloadLink = document.createElement("a");
+            downloadLink.href = svgUrl;
+            downloadLink.download = "vectorized_image.svg";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    </script>
+</body>
+</html>
