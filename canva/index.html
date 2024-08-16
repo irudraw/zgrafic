@@ -3,21 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VectorizeIt - Depuración</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        #dropzone { border: 2px dashed #ccc; padding: 20px; text-align: center; }
-        #preview { margin-top: 20px; display: flex; justify-content: space-between; }
-        .image-container { width: 45%; }
-        .image-label { text-align: center; margin-top: 5px; }
-        #log { margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; }
-        #vectorImage { border: 1px solid #000; } /* Añadido para hacer visible el SVG */
-    </style>
+    <title>VectorizeIt</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>VectorizeIt - Depuración</h1>
+        <h1>VectorizeIt</h1>
 
         <div id="upload-container">
             <div id="dropzone">
@@ -40,92 +31,6 @@
         <div id="log"></div>
     </div>
 
-    <script>
-        const dropzone = document.getElementById('dropzone');
-        const fileInput = document.getElementById('fileInput');
-        const preview = document.getElementById('preview');
-        const originalImage = document.getElementById('originalImage');
-        const vectorImage = document.getElementById('vectorImage');
-        const logDiv = document.getElementById('log');
-
-        function log(message) {
-            console.log(message);
-            logDiv.innerHTML += message + '<br>';
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }
-
-        dropzone.addEventListener('click', () => fileInput.click());
-        dropzone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
-        dropzone.addEventListener('drop', handleDrop);
-        fileInput.addEventListener('change', handleFileSelect);
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            log('Archivo soltado');
-            const file = e.dataTransfer.files[0];
-            processFile(file);
-        }
-
-        function handleFileSelect(e) {
-            log('Archivo seleccionado');
-            const file = e.target.files[0];
-            processFile(file);
-        }
-
-        function processFile(file) {
-            if (!file) {
-                log('No se seleccionó ningún archivo');
-                return;
-            }
-            log(`Procesando archivo: ${file.name}`);
-            
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                log('Archivo leído correctamente');
-                originalImage.src = event.target.result;
-                originalImage.onload = () => {
-                    preview.style.display = 'flex';
-                    log('Imagen mostrada en preview');
-                    vectorizeImage();
-                };
-            };
-            reader.onerror = (error) => {
-                log(`Error al leer el archivo: ${error}`);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function vectorizeImage() {
-            log('Iniciando vectorización');
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = originalImage.width;
-            canvas.height = originalImage.height;
-            ctx.drawImage(originalImage, 0, 0);
-
-            log(`Dimensiones de la imagen: ${canvas.width}x${canvas.height}`);
-
-            // Simplificamos la vectorización para depuración
-            vectorImage.setAttribute('width', canvas.width);
-            vectorImage.setAttribute('height', canvas.height);
-            vectorImage.setAttribute('viewBox', `0 0 ${canvas.width} ${canvas.height}`);
-            
-            // Dibujamos un simple rectángulo y una línea diagonal
-            const svgContent = `
-                <rect x="0" y="0" width="${canvas.width}" height="${canvas.height}" 
-                      fill="none" stroke="black" stroke-width="2"/>
-                <line x1="0" y1="0" x2="${canvas.width}" y2="${canvas.height}" 
-                      stroke="red" stroke-width="2"/>
-            `;
-            vectorImage.innerHTML = svgContent;
-
-            log('Vectorización simplificada completada');
-            log(`Contenido SVG: ${svgContent}`);
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
