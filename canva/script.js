@@ -56,8 +56,6 @@ function processFile(file) {
     reader.readAsDataURL(file);
 }
 
-// ... (mantén el código anterior hasta la función vectorizeImage)
-
 function vectorizeImage() {
     log('Iniciando vectorización');
     const canvas = document.createElement('canvas');
@@ -69,19 +67,17 @@ function vectorizeImage() {
     log(`Dimensiones de la imagen: ${canvas.width}x${canvas.height}`);
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const { edges, colors } = processImageData(imageData);
+    const { edges, colors, areas } = processImageData(imageData);
 
     vectorImage.setAttribute('width', canvas.width);
     vectorImage.setAttribute('height', canvas.height);
     vectorImage.setAttribute('viewBox', `0 0 ${canvas.width} ${canvas.height}`);
     
-    const svgContent = generateSVG(edges, colors, canvas.width, canvas.height);
+    const svgContent = generateSVG(edges, colors, areas, canvas.width, canvas.height);
     vectorImage.innerHTML = svgContent;
 
     log('Vectorización completada');
 }
-
-// ... (mantén las funciones anteriores hasta processImageData)
 
 function processImageData(imageData) {
     const edges = detectEdges(imageData);
@@ -203,6 +199,33 @@ function generateSVG(edges, colors, areas, width, height) {
     `;
 }
 
+function tracePath(startX, startY, edges, visited, width, height) {
+    let path = `M${startX},${startY}`;
+    let x = startX, y = startY;
+    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+    while (true) {
+        visited[y * width + x] = 1;
+        let found = false;
+
+        for (const [dx, dy] of directions) {
+            const nx = x + dx, ny = y + dy;
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height &&
+                edges[ny * width + nx] && !visited[ny * width + nx]) {
+                path += `L${nx},${ny}`;
+                x = nx;
+                y = ny;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) break;
+    }
+
+    return `<path d="${path}" fill="none" stroke="black" />`;
+}
+
 function traceArea(areas, targetArea, width, height) {
     let path = '';
     let startX = -1, startY = -1;
@@ -242,33 +265,4 @@ function traceArea(areas, targetArea, width, height) {
     } while (x !== startX || y !== startY);
 
     return path + 'Z';
-}
-
-// ... (mantén las otras funciones sin cambios)
-
-function tracePath(startX, startY, edges, visited, width, height) {
-    let path = `M${startX},${startY}`;
-    let x = startX, y = startY;
-    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-
-    while (true) {
-        visited[y * width + x] = 1;
-        let found = false;
-
-        for (const [dx, dy] of directions) {
-            const nx = x + dx, ny = y + dy;
-            if (nx >= 0 && nx < width && ny >= 0 && ny < height &&
-                edges[ny * width + nx] && !visited[ny * width + nx]) {
-                path += `L${nx},${ny}`;
-                x = nx;
-                y = ny;
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) break;
-    }
-
-    return `<path d="${path}" fill="none" stroke="black" />`;
 }
