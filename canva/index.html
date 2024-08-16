@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VectorizeIt - Vectorización Básica</title>
+    <title>VectorizeIt - Depuración</title>
     <style>
         body { font-family: Arial, sans-serif; }
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
@@ -11,12 +11,13 @@
         #preview { margin-top: 20px; display: flex; justify-content: space-between; }
         .image-container { width: 45%; }
         .image-label { text-align: center; margin-top: 5px; }
-        #log { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
+        #log { margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; }
+        #vectorImage { border: 1px solid #000; } /* Añadido para hacer visible el SVG */
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>VectorizeIt - Vectorización Básica</h1>
+        <h1>VectorizeIt - Depuración</h1>
 
         <div id="upload-container">
             <div id="dropzone">
@@ -50,6 +51,7 @@
         function log(message) {
             console.log(message);
             logDiv.innerHTML += message + '<br>';
+            logDiv.scrollTop = logDiv.scrollHeight;
         }
 
         dropzone.addEventListener('click', () => fileInput.click());
@@ -105,79 +107,24 @@
             canvas.height = originalImage.height;
             ctx.drawImage(originalImage, 0, 0);
 
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const edges = detectEdges(imageData);
-            const paths = tracePaths(edges);
+            log(`Dimensiones de la imagen: ${canvas.width}x${canvas.height}`);
 
+            // Simplificamos la vectorización para depuración
             vectorImage.setAttribute('width', canvas.width);
             vectorImage.setAttribute('height', canvas.height);
             vectorImage.setAttribute('viewBox', `0 0 ${canvas.width} ${canvas.height}`);
-            vectorImage.innerHTML = paths.map(path => `<path d="${path}" fill="none" stroke="black" />`).join('');
+            
+            // Dibujamos un simple rectángulo y una línea diagonal
+            const svgContent = `
+                <rect x="0" y="0" width="${canvas.width}" height="${canvas.height}" 
+                      fill="none" stroke="black" stroke-width="2"/>
+                <line x1="0" y1="0" x2="${canvas.width}" y2="${canvas.height}" 
+                      stroke="red" stroke-width="2"/>
+            `;
+            vectorImage.innerHTML = svgContent;
 
-            log('Vectorización completada');
-        }
-
-        function detectEdges(imageData) {
-            const edges = new Uint8Array(imageData.width * imageData.height);
-            const threshold = 30;
-
-            for (let y = 1; y < imageData.height - 1; y++) {
-                for (let x = 1; x < imageData.width - 1; x++) {
-                    const idx = (y * imageData.width + x) * 4;
-                    const neighbors = [
-                        imageData.data[idx - 4], imageData.data[idx + 4],
-                        imageData.data[idx - imageData.width * 4], imageData.data[idx + imageData.width * 4]
-                    ];
-                    const diff = Math.max(...neighbors.map(n => Math.abs(n - imageData.data[idx])));
-                    edges[y * imageData.width + x] = diff > threshold ? 255 : 0;
-                }
-            }
-
-            return edges;
-        }
-
-        function tracePaths(edges) {
-            const paths = [];
-            const width = Math.sqrt(edges.length);
-            const visited = new Uint8Array(edges.length);
-
-            for (let y = 0; y < width; y++) {
-                for (let x = 0; x < width; x++) {
-                    if (edges[y * width + x] && !visited[y * width + x]) {
-                        paths.push(tracePath(x, y, edges, visited, width));
-                    }
-                }
-            }
-
-            return paths;
-        }
-
-        function tracePath(startX, startY, edges, visited, width) {
-            let path = `M${startX},${startY}`;
-            let x = startX, y = startY;
-
-            const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-
-            while (true) {
-                visited[y * width + x] = 1;
-                let found = false;
-
-                for (const [dx, dy] of directions) {
-                    const nx = x + dx, ny = y + dy;
-                    if (nx >= 0 && nx < width && ny >= 0 && ny < width &&
-                        edges[ny * width + nx] && !visited[ny * width + nx]) {
-                        path += `L${nx},${ny}`;
-                        x = nx;
-                        y = ny;
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) break;
-            }
-
-            return path;
+            log('Vectorización simplificada completada');
+            log(`Contenido SVG: ${svgContent}`);
         }
     </script>
 </body>
