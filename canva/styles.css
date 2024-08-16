@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#dropzone {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+}
+
+#preview {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.image-container {
+    width: 45%;
+}
+
+.image-label {
+    text-align: center;
+    margin-top: 5px;
+}
+
+#log {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    height: 200px;
+    overflow-y: auto;
+}
+
+#vectorImage {
+    border: 1px solid #000;
+}
