@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+.container {
+    text-align: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 90%;
+    width: 500px;
+}
+#qrOutput {
+    margin-top: 20px;
+}
+button, input[type="file"] {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#textInput {
+    margin-top: 10px;
+    padding: 10px;
+    width: calc(100% - 22px);
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+    min-height: 60px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+#dropZone {
+    border: 2px dashed #ccc;
+    border-radius: 20px;
+    width: calc(100% - 44px);
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+    color: #777;
+    cursor: pointer;
+    position: relative;
+}
+#dropZone.dragover {
+    background-color: #e1e1e1;
+    border-color: #999;
+}
+#fileInput {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
