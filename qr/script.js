@@ -1,12 +1,9 @@
-// Añade esto al principio del archivo script.js
 function autoResizeTextarea() {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
 }
 
 document.getElementById('textInput').addEventListener('input', autoResizeTextarea);
-
-// ... (resto del código sin cambios)
 
 function readQRCode(file) {
     return new Promise((resolve, reject) => {
@@ -46,7 +43,7 @@ function generateStylizedQR(text, size = 256) {
     
     function addCornerElement(x, y) {
         const cornerSize = cellSize * 7;
-        const borderRadius = cellSize; // Ajusta este valor para cambiar el redondeo de las esquinas
+        const borderRadius = cellSize;
 
         svg += `<rect x="${x}" y="${y}" width="${cornerSize}" height="${cornerSize}" fill="black" rx="${borderRadius}" ry="${borderRadius}"/>`;
         svg += `<rect x="${x + cellSize}" y="${y + cellSize}" width="${cornerSize - 2*cellSize}" height="${cornerSize - 2*cellSize}" fill="white" rx="${borderRadius * 1}" ry="${borderRadius * 1}"/>`;
@@ -76,13 +73,70 @@ function generateStylizedQR(text, size = 256) {
     return svg;
 }
 
+function saveHistory(text) {
+    let history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+    if (!history.some(item => item.text === text)) {
+        const qrSvg = generateStylizedQR(text, 64);  // Generar miniatura
+        history.unshift({ text, date: new Date().toLocaleString(), qrSvg });
+        localStorage.setItem('qrHistory', JSON.stringify(history));
+    }
+    updateHistoryDisplay();
+}
+
+function updateHistoryDisplay() {
+    const historyList = document.getElementById('historyList');
+    const history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+    
+    historyList.innerHTML = '';
+    history.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div class="history-item-qr">${item.qrSvg}</div>
+            <div class="history-item-content">
+                <div class="history-item-text">${item.text.substring(0, 30)}${item.text.length > 30 ? '...' : ''}</div>
+                <div class="history-item-date">${item.date}</div>
+            </div>
+            <div class="history-item-actions">
+                <button class="view-btn" onclick="viewHistoryItem(${index})">Ver</button>
+                <button class="delete-btn" onclick="deleteHistoryItem(${index})">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                </button>
+            </div>
+        `;
+        historyList.appendChild(li);
+    });
+}
+
+function viewHistoryItem(index) {
+    const history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+    const item = history[index];
+    document.getElementById('textInput').value = item.text;
+    displayQRWithoutSaving(item.text);
+}
+
+function deleteHistoryItem(index) {
+    let history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+    history.splice(index, 1);
+    localStorage.setItem('qrHistory', JSON.stringify(history));
+    updateHistoryDisplay();
+}
+
 function displayQR(text) {
+    const svgQR = generateStylizedQR(text);
+    document.getElementById('qrOutput').innerHTML = svgQR;
+    document.getElementById('downloadBtn').style.display = 'inline-block';
+    saveHistory(text);
+}
+
+function displayQRWithoutSaving(text) {
     const svgQR = generateStylizedQR(text);
     document.getElementById('qrOutput').innerHTML = svgQR;
     document.getElementById('downloadBtn').style.display = 'inline-block';
 }
 
-// Modifica la función handleFile para ajustar el textarea
 function handleFile(file) {
     readQRCode(file)
         .then(text => {
@@ -98,8 +152,6 @@ function handleFile(file) {
             document.getElementById('downloadBtn').style.display = 'none';
         });
 }
-
-// ... (resto del código sin cambios)
 
 document.getElementById('generateBtn').addEventListener('click', function() {
     const text = document.getElementById('textInput').value;
@@ -149,3 +201,5 @@ document.getElementById('downloadBtn').addEventListener('click', function() {
     downloadLink.click();
     document.body.removeChild(downloadLink);
 });
+
+document.addEventListener('DOMContentLoaded', updateHistoryDisplay);
