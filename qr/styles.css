@@ -63,3 +63,67 @@ button, input[type="file"] {
     opacity: 0;
     cursor: pointer;
 }
+#historyContainer {
+    margin-top: 20px;
+    text-align: left;
+}
+#historyList {
+    list-style-type: none;
+    padding: 0;
+}
+#historyList li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.history-item-qr {
+    width: 64px;
+    height: 64px;
+    margin-right: 10px;
+}
+.history-item-qr svg {
+    width: 100%;
+    height: 100%;
+}
+.history-item-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.history-item-text {
+    font-weight: bold;
+}
+.history-item-date {
+    font-size: 0.8em;
+    color: #666;
+}
+.history-item-actions {
+    display: flex;
+    align-items: center;
+}
+.view-btn, .delete-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.delete-btn {
+    background-color: transparent;
+    color: #ff4444;
+    padding: 5px;
+}
+.delete-btn:hover {
+    background-color: #ffeeee;
+}
+.delete-btn svg {
+    vertical-align: middle;
+}
