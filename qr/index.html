@@ -5,25 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador y Lector de QR Online</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.3.1/dist/jsQR.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Generador y Lector de QR Online</h1>
-        
-        <br>
+
         <div id="dropZone">
             Arrastre y suelte una imagen QR aquí o haga clic para seleccionar
             <input type="file" id="fileInput" accept="image/*">
         </div>
-        <div id="qrOutput"></div>
-      
-      <textarea id="textInput" placeholder="Ingrese texto para generar QR" rows="3"></textarea>
+
+        <textarea id="textInput" placeholder="Ingrese el texto para generar el QR"></textarea>
+
         <button id="generateBtn">Generar QR</button>
-      
+
+        <div id="qrOutput"></div>
+
         <button id="downloadBtn" style="display: none;">Descargar QR SVG</button>
+
+        <div id="historyContainer">
+            <h3>Historial de QR</h3>
+            <ul id="historyList"></ul>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.3.1/dist/jsQR.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
