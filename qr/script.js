@@ -93,57 +93,67 @@ function updateHistoryDisplay() {
     let history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
     
     // Filtrar por término de búsqueda
-    history = history.filter(item => 
+    const filteredHistory = history.filter(item => 
         item.text.toLowerCase().includes(searchTerm) || 
         (item.title && item.title.toLowerCase().includes(searchTerm))
     );
     
-    const totalPages = Math.ceil(history.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentItems = history.slice(startIndex, endIndex);
+    const currentItems = filteredHistory.slice(startIndex, endIndex);
     
     historyList.innerHTML = '';
     currentItems.forEach((item, index) => {
         const li = document.createElement('li');
-li.innerHTML = `
-    <div class="history-item-qr">${item.qrSvg}</div>
-    <div class="history-item-content">
-        <div class="editable-container">
-            <span class="history-item-title" title="${item.title || "Sin título"}">${(item.title || "Sin título").substring(0, 12)}${(item.title || "Sin título").length > 12 ? '...' : ''}</span>
-            <span class="edit-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                </svg>
-            </span>
-        </div>
-        <div class="history-item-text">${item.text.substring(0, 30)}${item.text.length > 30 ? '...' : ''}</div>
-        <div class="history-item-date">${item.date}</div>
-    </div>
-    <div class="history-item-actions">
-        <button class="view-btn" onclick="viewHistoryItem(${startIndex + index})">Ver</button>
-        <button class="delete-btn" onclick="deleteHistoryItem(${startIndex + index})">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-            </svg>
-        </button>
-    </div>
-`;
+        const originalIndex = history.findIndex(h => h.text === item.text && h.date === item.date);
+        li.innerHTML = `
+            <div class="history-item-qr">${item.qrSvg}</div>
+            <div class="history-item-content">
+                <div class="editable-container">
+                    <span class="history-item-title" title="${item.title || "Sin título"}">${(item.title || "Sin título").substring(0, 12)}${(item.title || "Sin título").length > 12 ? '...' : ''}</span>
+                    <span class="edit-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="history-item-text">${item.text.substring(0, 30)}${item.text.length > 30 ? '...' : ''}</div>
+                <div class="history-item-date">${item.date}</div>
+            </div>
+            <div class="history-item-actions">
+                <button class="view-btn" data-index="${originalIndex}">Ver</button>
+                <button class="delete-btn" data-index="${originalIndex}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                </button>
+            </div>
+        `;
         historyList.appendChild(li);
         
-        // Agregar funcionalidad de edición
-        const editIcon = li.querySelector('.edit-icon');
-        const titleSpan = li.querySelector('.history-item-title');
         const editableContainer = li.querySelector('.editable-container');
-editableContainer.addEventListener('click', (e) => {
-    if (e.target.closest('.edit-icon')) {
-        makeEditable(editableContainer.querySelector('.history-item-title'), startIndex + index);
-    }
-});
+        editableContainer.addEventListener('click', (e) => {
+            if (e.target.closest('.edit-icon')) {
+                makeEditable(editableContainer.querySelector('.history-item-title'), originalIndex);
+            }
+        });
     });
     
     updatePagination(totalPages);
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            viewHistoryItem(parseInt(this.getAttribute('data-index')));
+        });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            deleteHistoryItem(parseInt(this.getAttribute('data-index')));
+        });
+    });
 }
 
 function makeEditable(element, index) {
@@ -152,7 +162,7 @@ function makeEditable(element, index) {
     
     const input = document.createElement('input');
     input.type = 'text';
-    input.value = fullTitle;  // Usa el título completo
+    input.value = fullTitle;
     input.classList.add('edit-input');
     
     const container = element.closest('.editable-container');
@@ -202,15 +212,19 @@ function updatePagination(totalPages) {
 function viewHistoryItem(index) {
     const history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
     const item = history[index];
-    document.getElementById('textInput').value = item.text;
-    displayQRWithoutSaving(item.text);
+    if (item) {
+        document.getElementById('textInput').value = item.text;
+        displayQRWithoutSaving(item.text);
+    }
 }
 
 function deleteHistoryItem(index) {
     let history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
-    history.splice(index, 1);
-    localStorage.setItem('qrHistory', JSON.stringify(history));
-    updateHistoryDisplay();
+    if (index >= 0 && index < history.length) {
+        history.splice(index, 1);
+        localStorage.setItem('qrHistory', JSON.stringify(history));
+        updateHistoryDisplay();
+    }
 }
 
 function displayQR(text) {
