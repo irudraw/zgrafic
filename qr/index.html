@@ -39,4 +39,45 @@
     <script src="https://cdn.rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
     <script src="script.js"></script>
 </body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador y Lector de QR Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Generador y Lector de QR Online</h1>
+        
+        <div id="dropZone">
+            Arrastre y suelte una imagen QR aquí o haga clic para seleccionar
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <textarea id="textInput" placeholder="Ingrese el texto para generar el QR"></textarea>
+        <button id="generateBtn">Generar QR</button>
+
+        <div id="qrOutput"></div>
+        <button id="downloadBtn" style="display: none;">Descargar QR SVG</button>
+
+        <div id="historyContainer">
+            <div id="historyHeader">
+                <h3>Historial de QR</h3>
+                <input type="text" id="searchInput" placeholder="Buscar...">
+            </div>
+            <ul id="historyList"></ul>
+            <div id="pagination">
+                <button id="prevPage">Anterior</button>
+                <span id="currentPage"></span>
+                <button id="nextPage">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+    <script src="https://cdn.rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
+    <script src="script.js"></script>
+</body>
 </html>
