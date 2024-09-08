@@ -93,7 +93,7 @@ justify-content: center;
 
 </style>
 
-
+<!--
 <script>
 // Función para obtener el valor del parámetro GET por su nombre
 function obtenerParametroGET(nombre) {
@@ -117,8 +117,39 @@ function seleccionarOpcion(tipo) {
   window.location.href = window.location.pathname + '?tipo=' + tipo;
 }
 </script>
+-->
+<script>
+  // Función para obtener el valor del parámetro GET por su nombre
+function obtenerParametroGET(nombre) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(nombre);
+}
 
+// Función para establecer los botones de radio seleccionados al cargar la página
+function establecerSeleccion() {
+  const tipo = obtenerParametroGET('tipo');
+  const cliente = obtenerParametroGET('cliente');
+  
+  if(tipo) {
+    document.getElementById(tipo).checked = true;
+  }
+  
+  if(cliente) {
+    document.getElementById(cliente).checked = true;
+  }
+}
 
+// Añadir el evento de carga para establecer la selección
+window.onload = establecerSeleccion;
+
+// Función para manejar la selección y redirigir con parámetros GET
+function seleccionarOpcion() {
+  const tipoSeleccionado = document.querySelector('input[name="tipo"]:checked').value;
+  const clienteSeleccionado = document.querySelector('input[name="cliente"]:checked').value;
+  
+  window.location.href = `${window.location.pathname}?tipo=${tipoSeleccionado}&cliente=${clienteSeleccionado}`;
+}
+</script>
 
 </head>
 <body>
