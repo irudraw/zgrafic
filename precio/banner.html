@@ -123,7 +123,7 @@ function establecerSeleccion() {
   const vendedor = obtenerParametroGET('vendedor');
   if(vendedor) {
     const vendedorInfo = document.getElementById('vendedor-info');
-    vendedorInfo.textContent = `Vendedor: ${vendedor}`;
+    vendedorInfo.textContent = `Calculadora: ${vendedor}`;
   }
 }
 
@@ -145,7 +145,7 @@ function seleccionarOpcion(tipo) {
 
 
 <div class="calculator">
-<div id="vendedor-info" class="label-result"></div>
+<div id="vendedor-info" class="label-result"></div><br>
 
 <form id="seleccion-form" class="form">
   <input type="radio" id="grueso" name="opcion" value="grueso" onclick="seleccionarOpcion(this.value)">
@@ -192,7 +192,7 @@ const parametrosURL = new URLSearchParams(window.location.search);
   
   let mensaje;
   if(tipo === 'grueso') {
-    mensaje = '11';
+    mensaje = '10';
   } else if(tipo === 'delgado') {
     mensaje = '8';
   } else {
