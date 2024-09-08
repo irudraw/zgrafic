@@ -147,7 +147,7 @@ function seleccionarOpcion() {
   const tipoSeleccionado = document.querySelector('input[name="tipo"]:checked').value;
   const clienteSeleccionado = document.querySelector('input[name="cliente"]:checked').value;
   
-  window.location.href = ${window.location.pathname}?tipo=${tipoSeleccionado}&cliente=${clienteSeleccionado};
+  window.location.href = ${window.location.pathname}'?tipo='${tipoSeleccionado}&'cliente='${clienteSeleccionado};
   </script>
 
 </head>
