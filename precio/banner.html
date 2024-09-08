@@ -95,43 +95,28 @@ justify-content: center;
 
 
 <script>
-        const app = Vue.createApp({
-            data() {
-                return {
-                    thickness: 'grueso',
-                    client: 'vendedor',
-                    value: 0,
-                    result: 0
-                }
-            },
-            methods: {
-                calculate() {
-                    // Aquí iría tu lógica de cálculo
-                    this.result = this.value * 2; // Ejemplo simple
-                    this.updateUrl();
-                },
-                updateUrl() {
-                    const url = new URL(window.location);
-                    url.searchParams.set('thickness', this.thickness);
-                    url.searchParams.set('client', this.client);
-                    url.searchParams.set('value', this.value);
-                    window.history.pushState({}, '', url);
-                },
-                loadFromUrl() {
-                    const params = new URLSearchParams(window.location.search);
-                    this.thickness = params.get('thickness') || 'grueso';
-                    this.client = params.get('client') || 'vendedor';
-                    this.value = params.get('value') || 0;
-                }
-            },
-            mounted() {
-                this.loadFromUrl();
-                window.addEventListener('popstate', this.loadFromUrl);
-            }
-        });
+// Función para obtener el valor del parámetro GET por su nombre
+function obtenerParametroGET(nombre) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(nombre);
+}
 
-        app.mount('#app');
-    </script>
+// Función para establecer el botón de radio seleccionado al cargar la página
+function establecerSeleccion() {
+  const tipo = obtenerParametroGET('tipo');
+  if(tipo) {
+    document.getElementById(tipo).checked = true;
+  }
+}
+
+// Añadir el evento de carga para establecer la selección
+window.onload = establecerSeleccion;
+
+// Función para manejar la selección y redirigir con parámetros GET
+function seleccionarOpcion(tipo) {
+  window.location.href = window.location.pathname + '?tipo=' + tipo;
+}
+</script>
 
 
 
