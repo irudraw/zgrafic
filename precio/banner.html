@@ -107,6 +107,13 @@ function establecerSeleccion() {
   if(tipo) {
     document.getElementById(tipo).checked = true;
   }
+  
+  // Obtener el vendedor del parámetro GET y mostrarlo en el elemento para impresión
+  const vendedor = obtenerParametroGET('vendedor');
+  if(vendedor) {
+    const vendedorInfo = document.getElementById('vendedor-info');
+    vendedorInfo.textContent = `Vendedor: ${vendedor}`;
+  }
 }
 
 // Añadir el evento de carga para establecer la selección
@@ -114,7 +121,8 @@ window.onload = establecerSeleccion;
 
 // Función para manejar la selección y redirigir con parámetros GET
 function seleccionarOpcion(tipo) {
-  window.location.href = window.location.pathname + '?tipo=' + tipo;
+  const vendedor = obtenerParametroGET('vendedor') || ''; // Mantener el vendedor si ya existe
+  window.location.href = `${window.location.pathname}?tipo=${tipo}&vendedor=${vendedor}`;
 }
 </script>
 
@@ -126,7 +134,7 @@ function seleccionarOpcion(tipo) {
 
 
 <div class="calculator">
-
+<div id="vendedor-info"></div>
 
 <form id="seleccion-form" class="form">
   <input type="radio" id="grueso" name="opcion" value="grueso" onclick="seleccionarOpcion(this.value)">
