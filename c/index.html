@@ -218,6 +218,7 @@ const parametrosURL = new URLSearchParams(window.location.search);
   }
 
   const xsuma = (Math.ceil(((num1 + (num2 / 100)) * (num3 + (num4 / 100)))* precio ));
+  const xmult = Math.ceil( ( (num1 + (num2 / 100)) * (num3 + (num4 / 100)) ) );
 
   let suma
   if(cliente === 'Diseñador') {
@@ -225,6 +226,18 @@ const parametrosURL = new URLSearchParams(window.location.search);
   } else if(cliente === 'Vendedor') {
     sumas = xsuma;
     suma = sumas < 4 ? 4 : sumas;
+  }
+
+  } else if(cliente === 'Cliente') {
+    
+  if(xmult === 1) {
+    suma = 1;
+  } else if(xmult === 2) {
+    sumas = 22;
+   
+  }
+
+  
   }
   else {
     suma = 'Valor no reconocido';
