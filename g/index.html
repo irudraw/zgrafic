@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería de Imágenes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .thumbnail {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="gallery" class="gallery"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gallery = document.getElementById('gallery');
+            const imageDirectory = 'images/'; // Directorio de imágenes
+
+            fetch(imageDirectory)
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const htmlDoc = parser.parseFromString(data, 'text/html');
+                    const imageFiles = Array.from(htmlDoc.querySelectorAll('a'))
+                        .map(link => link.href)
+                        .filter(href => href.match(/\.(jpe?g|png|gif)$/i));
+
+                    imageFiles.forEach(file => {
+                        const img = document.createElement('img');
+                        img.classList.add('thumbnail');
+                        img.src = imageDirectory + file;
+                        gallery.appendChild(img);
+                    });
+                })
+                .catch(error => console.error('Error al cargar las imágenes:', error));
+        });
+    </script>
+</body>
+</html>
