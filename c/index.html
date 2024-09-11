@@ -329,6 +329,18 @@ const parametrosURL = new URLSearchParams(window.location.search);
 
 // var suma = (Math.ceil(((num1 + (num2 / 100)) * (num3 + (num4 / 100)))* precio ));
 document.getElementById('result').textContent = 'Precio: ' + suma;
+
+//copiar texto
+
+navigator.clipboard.writeText("Banner "+(num1+(num2/100)).toFixed(2) + 'mt x' + (num3+ (num4/100)).toFixed(2)+ 'mt' + ' = ' +suma)
+.then(() => {
+alert('Texto copiado al portapapeles');
+})
+.catch(err => {
+console.error('Error al copiar texto: ', err);
+});
+
+	
 }
 
 
@@ -336,21 +348,6 @@ function redireccionar(url) {
   window.location.href = url;
 }
 
-
-function copiar() {
-var num1 = document.getElementById('num1').value;
-var num2 = document.getElementById('num2').value;
-var num3 = document.getElementById('num3').value;
-var num4 = document.getElementById('num4').value;
-
-navigator.clipboard.writeText(num1 +'.'+ num2/10 + 'x' + num3 +'.'+ num4/10)
-.then(() => {
-alert('Texto copiado al portapapeles');
-})
-.catch(err => {
-console.error('Error al copiar texto: ', err);
-});
-}
 </script>
 
 </body>
