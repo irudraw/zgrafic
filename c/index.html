@@ -194,23 +194,34 @@ const parametrosURL = new URLSearchParams(window.location.search);
 
   let precio
   if(tipo === 'grueso' & cliente === 'Diseñador') {
-    precio = '10';
+    precio = 10;
   } else if(tipo === 'delgado'& cliente === 'Diseñador') {
-    precio = '8';
+    precio = 8;
   }
 
   else if(tipo === 'grueso'& cliente === 'Vendedor') {
-    precio = '11';
+    precio = 11;
   }
   else if(tipo === 'delgado'& cliente === 'Vendedor') {
-    precio = '9';
+    precio = 9;
   }
 
   else if(tipo === 'grueso'& cliente === 'Cliente') {
-    precio = '12';
+    precio = 12;
+    adicional = 1;
   }
   else if(tipo === 'delgado'& cliente === 'Cliente') {
-    precio = '10';
+    precio = 10;
+    adicional = 1;
+  }
+
+  else if(tipo === 'grueso'& cliente === 'Casero') {
+    precio = 12;
+    adicional = 0.35;
+  }
+  else if(tipo === 'delgado'& cliente === 'Casero') {
+    precio = 10;
+    adicional = 0.35;
   }
 
   else {
@@ -218,7 +229,7 @@ const parametrosURL = new URLSearchParams(window.location.search);
   }
 
   const xsuma = (Math.ceil(((num1 + (num2 / 100)) * (num3 + (num4 / 100)))* precio ));
-  const xmult = Math.ceil( ( (num1 + (num2 / 100)) * (num3 + (num4 / 100)) ) );
+  const xmult =  ( (num1 + (num2 / 100)) * (num3 + (num4 / 100)) ) ;
 
   let suma
   if(cliente === 'Diseñador') {
@@ -228,15 +239,76 @@ const parametrosURL = new URLSearchParams(window.location.search);
     suma = sumas < 4 ? 4 : sumas;
   }
 
-  } else if(cliente === 'Cliente') {
+  else if(cliente === 'Cliente' || cliente === 'Casero') {
     
-  if(xmult = 1) {
-    suma = 1;
-  } else if(xmult = 2) {
-    sumas = 22;
+  if(xmult >= 10) {
+    suma = Math.ceil(xmult*(precio+(adicional*0)));
+  } 
+  
+  else if(xmult >= 8) {
+    suma = Math.ceil(xmult*(precio+(adicional*0.5)));
    
   }
-
+  
+  else if(xmult >= 6) {
+    suma = Math.ceil(xmult*(precio+(adicional*1)));
+   
+  }
+  
+  else if(xmult >= 4) {
+    suma = Math.ceil(xmult*(precio+(adicional*2)));
+   
+  }
+  
+  else if(xmult >= 2) {
+    suma = Math.ceil(xmult*(precio+(adicional*3)));
+   
+  }
+  else if(xmult >= 1) {
+    suma = Math.ceil(xmult*(precio+(adicional*4)));
+   
+  }
+  
+  else if(xmult >= 0.9) {
+    suma = Math.ceil(xmult*(precio+(adicional*5)));
+   
+  }
+  else if(xmult >= 0.8) {
+    suma = Math.ceil(xmult*(precio+(adicional*6)));
+   
+  }
+  else if(xmult >= 0.7) {
+    suma = Math.ceil(xmult*(precio+(adicional*7)));
+   
+  }
+  else if(xmult >= 0.6) {
+    suma = Math.ceil(xmult*(precio+(adicional*8)));
+   
+  }
+  else if(xmult >= 0.5) {
+    suma = Math.ceil(xmult*(precio+(adicional*9)));
+   
+  }
+  else if(xmult >= 0.4) {
+    suma = Math.ceil(xmult*(precio+(adicional*10)));
+   
+  }
+  else if(xmult >= 0.3) {
+    suma = Math.ceil(xmult*(precio+(adicional*11)));
+   
+  }
+  else if(xmult >= 0.2) {
+    suma = Math.ceil(xmult*(precio+(adicional*12)));
+   
+  }
+  else if(xmult >= 0.1) {
+    suma = Math.ceil(xmult*(precio+(adicional*13)));
+   
+  }
+  else if(xmult >= 0) {
+    suma = Math.ceil(xmult*(precio+(adicional*14)));
+   
+  }
   
   }
   else {
