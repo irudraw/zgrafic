@@ -332,9 +332,9 @@ document.getElementById('result').textContent = 'Precio: ' + suma;
 
 //copiar texto
 
-navigator.clipboard.writeText("Banner "+(num1+(num2/100)).toFixed(2) + 'mt x' + (num3+ (num4/100)).toFixed(2)+ 'mt' + ' = ' +suma)
+navigator.clipboard.writeText("Banner "+(num1+(num2/100)).toFixed(2) + 'mt x' + (num3+ (num4/100)).toFixed(2)+ 'mt' + ' = S/' +suma)
 .then(() => {
-alert('Texto copiado al portapapeles');
+console.log('Texto copiado al portapapeles');
 })
 .catch(err => {
 console.error('Error al copiar texto: ', err);
