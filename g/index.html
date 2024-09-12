@@ -42,9 +42,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const gallery = document.getElementById('gallery');
-            const imageDirectory = 'images/'; // Directorio de imágenes
+            const imageDirectory = '../images/'; // Directorio de imágenes
             
-            fetch('image-list.json')
+            fetch('../image-list.json')
                 .then(response => response.json())
                 .then(data => {
                     data.images.forEach(file => {
