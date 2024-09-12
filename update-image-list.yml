@@ -1,0 +1,34 @@
+name: Update Image List
+
+on:
+  push:
+    paths:
+      - 'g/images/**'
+  workflow_dispatch:
+
+jobs:
+  update-image-list:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Generate image list
+      run: |
+        cd images
+        echo '{"images":[' > ../image-list.json
+        for file in *; do
+          if [[ $file == *.jpg || $file == *.jpeg || $file == *.png || $file == *.gif ]]; then
+            echo "\"$file\"," >> ../image-list.json
+          fi
+        done
+        sed -i '$ s/,$//' ../image-list.json
+        echo ']}' >> ../image-list.json
+      shell: bash
+    
+    - name: Commit and push if changed
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git add image-list.json
+        git commit -m "Update image list" || exit 0
+        git push
