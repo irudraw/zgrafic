@@ -3,7 +3,7 @@ name: Update Image List
 on:
   push:
     paths:
-      - 'g/images/**'
+      - 'images/**'
   workflow_dispatch:
 
 jobs:
