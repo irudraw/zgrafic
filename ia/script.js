@@ -31,10 +31,8 @@ function mostrarProductos() {
         const divProducto = document.createElement('div');
         divProducto.className = 'producto';
         divProducto.innerHTML = `
-            <img src="${producto.imagen}" alt="${producto.nombre}">
+            <img src="${producto.imagen}" alt="${producto.nombre}" onclick="abrirPopup(${producto.id})">
             <h3>${producto.nombre}</h3>
-            <p class="precio">${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}</p>
-            <p class="descripcion">${producto.descripcion}</p>
             <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
         `;
         contenedor.appendChild(divProducto);
@@ -44,6 +42,84 @@ function mostrarProductos() {
         }, index * 100);
     });
 }
+
+function abrirPopup(id) {
+    const producto = productos.find(p => p.id === id);
+    const popup = document.getElementById('producto-popup');
+    const popupImagen = document.getElementById('popup-imagen');
+    const popupNombre = document.getElementById('popup-nombre');
+    const popupPrecio = document.getElementById('popup-precio');
+    const popupDescripcion = document.getElementById('popup-descripcion');
+    const popupAgregar = document.getElementById('popup-agregar');
+
+    popupImagen.src = producto.imagen;
+    popupImagen.alt = producto.nombre;
+    popupNombre.textContent = producto.nombre;
+    popupPrecio.textContent = `${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}`;
+    popupDescripcion.textContent = producto.descripcion;
+    popupAgregar.onclick = () => {
+        agregarAlCarrito(id);
+        mostrarNotificacion('Producto agregado al carrito');
+    };
+
+    popup.style.display = 'block';
+    // Forzamos un reflow antes de añadir la clase 'active'
+    void popup.offsetWidth;
+    popup.classList.add('active');
+}
+
+function mostrarNotificacion(mensaje) {
+    const notificacion = document.createElement('div');
+    notificacion.textContent = mensaje;
+    notificacion.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 1001;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    `;
+    document.body.appendChild(notificacion);
+
+    // Hacer visible la notificación
+    setTimeout(() => {
+        notificacion.style.opacity = '1';
+    }, 10);
+
+    // Ocultar y remover la notificación después de 3 segundos
+    setTimeout(() => {
+        notificacion.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(notificacion);
+        }, 300);
+    }, 3000);
+}
+
+function cerrarPopup() {
+    const popup = document.getElementById('producto-popup');
+    popup.classList.remove('active');
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 300); // Este tiempo debe coincidir con la duración de la transición en CSS
+}
+
+// Agregar evento para cerrar el popup
+document.querySelector('.cerrar-popup').addEventListener('click', cerrarPopup);
+
+// Cerrar el popup si se hace clic fuera de él
+window.addEventListener('click', (event) => {
+    const popup = document.getElementById('producto-popup');
+    if (event.target === popup) {
+        cerrarPopup();
+    }
+});
+
+
 
 function actualizarPaginacion() {
     const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina);
