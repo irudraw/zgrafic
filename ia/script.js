@@ -56,7 +56,10 @@ function abrirPopup(id) {
     popupImagen.alt = producto.nombre;
     popupNombre.textContent = producto.nombre;
     popupPrecio.textContent = `${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}`;
-    popupDescripcion.textContent = producto.descripcion;
+    
+    // Modificación para manejar saltos de línea en la descripción
+    popupDescripcion.innerHTML = producto.descripcion.replace(/\n/g, '<br>');
+    
     popupAgregar.onclick = () => {
         agregarAlCarrito(id);
         mostrarNotificacion('Producto agregado al carrito');
