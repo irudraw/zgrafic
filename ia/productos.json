@@ -4,7 +4,7 @@
         "nombre": "Display Velcro Pop Up",
         "precio": 10,
         "imagen": "https://5macdigital.pe/wp-content/uploads/2021/09/10.jpg",
-        "descripcion": "Tamaños: <br>3.00 x 3.00 L mts.<br>4.00 x 3.00 L mts.<br>5.00 x 3.00 L mts<p>Material de Aluminio y plástico.<br>Color Plateado.<br>Caja de plástico redonda.<br>Empacado en bolsa Oxford.<br>Sin luces"
+        "descripcion": "Tamaños: '<br>'3.00 x 3.00 L mts.<br>4.00 x 3.00 L mts.<br>5.00 x 3.00 L mts<p>Material de Aluminio y plástico.<br>Color Plateado.<br>Caja de plástico redonda.<br>Empacado en bolsa Oxford.<br>Sin luces"
     },
     {
         "id": 2,
