@@ -3,14 +3,14 @@
         "id": 1,
         "nombre": "Display Velcro Pop Up",
         "precio": 10,
-        "imagen": "https://5macdigital.pe/wp-content/uploads/2021/09/10.jpg",
+        "imagen": "img/10.jpg",
         "descripcion": "Tamaños: <br>3.00 x 3.00 L mts.<br>4.00 x 3.00 L mts.<br>5.00 x 3.00 L mts<p>Material de Aluminio y plástico.<br>Color Plateado.<br>Caja de plástico redonda.<br>Empacado en bolsa Oxford.<br>Sin luces"
     },
     {
         "id": 2,
         "nombre": "Parante Araña Modelo CX",
         "precio": 15,
-        "imagen": "https://5macdigital.pe/wp-content/uploads/2021/09/parante-arana.png",
+        "imagen": "img/parante-arana.png",
         "descripcion": "Con estructura tipo «araña» o «Stand forma de X» en material de aluminio en color plateado y negro, tiene la ventaja de ser desmontable. incluye el estuche para una mejor movilidad.<p>Tamaño 1.00 x 2.00 Mt. y 1.20 x 2.00 Mt.<br>Material de Aluminio<br>Color Plateado<br>Incluye bolso"
     },
     {
