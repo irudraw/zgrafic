@@ -12,7 +12,14 @@ let lastPageChangeTime = 0;
 const pageChangeDelay = 200; // lastPageChangeTime y pageChangeDelay. Esto asegura que debe pasar al menos (2000) 2 segundos entre cambios de página, sin importar cuánto se desplace el usuario.
 
 async function cargarProductos() {
-    const respuesta = await fetch('productos.json');
+    // Generar un número aleatorio para la versión
+    const versionAleatoria = Math.floor(Math.random() * 1000000);
+    
+    // Construir la URL con el número de versión aleatorio
+    const url = `productos.json?v=${versionAleatoria}`;
+    
+    // Realizar la solicitud fetch con la nueva URL
+    const respuesta = await fetch(url);
     productos = await respuesta.json();
     productosFiltrados = [...productos];
     actualizarPaginacion();
