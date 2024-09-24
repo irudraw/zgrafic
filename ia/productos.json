@@ -1,89 +1,18 @@
 [
     {
         "id": 1,
-        "nombre": "Display Velcro Pop Up",
-        "precio": 10,
-        "imagen": "img/10.jpg",
-        "descripcion": "Tamaños: <br>3.00 x 3.00 L mts.<br>4.00 x 3.00 L mts.<br>5.00 x 3.00 L mts<p>Material de Aluminio y plástico.<br>Color Plateado.<br>Caja de plástico redonda.<br>Empacado en bolsa Oxford.<br>Sin luces"
-    },
-    {
-        "id": 2,
         "nombre": "Parante Araña Modelo CX",
-        "precio": 15,
+        "precio": "Consultar",
         "imagen": "img/parante-arana.png",
         "descripcion": "Con estructura tipo «araña» o «Stand forma de X» en material de aluminio en color plateado y negro, tiene la ventaja de ser desmontable. incluye el estuche para una mejor movilidad.<p>Tamaño 1.00 x 2.00 Mt. y 1.20 x 2.00 Mt.<br>Material de Aluminio<br>Color Plateado<br>Incluye bolso"
     },
     {
-        "id": 3,
+        "id": 2,
         "nombre": "Roll Screen Extra Wide",
-        "precio": 20,
+        "precio": "Consultar",
         "imagen": "img/roll-modelo-17-extra-wide.jpg",
         "descripcion": "Ideal para grandes presentaciones en publicidad. Estructura de aluminio con 2 varillas que permite dar tensión al banner.<br>Roll Screen Extra Wide Producto importado resistente y pesada ideal para exhibir presentaciones. También son una gran opción para la marca de una entrada a un evento, es fácil de transportar.<br>Tamaño: 2.40 x 2.00 Mt.<br>Material de Aluminio<br>Color Plateado<br>Incluye bolso"
     },
-    {
-        "id": 4,
-        "nombre": "Producto 4",
-        "precio": 25,
-        "imagen": "https://via.placeholder.com/150?text=Producto+4",
-        "descripcion": "El Producto 4 es innovador y eficiente, diseñado para satisfacer tus expectativas."
-    },
-
-    {
-        "id": 5,
-        "nombre": "Producto 5",
-        "precio": 10,
-        "imagen": "https://via.placeholder.com/150?text=Producto+1",
-        "descripcion": "Este es el Producto 1, una excelente opción para tus necesidades diarias."
-    },
-    {
-        "id": 6,
-        "nombre": "Producto 6",
-        "precio": 15,
-        "imagen": "https://via.placeholder.com/150?text=Producto+2",
-        "descripcion": "El Producto 2 es versátil y duradero, perfecto para múltiples usos."
-    },
-    {
-        "id": 7,
-        "nombre": "Producto 7",
-        "precio": 20,
-        "imagen": "https://via.placeholder.com/150?text=Producto+3",
-        "descripcion": "Nuestro Producto 3 es de alta calidad y ofrece un rendimiento superior."
-    },
-    {
-        "id": 8,
-        "nombre": "Producto 8",
-        "precio": 25,
-        "imagen": "https://via.placeholder.com/150?text=Producto+4",
-        "descripcion": "El Producto 4 es innovador y eficiente, diseñado para satisfacer tus expectativas."
-    },
-        {
-        "id": 9,
-        "nombre": "Producto 9",
-        "precio": 10,
-        "imagen": "https://via.placeholder.com/150?text=Producto+1",
-        "descripcion": "Este es el Producto 1, una excelente opción para tus necesidades diarias."
-    },
-    {
-        "id": 10,
-        "nombre": "Producto 10",
-        "precio": 15,
-        "imagen": "https://via.placeholder.com/150?text=Producto+2",
-        "descripcion": "El Producto 2 es versátil y duradero, perfecto para múltiples usos."
-    },
-    {
-        "id": 11,
-        "nombre": "Producto 11",
-        "precio": 20,
-        "imagen": "https://via.placeholder.com/150?text=Producto+3",
-        "descripcion": "Nuestro Producto 3 es de alta calidad y ofrece un rendimiento superior."
-    },
-    {
-        "id": 12,
-        "nombre": "Producto 12",
-        "precio": 25,
-        "imagen": "https://via.placeholder.com/150?text=Producto+4",
-        "descripcion": "El Producto 4 es innovador y eficiente, diseñado para satisfacer tus expectativas."
-    }
-
+    
     
 ]
