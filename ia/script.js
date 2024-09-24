@@ -206,19 +206,37 @@ function actualizarCarrito() {
     
     listaCarrito.innerHTML = '';
     let suma = 0;
+    let hayProductosCotizar = false;
 
     carrito.forEach(item => {
         const li = document.createElement('li');
-        li.innerHTML = `
-            <img src="${item.imagen}" alt="${item.nombre}">
-            <span>${item.nombre} - ${SIMBOLO_MONEDA}${item.precio.toFixed(2)} x ${item.cantidad}</span>
-            <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
-        `;
+        if (item.precio === 0) {
+            li.innerHTML = `
+                <img src="${item.imagen}" alt="${item.nombre}">
+                <span>${item.nombre} - Cotizar x ${item.cantidad}</span>
+                <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
+            `;
+            hayProductosCotizar = true;
+        } else {
+            li.innerHTML = `
+                <img src="${item.imagen}" alt="${item.nombre}">
+                <span>${item.nombre} - ${SIMBOLO_MONEDA}${item.precio.toFixed(2)} x ${item.cantidad}</span>
+                <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
+            `;
+            suma += item.precio * item.cantidad;
+        }
         listaCarrito.appendChild(li);
-        suma += item.precio * item.cantidad;
     });
 
-    total.textContent = SIMBOLO_MONEDA + suma.toFixed(2);
+    if (hayProductosCotizar) {
+        if (suma > 0) {
+            total.textContent = `${SIMBOLO_MONEDA}${suma.toFixed(2)} + Cotización`;
+        } else {
+            total.textContent = 'Cotización';
+        }
+    } else {
+        total.textContent = SIMBOLO_MONEDA + suma.toFixed(2);
+    }
 }
 
 function actualizarContadorCarrito() {
