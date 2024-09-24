@@ -29,7 +29,7 @@ function actualizarCarrito() {
                     <img src="${item.imagen}" alt="${item.nombre}" class="producto-miniatura">
                     <span>${item.nombre}</span>
                 </div>
-                <span class="precio-item">${SIMBOLO_MONEDA}${item.precio.toFixed(2)}</span>
+                <span class="precio-item">${item.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${item.precio.toFixed(2)}`}</span>
                 <div class="cantidad-control">
                     <button class="btn-cantidad" onclick="cambiarCantidad(${item.id}, -1)">-</button>
                     <input type="number" value="${item.cantidad}" min="1" class="cantidad-input" data-id="${item.id}" onchange="actualizarCantidad(event)">
@@ -38,11 +38,13 @@ function actualizarCarrito() {
                 <button class="btn-eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
             `;
             listaCarrito.appendChild(li);
-            suma += item.precio * item.cantidad;
+            if (item.precio !== 0) {
+                suma += item.precio * item.cantidad;
+            }
         });
     }
 
-    total.textContent = SIMBOLO_MONEDA + suma.toFixed(2);
+    total.textContent = suma === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${suma.toFixed(2)}`;
     actualizarBotonPedido();
 }
 
@@ -107,24 +109,35 @@ function enviarPedidoPorWhatsApp() {
     }
 
     let mensaje = "Hola, me gustaría hacer el siguiente pedido:\n\n";
+    let totalConocido = 0;
+    let hayProductosCotizar = false;
+
     carrito.forEach(item => {
-        mensaje += `${item.nombre} x ${item.cantidad} - ${SIMBOLO_MONEDA}${(item.precio * item.cantidad).toFixed(2)}\n`;
+        if (item.precio === 0) {
+            mensaje += `${item.nombre} x ${item.cantidad} - Cotizar\n`;
+            hayProductosCotizar = true;
+        } else {
+            mensaje += `${item.nombre} x ${item.cantidad} - ${SIMBOLO_MONEDA}${(item.precio * item.cantidad).toFixed(2)}\n`;
+            totalConocido += item.precio * item.cantidad;
+        }
     });
-    const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
-    mensaje += `\nTotal: ${SIMBOLO_MONEDA}${total.toFixed(2)}`;
+
+    if (hayProductosCotizar) {
+        mensaje += `\nSubtotal conocido: ${SIMBOLO_MONEDA}${totalConocido.toFixed(2)}`;
+        mensaje += "\nHay productos que requieren cotización.";
+    } else {
+        mensaje += `\nTotal: ${SIMBOLO_MONEDA}${totalConocido.toFixed(2)}`;
+    }
     
     const numeroWhatsApp = "51955486170";
     const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
     
-    // Abrir WhatsApp en una nueva ventana
     window.open(url, '_blank');
     
-    // Limpiar el carrito
     carrito = [];
     actualizarCarrito();
     guardarCarritoEnLocalStorage();
     
-    // Mostrar un mensaje de confirmación
     mostrarMensaje('¡Pedido enviado! El carrito ha sido limpiado.', 'exito');
 }
 

@@ -536,3 +536,20 @@ button:hover {
         max-width: 100%;
     }
 }
+
+.producto .precio {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.producto .precio:contains('Cotizar') {
+    color: #FFA500;
+}
+
+.btn-cotizar {
+    background-color: #FFA500;
+}
+
+.btn-cotizar:hover {
+    background-color: #FF8C00;
+}

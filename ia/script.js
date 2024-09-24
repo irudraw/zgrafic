@@ -40,7 +40,8 @@ function mostrarProductos() {
         divProducto.innerHTML = `
             <img src="${producto.imagen}" alt="${producto.nombre}" onclick="abrirPopup(${producto.id})">
             <h3>${producto.nombre}</h3>
-            <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
+            <p class="precio">${producto.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}`}</p>
+            <button onclick="agregarAlCarrito(${producto.id})">${producto.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito'}</button>
         `;
         contenedor.appendChild(divProducto);
         
@@ -62,18 +63,17 @@ function abrirPopup(id) {
     popupImagen.src = producto.imagen;
     popupImagen.alt = producto.nombre;
     popupNombre.textContent = producto.nombre;
-    popupPrecio.textContent = `${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}`;
+    popupPrecio.textContent = producto.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}`;
     
-    // Modificación para manejar saltos de línea en la descripción
     popupDescripcion.innerHTML = producto.descripcion.replace(/\n/g, '<br>');
     
+    popupAgregar.textContent = producto.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito';
     popupAgregar.onclick = () => {
         agregarAlCarrito(id);
-        mostrarNotificacion('Producto agregado al carrito');
+        mostrarNotificacion(producto.precio === 0 ? 'Solicitud de cotización agregada' : 'Producto agregado al carrito');
     };
 
     popup.style.display = 'block';
-    // Forzamos un reflow antes de añadir la clase 'active'
     void popup.offsetWidth;
     popup.classList.add('active');
 }
