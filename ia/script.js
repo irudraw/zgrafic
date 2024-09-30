@@ -1,5 +1,5 @@
+// Constantes y variables globales
 const SIMBOLO_MONEDA = 'S/.';
-
 let productos = [];
 let productosFiltrados = [];
 let carrito = [];
@@ -7,18 +7,14 @@ let paginaActual = 1;
 const productosPorPagina = 8;
 let isScrolling = false;
 let scrollAccumulator = 0;
-const scrollThreshold = 1000; // Esto significa que se necesitará mucho más desplazamiento antes de que se active un cambio de página
+const scrollThreshold = 1000;
 let lastPageChangeTime = 0;
-const pageChangeDelay = 200; // lastPageChangeTime y pageChangeDelay. Esto asegura que debe pasar al menos (2000) 2 segundos entre cambios de página, sin importar cuánto se desplace el usuario.
+const pageChangeDelay = 200;
 
+// Funciones para cargar y mostrar productos
 async function cargarProductos() {
-    // Generar un número aleatorio para la versión
     const versionAleatoria = Math.floor(Math.random() * 1000000);
-    
-    // Construir la URL con el número de versión aleatorio
     const url = `productos.json?v=${versionAleatoria}`;
-    
-    // Realizar la solicitud fetch con la nueva URL
     const respuesta = await fetch(url);
     productos = await respuesta.json();
     productosFiltrados = [...productos];
@@ -51,85 +47,131 @@ function mostrarProductos() {
     });
 }
 
-function abrirPopup(id) {
+// Funciones para el manejo del carrito
+function agregarAlCarrito(id) {
     const producto = productos.find(p => p.id === id);
-    const popup = document.getElementById('producto-popup');
-    const popupImagen = document.getElementById('popup-imagen');
-    const popupNombre = document.getElementById('popup-nombre');
-    const popupPrecio = document.getElementById('popup-precio');
-    const popupDescripcion = document.getElementById('popup-descripcion');
-    const popupAgregar = document.getElementById('popup-agregar');
+    const itemEnCarrito = carrito.find(item => item.id === id);
 
-    popupImagen.src = producto.imagen;
-    popupImagen.alt = producto.nombre;
-    popupNombre.textContent = producto.nombre;
-    popupPrecio.textContent = producto.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}`;
-    
-    popupDescripcion.innerHTML = producto.descripcion.replace(/\n/g, '<br>');
-    
-    popupAgregar.textContent = producto.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito';
-    popupAgregar.onclick = () => {
-        agregarAlCarrito(id);
-        mostrarNotificacion(producto.precio === 0 ? 'Solicitud de cotización agregada' : 'Producto agregado al carrito');
-    };
+    if (itemEnCarrito) {
+        itemEnCarrito.cantidad++;
+    } else {
+        carrito.push({ ...producto, cantidad: 1 });
+    }
 
+    actualizarCarrito();
+    actualizarContadorCarrito();
+    guardarCarritoEnLocalStorage();
+    mostrarNotificacion(producto.precio === 0 ? 'Solicitud de cotización agregada' : 'Producto agregado al carrito');
+}
+
+function eliminarDelCarrito(id) {
+    const index = carrito.findIndex(item => item.id === id);
+    if (index !== -1) {
+        if (carrito[index].cantidad > 1) {
+            carrito[index].cantidad--;
+        } else {
+            carrito.splice(index, 1);
+        }
+    }
+    actualizarCarrito();
+    actualizarContadorCarrito();
+    guardarCarritoEnLocalStorage();
+}
+
+function actualizarCarrito() {
+    const listaCarrito = document.getElementById('carrito-items');
+    const total = document.getElementById('carrito-total');
+    
+    listaCarrito.innerHTML = '';
+    let suma = 0;
+    let hayProductosCotizar = false;
+
+    carrito.forEach(item => {
+        const li = document.createElement('div');
+        if (item.precio === 0) {
+            li.innerHTML = `
+                <img src="${item.imagen}" alt="${item.nombre}">
+                <span>${item.nombre} - Cotizar x ${item.cantidad}</span>
+                <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
+            `;
+            hayProductosCotizar = true;
+        } else {
+            li.innerHTML = `
+                <img src="${item.imagen}" alt="${item.nombre}">
+                <span>${item.nombre} - ${SIMBOLO_MONEDA}${item.precio.toFixed(2)} x ${item.cantidad}</span>
+                <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
+            `;
+            suma += item.precio * item.cantidad;
+        }
+        listaCarrito.appendChild(li);
+    });
+
+    if (hayProductosCotizar) {
+        if (suma > 0) {
+            total.textContent = `Total: ${SIMBOLO_MONEDA}${suma.toFixed(2)} + Cotización`;
+        } else {
+            total.textContent = 'Total: Cotización';
+        }
+    } else {
+        total.textContent = `Total: ${SIMBOLO_MONEDA}${suma.toFixed(2)}`;
+    }
+}
+
+function actualizarContadorCarrito() {
+    const contador = document.getElementById('contador');
+    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+    contador.textContent = totalItems;
+}
+
+// Funciones para el manejo del almacenamiento local
+function guardarCarritoEnLocalStorage() {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+}
+
+function cargarCarritoDesdeLocalStorage() {
+    const carritoGuardado = localStorage.getItem('carrito');
+    if (carritoGuardado) {
+        carrito = JSON.parse(carritoGuardado);
+        actualizarCarrito();
+        actualizarContadorCarrito();
+    }
+}
+
+// Funciones para el manejo de popups
+function abrirCarritoPopup() {
+    const popup = document.getElementById('carrito-popup');
     popup.style.display = 'block';
-    void popup.offsetWidth;
-    popup.classList.add('active');
-}
-
-function mostrarNotificacion(mensaje) {
-    const notificacion = document.createElement('div');
-    notificacion.textContent = mensaje;
-    notificacion.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        z-index: 1001;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-    `;
-    document.body.appendChild(notificacion);
-
-    // Hacer visible la notificación
     setTimeout(() => {
-        notificacion.style.opacity = '1';
+        popup.classList.add('active');
     }, 10);
-
-    // Ocultar y remover la notificación después de 3 segundos
-    setTimeout(() => {
-        notificacion.style.opacity = '0';
-        setTimeout(() => {
-            document.body.removeChild(notificacion);
-        }, 300);
-    }, 3000);
 }
 
-function cerrarPopup() {
-    const popup = document.getElementById('producto-popup');
+function cerrarCarritoPopup() {
+    const popup = document.getElementById('carrito-popup');
     popup.classList.remove('active');
     setTimeout(() => {
         popup.style.display = 'none';
-    }, 300); // Este tiempo debe coincidir con la duración de la transición en CSS
+    }, 300);
 }
-
-// Agregar evento para cerrar el popup
-document.querySelector('.cerrar-popup').addEventListener('click', cerrarPopup);
-
-// Cerrar el popup si se hace clic fuera de él
-window.addEventListener('click', (event) => {
-    const popup = document.getElementById('producto-popup');
-    if (event.target === popup) {
-        cerrarPopup();
+// Funciones para la búsqueda y paginación
+function buscarProductos() {
+    const textoBusqueda = document.getElementById('buscar-producto').value.toLowerCase();
+    if (textoBusqueda.trim() === '') {
+        productosFiltrados = [...productos];
+    } else {
+        productosFiltrados = productos.filter(producto => 
+            producto.nombre.toLowerCase().includes(textoBusqueda) ||
+            producto.descripcion.toLowerCase().includes(textoBusqueda)
+        );
     }
-});
-
-
+    paginaActual = 1;
+    actualizarPaginacion();
+    
+    const productosActuales = document.querySelectorAll('.producto');
+    productosActuales.forEach(producto => producto.classList.remove('aparecer'));
+    
+    setTimeout(mostrarProductos, 50);
+}
 
 function actualizarPaginacion() {
     const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina);
@@ -171,184 +213,112 @@ function cambiarPagina(direccion) {
     }, 500);
 }
 
-function agregarAlCarrito(id) {
-    const producto = productos.find(p => p.id === id);
-    const itemEnCarrito = carrito.find(item => item.id === id);
+// Función para mostrar notificaciones
+function mostrarNotificacion(mensaje) {
+    const notificacion = document.createElement('div');
+    notificacion.textContent = mensaje;
+    notificacion.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 1001;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    `;
+    document.body.appendChild(notificacion);
 
-    if (itemEnCarrito) {
-        itemEnCarrito.cantidad++;
-    } else {
-        carrito.push({ ...producto, cantidad: 1 });
-    }
+    setTimeout(() => {
+        notificacion.style.opacity = '1';
+    }, 10);
 
-    actualizarCarrito();
-    actualizarContadorCarrito();
-    guardarCarritoEnLocalStorage();
+    setTimeout(() => {
+        notificacion.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(notificacion);
+        }, 300);
+    }, 3000);
 }
 
-function eliminarDelCarrito(id) {
-    const index = carrito.findIndex(item => item.id === id);
-    if (index !== -1) {
-        if (carrito[index].cantidad > 1) {
-            carrito[index].cantidad--;
-        } else {
-            carrito.splice(index, 1);
-        }
-    }
-    actualizarCarrito();
-    actualizarContadorCarrito();
-    guardarCarritoEnLocalStorage();
-}
-
-function actualizarCarrito() {
-    const listaCarrito = document.getElementById('lista-carrito-flotante');
-    const total = document.getElementById('total-flotante');
-    
-    listaCarrito.innerHTML = '';
-    let suma = 0;
-    let hayProductosCotizar = false;
-
-    carrito.forEach(item => {
-        const li = document.createElement('li');
-        if (item.precio === 0) {
-            li.innerHTML = `
-                <img src="${item.imagen}" alt="${item.nombre}">
-                <span>${item.nombre} - Cotizar x ${item.cantidad}</span>
-                <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
-            `;
-            hayProductosCotizar = true;
-        } else {
-            li.innerHTML = `
-                <img src="${item.imagen}" alt="${item.nombre}">
-                <span>${item.nombre} - ${SIMBOLO_MONEDA}${item.precio.toFixed(2)} x ${item.cantidad}</span>
-                <button class="eliminar" onclick="eliminarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button>
-            `;
-            suma += item.precio * item.cantidad;
-        }
-        listaCarrito.appendChild(li);
-    });
-
-    if (hayProductosCotizar) {
-        if (suma > 0) {
-            total.textContent = `${SIMBOLO_MONEDA}${suma.toFixed(2)} + Cotización`;
-        } else {
-            total.textContent = 'Cotización';
-        }
-    } else {
-        total.textContent = SIMBOLO_MONEDA + suma.toFixed(2);
-    }
-}
-
-function actualizarContadorCarrito() {
-    const contador = document.getElementById('contador');
-    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
-    contador.textContent = totalItems;
-}
-
-function guardarCarritoEnLocalStorage() {
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-}
-
-function cargarCarritoDesdeLocalStorage() {
-    const carritoGuardado = localStorage.getItem('carrito');
-    if (carritoGuardado) {
-        carrito = JSON.parse(carritoGuardado);
-        actualizarCarrito();
-        actualizarContadorCarrito();
-    }
-}
-
+// Función para ir al carrito completo
 function irACarrito() {
     window.location.href = 'carrito.html';
 }
 
-function buscarProductos() {
-    const textoBusqueda = document.getElementById('buscar-producto').value.toLowerCase();
-    if (textoBusqueda.trim() === '') {
-        productosFiltrados = [...productos];
-    } else {
-        productosFiltrados = productos.filter(producto => 
-            producto.nombre.toLowerCase().includes(textoBusqueda) ||
-            producto.descripcion.toLowerCase().includes(textoBusqueda)
-        );
-    }
-    paginaActual = 1;
-    actualizarPaginacion();
-    
-    const productosActuales = document.querySelectorAll('.producto');
-    productosActuales.forEach(producto => producto.classList.remove('aparecer'));
-    
-    setTimeout(mostrarProductos, 50);
-}
-
 // Eventos
-document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
-document.getElementById('buscar-producto').addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
-        buscarProductos();
-    }
-});
+document.addEventListener('DOMContentLoaded', () => {
+    cargarProductos();
+    cargarCarritoDesdeLocalStorage();
 
-document.getElementById('anterior').addEventListener('click', () => cambiarPagina('anterior'));
-document.getElementById('siguiente').addEventListener('click', () => cambiarPagina('siguiente'));
-
-const carritoFlotante = document.getElementById('carrito-flotante');
-const carritoContador = document.getElementById('carrito-contador');
-
-carritoContador.addEventListener('mouseenter', () => {
-    carritoFlotante.classList.remove('oculto');
-});
-
-carritoFlotante.addEventListener('mouseleave', () => {
-    carritoFlotante.classList.add('oculto');
-});
-
-document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
-
-window.addEventListener('wheel', (event) => {
-    if (isScrolling) return;
-
-    const currentTime = new Date().getTime();
-    if (currentTime - lastPageChangeTime < pageChangeDelay) return;
-
-    const scrollDirection = event.deltaY > 0 ? 'down' : 'up';
-    const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
-    const isAtTop = window.scrollY === 0;
-
-    // Acumular el desplazamiento
-    scrollAccumulator += Math.abs(event.deltaY);
-
-    if (scrollAccumulator >= scrollThreshold) {
-        if (scrollDirection === 'down' && isAtBottom) {
-            isScrolling = true;
-            cambiarPagina('siguiente');
-            lastPageChangeTime = currentTime;
-            setTimeout(() => { 
-                isScrolling = false; 
-                scrollAccumulator = 0; // Reiniciar el acumulador
-            }, 1000);
-        } else if (scrollDirection === 'up' && isAtTop) {
-            isScrolling = true;
-            cambiarPagina('anterior');
-            lastPageChangeTime = currentTime;
-            setTimeout(() => { 
-                isScrolling = false; 
-                scrollAccumulator = 0; // Reiniciar el acumulador
-            }, 1000);
-        } else {
-            scrollAccumulator = 0; // Reiniciar si no estamos en el tope o fondo
+    document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
+    document.getElementById('buscar-producto').addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            buscarProductos();
         }
-    }
-});
+    });
 
-// Reiniciar el acumulador cuando el usuario deja de desplazarse
-let scrollTimeout;
-window.addEventListener('scroll', () => {
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-        scrollAccumulator = 0;
-    }, 500);
-});
+    document.getElementById('anterior').addEventListener('click', () => cambiarPagina('anterior'));
+    document.getElementById('siguiente').addEventListener('click', () => cambiarPagina('siguiente'));
 
-cargarProductos();
-cargarCarritoDesdeLocalStorage();
+    document.getElementById('carrito-contador').addEventListener('click', abrirCarritoPopup);
+    document.querySelector('.cerrar-popup').addEventListener('click', cerrarCarritoPopup);
+
+    document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
+
+    // Cerrar el popup si se hace clic fuera de él
+    window.addEventListener('click', (event) => {
+        const popup = document.getElementById('carrito-popup');
+        if (event.target === popup) {
+            cerrarCarritoPopup();
+        }
+    });
+
+    // Manejo del scroll para cambio de página
+    window.addEventListener('wheel', (event) => {
+        if (isScrolling) return;
+
+        const currentTime = new Date().getTime();
+        if (currentTime - lastPageChangeTime < pageChangeDelay) return;
+
+        const scrollDirection = event.deltaY > 0 ? 'down' : 'up';
+        const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
+        const isAtTop = window.scrollY === 0;
+
+        scrollAccumulator += Math.abs(event.deltaY);
+
+        if (scrollAccumulator >= scrollThreshold) {
+            if (scrollDirection === 'down' && isAtBottom) {
+                isScrolling = true;
+                cambiarPagina('siguiente');
+                lastPageChangeTime = currentTime;
+                setTimeout(() => { 
+                    isScrolling = false; 
+                    scrollAccumulator = 0;
+                }, 1000);
+            } else if (scrollDirection === 'up' && isAtTop) {
+                isScrolling = true;
+                cambiarPagina('anterior');
+                lastPageChangeTime = currentTime;
+                setTimeout(() => { 
+                    isScrolling = false; 
+                    scrollAccumulator = 0;
+                }, 1000);
+            } else {
+                scrollAccumulator = 0;
+            }
+        }
+    });
+
+    // Reiniciar el acumulador cuando el usuario deja de desplazarse
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            scrollAccumulator = 0;
+        }, 500);
+    });
+});
