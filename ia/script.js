@@ -22,6 +22,8 @@ async function cargarProductos() {
     mostrarProductos();
 }
 
+let productoActual = null;
+
 function mostrarProductos() {
     const contenedor = document.getElementById('productos');
     contenedor.innerHTML = '';
@@ -45,6 +47,38 @@ function mostrarProductos() {
             divProducto.classList.add('aparecer');
         }, index * 100);
     });
+}
+
+function abrirProductoPopup(id) {
+    productoActual = productos.find(p => p.id === id);
+    const popup = document.getElementById('producto-popup');
+    const popupImagen = document.getElementById('popup-imagen');
+    const popupNombre = document.getElementById('popup-nombre');
+    const popupPrecio = document.getElementById('popup-precio');
+    const popupDescripcion = document.getElementById('popup-descripcion');
+    const popupAgregar = document.getElementById('popup-agregar');
+
+    popupImagen.src = productoActual.imagen;
+    popupImagen.alt = productoActual.nombre;
+    popupNombre.textContent = productoActual.nombre;
+    popupPrecio.textContent = productoActual.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${productoActual.precio.toFixed(2)}`;
+    popupDescripcion.textContent = productoActual.descripcion;
+    
+    popupAgregar.textContent = productoActual.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito';
+    popupAgregar.onclick = () => agregarAlCarrito(productoActual.id);
+
+    popup.style.display = 'block';
+    setTimeout(() => {
+        popup.classList.add('active');
+    }, 10);
+}
+
+function cerrarProductoPopup() {
+    const popup = document.getElementById('producto-popup');
+    popup.classList.remove('active');
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 300);
 }
 
 // Funciones para el manejo del carrito
@@ -255,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarCarritoDesdeLocalStorage();
 
     document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
+    document.querySelector('#producto-popup .cerrar-popup').addEventListener('click', cerrarProductoPopup);
     document.getElementById('buscar-producto').addEventListener('keyup', (e) => {
         if (e.key === 'Enter') {
             buscarProductos();
@@ -270,12 +305,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
 
     // Cerrar el popup si se hace clic fuera de él
+    // Cerrar el popup si se hace clic fuera de él
     window.addEventListener('click', (event) => {
-        const popup = document.getElementById('carrito-popup');
-        if (event.target === popup) {
+        const popupCarrito = document.getElementById('carrito-popup');
+        const popupProducto = document.getElementById('producto-popup');
+        if (event.target === popupCarrito) {
             cerrarCarritoPopup();
+        } else if (event.target === popupProducto) {
+            cerrarProductoPopup();
         }
     });
+
+    
 
     // Manejo del scroll para cambio de página
     window.addEventListener('wheel', (event) => {
