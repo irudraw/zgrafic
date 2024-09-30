@@ -34,7 +34,7 @@ function mostrarProductos() {
         const divProducto = document.createElement('div');
         divProducto.className = 'producto';
         divProducto.innerHTML = `
-            <img src="${producto.imagen}" alt="${producto.nombre}" onclick="abrirPopup(${producto.id})">
+            <img src="${producto.imagen}" alt="${producto.nombre}" onclick="abrirProductoPopup(${producto.id})">
             <h3>${producto.nombre}</h3>
             <p class="precio">${producto.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${producto.precio.toFixed(2)}`}</p>
             <button onclick="agregarAlCarrito(${producto.id})">${producto.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito'}</button>
