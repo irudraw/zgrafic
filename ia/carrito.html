@@ -4,40 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito de Compras</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="carrito-styles.css">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="dark-theme.css">
 </head>
 <body>
-
-<header>
+    <header>
         <h1>Carrito de Compras</h1>
         <a href="index.html" class="btn-volver">
-    <i class="fas fa-store"></i>
-    <span>Volver a la Tienda</span>
+            <i class="fas fa-arrow-left"></i>
+            <span>Volver a la Tienda</span>
         </a>
-</header>
+    </header>
 
     <div id="mensaje-confirmacion" class="mensaje-confirmacion" style="display: none;"></div>
 
-<main role="main">
-  <div id="carrito-contenido">
-    <div class="carrito-encabezado">
-      <span>Producto</span>
-      <span>Precio</span>
-      <span>Cantidad</span>
-      <span>Acciones</span>
-    </div>
-    <ul id="lista-carrito"></ul>
-  </div>
+    <main>
+        <section id="carrito-contenido">
+            <div class="carrito-encabezado">
+                <span>Producto</span>
+                <span>Precio</span>
+                <span>Cantidad</span>
+                <span>Acciones</span>
+            </div>
+            <ul id="lista-carrito"></ul>
+        </section>
 
-  <div id="carrito-footer">
-    <div class="carrito-total">
-      Total: <span id="total">0</span>
-    </div>
-    <button id="realizar-pedido" class="btn-realizar-pedido">Realizar Pedido por WhatsApp</button>
-  </div>
-</main>
+        <div id="carrito-footer">
+            <div class="carrito-total">
+                Total: <span id="total">S/. 0.00</span>
+            </div>
+            <button id="realizar-pedido" class="btn-realizar-pedido">Realizar Pedido por WhatsApp</button>
+        </div>
+    </main>
 
     <script src="carrito.js"></script>
 </body>

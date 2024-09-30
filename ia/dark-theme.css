@@ -1,0 +1,147 @@
+/* Tema oscuro inspirado en WhatsApp */
+body {
+    background-color: #111b21;
+    color: #e9edef;
+}
+
+header {
+    background-color: #202c33;
+}
+
+#carrito-flotante {
+    background-color: #202c33;
+    border-color: #30383d;
+}
+
+.carrito-header {
+    background-color: #202c33;
+}
+
+.carrito-footer {
+    background-color: #202c33;
+    border-color: #30383d;
+}
+
+#lista-carrito-flotante li {
+    background-color: #2a3942;
+}
+
+.producto {
+    background-color: #202c33;
+    border-color: #30383d;
+}
+
+.producto h3 {
+    color: #e9edef;
+}
+
+.producto .precio {
+    color: #00a884;
+}
+
+.producto .descripcion {
+    color: #8696a0;
+}
+
+button, #ver-carrito-completo {
+    background-color: #00a884;
+}
+
+button:hover, #ver-carrito-completo:hover {
+    background-color: #008f72;
+}
+
+#buscador {
+    background-color: #202c33;
+}
+
+#buscar-producto {
+    color: #e9edef;
+}
+
+#btn-buscar {
+    color: #00a884;
+}
+
+#btn-buscar:hover {
+    background-color: rgba(0, 168, 132, 0.1);
+}
+
+.popup {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.popup-content {
+    background-color: #202c33;
+    border-color: #30383d;
+}
+
+#popup-precio {
+    color: #00a884;
+}
+
+.cerrar-popup {
+    color: #8696a0;
+}
+
+.cerrar-popup:hover,
+.cerrar-popup:focus {
+    color: #e9edef;
+}
+
+/* Estilos específicos para carrito.html */
+.btn-volver {
+    background-color: #00a884;
+    color: #e9edef;
+}
+
+.btn-volver:hover {
+    background-color: #008f72;
+}
+
+#carrito-footer {
+    background-color: #202c33;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-realizar-pedido {
+    background-color: #00a884;
+}
+
+.btn-realizar-pedido:hover {
+    background-color: #008f72;
+}
+
+.btn-realizar-pedido.disabled {
+    background-color: #30383d;
+    color: #8696a0;
+}
+
+.carrito-encabezado {
+    background-color: #202c33;
+    border-bottom-color: #30383d;
+}
+
+#lista-carrito li {
+    border-bottom-color: #30383d;
+}
+
+.cantidad-input {
+    background-color: #2a3942;
+    border-color: #30383d;
+    color: #e9edef;
+}
+
+.btn-cantidad {
+    background-color: #00a884;
+    color: #e9edef;
+}
+
+.btn-eliminar {
+    color: #f44336;
+}
+
+.mensaje-confirmacion {
+    background-color: #00a884;
+    color: #e9edef;
+}

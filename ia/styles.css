@@ -1,8 +1,9 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #f0f2f5;
+    color: #111b21;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -10,9 +11,9 @@ body {
 }
 
 header {
-    background-color: #333;
+    background-color: #00a884;
     color: white;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -25,7 +26,8 @@ header {
 
 header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    color: #fff;
 }
 
 #carrito-contador {
@@ -44,7 +46,7 @@ header h1 {
     position: absolute;
     top: -10px;
     right: -10px;
-    background-color: red;
+    background-color: #ff3b30;
     color: white;
     border-radius: 50%;
     padding: 2px 6px;
@@ -55,9 +57,9 @@ header h1 {
     position: fixed;
     top: 60px;
     right: 10px;
-    background-color: white;
+    background-color: #fff;
     border: 1px solid #ddd;
-    border-radius: 10px;
+    border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     z-index: 1000;
     width: 300px;
@@ -78,9 +80,9 @@ header h1 {
 
 .carrito-header {
     padding: 1rem;
-    background-color: #f9f9f9;
-    border-bottom: 1px solid #ddd;
-    border-radius: 10px 10px 0 0;
+    background-color: #00a884;
+    color: #fff;
+    border-radius: 8px 8px 0 0;
 }
 
 .carrito-header h3 {
@@ -103,7 +105,7 @@ header h1 {
     border-top: 1px solid #ddd;
     padding: 1rem;
     background-color: #f9f9f9;
-    border-radius: 0 0 10px 10px;
+    border-radius: 0 0 8px 8px;
 }
 
 #lista-carrito-flotante {
@@ -116,9 +118,9 @@ header h1 {
     display: flex;
     align-items: center;
     margin-bottom: 0.5rem;
-    background-color: #f9f9f9;
+    background-color: #f0f2f5;
     padding: 0.5rem;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
 #lista-carrito-flotante li img {
@@ -132,16 +134,17 @@ header h1 {
 #ver-carrito-completo {
     width: 100%;
     padding: 0.5rem;
-    background-color: #4CAF50;
+    background-color: #00a884;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 #ver-carrito-completo:hover {
-    background-color: #45a049;
+    background-color: #008f72;
 }
 
 main {
@@ -182,7 +185,7 @@ main {
     padding: 1rem;
     text-align: center;
     background-color: white;
-    border-radius: 10px;
+    border-radius: 8px;
     transition: box-shadow 0.3s ease, transform 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -207,7 +210,7 @@ main {
     max-width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: 8px 8px 0 0;
     cursor: pointer;
     margin-bottom: 1rem;
     transition: transform 0.3s ease;
@@ -220,10 +223,11 @@ main {
 .producto h3 {
     margin: 0.5rem 0;
     font-size: 1.1rem;
+    color: #111b21;
 }
 
 .producto button {
-    background-color: #4CAF50;
+    background-color: #00a884;
     color: white;
     border: none;
     padding: 0.5rem 1rem;
@@ -233,17 +237,18 @@ main {
     font-size: 1rem;
     margin-top: 0.5rem;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 20px;
     transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 .producto button:hover {
-    background-color: #45a049;
+    background-color: #008f72;
 }
 
 .producto .precio {
     font-weight: bold;
-    color: #4CAF50;
+    color: #00a884;
 }
 
 .producto .descripcion {
@@ -253,7 +258,7 @@ main {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: #00a884;
     border: none;
     color: white;
     padding: 0.5rem 1rem;
@@ -263,12 +268,13 @@ button {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 20px;
     transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #008f72;
 }
 
 .eliminar {
@@ -287,6 +293,9 @@ button:hover {
     margin: 0 1rem;
     flex-grow: 1;
     max-width: 500px;
+    background-color: #f0f2f5;
+    border-radius: 8px;
+    padding: 0.25rem;
 }
 
 #buscar-producto {
@@ -294,21 +303,23 @@ button:hover {
     padding: 0.5rem;
     font-size: 1rem;
     border: none;
-    border-radius: 5px 0 0 5px;
+    border-radius: 8px 0 0 8px;
+    background-color: transparent;
+    color: #111b21;
 }
 
 #btn-buscar {
     padding: 0.5rem 1rem;
     font-size: 1rem;
-    background-color: #4CAF50;
-    color: white;
+    background-color: transparent;
+    color: #00a884;
     border: none;
-    border-radius: 0 5px 5px 0;
+    border-radius: 0 8px 8px 0;
     cursor: pointer;
 }
 
 #btn-buscar:hover {
-    background-color: #45a049;
+    background-color: rgba(0, 168, 132, 0.1);
 }
 
 #paginacion {
@@ -319,7 +330,7 @@ button:hover {
 }
 
 .btn-pagina {
-    background-color: #4CAF50;
+    background-color: #00a884;
     color: white;
     border: none;
     border-radius: 50%;
@@ -331,10 +342,11 @@ button:hover {
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin: 0 1rem;
+    font-weight: bold;
 }
 
 .btn-pagina:hover {
-    background-color: #45a049;
+    background-color: #008f72;
 }
 
 .btn-pagina:disabled {
@@ -353,7 +365,7 @@ button:hover {
     left: 0;
     width: 100%;
     height: 5px;
-    background-color: #4CAF50;
+    background-color: #00a884;
     transform: scaleX(0);
     transform-origin: 0 50%;
     transition: transform 0.5s ease-out;
@@ -385,13 +397,13 @@ button:hover {
 }
 
 .popup-content {
-    background-color: #fefefe;
+    background-color: #fff;
     margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 90%;
     max-width: 800px;
-    border-radius: 10px;
+    border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     transform: scale(0.7);
     opacity: 0;
@@ -417,7 +429,7 @@ button:hover {
 #popup-imagen {
     width: 100%;
     height: auto;
-    border-radius: 5px;
+    border-radius: 8px;
     object-fit: cover;
     transform: scale(1.1);
     transition: transform 0.3s ease;
@@ -448,7 +460,7 @@ button:hover {
 
 #popup-precio {
     font-weight: bold;
-    color: #4CAF50;
+    color: #00a884;
     margin-bottom: 10px;
 }
 
@@ -460,16 +472,17 @@ button:hover {
 #popup-agregar {
     align-self: flex-start;
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #00a884;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-weight: bold;
 }
 
 #popup-agregar:hover {
-    background-color: #45a049;
+    background-color: #008f72;
 }
 
 .cerrar-popup {
@@ -537,19 +550,14 @@ button:hover {
     }
 }
 
-.producto .precio {
-    font-weight: bold;
-    color: #4CAF50;
-}
-
 .producto .precio:contains('Cotizar') {
-    color: #FFA500;
+    color: #ffa500;
 }
 
 .btn-cotizar {
-    background-color: #FFA500;
+    background-color: #ffa500;
 }
 
 .btn-cotizar:hover {
-    background-color: #FF8C00;
+    background-color: #ff8c00;
 }

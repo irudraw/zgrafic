@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda en línea</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dark-theme.css">
 </head>
 <body>
     <div class="page-transition"></div>
 
     <header>
         <h1>Tienda en línea</h1>
-
+        
         <div id="buscador">
             <input type="text" id="buscar-producto" placeholder="Buscar productos...">
             <button id="btn-buscar"><i class="fas fa-search"></i></button>
@@ -32,7 +33,7 @@
             <ul id="lista-carrito-flotante"></ul>
         </div>
         <div class="carrito-footer">
-            Total: <span id="total-flotante">0</span>
+            <p>Total: <span id="total-flotante">S/. 0.00</span></p>
             <button id="ver-carrito-completo">Ver Carrito Completo</button>
         </div>
     </div>
@@ -42,7 +43,7 @@
 
         <div id="paginacion">
             <button id="anterior" class="btn-pagina">&lt;</button>
-            <span><span id="pagina-actual">1</span> de <span id="total-paginas">1</span></span>
+            <span id="pagina-actual">1</span> de <span id="total-paginas">1</span>
             <button id="siguiente" class="btn-pagina">&gt;</button>
         </div>
     </main>
