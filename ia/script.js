@@ -62,7 +62,9 @@ function abrirProductoPopup(id) {
     popupImagen.alt = productoActual.nombre;
     popupNombre.textContent = productoActual.nombre;
     popupPrecio.textContent = productoActual.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${productoActual.precio.toFixed(2)}`;
-    popupDescripcion.textContent = productoActual.descripcion;
+    
+    // Reemplazar '\n' con '<br>' para los saltos de línea
+    popupDescripcion.innerHTML = productoActual.descripcion.replace(/\n/g, '<br>');
     
     popupAgregar.textContent = productoActual.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito';
     popupAgregar.onclick = () => agregarAlCarrito(productoActual.id);

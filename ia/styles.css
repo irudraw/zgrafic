@@ -196,6 +196,7 @@ main {
     color: #666;
     margin-bottom: 1rem;
 }
+
 /* Estilos para el popup del carrito */
 .popup {
     display: none;
@@ -374,17 +375,6 @@ main {
     }
 }
 
-@media (max-width: 600px) {
-    .popup-flex {
-        flex-direction: column;
-    }
-
-    .popup-imagen-container {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-}
-
 .producto .precio:contains('Cotizar') {
     color: #ffa500;
 }
@@ -395,4 +385,81 @@ main {
 
 .btn-cotizar:hover {
     background-color: #ff8c00;
+}
+
+/* Estilos para el popup del producto */
+.popup-flex {
+    display: flex;
+    gap: 20px;
+}
+
+.popup-imagen-container {
+    flex: 1;
+    max-width: 50%;
+}
+
+.popup-imagen-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.popup-detalles {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-detalles h2 {
+    margin-top: 0;
+    color: #00a884;
+}
+
+.popup-detalles .precio {
+    font-weight: bold;
+    color: #00a884;
+    margin-bottom: 10px;
+}
+
+.popup-detalles .descripcion {
+    flex-grow: 1;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+}
+
+.popup-detalles button {
+    align-self: flex-start;
+    background-color: #00a884;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.popup-detalles button:hover {
+    background-color: #008f72;
+}
+
+@media (max-width: 768px) {
+    .popup-flex {
+        flex-direction: column;
+    }
+
+    .popup-imagen-container {
+        max-width: 100%;
+    }
+
+    .popup-detalles {
+        margin-top: 20px;
+    }
 }
