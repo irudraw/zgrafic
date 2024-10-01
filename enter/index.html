@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de salto de línea HTML</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #0D1418;
+            color: #E9EDF0;
+        }
+        h1 {
+            color: #00A884;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            background-color: #2A3942;
+            border: 1px solid #435058;
+            color: #E9EDF0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #00A884;
+            color: #E9EDF0;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #008f72;
+        }
+        #copyButton {
+            background-color: #34B7F1;
+        }
+        #copyButton:hover {
+            background-color: #2C9ECD;
+        }
+        .button-container {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        #mensaje {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #00A884;
+            color: #E9EDF0;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generador de salto de línea HTML</h1>
+    <textarea id="entrada" placeholder="Escribe tu texto aquí..."></textarea>
+    <div class="button-container">
+        <button onclick="convertir()">Convertir</button>
+        <button id="copyButton" onclick="copiarResultado()">
+            <i class="fas fa-copy"></i> Copiar
+        </button>
+    </div>
+    <textarea id="salida" readonly placeholder="Resultado..."></textarea>
+    <div id="mensaje"></div>
+
+    <script>
+        function convertir() {
+            const texto = document.getElementById('entrada').value;
+            const lineas = texto.split('\n');
+            let convertido = '';
+        
+            for (let i = 0; i < lineas.length; i++) {
+                const linea = lineas[i].trim();
+                
+                if (linea === '') {
+                    convertido += '\\n';
+                } else {
+                    convertido += linea + '\\n';
+                }
+            }
+        
+            // Removemos el último \n añadido
+            convertido = convertido.slice(0, -2);
+        
+            document.getElementById('salida').value = convertido;
+        }
+
+        function copiarResultado() {
+            const salida = document.getElementById('salida');
+            salida.select();
+            document.execCommand('copy');
+            mostrarMensaje('Texto copiado al portapapeles');
+        }
+
+        function mostrarMensaje(texto) {
+            const mensaje = document.getElementById('mensaje');
+            mensaje.textContent = texto;
+            mensaje.style.display = 'block';
+            mensaje.style.opacity = '1';
+
+            setTimeout(() => {
+                mensaje.style.opacity = '0';
+                setTimeout(() => {
+                    mensaje.style.display = 'none';
+                }, 500);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
