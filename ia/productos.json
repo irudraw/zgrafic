@@ -26,6 +26,13 @@
         "precio": 90,
         "imagen": "img/roll-screen-60x160.jpg",
         "descripcion": "Sistema Enrollable\nPeso 2 Kgs.\nIncluye impresion grafica,\nIncluye maletín textil"
+    },
+    {
+        "id": 5,
+        "nombre": "ROLL SCREEN 0.85 X 2.00 MTS",
+        "precio": 120,
+        "imagen": "img/roll-screen-85x200.jpg",
+        "descripcion": "Producto ideal para la presentación de una promocion o imagen empresarial."
     }
     
 ]
