@@ -51,20 +51,37 @@ button:hover, #ver-carrito-completo:hover {
     background-color: #008f72;
 }
 
+/* Estilos actualizados para el buscador */
 #buscador {
-    background-color: #202c33;
+    background-color: #2a3942;
+    border-radius: 8px;
+    padding: 8px;
+
 }
 
 #buscar-producto {
+    background-color: transparent;
     color: #e9edef;
+    border: none;
+    width: 100%;
+    padding: 8px;
+    font-size: 15px;
+}
+
+#buscar-producto::placeholder {
+    color: #8696a0;
 }
 
 #btn-buscar {
-    color: #00a884;
+    background-color: transparent;
+    color: #8696a0;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
 }
 
 #btn-buscar:hover {
-    background-color: rgba(0, 168, 132, 0.1);
+    color: #00a884;
 }
 
 .popup {
