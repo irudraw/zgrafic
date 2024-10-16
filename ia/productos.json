@@ -33,6 +33,13 @@
         "precio": 120,
         "imagen": "img/roll-screen-85x200.jpg",
         "descripcion": "Producto ideal para la presentación de una promocion o imagen empresarial."
+    },
+    {
+        "id": 6,
+        "nombre": "ROLL SCREEN 1.0 X 2.0 MTS",
+        "precio": 140,
+        "imagen": "img/roll-screen-100x200.jpg",
+        "descripcion": "Display de sistema enrollable de la mejor calidad permite desplegar el banner por medio de un sistema de enrollable y tension, con buena estabilidad para uso interiores no ocupada espacio."
     }
     
 ]
