@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -168,7 +168,7 @@
 
             $('.bottom-buttons .btn').click(function(e) {
                 e.preventDefault();
-                const tipo = $(this).data('tipo');
+                //const tipo = $(this).data('tipo');
                 const cliente = $(this).data('cliente');
                 window.history.pushState({}, '', '?tipo=' + tipo + '&cliente=' + cliente);
                 applyUrlParams();
