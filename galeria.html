@@ -1,21 +1,20 @@
+---
+layout: default
+title: Galería
+permalink: /galeria/
+---
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ site.title }}</title>
+    <title>Galería - {{ site.title }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        .gallery-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
         }
 
         .category {
@@ -26,10 +25,11 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        h2 {
+        .category h2 {
             color: #444;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
+            margin-top: 0;
         }
 
         .gallery {
@@ -45,6 +45,7 @@
             border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: transform 0.3s ease;
+            aspect-ratio: 3/2;
         }
 
         .image-container:hover {
@@ -53,43 +54,52 @@
 
         .image-container img {
             width: 100%;
-            height: 200px;
+            height: 100%;
             object-fit: cover;
             display: block;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
         }
     </style>
 </head>
 <body>
-    <h1>{{ site.title }}</h1>
+    <div class="gallery-container">
+        <h1>Galería de Imágenes</h1>
 
-    {% assign categories = "" | split: "" %}
-    {% for file in site.static_files %}
-        {% if file.path contains '/imagenes/' %}
-            {% assign category = file.path | split: '/' | last | split: '.' | first | split: '-' | first %}
-            {% unless categories contains category %}
-                {% assign categories = categories | push: category %}
-            {% endunless %}
-        {% endif %}
-    {% endfor %}
+        {% assign categories = "" | split: "" %}
+        {% for file in site.static_files %}
+            {% if file.path contains '/imagenes/' %}
+                {% assign category = file.path | split: '/' | last | split: '.' | first | split: '-' | first %}
+                {% unless categories contains category %}
+                    {% assign categories = categories | push: category %}
+                {% endunless %}
+            {% endif %}
+        {% endfor %}
 
-    {% for category in categories %}
-        <div class="category">
-            <h2>{{ category | capitalize }}</h2>
-            <div class="gallery">
-                {% for file in site.static_files %}
-                    {% if file.path contains '/imagenes/' %}
-                        {% assign image_category = file.path | split: '/' | last | split: '.' | first | split: '-' | first %}
-                        {% if image_category == category %}
-                            {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' %}
-                                <div class="image-container">
-                                    <img src="{{ file.path | relative_url }}" alt="{{ file.name }}" loading="lazy">
-                                </div>
+        {% assign sorted_categories = categories | sort %}
+        {% for category in sorted_categories %}
+            <div class="category">
+                <h2>{{ category | capitalize }}</h2>
+                <div class="gallery">
+                    {% for file in site.static_files %}
+                        {% if file.path contains '/imagenes/' %}
+                            {% assign image_category = file.path | split: '/' | last | split: '.' | first | split: '-' | first %}
+                            {% if image_category == category %}
+                                {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' %}
+                                    <div class="image-container">
+                                        <img src="{{ file.path | relative_url }}" alt="{{ file.name | split: '.' | first }}" loading="lazy">
+                                    </div>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
-                    {% endif %}
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </body>
 </html>
