@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ site.title }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .category {
+      margin: 20px 0;
+      width: 100%;
+      max-width: 800px;
+    }
+    .category h2 {
+      text-align: left;
+      font-size: 1.5em;
+      color: #333;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 5px;
+      margin-top: 20px;
+    }
+    #gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .image-container {
+      width: 150px;
+      height: 150px;
+      overflow: hidden;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+    .image-container img {
+      width: 100%;
+      height: auto;
+    }
+    .image-container:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>{{ site.title }}</h1>
+
+  {% assign categories = site.static_files | group_by_exp:"file", "file.path | split: '/' | last | split: '/' | first" %}
+  
+  {% for category in categories %}
+    <div class="category">
+      <h2>{{ category.name }}</h2>
+      <div id="gallery">
+        {% for image in category.items %}
+          {% if image.extname == '.jpg' or image.extname == '.png' or image.extname == '.jpeg' %}
+            <div class="image-container">
+              <img src="{{ image.path | relative_url }}" alt="{{ image.name }}">
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+
+</body>
+</html>
