@@ -54,17 +54,30 @@
 <body>
   <h1>{{ site.title }}</h1>
 
-  {% assign images_by_category = site.static_files | where_exp: "file", "file.path contains '/imagenes/'" | group_by: "dir" %}
+  {% assign categories = "" | split: "" %}
 
-  {% for category in images_by_category %}
+  <!-- Recorre los archivos en la carpeta "imagenes" -->
+  {% for file in site.static_files %}
+    {% if file.path contains '/imagenes/' %}
+      {% assign category = file.path | split: '/' | last | prepend: '/' %}
+      {% unless categories contains category %}
+        {% assign categories = categories | push: category %}
+      {% endunless %}
+    {% endif %}
+  {% endfor %}
+
+  <!-- Muestra las categorías y sus imágenes -->
+  {% for category in categories %}
     <div class="category">
-      <h2>{{ category.name | split: '/' | last }}</h2>
+      <h2>{{ category | split: '/' | last }}</h2>
       <div id="gallery">
-        {% for image in category.items %}
-          {% if image.extname == '.jpg' or image.extname == '.png' or image.extname == '.jpeg' %}
-            <div class="image-container">
-              <img src="{{ image.path | relative_url }}" alt="{{ image.name }}">
-            </div>
+        {% for file in site.static_files %}
+          {% if file.path contains category %}
+            {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' %}
+              <div class="image-container">
+                <img src="{{ file.path | relative_url }}" alt="{{ file.name }}">
+              </div>
+            {% endif %}
           {% endif %}
         {% endfor %}
       </div>
