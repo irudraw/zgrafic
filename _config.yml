@@ -1,5 +1,5 @@
-# _config.yml
-title: "Galería de Imágenes con Categorías"
-url: "https://zgrafic.com/"  # Asegúrate de incluir tu dominio personalizado aquí
+title: Galería de Imágenes
+url: "https://zgrafic.com"
+baseurl: ""
 include:
   - imagenes
