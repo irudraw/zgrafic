@@ -1,5 +1,5 @@
-title: Galería de Imágenes con Categorías
-baseurl: "" # cambiar si tu sitio no está en la raíz
-url: "" # tu URL de GitHub Pages
+# _config.yml
+title: "Galería de Imágenes con Categorías"
+url: "https://zgrafic.com/"  # Asegúrate de incluir tu dominio personalizado aquí
 include:
   - imagenes
