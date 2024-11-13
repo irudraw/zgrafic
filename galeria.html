@@ -54,11 +54,11 @@
 <body>
   <h1>{{ site.title }}</h1>
 
-  {% assign categories = site.static_files | group_by_exp:"file", "file.path | split: '/' | last | split: '/' | first" %}
-  
-  {% for category in categories %}
+  {% assign images_by_category = site.static_files | where_exp: "file", "file.path contains '/imagenes/'" | group_by: "dir" %}
+
+  {% for category in images_by_category %}
     <div class="category">
-      <h2>{{ category.name }}</h2>
+      <h2>{{ category.name | split: '/' | last }}</h2>
       <div id="gallery">
         {% for image in category.items %}
           {% if image.extname == '.jpg' or image.extname == '.png' or image.extname == '.jpeg' %}
