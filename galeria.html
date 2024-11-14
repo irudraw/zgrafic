@@ -5,19 +5,19 @@ permalink: /galeria/
 ---
 
 <style>
-    /* Estilos del Loader */
     .loader {
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 200px;
+        min-height: 100px;
+        margin: 20px 0;
     }
 
     .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #3498db;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
@@ -27,7 +27,6 @@ permalink: /galeria/
         100% { transform: rotate(360deg); }
     }
 
-    /* Estilos del Contenedor Principal */
     .page-container {
         display: flex;
         gap: 2rem;
@@ -36,13 +35,14 @@ permalink: /galeria/
         margin: 0 auto;
     }
 
-    /* Estilos del Menú Lateral */
     .sidebar-menu {
         flex: 0 0 200px;
         padding: 1rem;
         background: #f8f9fa;
         border-radius: 8px;
         height: fit-content;
+        position: sticky;
+        top: 20px;
     }
 
     .sidebar-menu h3 {
@@ -73,14 +73,13 @@ permalink: /galeria/
         color: white;
     }
 
-    /* Estilos de la Galería */
     .gallery-container {
         flex: 1;
     }
 
     .gallery {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 1.5rem;
         padding: 1rem;
     }
@@ -93,6 +92,16 @@ permalink: /galeria/
         cursor: pointer;
         transition: transform 0.3s ease;
         aspect-ratio: 1;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .image-container:hover {
@@ -129,7 +138,6 @@ permalink: /galeria/
         transform: translateY(0);
     }
 
-    /* Estilos del Modal */
     .modal {
         display: none;
         position: fixed;
@@ -141,32 +149,22 @@ permalink: /galeria/
         z-index: 1000;
         justify-content: center;
         align-items: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
     }
 
     .modal.active {
         display: flex;
-        opacity: 1;
     }
 
     .modal-content {
         max-width: 90%;
         max-height: 90vh;
         position: relative;
-        transform: scale(0.9);
-        transition: transform 0.3s ease;
-    }
-
-    .modal.active .modal-content {
-        transform: scale(1);
     }
 
     .modal-content img {
         max-width: 100%;
         max-height: 90vh;
         object-fit: contain;
-        border-radius: 4px;
     }
 
     .modal-close {
@@ -179,15 +177,8 @@ permalink: /galeria/
         background: none;
         border: none;
         padding: 5px;
-        opacity: 0.8;
-        transition: opacity 0.3s ease;
     }
 
-    .modal-close:hover {
-        opacity: 1;
-    }
-
-    /* Estilos Responsivos */
     @media (max-width: 768px) {
         .page-container {
             flex-direction: column;
@@ -195,7 +186,8 @@ permalink: /galeria/
         }
         
         .sidebar-menu {
-            flex: none;
+            position: relative;
+            top: 0;
             width: auto;
         }
 
@@ -204,11 +196,11 @@ permalink: /galeria/
             gap: 1rem;
         }
     }
-</style>
 
-<div class="loader">
-    <div class="spinner"></div>
-</div>
+    .hidden {
+        display: none !important;
+    }
+</style>
 
 <div class="page-container">
     <div class="sidebar-menu">
@@ -237,7 +229,7 @@ permalink: /galeria/
                 {% if file.path contains '/imagenes/' %}
                     {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
                         {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                        <div class="image-container" data-category="{{ category | slugify }}">
+                        <div class="image-container hidden" data-category="{{ category | slugify }}">
                             <img src="{{ file.path | relative_url }}" alt="{{ file.name | split: '.' | first }}" loading="lazy">
                             <div class="image-title">
                                 {{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}
@@ -246,6 +238,9 @@ permalink: /galeria/
                     {% endif %}
                 {% endif %}
             {% endfor %}
+        </div>
+        <div class="loader hidden">
+            <div class="spinner"></div>
         </div>
     </div>
 </div>
@@ -259,13 +254,92 @@ permalink: /galeria/
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const imageContainers = document.querySelectorAll('.image-container');
+    const imageContainers = Array.from(document.querySelectorAll('.image-container'));
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
     const modalClose = document.querySelector('.modal-close');
     const categoryButtons = document.querySelectorAll('.sidebar-menu li');
+    const loader = document.querySelector('.loader');
+    
+    let currentCategory = 'all';
+    let currentIndex = 0;
+    const imagesPerLoad = 9;
+    let isLoading = false;
 
-    // Función para abrir el modal
+    // Función para mostrar las imágenes iniciales
+    function showInitialImages() {
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        // Ocultar todas las imágenes primero
+        imageContainers.forEach(container => container.classList.add('hidden'));
+
+        // Mostrar las primeras imágenes
+        visibleImages.slice(0, imagesPerLoad).forEach(container => {
+            container.classList.remove('hidden');
+        });
+
+        currentIndex = imagesPerLoad;
+        checkAndLoadMore();
+    }
+
+    // Función para cargar más imágenes
+    function loadMoreImages() {
+        if (isLoading) return;
+
+        isLoading = true;
+        loader.classList.remove('hidden');
+
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        setTimeout(() => {
+            const nextImages = visibleImages.slice(currentIndex, currentIndex + imagesPerLoad);
+            
+            nextImages.forEach(container => {
+                container.classList.remove('hidden');
+            });
+
+            currentIndex += imagesPerLoad;
+            isLoading = false;
+            loader.classList.add('hidden');
+            checkAndLoadMore();
+        }, 500); // Pequeño delay para mostrar el loader
+    }
+
+    // Función para verificar si necesitamos cargar más imágenes
+    function checkAndLoadMore() {
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        if (currentIndex >= visibleImages.length) {
+            loader.classList.add('hidden');
+        } else {
+            loader.classList.remove('hidden');
+        }
+    }
+
+    // Observer para el scroll infinito
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isLoading) {
+                loadMoreImages();
+            }
+        });
+    }, options);
+
+    observer.observe(loader);
+
+    // Funciones del modal
     function openModal(imgSrc, imgAlt) {
         modalImg.src = imgSrc;
         modalImg.alt = imgAlt;
@@ -273,7 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = 'hidden';
     }
 
-    // Función para cerrar el modal
     function closeModal() {
         modal.classList.remove('active');
         document.body.style.overflow = 'auto';
@@ -287,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Event listener para cerrar el modal
+    // Event listeners para el modal
     modalClose.addEventListener('click', closeModal);
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
@@ -295,58 +368,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Cerrar con tecla Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeModal();
         }
     });
 
-    // Filtrado por categorías
+    // Event listeners para las categorías
     categoryButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const category = this.dataset.category;
+            currentCategory = this.dataset.category;
+            currentIndex = 0;
             
-            // Actualizar botones
             categoryButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
 
-            // Filtrar imágenes con animación
-            imageContainers.forEach(container => {
-                container.style.transition = 'opacity 0.3s ease';
-                if (category === 'all' || container.dataset.category === category) {
-                    container.style.display = '';
-                    setTimeout(() => {
-                        container.style.opacity = '1';
-                    }, 50);
-                } else {
-                    container.style.opacity = '0';
-                    setTimeout(() => {
-                        container.style.display = 'none';
-                    }, 300);
-                }
-            });
+            showInitialImages();
         });
     });
 
-    // Ocultar el loader cuando se carguen todas las imágenes
-    let loadedImages = 0;
-    const totalImages = document.querySelectorAll('img').length;
-
-    function imageLoaded() {
-        loadedImages++;
-        if (loadedImages === totalImages) {
-            document.querySelector('.loader').style.display = 'none';
-        }
-    }
-
-    document.querySelectorAll('img').forEach(img => {
-        if (img.complete) {
-            imageLoaded();
-        } else {
-            img.addEventListener('load', imageLoaded);
-            img.addEventListener('error', imageLoaded);
-        }
-    });
+    // Iniciar la galería
+    showInitialImages();
 });
 </script>
