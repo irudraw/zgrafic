@@ -9,9 +9,23 @@ permalink: /galeria/
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería - {{ site.title }}</title>
+    <title>Catálogo de Imágenes - {{ site.title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Estilos generales */
+        /* Estilos base y variables */
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-color: #f9fafb;
+            --text-color: #2c3e50;
+            --border-color: #edf2f7;
+            --hover-color: #f7fafc;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -19,109 +33,141 @@ permalink: /galeria/
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+            font-family: 'Playfair Display', serif;
             line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        /* Header elegante */
+        .header {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: linear-gradient(to right, #2c3e50, #3498db);
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         /* Contenedor principal */
         .page-container {
             display: flex;
-            min-height: 100vh;
             max-width: 1800px;
             margin: 0 auto;
             background-color: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            min-height: calc(100vh - 200px);
         }
 
-        /* Estilos del sidebar */
+        /* Sidebar elegante */
         .sidebar {
-            width: 250px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-right: 1px solid #dee2e6;
-            flex-shrink: 0;
+            width: 300px;
+            background: white;
+            padding: 2rem;
+            border-right: 1px solid var(--border-color);
         }
 
         .sidebar-menu {
             position: sticky;
-            top: 20px;
+            top: 2rem;
         }
 
         .sidebar-menu h3 {
-            margin-top: 0;
-            color: #212529;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #dee2e6;
-            font-size: 1.2em;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .sidebar-menu h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--accent-color);
         }
 
         .category-menu {
             list-style: none;
-            padding: 0;
-            margin-top: 15px;
         }
 
         .category-menu li {
-            margin: 8px 0;
+            margin: 0.5rem 0;
         }
 
         .category-menu button {
             width: 100%;
-            color: #495057;
-            padding: 10px 15px;
-            border-radius: 6px;
+            padding: 0.8rem 1.2rem;
             border: none;
             background: none;
+            color: var(--text-color);
+            font-size: 1rem;
             text-align: left;
             cursor: pointer;
-            font-size: 0.95em;
-            transition: all 0.2s ease;
-            font-weight: 500;
+            border-radius: 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .category-menu button i {
+            margin-right: 10px;
+            font-size: 1.1rem;
         }
 
         .category-menu button:hover {
-            background-color: #e9ecef;
-            color: #212529;
+            background-color: var(--hover-color);
+            transform: translateX(5px);
         }
 
         .category-menu button.active {
-            background-color: #0d6efd;
+            background-color: var(--primary-color);
             color: white;
         }
 
         /* Contenedor de la galería */
         .gallery-container {
             flex: 1;
-            padding: 30px;
+            padding: 2rem;
             background-color: white;
-        }
-
-        .gallery-container h1 {
-            color: #212529;
-            margin-bottom: 30px;
-            font-size: 2em;
-            border-bottom: 3px solid #dee2e6;
-            padding-bottom: 10px;
         }
 
         /* Grid de la galería */
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 20px 0;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
         }
 
         /* Contenedor de imágenes */
         .image-container {
             position: relative;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            aspect-ratio: 3/2;
-            background-color: #f8f9fa;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            aspect-ratio: 3/4;
+            background-color: var(--bg-color);
         }
 
         .image-container.hidden {
@@ -129,27 +175,86 @@ permalink: /galeria/
         }
 
         .image-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
         }
 
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
-            transition: transform 0.3s ease;
+            transition: var(--transition);
         }
 
         .image-container:hover img {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
-        /* Estilos responsive */
-        @media (max-width: 1200px) {
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            color: white;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .image-container:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .image-overlay h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .image-overlay p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Loader elegante */
+        .loader {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .image-container {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .page-container {
+                margin: 1rem;
+                min-height: calc(100vh - 2rem);
+            }
+
             .gallery {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 20px;
             }
         }
 
@@ -161,60 +266,43 @@ permalink: /galeria/
             .sidebar {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid #dee2e6;
-            }
-
-            .sidebar-menu {
-                position: relative;
-                top: 0;
-            }
-
-            .gallery-container {
-                padding: 20px;
+                border-bottom: 1px solid var(--border-color);
             }
 
             .gallery {
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 15px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .gallery {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 10px;
+                gap: 1rem;
             }
 
-            .gallery-container {
-                padding: 15px;
+            .header h1 {
+                font-size: 2rem;
             }
-
-            .gallery-container h1 {
-                font-size: 1.5em;
-                margin-bottom: 20px;
-            }
-        }
-
-        /* Animaciones */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .image-container {
-            animation: fadeIn 0.5s ease-in-out;
         }
     </style>
 </head>
 <body>
+    <!-- Loader -->
+    <div class="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <h1>Catálogo de Imágenes</h1>
+        <p>Explora nuestra colección de imágenes de alta calidad</p>
+    </header>
+
     <div class="page-container">
-        <!-- Sidebar con menú de categorías -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-menu">
                 <h3>Categorías</h3>
                 <ul class="category-menu">
                     <li>
-                        <button onclick="filterGallery('all')" class="active">Todas las imágenes</button>
+                        <button onclick="filterGallery('all')" class="active">
+                            <i class="fas fa-images"></i>
+                            Todas las imágenes
+                        </button>
                     </li>
                     {% assign categories = "" | split: "" %}
                     {% for file in site.static_files %}
@@ -230,6 +318,7 @@ permalink: /galeria/
                     {% for category in sorted_categories %}
                         <li>
                             <button onclick="filterGallery('{{ category | slugify }}')">
+                                <i class="fas fa-folder"></i>
                                 {{ category | capitalize }}
                             </button>
                         </li>
@@ -238,9 +327,8 @@ permalink: /galeria/
             </div>
         </aside>
 
-        <!-- Contenedor principal de la galería -->
+        <!-- Galería -->
         <div class="gallery-container">
-            <h1>Galería de Imágenes</h1>
             <div class="gallery">
                 {% for file in site.static_files %}
                     {% if file.path contains '/imagenes/' %}
@@ -250,6 +338,10 @@ permalink: /galeria/
                                 <img src="{{ file.path | relative_url }}" 
                                      alt="{{ file.name | split: '.' | first }}" 
                                      loading="lazy">
+                                <div class="image-overlay">
+                                    <h3>{{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}</h3>
+                                    <p>{{ category | capitalize }}</p>
+                                </div>
                             </div>
                         {% endif %}
                     {% endif %}
@@ -259,33 +351,44 @@ permalink: /galeria/
     </div>
 
     <script>
+        // Ocultar loader cuando la página carga
+        window.addEventListener('load', () => {
+            document.querySelector('.loader').classList.add('hidden');
+        });
+
         // Función para filtrar la galería
         function filterGallery(category) {
-            // Actualizar botones activos
             const buttons = document.querySelectorAll('.category-menu button');
             buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            event.target.closest('button').classList.add('active');
 
-            // Filtrar imágenes
             const images = document.querySelectorAll('.image-container');
             images.forEach(img => {
                 if (category === 'all' || img.dataset.category === category) {
                     img.classList.remove('hidden');
+                    setTimeout(() => {
+                        img.style.opacity = '1';
+                    }, 50);
                 } else {
                     img.classList.add('hidden');
+                    img.style.opacity = '0';
                 }
             });
         }
 
-        // Evento para cargar imágenes de forma lazy
+        // Lazy loading mejorado
         document.addEventListener('DOMContentLoaded', function() {
             const images = document.querySelectorAll('img[loading="lazy"]');
+            
             if ('IntersectionObserver' in window) {
                 const imageObserver = new IntersectionObserver((entries, observer) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const img = entry.target;
-                            img.src = img.src; // Trigger load
+                            img.src = img.src;
+                            img.onload = () => {
+                                img.classList.add('loaded');
+                            };
                             observer.unobserve(img);
                         }
                     });
