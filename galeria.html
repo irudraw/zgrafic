@@ -89,7 +89,7 @@ permalink: /galeria/
                         {% if file.path contains '/imagenes/' %}
                             {% assign image_category = file.path | split: '/' | last | split: '.' | first | split: '-' | first %}
                             {% if image_category == category %}
-                                {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' %}
+                                {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
                                     <div class="image-container">
                                         <img src="{{ file.path | relative_url }}" alt="{{ file.name | split: '.' | first }}" loading="lazy">
                                     </div>
