@@ -1,402 +1,219 @@
----
-layout: default
-title: Galería
-permalink: /galeria/
----
-
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Imágenes - {{ site.title }}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Estilos base y variables */
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #e74c3c;
-            --bg-color: #f9fafb;
-            --text-color: #2c3e50;
-            --border-color: #edf2f7;
-            --hover-color: #f7fafc;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
-
-        body {
-            font-family: 'Playfair Display', serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--bg-color);
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        /* Header elegante */
-        .header {
-            text-align: center;
-            padding: 3rem 1rem;
-            background: linear-gradient(to right, #2c3e50, #3498db);
-            color: white;
-            margin-bottom: 2rem;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: 1px;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Contenedor principal */
+        
         .page-container {
             display: flex;
-            max-width: 1800px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            min-height: calc(100vh - 200px);
-        }
-
-        /* Sidebar elegante */
-        .sidebar {
-            width: 300px;
-            background: white;
+            gap: 2rem;
             padding: 2rem;
-            border-right: 1px solid var(--border-color);
         }
-
+        
         .sidebar-menu {
-            position: sticky;
-            top: 2rem;
-        }
-
-        .sidebar-menu h3 {
-            color: var(--primary-color);
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            padding-bottom: 0.5rem;
-        }
-
-        .sidebar-menu h3::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 2px;
-            background-color: var(--accent-color);
-        }
-
-        .category-menu {
-            list-style: none;
-        }
-
-        .category-menu li {
-            margin: 0.5rem 0;
-        }
-
-        .category-menu button {
-            width: 100%;
-            padding: 0.8rem 1.2rem;
-            border: none;
-            background: none;
-            color: var(--text-color);
-            font-size: 1rem;
-            text-align: left;
-            cursor: pointer;
+            flex: 0 0 200px;
+            padding: 1rem;
+            background: #f8f9fa;
             border-radius: 8px;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            font-family: 'Playfair Display', serif;
         }
-
-        .category-menu button i {
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-
-        .category-menu button:hover {
-            background-color: var(--hover-color);
-            transform: translateX(5px);
-        }
-
-        .category-menu button.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        /* Contenedor de la galería */
+        
         .gallery-container {
             flex: 1;
-            padding: 2rem;
-            background-color: white;
         }
-
-        /* Grid de la galería */
+        
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
             padding: 1rem;
         }
-
-        /* Contenedor de imágenes */
+        
         .image-container {
             position: relative;
-            border-radius: 12px;
             overflow: hidden;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-            aspect-ratio: 3/4;
-            background-color: var(--bg-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
         }
-
-        .image-container.hidden {
-            display: none;
-        }
-
+        
         .image-container:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
         }
-
+        
         .image-container img {
             width: 100%;
-            height: 100%;
+            height: 200px;
             object-fit: cover;
-            transition: var(--transition);
         }
-
-        .image-container:hover img {
-            transform: scale(1.1);
+        
+        /* Modal/Popup styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
-
-        .image-overlay {
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90vh;
+            position: relative;
+        }
+        
+        .modal-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+        
+        .image-title {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 1.5rem;
-            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            background: rgba(0,0,0,0.7);
             color: white;
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .image-container:hover .image-overlay {
-            opacity: 1;
-        }
-
-        .image-overlay h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .image-overlay p {
+            padding: 0.5rem;
+            text-align: center;
             font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        /* Loader elegante */
-        .loader {
-            width: 100%;
-            height: 100%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease;
-        }
-
-        .loader.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Animaciones */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .image-container {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .page-container {
-                margin: 1rem;
-                min-height: calc(100vh - 2rem);
-            }
-
-            .gallery {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
-
-        @media (max-width: 768px) {
-            .page-container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .gallery {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 1rem;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Loader -->
-    <div class="loader">
-        <div class="spinner"></div>
+
+<div class="loader">
+    <div class="spinner"></div>
+</div>
+
+<div class="page-container">
+    <div class="sidebar-menu">
+        <h3>Categorías</h3>
+        <ul>
+            <li>Todas las imágenes</li>
+            {% assign categories = "" | split: "" %}
+            {% for file in site.static_files %}
+                {% if file.path contains '/imagenes/' %}
+                    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                    {% unless categories contains folder %}
+                        {% assign categories = categories | push: folder %}
+                    {% endunless %}
+                {% endif %}
+            {% endfor %}
+            {% assign sorted_categories = categories | sort %}
+            {% for category in sorted_categories %}
+                <li>{{ category | capitalize }}</li>
+            {% endfor %}
+        </ul>
     </div>
 
-    <!-- Header -->
-    <header class="header">
-        <h1>Catálogo de Imágenes</h1>
-        <p>Explora nuestra colección de imágenes de alta calidad</p>
-    </header>
-
-    <div class="page-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-menu">
-                <h3>Categorías</h3>
-                <ul class="category-menu">
-                    <li>
-                        <button onclick="filterGallery('all')" class="active">
-                            <i class="fas fa-images"></i>
-                            Todas las imágenes
-                        </button>
-                    </li>
-                    {% assign categories = "" | split: "" %}
-                    {% for file in site.static_files %}
-                        {% if file.path contains '/imagenes/' %}
-                            {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                            {% unless categories contains folder %}
-                                {% assign categories = categories | push: folder %}
-                            {% endunless %}
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% assign sorted_categories = categories | sort %}
-                    {% for category in sorted_categories %}
-                        <li>
-                            <button onclick="filterGallery('{{ category | slugify }}')">
-                                <i class="fas fa-folder"></i>
-                                {{ category | capitalize }}
-                            </button>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </aside>
-
-        <!-- Galería -->
-        <div class="gallery-container">
-            <div class="gallery">
-                {% for file in site.static_files %}
-                    {% if file.path contains '/imagenes/' %}
-                        {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-                            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                            <div class="image-container" data-category="{{ category | slugify }}">
-                                <img src="{{ file.path | relative_url }}" 
-                                     alt="{{ file.name | split: '.' | first }}" 
-                                     loading="lazy">
-                                <div class="image-overlay">
-                                    <h3>{{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}</h3>
-                                    <p>{{ category | capitalize }}</p>
-                                </div>
+    <div class="gallery-container">
+        <div class="gallery">
+            {% for file in site.static_files %}
+                {% if file.path contains '/imagenes/' %}
+                    {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+                        {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                        <div class="image-container" category="{{ category | slugify }}" onclick="openModal(this)">
+                            <img src="{{ file.path | relative_url }}" alt="{{ file.name | split: '.' | first }}" loading="lazy">
+                            <div class="image-title">
+                                {{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}
                             </div>
-                        {% endif %}
+                        </div>
                     {% endif %}
-                {% endfor %}
-            </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
+</div>
 
-    <script>
-        // Ocultar loader cuando la página carga
-        window.addEventListener('load', () => {
-            document.querySelector('.loader').classList.add('hidden');
-        });
+<!-- Modal/Popup -->
+<div class="modal" id="imageModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <img id="modalImage" src="" alt="">
+    </div>
+</div>
 
-        // Función para filtrar la galería
-        function filterGallery(category) {
-            const buttons = document.querySelectorAll('.category-menu button');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.closest('button').classList.add('active');
+<script>
+function openModal(element) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const img = element.querySelector('img');
+    
+    modalImg.src = img.src;
+    modalImg.alt = img.alt;
+    modal.classList.add('active');
+    
+    // Prevent body scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+}
 
-            const images = document.querySelectorAll('.image-container');
-            images.forEach(img => {
-                if (category === 'all' || img.dataset.category === category) {
-                    img.classList.remove('hidden');
-                    setTimeout(() => {
-                        img.style.opacity = '1';
-                    }, 50);
-                } else {
-                    img.classList.add('hidden');
-                    img.style.opacity = '0';
-                }
-            });
-        }
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
 
-        // Lazy loading mejorado
-        document.addEventListener('DOMContentLoaded', function() {
-            const images = document.querySelectorAll('img[loading="lazy"]');
-            
-            if ('IntersectionObserver' in window) {
-                const imageObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const img = entry.target;
-                            img.src = img.src;
-                            img.onload = () => {
-                                img.classList.add('loaded');
-                            };
-                            observer.unobserve(img);
-                        }
-                    });
-                });
+// Close modal when clicking outside the image
+document.getElementById('imageModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
 
-                images.forEach(img => imageObserver.observe(img));
-            }
-        });
-    </script>
+// Close modal with escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+
+// Hide loader when page is loaded
+window.addEventListener('load', function() {
+    document.querySelector('.loader').style.display = 'none';
+});
+</script>
+
 </body>
 </html>
