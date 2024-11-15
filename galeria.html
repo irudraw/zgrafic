@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Galería
-permalink: /galeria/
+permalink: /galeria.html
 ---
 
 :::::::::: page-container
@@ -44,7 +44,7 @@ permalink: /galeria/
             {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
             
             :::: {.image-container .hidden category="{{ category | slugify }}"}
-            ![{{ file.name | split: '.' | first }}](%7B%7B%20file.path%20%7C%20relative_url%20%7D%7D){loading="lazy"}
+            ![{{ file.name | split: '.' | first }}]({{ file.path | relative_url }}){loading="lazy"}
             
             ::: image-title
             {{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}
@@ -143,7 +143,6 @@ permalink: /galeria/
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const siteUrl = '{{ site.url }}';
         const baseUrl = '{{ site.baseurl }}';
         
         // Añadir el buscador
@@ -200,7 +199,7 @@ permalink: /galeria/
         shareButton.addEventListener('click', function() {
             const imageUrl = modalImg.src;
             const relativeUrl = imageUrl.split('/imagenes/')[1];
-            const fullUrl = `${window.location.origin}/galeria/?image=/imagenes/${relativeUrl}`;
+            const fullUrl = `${window.location.origin}${baseUrl}/galeria.html?image=/imagenes/${relativeUrl}`;
             
             navigator.clipboard.writeText(fullUrl).then(() => {
                 const notification = document.getElementById('shareNotification');
@@ -220,7 +219,7 @@ permalink: /galeria/
                 
                 // Actualizar URL sin recargar la página
                 const relativeUrl = imageUrl.split('/imagenes/')[1];
-                const newUrl = `/galeria/?image=/imagenes/${relativeUrl}`;
+                const newUrl = `${baseUrl}/galeria.html?image=/imagenes/${relativeUrl}`;
                 window.history.pushState({ path: newUrl }, '', newUrl);
 
                 e.stopPropagation();
@@ -231,7 +230,7 @@ permalink: /galeria/
         modal.querySelector('.modal-content').firstChild.addEventListener('click', function() {
             modal.style.display = 'none';
             // Restaurar URL original
-            window.history.pushState({ path: '/galeria/' }, '', '/galeria/');
+            window.history.pushState({ path: `${baseUrl}/galeria.html` }, '', `${baseUrl}/galeria.html`);
         });
 
         // Manejar navegación del historial
