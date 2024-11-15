@@ -1,251 +1,393 @@
 ---
 layout: default
 title: Galería
-permalink: /galeria.html
+permalink: /galeria/
 ---
 
-:::::::::: page-container
-<div class="search-container">
-    <input type="text" id="searchInput" placeholder="Buscar por título o categoría...">
-</div>
-
-<div id="noResults" class="no-results">
-    No se encontraron imágenes que coincidan con tu búsqueda
-</div>
-
-<div id="shareNotification" class="share-notification">
-    URL copiada al portapapeles
-</div>
-
-::: sidebar-menu
-### Categorías
-
-- Todas las imágenes
-{% assign categories = "" | split: "" %}
-{% for file in site.static_files %}
-    {% if file.path contains '/imagenes/' %}
-        {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
-        {% unless categories contains folder %}
-            {% assign categories = categories | push: folder %}
-        {% endunless %}
-    {% endif %}
-{% endfor %}
-{% assign sorted_categories = categories | sort %}
-{% for category in sorted_categories %}
-- {{ category | capitalize }}
-{% endfor %}
-:::
-
-:::::::: gallery-container
-::::: gallery
-{% for file in site.static_files %}
-    {% if file.path contains '/imagenes/' %}
-        {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-            
-            :::: {.image-container .hidden category="{{ category | slugify }}"}
-            ![{{ file.name | split: '.' | first }}]({{ file.path | relative_url }}){loading="lazy"}
-            
-            ::: image-title
-            {{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}
-            :::
-            ::::
-            
-        {% endif %}
-    {% endif %}
-{% endfor %}
-:::::
-
-:::: {.loader .hidden}
-::: spinner
-:::
-::::
-::::::::
-::::::::::
-
-:::: {#imageModal .modal}
-::: modal-content
-×
-![](){#modalImage}
-:::
-::::
-
 <style>
-    .search-container {
-        margin: 20px auto;
-        max-width: 800px;
-        padding: 15px;
-        background: #ffffff;
+    .loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100px;
+        margin: 20px 0;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .page-container {
+        display: flex;
+        gap: 2rem;
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .sidebar-menu {
+        flex: 0 0 200px;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+    .sidebar-menu h3 {
+        margin-top: 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .sidebar-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-menu li {
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        border-radius: 4px;
+    }
+
+    .sidebar-menu li:hover {
+        background-color: #e9ecef;
+    }
+
+    .sidebar-menu li.active {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .gallery-container {
+        flex: 1;
+    }
+
+    .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+
+    .image-container {
+        position: relative;
+        overflow: hidden;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    #searchInput {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #e1e1e1;
-        border-radius: 6px;
-        font-size: 16px;
-        transition: border-color 0.3s ease;
-    }
-    
-    #searchInput:focus {
-        outline: none;
-        border-color: #4CAF50;
-    }
-    
-    .share-button {
-        position: absolute;
-        top: 15px;
-        right: 60px;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 6px;
         cursor: pointer;
-        font-size: 14px;
-        transition: background 0.3s ease;
-        z-index: 1001;
+        transition: transform 0.3s ease;
+        aspect-ratio: 1;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.5s ease forwards;
     }
-    
-    .share-button:hover {
-        background: #45a049;
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    
-    .share-notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(51, 51, 51, 0.9);
+
+    .image-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .image-container:hover img {
+        transform: scale(1.05);
+    }
+
+    .image-title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.7);
         color: white;
-        padding: 12px 24px;
-        border-radius: 6px;
-        display: none;
-        z-index: 1002;
-        animation: fadeInOut 2s ease;
-    }
-
-    @keyframes fadeInOut {
-        0% { opacity: 0; }
-        15% { opacity: 1; }
-        85% { opacity: 1; }
-        100% { opacity: 0; }
-    }
-
-    .no-results {
+        padding: 0.5rem;
         text-align: center;
-        padding: 20px;
-        color: #666;
+        font-size: 0.9rem;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .image-container:hover .image-title {
+        transform: translateY(0);
+    }
+
+    .modal {
         display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
+    .modal-content {
+        max-width: 90%;
+        max-height: 90vh;
+        position: relative;
+    }
+
+    .modal-content img {
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .page-container {
+            flex-direction: column;
+            padding: 1rem;
+        }
+        
+        .sidebar-menu {
+            position: relative;
+            top: 0;
+            width: auto;
+        }
+
+        .gallery {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+    }
+
+    .hidden {
+        display: none !important;
     }
 </style>
 
+<div class="page-container">
+    <div class="sidebar-menu">
+        <h3>Categorías</h3>
+        <ul>
+            <li data-category="all" class="active">Todas las imágenes</li>
+            {% assign categories = "" | split: "" %}
+            {% for file in site.static_files %}
+                {% if file.path contains '/imagenes/' %}
+                    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                    {% unless categories contains folder %}
+                        {% assign categories = categories | push: folder %}
+                    {% endunless %}
+                {% endif %}
+            {% endfor %}
+            {% assign sorted_categories = categories | sort %}
+            {% for category in sorted_categories %}
+                <li data-category="{{ category | slugify }}">{{ category | capitalize }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="gallery-container">
+        <div class="gallery">
+            {% for file in site.static_files %}
+                {% if file.path contains '/imagenes/' %}
+                    {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+                        {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                        <div class="image-container hidden" data-category="{{ category | slugify }}">
+                            <img src="{{ file.path | relative_url }}" alt="{{ file.name | split: '.' | first }}" loading="lazy">
+                            <div class="image-title">
+                                {{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="loader hidden">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="imageModal">
+    <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <img id="modalImage" src="" alt="">
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Añadir el buscador
-        const searchInput = document.getElementById('searchInput');
-        const imageContainers = document.querySelectorAll('.image-container');
-        const noResults = document.getElementById('noResults');
-        
-        // Función de búsqueda
-        searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            let visibleCount = 0;
-            
-            imageContainers.forEach(container => {
-                const title = container.querySelector('.image-title').textContent.toLowerCase();
-                const category = container.getAttribute('category').toLowerCase();
-                
-                if (title.includes(searchTerm) || category.includes(searchTerm)) {
-                    container.style.display = '';
-                    container.classList.remove('hidden');
-                    visibleCount++;
-                } else {
-                    container.style.display = 'none';
-                    container.classList.add('hidden');
-                }
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    const imageContainers = Array.from(document.querySelectorAll('.image-container'));
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalClose = document.querySelector('.modal-close');
+    const categoryButtons = document.querySelectorAll('.sidebar-menu li');
+    const loader = document.querySelector('.loader');
+    
+    let currentCategory = 'all';
+    let currentIndex = 0;
+    const imagesPerLoad = 4;
+    let isLoading = false;
 
-            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    // Función para mostrar las imágenes iniciales
+    function showInitialImages() {
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        // Ocultar todas las imágenes primero
+        imageContainers.forEach(container => container.classList.add('hidden'));
+
+        // Mostrar las primeras imágenes
+        visibleImages.slice(0, imagesPerLoad).forEach(container => {
+            container.classList.remove('hidden');
         });
 
-        // Manejar parámetros URL al cargar
-        const urlParams = new URLSearchParams(window.location.search);
-        const imageParam = urlParams.get('image');
-        if (imageParam) {
-            const decodedImage = decodeURIComponent(imageParam);
-            const targetImage = document.querySelector(`img[src*="${decodedImage}"]`);
-            if (targetImage) {
-                setTimeout(() => {
-                    targetImage.click();
-                }, 300);
-            }
+        currentIndex = imagesPerLoad;
+        checkAndLoadMore();
+    }
+
+    // Función para cargar más imágenes
+    function loadMoreImages() {
+        if (isLoading) return;
+
+        isLoading = true;
+        loader.classList.remove('hidden');
+
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        setTimeout(() => {
+            const nextImages = visibleImages.slice(currentIndex, currentIndex + imagesPerLoad);
+            
+            nextImages.forEach(container => {
+                container.classList.remove('hidden');
+            });
+
+            currentIndex += imagesPerLoad;
+            isLoading = false;
+            loader.classList.add('hidden');
+            checkAndLoadMore();
+        }, 500); // Pequeño delay para mostrar el loader
+    }
+
+    // Función para verificar si necesitamos cargar más imágenes
+    function checkAndLoadMore() {
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        if (currentIndex >= visibleImages.length) {
+            loader.classList.add('hidden');
+        } else {
+            loader.classList.remove('hidden');
         }
+    }
 
-        // Modificar el modal existente
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        
-        // Añadir botón de compartir
-        const shareButton = document.createElement('button');
-        shareButton.className = 'share-button';
-        shareButton.textContent = 'Compartir';
-        modal.querySelector('.modal-content').appendChild(shareButton);
+    // Observer para el scroll infinito
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
 
-        // Manejar compartir
-        shareButton.addEventListener('click', function() {
-            const imageUrl = modalImg.src;
-            const relativeUrl = imageUrl.split('/imagenes/')[1];
-            const fullUrl = `${window.location.origin}/galeria.html?image=/imagenes/${relativeUrl}`;
-            
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                const notification = document.getElementById('shareNotification');
-                notification.style.display = 'block';
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 2000);
-            });
-        });
-
-        // Modificar el comportamiento de apertura de imágenes
-        document.querySelectorAll('.image-container img').forEach(img => {
-            img.addEventListener('click', function(e) {
-                const imageUrl = this.src;
-                modalImg.src = imageUrl;
-                modal.style.display = 'block';
-                
-                // Actualizar URL sin recargar la página
-                const relativeUrl = imageUrl.split('/imagenes/')[1];
-                const newUrl = `/galeria.html?image=/imagenes/${relativeUrl}`;
-                window.history.pushState({ path: newUrl }, '', newUrl);
-
-                e.stopPropagation();
-            });
-        });
-
-        // Manejar cierre del modal
-        modal.querySelector('.modal-content').firstChild.addEventListener('click', function() {
-            modal.style.display = 'none';
-            // Restaurar URL original
-            window.history.pushState({ path: '/galeria.html' }, '', '/galeria.html');
-        });
-
-        // Manejar navegación del historial
-        window.addEventListener('popstate', function(e) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const imageParam = urlParams.get('image');
-            
-            if (!imageParam) {
-                modal.style.display = 'none';
-            } else {
-                const decodedImage = decodeURIComponent(imageParam);
-                const targetImage = document.querySelector(`img[src*="${decodedImage}"]`);
-                if (targetImage) {
-                    modalImg.src = targetImage.src;
-                    modal.style.display = 'block';
-                }
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isLoading) {
+                loadMoreImages();
             }
+        });
+    }, options);
+
+    observer.observe(loader);
+
+    // Funciones del modal
+    function openModal(imgSrc, imgAlt) {
+        modalImg.src = imgSrc;
+        modalImg.alt = imgAlt;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Event listeners para las imágenes
+    imageContainers.forEach(container => {
+        container.addEventListener('click', function() {
+            const img = this.querySelector('img');
+            openModal(img.src, img.alt);
         });
     });
+
+    // Event listeners para el modal
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+    // Event listeners para las categorías
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            currentCategory = this.dataset.category;
+            currentIndex = 0;
+            
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            showInitialImages();
+        });
+    });
+
+    // Iniciar la galería
+    showInitialImages();
+});
 </script>
