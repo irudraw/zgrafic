@@ -143,8 +143,6 @@ permalink: /galeria.html
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const baseUrl = '{{ site.baseurl }}';
-        
         // Añadir el buscador
         const searchInput = document.getElementById('searchInput');
         const imageContainers = document.querySelectorAll('.image-container');
@@ -199,7 +197,7 @@ permalink: /galeria.html
         shareButton.addEventListener('click', function() {
             const imageUrl = modalImg.src;
             const relativeUrl = imageUrl.split('/imagenes/')[1];
-            const fullUrl = `${window.location.origin}${baseUrl}/galeria.html?image=/imagenes/${relativeUrl}`;
+            const fullUrl = `${window.location.origin}/galeria.html?image=/imagenes/${relativeUrl}`;
             
             navigator.clipboard.writeText(fullUrl).then(() => {
                 const notification = document.getElementById('shareNotification');
@@ -219,7 +217,7 @@ permalink: /galeria.html
                 
                 // Actualizar URL sin recargar la página
                 const relativeUrl = imageUrl.split('/imagenes/')[1];
-                const newUrl = `${baseUrl}/galeria.html?image=/imagenes/${relativeUrl}`;
+                const newUrl = `/galeria.html?image=/imagenes/${relativeUrl}`;
                 window.history.pushState({ path: newUrl }, '', newUrl);
 
                 e.stopPropagation();
@@ -230,7 +228,7 @@ permalink: /galeria.html
         modal.querySelector('.modal-content').firstChild.addEventListener('click', function() {
             modal.style.display = 'none';
             // Restaurar URL original
-            window.history.pushState({ path: `${baseUrl}/galeria.html` }, '', `${baseUrl}/galeria.html`);
+            window.history.pushState({ path: '/galeria.html' }, '', '/galeria.html');
         });
 
         // Manejar navegación del historial
