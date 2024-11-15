@@ -10,6 +10,8 @@ permalink: /galeria.html
     display: flex;
     padding: 20px;
     gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .sidebar-menu {
@@ -17,10 +19,29 @@ permalink: /galeria.html
     padding: 20px;
     background: #f5f5f5;
     border-radius: 8px;
+    height: fit-content;
+}
+
+.sidebar-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.sidebar-menu li:hover {
+    background-color: #e0e0e0;
 }
 
 .gallery-container {
     flex: 1;
+    min-width: 0;
 }
 
 .gallery {
@@ -50,6 +71,7 @@ permalink: /galeria.html
     height: 250px;
     object-fit: cover;
     transition: transform 0.3s ease;
+    display: block;
 }
 
 .image-title {
@@ -60,28 +82,29 @@ permalink: /galeria.html
 }
 
 /* Estilos del modal */
-.modal {
+#imageModal {
     display: none;
     position: fixed;
     z-index: 1000;
-    top: 0;
+    padding-top: 50px;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.9);
+    overflow: auto;
 }
 
 .modal-content {
     position: relative;
-    max-width: 90%;
-    max-height: 90vh;
-    margin: 50px auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin: auto;
+    padding: 0;
+    width: 90%;
+    max-width: 1200px;
+    text-align: center;
 }
 
-.modal-content img {
+#modalImage {
     max-width: 100%;
     max-height: 85vh;
     object-fit: contain;
@@ -89,19 +112,26 @@ permalink: /galeria.html
     display: block;
 }
 
-.modal-content > span {
+.close {
     position: absolute;
-    top: -30px;
-    right: -30px;
-    color: #fff;
-    font-size: 30px;
+    right: 25px;
+    top: -45px;
+    color: #f1f1f1;
+    font-size: 35px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 1001;
+}
+
+.close:hover,
+.close:focus {
+    color: #999;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 /* Loader */
 .loader {
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -131,21 +161,26 @@ permalink: /galeria.html
 @media screen and (max-width: 768px) {
     .page-container {
         flex-direction: column;
+        padding: 10px;
     }
     
     .sidebar-menu {
         flex: none;
-        width: 100%;
+        width: auto;
+    }
+    
+    .gallery {
+        padding: 10px;
+        gap: 10px;
     }
     
     .modal-content {
         width: 95%;
-        margin: 20px auto;
     }
     
-    .modal-content > span {
-        top: -40px;
-        right: 10px;
+    .close {
+        right: 15px;
+        top: -35px;
     }
 }
 </style>
@@ -154,11 +189,11 @@ permalink: /galeria.html
     <div class="sidebar-menu">
         <h3>Categorías</h3>
         <ul>
-            <li>Todas las imágenes</li>
+            <li class="category-item" data-category="all">Todas las imágenes</li>
             {% assign categories = "" | split: "" %}
             {% for file in site.static_files %}
-                {% if file.path contains '/imagenes/' %}
-                    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                {% if file.path contains 'imagenes/' %}
+                    {% assign folder = file.path | split: 'imagenes/' | last | split: '/' | first %}
                     {% unless categories contains folder %}
                         {% assign categories = categories | push: folder %}
                     {% endunless %}
@@ -166,7 +201,7 @@ permalink: /galeria.html
             {% endfor %}
             {% assign sorted_categories = categories | sort %}
             {% for category in sorted_categories %}
-                <li>{{ category | capitalize }}</li>
+                <li class="category-item" data-category="{{ category | slugify }}">{{ category | capitalize }}</li>
             {% endfor %}
         </ul>
     </div>
@@ -174,13 +209,13 @@ permalink: /galeria.html
     <div class="gallery-container">
         <div class="gallery">
             {% for file in site.static_files %}
-                {% if file.path contains '/imagenes/' %}
+                {% if file.path contains 'imagenes/' %}
                     {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-                        {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                        {% assign category = file.path | split: 'imagenes/' | last | split: '/' | first %}
                         {% assign image_name = file.name | split: '.' | first %}
                         
-                        <div class="image-container" category="{{ category | slugify }}">
-                            <img src="{{ site.baseurl }}{{ file.path }}" alt="{{ image_name }}" loading="lazy">
+                        <div class="image-container" data-category="{{ category | slugify }}">
+                            <img src="{{ file.path }}" alt="{{ image_name }}" loading="lazy">
                             <div class="image-title">
                                 {{ image_name | replace: '-', ' ' | capitalize }}
                             </div>
@@ -189,27 +224,23 @@ permalink: /galeria.html
                 {% endif %}
             {% endfor %}
         </div>
-
-        <div class="loader hidden">
-            <div class="spinner"></div>
-        </div>
     </div>
 </div>
 
 <div id="imageModal" class="modal">
     <div class="modal-content">
-        <span>&times;</span>
+        <span class="close">&times;</span>
         <img id="modalImage" src="" alt="">
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos del DOM
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
-    const closeBtn = document.querySelector('.modal-content > span');
+    const closeBtn = document.getElementsByClassName('close')[0];
     const images = document.querySelectorAll('.image-container img');
+    const categoryItems = document.querySelectorAll('.category-item');
     const imageContainers = document.querySelectorAll('.image-container');
 
     // Función para abrir el modal
@@ -222,7 +253,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para cerrar el modal
     function closeModal() {
         modal.style.display = 'none';
-        modalImg.src = '';
         document.body.style.overflow = 'auto';
     }
 
@@ -233,39 +263,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Cerrar modal con el botón
-    closeBtn.addEventListener('click', closeModal);
-
-    // Cerrar modal clickeando fuera
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
+    // Cerrar modal
+    closeBtn.onclick = closeModal;
+    window.onclick = function(event) {
+        if (event.target == modal) {
             closeModal();
         }
-    });
+    }
 
-    // Cerrar modal con ESC
+    // Cerrar con ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeModal();
         }
     });
 
-    // Filtrado por categorías
-    const categoryLinks = document.querySelectorAll('.sidebar-menu li');
-    
-    categoryLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            const category = this.textContent.trim().toLowerCase();
+    // Filtrado de categorías
+    categoryItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const selectedCategory = this.dataset.category;
             
             imageContainers.forEach(container => {
-                if (category === 'todas las imágenes') {
-                    container.classList.remove('hidden');
+                if (selectedCategory === 'all') {
+                    container.style.display = 'block';
                 } else {
-                    const imgCategory = container.getAttribute('category');
-                    if (imgCategory === category) {
-                        container.classList.remove('hidden');
+                    if (container.dataset.category === selectedCategory) {
+                        container.style.display = 'block';
                     } else {
-                        container.classList.add('hidden');
+                        container.style.display = 'none';
                     }
                 }
             });
