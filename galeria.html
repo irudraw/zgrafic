@@ -204,7 +204,7 @@ permalink: /galeria/
     100% { transform: rotate(360deg); }
 }
 
-/* Modal */
+/* Estilos para el modal */
 .modal {
     display: none;
     position: fixed;
@@ -213,17 +213,20 @@ permalink: /galeria/
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.9);
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
-    margin: auto;
-    display: block;
+    position: relative;
     max-width: 90%;
     max-height: 90vh;
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content img {
@@ -234,15 +237,15 @@ permalink: /galeria/
 
 .close {
     position: absolute;
-    right: 20px;
-    top: 20px;
+    top: -30px;
+    right: -30px;
     color: #fff;
-    font-size: 35px;
+    font-size: 30px;
     font-weight: bold;
     cursor: pointer;
     z-index: 1001;
 }
-
+    
 .hidden {
     display: none !important;
 }
@@ -260,14 +263,15 @@ permalink: /galeria/
     }
 }
 
-@media (max-width: 768px) {
-    .page-container {
-        flex-direction: column;
+/* Asegura que el modal sea responsive */
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 95%;
     }
-
-    .sidebar-menu {
-        width: 100%;
-        position: static;
+    
+    .close {
+        top: -40px;
+        right: 10px;
     }
 }
 
