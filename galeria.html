@@ -37,24 +37,16 @@ permalink: /galeria/
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
     cursor: pointer;
+    background: white;
 }
 
 .image-container:hover {
     transform: translateY(-5px);
 }
 
-.image-wrapper {
-    position: relative;
-    padding-top: 75%; /* Ratio 4:3 */
-    overflow: hidden;
-}
-
-.image-wrapper img {
-    position: absolute;
-    top: 0;
-    left: 0;
+.image-container img {
     width: 100%;
-    height: 100%;
+    height: 250px;
     object-fit: cover;
     transition: transform 0.3s ease;
 }
@@ -97,7 +89,7 @@ permalink: /galeria/
     object-fit: contain;
 }
 
-.close {
+.modal-content > span {
     position: absolute;
     top: -30px;
     right: -30px;
@@ -150,88 +142,93 @@ permalink: /galeria/
         width: 95%;
     }
     
-    .close {
+    .modal-content > span {
         top: -40px;
         right: 10px;
     }
 }
 </style>
 
-<div class="page-container">
-    <div class="sidebar-menu">
-        <h3>Categorías</h3>
-        <div class="search-container">
-        </div>
-        <ul>
-            <li>Todas las imágenes</li>
-            {% assign categories = "" | split: "" %}
-            {% for file in site.static_files %}
-                {% if file.path contains '/imagenes/' %}
-                    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                    {% unless categories contains folder %}
-                        {% assign categories = categories | push: folder %}
-                    {% endunless %}
-                {% endif %}
-            {% endfor %}
-            {% assign sorted_categories = categories | sort %}
-            {% for category in sorted_categories %}
-                <li>{{ category | capitalize }}</li>
-            {% endfor %}
-        </ul>
-    </div>
+:::::::::: page-container
+::: sidebar-menu
+### Categorías
 
-    <div class="gallery-container">
-        <div class="gallery">
-            {% for file in site.static_files %}
-                {% if file.path contains '/imagenes/' %}
-                    {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-                        {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                        {% assign image_name = file.name | split: '.' | first %}
-                        <div class="image-container lazy-load" category="{{ category | slugify }}" data-title="{{ image_name | replace: '-', ' ' | capitalize }}">
-                            <div class="image-wrapper">
-                                <img src="{{ file.path }}" loading="lazy" image-id="{{ image_name | slugify }}" alt="{{ image_name }}">
-                            </div>
-                            <div class="image-title">
-                                {{ image_name | split: '.' | first | replace: '-', ' ' | capitalize }}
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-        </div>
+- Todas las imágenes
+    {% assign categories = "" | split: "" %}
+    {% for file in site.static_files %}
+        {% if file.path contains '/imagenes/' %}
+            {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% unless categories contains folder %}
+                {% assign categories = categories | push: folder %}
+            {% endunless %}
+        {% endif %}
+    {% endfor %}
+    {% assign sorted_categories = categories | sort %}
+    {% for category in sorted_categories %}
+- {{ category | capitalize }}
+    {% endfor %}
+:::
 
-        <div class="loader hidden">
-            <div class="spinner"></div>
-        </div>
-    </div>
-</div>
+:::::::: gallery-container
+::::: gallery
+{% for file in site.static_files %}
+    {% if file.path contains '/imagenes/' %}
+        {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
 
-<div id="imageModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <img id="modalImage" src="" alt="">
-    </div>
-</div>
+:::: {.image-container .hidden category="{{ category | slugify }}"}
+![{{ file.name | split: '.' | first }}]({{ file.path | relative_url }}){loading="lazy"}
+
+::: image-title
+{{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}
+:::
+::::
+
+        {% endif %}
+    {% endif %}
+{% endfor %}
+:::::
+
+:::: {.loader .hidden}
+::: spinner
+:::
+::::
+::::::::
+::::::::::
+
+:::: {#imageModal .modal}
+::: modal-content
+×
+![](){#modalImage}
+:::
+::::
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Elementos del DOM
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
-    const closeBtn = document.getElementsByClassName('close')[0];
+    const closeBtn = document.querySelector('.modal-content > span');
     const images = document.querySelectorAll('.image-container img');
+    const imageContainers = document.querySelectorAll('.image-container');
+    
+    // Mostrar todas las imágenes al cargar
+    imageContainers.forEach(container => {
+        container.classList.remove('hidden');
+    });
 
     // Función para abrir el modal
     function openModal(imgSrc) {
         modal.style.display = 'flex';
         modalImg.src = imgSrc;
-        document.body.style.overflow = 'hidden'; // Previene el scroll
+        document.body.style.overflow = 'hidden';
     }
 
     // Función para cerrar el modal
     function closeModal() {
         modal.style.display = 'none';
         modalImg.src = '';
-        document.body.style.overflow = 'auto'; // Restaura el scroll
+        document.body.style.overflow = 'auto';
     }
 
     // Event listeners para las imágenes
@@ -260,18 +257,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Filtrado por categorías
     const categoryLinks = document.querySelectorAll('.sidebar-menu li');
-    const allImages = document.querySelectorAll('.image-container');
-
+    
     categoryLinks.forEach(link => {
         link.addEventListener('click', function() {
-            const category = this.textContent.toLowerCase();
+            const category = this.textContent.trim().toLowerCase();
             
-            allImages.forEach(img => {
+            imageContainers.forEach(container => {
                 if (category === 'todas las imágenes') {
-                    img.style.display = 'block';
+                    container.classList.remove('hidden');
                 } else {
-                    const imgCategory = img.getAttribute('category');
-                    img.style.display = imgCategory === category ? 'block' : 'none';
+                    const imgCategory = container.getAttribute('category');
+                    if (imgCategory === category) {
+                        container.classList.remove('hidden');
+                    } else {
+                        container.classList.add('hidden');
+                    }
                 }
             });
         });
