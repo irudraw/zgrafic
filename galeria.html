@@ -1,199 +1,216 @@
 ---
 layout: default
 title: Galería
-permalink: /galeria.html
+permalink: /galeria/
 ---
 
 <style>
-/* Estilos generales */
-.page-container {
-    display: flex;
-    padding: 20px;
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+    .loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100px;
+        margin: 20px 0;
+    }
 
-.sidebar-menu {
-    flex: 0 0 250px;
-    padding: 20px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    height: fit-content;
-}
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
 
-.sidebar-menu ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-.sidebar-menu li {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-.sidebar-menu li:hover {
-    background-color: #e0e0e0;
-}
-
-.gallery-container {
-    flex: 1;
-    min-width: 0;
-}
-
-.gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-
-/* Estilos de las imágenes */
-.image-container {
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-    cursor: pointer;
-    background: white;
-    display: block;
-}
-
-.image-container:hover {
-    transform: translateY(-5px);
-}
-
-.image-container img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-    display: block;
-}
-
-.image-title {
-    padding: 10px;
-    background: #fff;
-    text-align: center;
-    font-size: 0.9em;
-}
-
-/* Estilos del modal */
-#imageModal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    padding-top: 50px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    overflow: auto;
-}
-
-.modal-content {
-    position: relative;
-    margin: auto;
-    padding: 0;
-    width: 90%;
-    max-width: 1200px;
-    text-align: center;
-}
-
-#modalImage {
-    max-width: 100%;
-    max-height: 85vh;
-    object-fit: contain;
-    margin: auto;
-    display: block;
-}
-
-.close {
-    position: absolute;
-    right: 25px;
-    top: -45px;
-    color: #f1f1f1;
-    font-size: 35px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-    color: #999;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Loader */
-.loader {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 999;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Responsive */
-@media screen and (max-width: 768px) {
     .page-container {
-        flex-direction: column;
-        padding: 10px;
+        display: flex;
+        gap: 2rem;
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
     }
-    
+
     .sidebar-menu {
-        flex: none;
-        width: auto;
+        flex: 0 0 200px;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        height: fit-content;
+        position: sticky;
+        top: 20px;
     }
-    
+
+    .sidebar-menu h3 {
+        margin-top: 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .sidebar-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-menu li {
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        border-radius: 4px;
+    }
+
+    .sidebar-menu li:hover {
+        background-color: #e9ecef;
+    }
+
+    .sidebar-menu li.active {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .gallery-container {
+        flex: 1;
+    }
+
     .gallery {
-        padding: 10px;
-        gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem;
     }
-    
+
+    .image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        aspect-ratio: 1;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .image-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .image-container:hover img {
+        transform: scale(1.05);
+    }
+
+    .image-title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 0.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .image-container:hover .image-title {
+        transform: translateY(0);
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
     .modal-content {
-        width: 95%;
+        max-width: 90%;
+        max-height: 90vh;
+        position: relative;
     }
-    
-    .close {
-        right: 15px;
-        top: -35px;
+
+    .modal-content img {
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
     }
-}
+
+    .modal-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .page-container {
+            flex-direction: column;
+            padding: 1rem;
+        }
+        
+        .sidebar-menu {
+            position: relative;
+            top: 0;
+            width: auto;
+        }
+
+        .gallery {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+    }
+
+    .hidden {
+        display: none !important;
+    }
 </style>
 
 <div class="page-container">
     <div class="sidebar-menu">
         <h3>Categorías</h3>
         <ul>
-            <li class="category-item" data-category="all">Todas las imágenes</li>
+            <li data-category="all" class="active">Todas las imágenes</li>
             {% assign categories = "" | split: "" %}
             {% for file in site.static_files %}
-                {% if file.path contains 'imagenes/' %}
-                    {% assign folder = file.path | split: 'imagenes/' | last | split: '/' | first %}
+                {% if file.path contains '/imagenes/' %}
+                    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
                     {% unless categories contains folder %}
                         {% assign categories = categories | push: folder %}
                     {% endunless %}
@@ -201,7 +218,7 @@ permalink: /galeria.html
             {% endfor %}
             {% assign sorted_categories = categories | sort %}
             {% for category in sorted_categories %}
-                <li class="category-item" data-category="{{ category | slugify }}">{{ category | capitalize }}</li>
+                <li data-category="{{ category | slugify }}">{{ category | capitalize }}</li>
             {% endfor %}
         </ul>
     </div>
@@ -209,92 +226,168 @@ permalink: /galeria.html
     <div class="gallery-container">
         <div class="gallery">
             {% for file in site.static_files %}
-                {% if file.path contains 'imagenes/' %}
+                {% if file.path contains '/imagenes/' %}
                     {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-                        {% assign category = file.path | split: 'imagenes/' | last | split: '/' | first %}
-                        {% assign image_name = file.name | split: '.' | first %}
-                        
-                        <div class="image-container" data-category="{{ category | slugify }}">
-                            <img src="{{ file.path }}" alt="{{ image_name }}" loading="lazy">
+                        {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                        <div class="image-container hidden" data-category="{{ category | slugify }}">
+                            <img src="{{ file.path | relative_url }}" alt="{{ file.name | split: '.' | first }}" loading="lazy">
                             <div class="image-title">
-                                {{ image_name | replace: '-', ' ' | capitalize }}
+                                {{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}
                             </div>
                         </div>
                     {% endif %}
                 {% endif %}
             {% endfor %}
         </div>
+        <div class="loader hidden">
+            <div class="spinner"></div>
+        </div>
     </div>
 </div>
 
-<div id="imageModal" class="modal">
+<div class="modal" id="imageModal">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <button class="modal-close">&times;</button>
         <img id="modalImage" src="" alt="">
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const imageContainers = Array.from(document.querySelectorAll('.image-container'));
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
-    const closeBtn = document.getElementsByClassName('close')[0];
-    const images = document.querySelectorAll('.image-container img');
-    const categoryItems = document.querySelectorAll('.category-item');
-    const imageContainers = document.querySelectorAll('.image-container');
+    const modalClose = document.querySelector('.modal-close');
+    const categoryButtons = document.querySelectorAll('.sidebar-menu li');
+    const loader = document.querySelector('.loader');
+    
+    let currentCategory = 'all';
+    let currentIndex = 0;
+    const imagesPerLoad = 4;
+    let isLoading = false;
 
-    // Función para abrir el modal
-    function openModal(imgSrc) {
-        modal.style.display = 'block';
+    // Función para mostrar las imágenes iniciales
+    function showInitialImages() {
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        // Ocultar todas las imágenes primero
+        imageContainers.forEach(container => container.classList.add('hidden'));
+
+        // Mostrar las primeras imágenes
+        visibleImages.slice(0, imagesPerLoad).forEach(container => {
+            container.classList.remove('hidden');
+        });
+
+        currentIndex = imagesPerLoad;
+        checkAndLoadMore();
+    }
+
+    // Función para cargar más imágenes
+    function loadMoreImages() {
+        if (isLoading) return;
+
+        isLoading = true;
+        loader.classList.remove('hidden');
+
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        setTimeout(() => {
+            const nextImages = visibleImages.slice(currentIndex, currentIndex + imagesPerLoad);
+            
+            nextImages.forEach(container => {
+                container.classList.remove('hidden');
+            });
+
+            currentIndex += imagesPerLoad;
+            isLoading = false;
+            loader.classList.add('hidden');
+            checkAndLoadMore();
+        }, 500); // Pequeño delay para mostrar el loader
+    }
+
+    // Función para verificar si necesitamos cargar más imágenes
+    function checkAndLoadMore() {
+        const visibleImages = imageContainers.filter(container => 
+            currentCategory === 'all' || container.dataset.category === currentCategory
+        );
+
+        if (currentIndex >= visibleImages.length) {
+            loader.classList.add('hidden');
+        } else {
+            loader.classList.remove('hidden');
+        }
+    }
+
+    // Observer para el scroll infinito
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isLoading) {
+                loadMoreImages();
+            }
+        });
+    }, options);
+
+    observer.observe(loader);
+
+    // Funciones del modal
+    function openModal(imgSrc, imgAlt) {
         modalImg.src = imgSrc;
+        modalImg.alt = imgAlt;
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 
-    // Función para cerrar el modal
     function closeModal() {
-        modal.style.display = 'none';
+        modal.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
 
     // Event listeners para las imágenes
-    images.forEach(img => {
-        img.addEventListener('click', function() {
-            openModal(this.src);
+    imageContainers.forEach(container => {
+        container.addEventListener('click', function() {
+            const img = this.querySelector('img');
+            openModal(img.src, img.alt);
         });
     });
 
-    // Cerrar modal
-    closeBtn.onclick = closeModal;
-    window.onclick = function(event) {
-        if (event.target == modal) {
+    // Event listeners para el modal
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
             closeModal();
         }
-    }
+    });
 
-    // Cerrar con ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeModal();
         }
     });
 
-    // Filtrado de categorías
-    categoryItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const selectedCategory = this.dataset.category;
+    // Event listeners para las categorías
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            currentCategory = this.dataset.category;
+            currentIndex = 0;
             
-            imageContainers.forEach(container => {
-                if (selectedCategory === 'all') {
-                    container.style.display = 'block';
-                } else {
-                    if (container.dataset.category === selectedCategory) {
-                        container.style.display = 'block';
-                    } else {
-                        container.style.display = 'none';
-                    }
-                }
-            });
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            showInitialImages();
         });
     });
+
+    // Iniciar la galería
+    showInitialImages();
 });
 </script>
