@@ -256,6 +256,12 @@ permalink: /galeria/
         </div>
     </div>
 </div>
+<div class="modal" id="imageModal">
+    <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <img id="modalImage" src="" alt="">
+    </div>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const imageContainers = Array.from(document.querySelectorAll('.image-container'));
@@ -382,10 +388,3 @@ document.addEventListener('DOMContentLoaded', function() {
     showInitialImages();
 });
 </script>
-
-<div class="modal" id="imageModal">
-    <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <img id="modalImage" src="" alt="">
-    </div>
-</div>
