@@ -26,6 +26,7 @@ permalink: /galeria/
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
+
     .page-container {
         display: flex;
         gap: 2rem;
@@ -75,6 +76,7 @@ permalink: /galeria/
     .gallery-container {
         flex: 1;
     }
+
     .gallery {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -152,6 +154,7 @@ permalink: /galeria/
     .modal.active {
         display: flex;
     }
+
     .modal-content {
         max-width: 90%;
         max-height: 90vh;
@@ -194,27 +197,14 @@ permalink: /galeria/
         }
     }
 
-    .search-container {
-        margin-bottom: 1rem;
-        display: flex;
-        justify-content: center;
-    }
-
-    #searchInput {
-        padding: 0.5rem;
-        font-size: 1rem;
-        width: 100%;
-        max-width: 300px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+    .hidden {
+        display: none !important;
     }
 </style>
+
 <div class="page-container">
     <div class="sidebar-menu">
         <h3>Categorías</h3>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Buscar imágenes..." />
-        </div>
         <ul>
             <li data-category="all" class="active">Todas las imágenes</li>
             {% assign categories = "" | split: "" %}
@@ -234,8 +224,6 @@ permalink: /galeria/
     </div>
 
     <div class="gallery-container">
-        
-
         <div class="gallery">
             {% for file in site.static_files %}
                 {% if file.path contains '/imagenes/' %}
@@ -256,16 +244,17 @@ permalink: /galeria/
         </div>
     </div>
 </div>
+
 <div class="modal" id="imageModal">
     <div class="modal-content">
         <button class="modal-close">&times;</button>
         <img id="modalImage" src="" alt="">
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const imageContainers = Array.from(document.querySelectorAll('.image-container'));
-    const searchInput = document.getElementById('searchInput');
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
     const modalClose = document.querySelector('.modal-close');
@@ -277,38 +266,50 @@ document.addEventListener('DOMContentLoaded', function() {
     const imagesPerLoad = 4;
     let isLoading = false;
 
+    // Función para mostrar las imágenes iniciales
     function showInitialImages() {
         const visibleImages = imageContainers.filter(container => 
             currentCategory === 'all' || container.dataset.category === currentCategory
         );
+
+        // Ocultar todas las imágenes primero
         imageContainers.forEach(container => container.classList.add('hidden'));
+
+        // Mostrar las primeras imágenes
         visibleImages.slice(0, imagesPerLoad).forEach(container => {
             container.classList.remove('hidden');
         });
+
         currentIndex = imagesPerLoad;
         checkAndLoadMore();
     }
 
+    // Función para cargar más imágenes
     function loadMoreImages() {
         if (isLoading) return;
+
         isLoading = true;
         loader.classList.remove('hidden');
+
         const visibleImages = imageContainers.filter(container => 
             currentCategory === 'all' || container.dataset.category === currentCategory
         );
 
         setTimeout(() => {
             const nextImages = visibleImages.slice(currentIndex, currentIndex + imagesPerLoad);
+            
             nextImages.forEach(container => {
                 container.classList.remove('hidden');
             });
+
             currentIndex += imagesPerLoad;
             isLoading = false;
             loader.classList.add('hidden');
             checkAndLoadMore();
-        }, 500);
+        }, 500); // Pequeño delay para mostrar el loader
     }
 
+    // Función para verificar si necesitamos cargar más imágenes
     function checkAndLoadMore() {
         const visibleImages = imageContainers.filter(container => 
             currentCategory === 'all' || container.dataset.category === currentCategory
@@ -321,16 +322,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Observer para el scroll infinito
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !isLoading) {
                 loadMoreImages();
             }
         });
-    }, { root: null, rootMargin: '0px', threshold: 0.1 });
+    }, options);
 
     observer.observe(loader);
 
+    // Funciones del modal
     function openModal(imgSrc, imgAlt) {
         modalImg.src = imgSrc;
         modalImg.alt = imgAlt;
@@ -343,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = 'auto';
     }
 
+    // Event listeners para las imágenes
     imageContainers.forEach(container => {
         container.addEventListener('click', function() {
             const img = this.querySelector('img');
@@ -350,6 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Event listeners para el modal
     modalClose.addEventListener('click', closeModal);
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
@@ -363,28 +374,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Event listeners para las categorías
     categoryButtons.forEach(button => {
         button.addEventListener('click', function() {
             currentCategory = this.dataset.category;
             currentIndex = 0;
+            
             categoryButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
+
             showInitialImages();
         });
     });
 
-    searchInput.addEventListener('input', function() {
-        const query = this.value.toLowerCase();
-        imageContainers.forEach(container => {
-            const title = container.querySelector('.image-title').innerText.toLowerCase();
-            if (title.includes(query) || container.dataset.category.includes(query)) {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
-        });
-    });
-
+    // Iniciar la galería
     showInitialImages();
 });
 </script>
