@@ -212,6 +212,9 @@ permalink: /galeria/
 <div class="page-container">
     <div class="sidebar-menu">
         <h3>Categorías</h3>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar imágenes..." />
+        </div>
         <ul>
             <li data-category="all" class="active">Todas las imágenes</li>
             {% assign categories = "" | split: "" %}
@@ -231,9 +234,7 @@ permalink: /galeria/
     </div>
 
     <div class="gallery-container">
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Buscar imágenes..." />
-        </div>
+        
 
         <div class="gallery">
             {% for file in site.static_files %}
