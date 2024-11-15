@@ -1,142 +1,223 @@
---- 
-layout: default 
+---
+layout: default
 title: Galería
 permalink: /galeria/
 ---
 
-:::::::::: page-container
-::: sidebar-menu
-### Categorías
+<div class="page-container">
+    <div class="sidebar-menu">
+        <h3>Categorías</h3>
 
-<!-- Agregar buscador -->
-<div class="search-container">
-  <input type="text" id="searchInput" placeholder="Buscar imágenes..." class="search-input">
+        <!-- Buscador -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar imágenes..." class="search-input">
+        </div>
+
+        <ul class="category-list">
+            <li>Todas las imágenes</li>
+            {% assign categories = "" | split: "" %}
+            {% for file in site.static_files %}
+                {% if file.path contains '/imagenes/' %}
+                    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                    {% unless categories contains folder %}
+                        {% assign categories = categories | push: folder %}
+                    {% endunless %}
+                {% endif %}
+            {% endfor %}
+            {% assign sorted_categories = categories | sort %}
+            {% for category in sorted_categories %}
+                <li>{{ category | capitalize }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="gallery-container">
+        <div class="gallery">
+            {% for file in site.static_files %}
+                {% if file.path contains '/imagenes/' %}
+                    {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+                        {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+                        {% assign image_name = file.name | split: '.' | first %}
+                        
+                        <div class="image-container" 
+                             data-category="{{ category | slugify }}" 
+                             data-title="{{ image_name | replace: '-', ' ' | capitalize }}">
+                            <img src="{{ file.path }}" 
+                                 alt="{{ image_name }}" 
+                                 loading="lazy" 
+                                 data-image-id="{{ image_name | slugify }}">
+                            <div class="image-title">
+                                {{ image_name | split: '.' | first | replace: '-', ' ' | capitalize }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
-- Todas las imágenes
-{% assign categories = "" | split: "" %}
-{% for file in site.static_files %}
-  {% if file.path contains '/imagenes/' %}
-    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
-    {% unless categories contains folder %}
-      {% assign categories = categories | push: folder %}
-    {% endunless %}
-  {% endif %}
-{% endfor %}
-{% assign sorted_categories = categories | sort %}
-{% for category in sorted_categories %}
-- {{ category | capitalize }}
-{% endfor %}
-:::
-
-:::::::: gallery-container
-::::: gallery
-{% for file in site.static_files %}
-  {% if file.path contains '/imagenes/' %}
-    {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-      {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-      {% assign image_name = file.name | split: '.' | first %}
-      
-      :::: {.image-container .hidden category="{{ category | slugify }}" data-title="{{ image_name | replace: '-', ' ' | capitalize }}"}
-        ![{{ image_name }}]({{ file.path | relative_url }}){loading="lazy" data-image-id="{{ image_name | slugify }}" data-full-url="{{ file.path | relative_url }}"}
-        
-        ::: image-title
-        {{ image_name | split: '.' | first | replace: '-', ' ' | capitalize }}
-        :::
-      ::::
-    {% endif %}
-  {% endif %}
-{% endfor %}
-:::::
-
-:::: {.loader .hidden}
-::: spinner
-:::
-::::
-::::::::
-::::::::::
-
-:::: {#imageModal .modal}
-::: modal-content
-<span class="close">&times;</span>
-<img id="modalImage" src="" alt="">
-:::
-::::
+<!-- Modal para las imágenes -->
+<div id="imageModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <img id="modalImage" src="" alt="">
+    </div>
+</div>
 
 <style>
+/* Estilos generales */
+.page-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Estilos del sidebar */
+.sidebar-menu {
+    width: 250px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
 .search-container {
-  margin-bottom: 20px;
-  padding: 10px;
+    margin-bottom: 20px;
 }
 
 .search-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
-.hidden-search {
-  display: none !important;
+.category-list {
+    list-style: none;
+    padding: 0;
 }
 
+.category-list li {
+    padding: 8px 0;
+    cursor: pointer;
+}
+
+.category-list li:hover {
+    color: #007bff;
+}
+
+/* Estilos de la galería */
+.gallery-container {
+    flex: 1;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.image-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.image-container:hover {
+    transform: translateY(-5px);
+}
+
+.image-container img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.image-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 0.9em;
+}
+
+/* Estilos del modal */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  padding-top: 50px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.9);
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
 }
 
 .modal-content {
-  margin: auto;
-  display: block;
-  position: relative;
-  max-width: 90%;
-  max-height: 90vh;
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90vh;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.modal-content img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
 }
 
 .close {
-  position: absolute;
-  right: 15px;
-  top: 15px;
-  color: #fff;
-  font-size: 35px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 1001;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    color: #fff;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-container {
+        flex-direction: column;
+    }
+
+    .sidebar-menu {
+        width: 100%;
+    }
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const baseUrl = '{{ site.baseurl }}';
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
     const closeBtn = document.querySelector('.close');
     const searchInput = document.getElementById('searchInput');
     const imageContainers = document.querySelectorAll('.image-container');
-
-    // Función para obtener la ruta relativa correcta
-    function getRelativePath(path) {
-        return `${baseUrl}${path}`.replace(/\/+/g, '/');
-    }
+    const categoryItems = document.querySelectorAll('.category-list li');
 
     // Función para actualizar la URL
     function updateURL(imageId) {
-        const currentPath = window.location.pathname;
-        const newPath = currentPath.endsWith('/') ? currentPath : `${currentPath}/`;
-        
         if (imageId) {
-            const newURL = `${newPath}?image=${imageId}`;
+            const newURL = `${window.location.pathname}?image=${imageId}`;
             window.history.pushState({ imageId: imageId }, '', newURL);
         } else {
-            window.history.pushState({}, '', newPath);
+            window.history.pushState({}, '', window.location.pathname);
         }
     }
 
@@ -144,14 +225,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function openModal(imageSrc, imageId) {
         modal.style.display = "block";
         modalImg.src = imageSrc;
-        modalImg.alt = imageId;
         updateURL(imageId);
+        document.body.style.overflow = 'hidden'; // Previene el scroll
     }
 
     // Función para cerrar modal
     function closeModal() {
         modal.style.display = "none";
         updateURL(null);
+        document.body.style.overflow = ''; // Restaura el scroll
     }
 
     // Búsqueda de imágenes
@@ -160,27 +242,25 @@ document.addEventListener('DOMContentLoaded', function() {
         
         imageContainers.forEach(container => {
             const title = container.getAttribute('data-title').toLowerCase();
-            const category = container.getAttribute('category').toLowerCase();
+            const category = container.getAttribute('data-category').toLowerCase();
             
             if (title.includes(searchTerm) || category.includes(searchTerm)) {
-                container.classList.remove('hidden-search');
+                container.style.display = '';
             } else {
-                container.classList.add('hidden-search');
+                container.style.display = 'none';
             }
         });
     });
 
-    // Evento para imágenes
+    // Eventos para imágenes
     imageContainers.forEach(container => {
         const img = container.querySelector('img');
         img.addEventListener('click', function() {
-            const imageId = this.getAttribute('data-image-id');
-            const fullUrl = this.getAttribute('data-full-url');
-            openModal(getRelativePath(fullUrl), imageId);
+            openModal(this.src, this.getAttribute('data-image-id'));
         });
     });
 
-    // Cerrar modal
+    // Eventos para cerrar modal
     closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
@@ -188,20 +268,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Manejar tecla ESC
+    // Cerrar con ESC
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
             closeModal();
         }
     });
 
-    // Manejar navegación del navegador
+    // Manejar navegación
     window.addEventListener('popstate', function(e) {
         if (e.state && e.state.imageId) {
             const img = document.querySelector(`img[data-image-id="${e.state.imageId}"]`);
             if (img) {
-                const fullUrl = img.getAttribute('data-full-url');
-                openModal(getRelativePath(fullUrl), e.state.imageId);
+                openModal(img.src, e.state.imageId);
             }
         } else {
             closeModal();
@@ -214,9 +293,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (initialImageId) {
         const img = document.querySelector(`img[data-image-id="${initialImageId}"]`);
         if (img) {
-            const fullUrl = img.getAttribute('data-full-url');
-            openModal(getRelativePath(fullUrl), initialImageId);
+            openModal(img.src, initialImageId);
         }
     }
+
+    // Filtrado por categorías
+    categoryItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const category = this.textContent.toLowerCase();
+            
+            imageContainers.forEach(container => {
+                if (category === 'todas las imágenes') {
+                    container.style.display = '';
+                } else {
+                    const containerCategory = container.getAttribute('data-category').toLowerCase();
+                    container.style.display = containerCategory === category ? '' : 'none';
+                }
+            });
+        });
+    });
 });
 </script>
