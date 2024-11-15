@@ -1,393 +1,170 @@
----
-layout: default
+--- 
+layout: default 
 title: Galería
 permalink: /galeria/
 ---
 
-<style>
-    .loader {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100px;
-        margin: 20px 0;
-    }
+:::::::::: page-container
+::: sidebar-menu
+### Categorías
 
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
+<!-- Agregar buscador -->
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Buscar imágenes..." class="search-input">
+</div>
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+- Todas las imágenes
+{% assign categories = "" | split: "" %}
+{% for file in site.static_files %}
+  {% if file.path contains '/imagenes/' %}
+    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+    {% unless categories contains folder %}
+      {% assign categories = categories | push: folder %}
+    {% endunless %}
+  {% endif %}
+{% endfor %}
+{% assign sorted_categories = categories | sort %}
+{% for category in sorted_categories %}
+- {{ category | capitalize }}
+{% endfor %}
+:::
 
-    .page-container {
-        display: flex;
-        gap: 2rem;
-        padding: 2rem;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    .sidebar-menu {
-        flex: 0 0 200px;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        height: fit-content;
-        position: sticky;
-        top: 20px;
-    }
-
-    .sidebar-menu h3 {
-        margin-top: 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #dee2e6;
-    }
-
-    .sidebar-menu ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .sidebar-menu li {
-        padding: 0.5rem;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        border-radius: 4px;
-    }
-
-    .sidebar-menu li:hover {
-        background-color: #e9ecef;
-    }
-
-    .sidebar-menu li.active {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .gallery-container {
-        flex: 1;
-    }
-
-    .gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1.5rem;
-        padding: 1rem;
-    }
-
-    .image-container {
-        position: relative;
-        overflow: hidden;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        cursor: pointer;
-        transition: transform 0.3s ease;
-        aspect-ratio: 1;
-        opacity: 0;
-        transform: translateY(20px);
-        animation: fadeIn 0.5s ease forwards;
-    }
-
-    @keyframes fadeIn {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .image-container:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-
-    .image-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-    .image-container:hover img {
-        transform: scale(1.05);
-    }
-
-    .image-title {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0,0,0,0.7);
-        color: white;
-        padding: 0.5rem;
-        text-align: center;
-        font-size: 0.9rem;
-        transform: translateY(100%);
-        transition: transform 0.3s ease;
-    }
-
-    .image-container:hover .image-title {
-        transform: translateY(0);
-    }
-
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.9);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal.active {
-        display: flex;
-    }
-
-    .modal-content {
-        max-width: 90%;
-        max-height: 90vh;
-        position: relative;
-    }
-
-    .modal-content img {
-        max-width: 100%;
-        max-height: 90vh;
-        object-fit: contain;
-    }
-
-    .modal-close {
-        position: absolute;
-        top: -40px;
-        right: 0;
-        color: white;
-        font-size: 30px;
-        cursor: pointer;
-        background: none;
-        border: none;
-        padding: 5px;
-    }
-
-    @media (max-width: 768px) {
-        .page-container {
-            flex-direction: column;
-            padding: 1rem;
-        }
+:::::::: gallery-container
+::::: gallery
+{% for file in site.static_files %}
+  {% if file.path contains '/imagenes/' %}
+    {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+      {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+      {% assign image_name = file.name | split: '.' | first %}
+      
+      :::: {.image-container .hidden category="{{ category | slugify }}" data-title="{{ image_name | replace: '-', ' ' | capitalize }}"}
+        ![{{ image_name }}]({{ file.path | relative_url }}){loading="lazy" data-image-id="{{ image_name | slugify }}"}
         
-        .sidebar-menu {
-            position: relative;
-            top: 0;
-            width: auto;
-        }
+        ::: image-title
+        {{ image_name | split: '.' | first | replace: '-', ' ' | capitalize }}
+        :::
+      ::::
+    {% endif %}
+  {% endif %}
+{% endfor %}
+:::::
 
-        .gallery {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-        }
-    }
+:::: {.loader .hidden}
+::: spinner
+:::
+::::
+::::::::
+::::::::::
 
-    .hidden {
-        display: none !important;
-    }
+:::: {#imageModal .modal}
+::: modal-content
+<span class="close">&times;</span>
+<img id="modalImage" src="" alt="">
+:::
+::::
+
+<style>
+.search-container {
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.hidden-search {
+  display: none !important;
+}
 </style>
-
-<div class="page-container">
-    <div class="sidebar-menu">
-        <h3>Categorías</h3>
-        <ul>
-            <li data-category="all" class="active">Todas las imágenes</li>
-            {% assign categories = "" | split: "" %}
-            {% for file in site.static_files %}
-                {% if file.path contains '/imagenes/' %}
-                    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                    {% unless categories contains folder %}
-                        {% assign categories = categories | push: folder %}
-                    {% endunless %}
-                {% endif %}
-            {% endfor %}
-            {% assign sorted_categories = categories | sort %}
-            {% for category in sorted_categories %}
-                <li data-category="{{ category | slugify }}">{{ category | capitalize }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="gallery-container">
-        <div class="gallery">
-            {% for file in site.static_files %}
-                {% if file.path contains '/imagenes/' %}
-                    {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-                        {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                        <div class="image-container hidden" data-category="{{ category | slugify }}">
-                            <img src="{{ file.path | relative_url }}" alt="{{ file.name | split: '.' | first }}" loading="lazy">
-                            <div class="image-title">
-                                {{ file.name | split: '.' | first | replace: '-', ' ' | capitalize }}
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-        </div>
-        <div class="loader hidden">
-            <div class="spinner"></div>
-        </div>
-    </div>
-</div>
-
-<div class="modal" id="imageModal">
-    <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <img id="modalImage" src="" alt="">
-    </div>
-</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const imageContainers = Array.from(document.querySelectorAll('.image-container'));
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
-    const modalClose = document.querySelector('.modal-close');
-    const categoryButtons = document.querySelectorAll('.sidebar-menu li');
-    const loader = document.querySelector('.loader');
-    
-    let currentCategory = 'all';
-    let currentIndex = 0;
-    const imagesPerLoad = 4;
-    let isLoading = false;
+    const closeBtn = document.querySelector('.close');
+    const searchInput = document.getElementById('searchInput');
+    const imageContainers = document.querySelectorAll('.image-container');
 
-    // Función para mostrar las imágenes iniciales
-    function showInitialImages() {
-        const visibleImages = imageContainers.filter(container => 
-            currentCategory === 'all' || container.dataset.category === currentCategory
-        );
-
-        // Ocultar todas las imágenes primero
-        imageContainers.forEach(container => container.classList.add('hidden'));
-
-        // Mostrar las primeras imágenes
-        visibleImages.slice(0, imagesPerLoad).forEach(container => {
-            container.classList.remove('hidden');
-        });
-
-        currentIndex = imagesPerLoad;
-        checkAndLoadMore();
-    }
-
-    // Función para cargar más imágenes
-    function loadMoreImages() {
-        if (isLoading) return;
-
-        isLoading = true;
-        loader.classList.remove('hidden');
-
-        const visibleImages = imageContainers.filter(container => 
-            currentCategory === 'all' || container.dataset.category === currentCategory
-        );
-
-        setTimeout(() => {
-            const nextImages = visibleImages.slice(currentIndex, currentIndex + imagesPerLoad);
-            
-            nextImages.forEach(container => {
-                container.classList.remove('hidden');
-            });
-
-            currentIndex += imagesPerLoad;
-            isLoading = false;
-            loader.classList.add('hidden');
-            checkAndLoadMore();
-        }, 500); // Pequeño delay para mostrar el loader
-    }
-
-    // Función para verificar si necesitamos cargar más imágenes
-    function checkAndLoadMore() {
-        const visibleImages = imageContainers.filter(container => 
-            currentCategory === 'all' || container.dataset.category === currentCategory
-        );
-
-        if (currentIndex >= visibleImages.length) {
-            loader.classList.add('hidden');
+    // Función para actualizar la URL
+    function updateURL(imageId) {
+        if (imageId) {
+            const newURL = `${window.location.pathname}?image=${imageId}`;
+            window.history.pushState({ imageId: imageId }, '', newURL);
         } else {
-            loader.classList.remove('hidden');
+            window.history.pushState({}, '', window.location.pathname);
         }
     }
 
-    // Observer para el scroll infinito
-    const options = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && !isLoading) {
-                loadMoreImages();
-            }
-        });
-    }, options);
-
-    observer.observe(loader);
-
-    // Funciones del modal
-    function openModal(imgSrc, imgAlt) {
-        modalImg.src = imgSrc;
-        modalImg.alt = imgAlt;
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+    // Función para abrir modal
+    function openModal(imageSrc, imageId) {
+        modal.style.display = "block";
+        modalImg.src = imageSrc;
+        updateURL(imageId);
     }
 
+    // Función para cerrar modal
     function closeModal() {
-        modal.classList.remove('active');
-        document.body.style.overflow = 'auto';
+        modal.style.display = "none";
+        updateURL(null);
     }
 
-    // Event listeners para las imágenes
-    imageContainers.forEach(container => {
-        container.addEventListener('click', function() {
-            const img = this.querySelector('img');
-            openModal(img.src, img.alt);
+    // Búsqueda de imágenes
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        
+        imageContainers.forEach(container => {
+            const title = container.getAttribute('data-title').toLowerCase();
+            const category = container.getAttribute('category').toLowerCase();
+            
+            if (title.includes(searchTerm) || category.includes(searchTerm)) {
+                container.classList.remove('hidden-search');
+            } else {
+                container.classList.add('hidden-search');
+            }
         });
     });
 
-    // Event listeners para el modal
-    modalClose.addEventListener('click', closeModal);
+    // Evento para imágenes
+    imageContainers.forEach(container => {
+        const img = container.querySelector('img');
+        img.addEventListener('click', function() {
+            const imageId = this.getAttribute('data-image-id');
+            openModal(this.src, imageId);
+        });
+    });
+
+    // Cerrar modal
+    closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeModal();
         }
     });
 
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
+    // Manejar navegación del navegador
+    window.addEventListener('popstate', function(e) {
+        if (e.state && e.state.imageId) {
+            const img = document.querySelector(`img[data-image-id="${e.state.imageId}"]`);
+            if (img) {
+                openModal(img.src, e.state.imageId);
+            }
+        } else {
             closeModal();
         }
     });
 
-    // Event listeners para las categorías
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            currentCategory = this.dataset.category;
-            currentIndex = 0;
-            
-            categoryButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-
-            showInitialImages();
-        });
-    });
-
-    // Iniciar la galería
-    showInitialImages();
+    // Verificar URL inicial
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialImageId = urlParams.get('image');
+    if (initialImageId) {
+        const img = document.querySelector(`img[data-image-id="${initialImageId}"]`);
+        if (img) {
+            openModal(img.src, initialImageId);
+        }
+    }
 });
 </script>
