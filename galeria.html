@@ -86,8 +86,6 @@ permalink: /galeria/
 </div>
 
 <style>
-/* Estilos previos... */
-
 /* Estilos adicionales para navegación y compartir */
 .modal-navigation {
     position: absolute;
@@ -148,11 +146,227 @@ permalink: /galeria/
     background: #0056b3;
 }
 
-/* Resto de estilos previos... */
+    
+/* Estilos generales */
+.page-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Estilos del sidebar */
+.sidebar-menu {
+    flex: 0 0 250px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+/* Estilos del buscador */
+.search-container {
+    margin-bottom: 20px;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 30px 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #666;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.clear-button {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #666;
+    cursor: pointer;
+    padding: 0 5px;
+    display: none;
+}
+
+.clear-button:hover {
+    color: #333;
+}
+
+.search-results {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Estilos de categorías */
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-item {
+    padding: 8px 12px;
+    margin: 4px 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.category-item:hover {
+    background: #e0e0e0;
+}
+
+.category-item.active {
+    background: #007bff;
+    color: white;
+}
+
+/* Estilos de la galería */
+.gallery-container {
+    flex: 1;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.image-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.image-container:hover {
+    transform: translateY(-5px);
+}
+
+.image-container img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+}
+
+.image-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Estilos del modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90vh;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+}
+
+.close-modal {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* Utilidades */
+.hidden {
+    display: none !important;
+}
+
+/* Loader */
+.loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-container {
+        flex-direction: column;
+    }
+
+    .sidebar-menu {
+        position: static;
+        width: 100%;
+    }
+
+    .gallery {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
 </style>
 
 <script>
-let currentImageId = null;
+    let currentImageId = null;
 const images = new Map();
 
 // Inicializar el mapa de imágenes
@@ -278,4 +492,101 @@ function fallbackShare() {
 }
 
 // Resto del código JavaScript previo...
+// Funciones para el buscador
+function filterImages() {
+    const searchInput = document.getElementById('searchInput');
+    const clearButton = document.getElementById('clearSearch');
+    const searchResults = document.getElementById('searchResults');
+    const filter = searchInput.value.toLowerCase();
+    const images = document.querySelectorAll('.image-container');
+    let visibleCount = 0;
+
+    clearButton.style.display = filter ? 'block' : 'none';
+
+    images.forEach(image => {
+        const title = image.dataset.title.toLowerCase();
+        const category = image.dataset.category.toLowerCase();
+        
+        if (title.includes(filter) || category.includes(filter)) {
+            image.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            image.classList.add('hidden');
+        }
+    });
+
+    // Actualizar contador de resultados
+    searchResults.textContent = filter 
+        ? `Encontradas ${visibleCount} imágenes` 
+        : 'Mostrando todas las imágenes';
+}
+
+function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = '';
+    filterImages();
+}
+
+// Funciones para las categorías
+function filterByCategory(category) {
+    const images = document.querySelectorAll('.image-container');
+    const categoryItems = document.querySelectorAll('.category-item');
+
+    // Actualizar categorías activas
+    categoryItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.category === category);
+    });
+
+    images.forEach(image => {
+        if (category === 'all' || image.dataset.category === category) {
+            image.classList.remove('hidden');
+        } else {
+            image.classList.add('hidden');
+        }
+    });
+}
+
+// Funciones para el modal
+function openModal(imgSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    modal.style.display = 'block';
+    modalImg.src = imgSrc;
+}
+
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Buscador
+    const searchInput = document.getElementById('searchInput');
+    const clearButton = document.getElementById('clearSearch');
+    
+    searchInput.addEventListener('input', filterImages);
+    clearButton.addEventListener('click', clearSearch);
+
+    // Categorías
+    const categoryItems = document.querySelectorAll('.category-item');
+    categoryItems.forEach(item => {
+        item.addEventListener('click', () => {
+            filterByCategory(item.dataset.category);
+        });
+    });
+
+    // Modal
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('imageModal');
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Prevenir que se cierre el modal al hacer click en la imagen
+    document.getElementById('modalImage').addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+});
 </script>
