@@ -67,23 +67,43 @@ permalink: /galeria/
     </div>
 </div>
 
-<!-- Modal para ver imagen -->
-<div id="imageModal" class="modal">
+  <!-- Modal mejorado -->
+  <div id="imageModal" class="modal">
     <div class="modal-content">
-        <div class="modal-navigation">
-            <button class="nav-button prev-button" onclick="navigateImage('prev')">&lt;</button>
-            <button class="nav-button next-button" onclick="navigateImage('next')">&gt;</button>
+      <div class="modal-header">
+        <h3 id="modalTitle"></h3>
+        <button class="close-button" onclick="closeImage()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <button class="nav-button prev" onclick="navigateImage(-1)">
+          <span>‹</span>
+        </button>
+        
+        <div class="image-wrapper">
+          <img id="modalImage" src="" alt="">
         </div>
-        <span class="close-modal" onclick="closeImage()">×</span>
-        <img id="modalImage" src="" alt="">
-        <div class="modal-info">
-            <h3 id="modalTitle"></h3>
-            <button id="shareButton" onclick="shareImage()" class="share-button">
-                Compartir
-            </button>
+        
+        <button class="nav-button next" onclick="navigateImage(1)">
+          <span>›</span>
+        </button>
+      </div>
+      
+      <div class="modal-footer">
+        <div class="share-buttons">
+          <button onclick="shareImage('facebook')" class="share-btn facebook">
+            Facebook
+          </button>
+          <button onclick="shareImage('twitter')" class="share-btn twitter">
+            Twitter
+          </button>
+          <button onclick="shareImage('pinterest')" class="share-btn pinterest">
+            Pinterest
+          </button>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
 <style>
 /* Estilos adicionales para navegación y compartir */
@@ -99,20 +119,76 @@ permalink: /galeria/
 }
 
 .nav-button {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    padding: 15px 20px;
-    font-size: 24px;
-    cursor: pointer;
-    border-radius: 50%;
-    transition: background-color 0.3s;
-    pointer-events: auto;
-}
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 1rem;
+      cursor: pointer;
+      font-size: 2rem;
+      transition: background-color 0.3s;
+      z-index: 2;
+    }
 
 .nav-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-button.prev {
+      left: 0;
+    }
+
+    .nav-button.next {
+      right: 0;
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      color: #666;
+    }
+
+    .close-button:hover {
+      color: #000;
+    }
+
+    .modal-footer {
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .share-buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .share-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+    }
+
+    .share-btn.facebook {
+      background-color: #1877f2;
+    }
+
+    .share-btn.twitter {
+      background-color: #1da1f2;
+    }
+
+    .share-btn.pinterest {
+      background-color: #e60023;
+    }
 
 .modal-info {
     position: absolute;
@@ -285,32 +361,69 @@ permalink: /galeria/
 
 /* Estilos del modal */
 .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.9);
-    z-index: 1000;
-    cursor: pointer;
-}
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+.modal.show {
+      display: flex;
+      opacity: 1;
+    }
 
 .modal-content {
-    position: relative;
-    max-width: 90%;
-    max-height: 90vh;
-    margin: 20px auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+      position: relative;
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+.modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
 
 .modal-content img {
     max-width: 100%;
     max-height: 90vh;
     object-fit: contain;
 }
+
+.image-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    #modalImage {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+    }
+
+.modal-body {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background-color: #000;
+      min-height: 400px;
+    }
 
 .close-modal {
     position: absolute;
