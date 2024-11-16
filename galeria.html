@@ -5,69 +5,65 @@ permalink: /galeria/
 ---
 
 <div class="page-container">
-    <div class="sidebar-menu">
-        <!-- Buscador -->
-        <div class="search-container">
-            <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar imágenes...">
-                <button id="clearSearch" class="clear-button" title="Limpiar búsqueda">×</button>
-            </div>
-            <div id="searchResults" class="search-results">
-                Mostrando todas las imágenes
-            </div>
-        </div>
-
-        <h3>Categorías</h3>
-        <ul class="category-list">
-            <li class="category-item active" data-category="all">Todas las imágenes</li>
-            {% assign categories = "" | split: "" %}
-            {% for file in site.static_files %}
-                {% if file.path contains '/imagenes/' %}
-                    {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                    {% unless categories contains folder %}
-                        {% assign categories = categories | push: folder %}
-                    {% endunless %}
-                {% endif %}
-            {% endfor %}
-            {% assign sorted_categories = categories | sort %}
-            {% for category in sorted_categories %}
-                <li class="category-item" data-category="{{ category | slugify }}">{{ category | capitalize }}</li>
-            {% endfor %}
-        </ul>
+  <!-- Sidebar con búsqueda y categorías -->
+  <div class="sidebar-menu">
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Buscar imágenes...">
+        <button class="search-clear" onclick="clearSearch()">×</button>
+      </div>
+      <div id="searchResults" class="search-results">
+        Mostrando todas las imágenes
+      </div>
     </div>
 
-    <div class="gallery-container">
-        <div class="gallery">
-            {% for file in site.static_files %}
-                {% if file.path contains '/imagenes/' %}
-                    {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-                        {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-                        {% assign title = file.name | split: '.' | first | replace: '-', ' ' | capitalize %}
-                        {% assign image_path = file.path | relative_url %}
-                        {% assign image_id = file.path | split: '/' | last | split: '.' | first | slugify %}
-                        
-                        <div class="image-container" 
-                             data-title="{{ title }}" 
-                             data-category="{{ category | slugify }}"
-                             data-image-id="{{ image_id }}">
-                            <img src="{{ image_path }}" 
-                                 alt="{{ title }}" 
-                                 loading="lazy" 
-                                 onclick="openImage('{{ image_id }}', '{{ image_path }}', '{{ title }}')">
-                            <div class="image-title">{{ title }}</div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-        </div>
-
-        <div class="loader hidden">
-            <div class="spinner"></div>
-        </div>
+    <div class="categories">
+      <h3>Categorías</h3>
+      <ul class="category-list">
+        <li class="active" data-category="all">Todas las imágenes</li>
+        {% assign categories = "" | split: "" %}
+        {% for file in site.static_files %}
+          {% if file.path contains '/imagenes/' %}
+            {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% unless categories contains folder %}
+              {% assign categories = categories | push: folder %}
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+        {% assign sorted_categories = categories | sort %}
+        {% for category in sorted_categories %}
+          <li data-category="{{ category | slugify }}">{{ category | capitalize }}</li>
+        {% endfor %}
+      </ul>
     </div>
-</div>
+  </div>
 
-  <!-- Modal mejorado -->
+  <!-- Contenedor de la galería -->
+  <div class="gallery-container">
+    <div class="gallery">
+      {% for file in site.static_files %}
+        {% if file.path contains '/imagenes/' %}
+          {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% assign title = file.name | split: '.' | first | replace: '-', ' ' | capitalize %}
+            {% assign image_path = file.path | relative_url %}
+            {% assign image_id = file.path | split: '/' | last | split: '.' | first | slugify %}
+
+            <div class="image-container" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
+              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}', '{{ title }}')">
+              <div class="image-title">{{ title }}</div>
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="loader hidden">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- Modal para visualizar imágenes -->
   <div id="imageModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -91,615 +87,544 @@ permalink: /galeria/
       
       <div class="modal-footer">
         <div class="share-buttons">
-          <button onclick="shareImage('facebook')" class="share-btn facebook">
-            Facebook
-          </button>
-          <button onclick="shareImage('twitter')" class="share-btn twitter">
-            Twitter
-          </button>
-          <button onclick="shareImage('pinterest')" class="share-btn pinterest">
-            Pinterest
-          </button>
+          <button onclick="shareImage('facebook')" class="share-btn facebook">Facebook</button>
+          <button onclick="shareImage('twitter')" class="share-btn twitter">Twitter</button>
+          <button onclick="shareImage('pinterest')" class="share-btn pinterest">Pinterest</button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 <style>
-/* Estilos adicionales para navegación y compartir */
-.modal-navigation {
-    position: absolute;
-    width: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-    pointer-events: none;
-}
-
-.nav-button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: white;
-      padding: 1rem;
-      cursor: pointer;
-      font-size: 2rem;
-      transition: background-color 0.3s;
-      z-index: 2;
-    }
-
-.nav-button:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    .nav-button.prev {
-      left: 0;
-    }
-
-    .nav-button.next {
-      right: 0;
-    }
-
-    .close-button {
-      background: none;
-      border: none;
-      font-size: 2rem;
-      cursor: pointer;
-      padding: 0.5rem;
-      color: #666;
-    }
-
-    .close-button:hover {
-      color: #000;
-    }
-
-    .modal-footer {
-      padding: 1rem;
-      background-color: #f8f9fa;
-      border-top: 1px solid #dee2e6;
-    }
-
-    .share-buttons {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-    }
-
-    .share-btn {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      color: white;
-      font-weight: bold;
-    }
-
-    .share-btn.facebook {
-      background-color: #1877f2;
-    }
-
-    .share-btn.twitter {
-      background-color: #1da1f2;
-    }
-
-    .share-btn.pinterest {
-      background-color: #e60023;
-    }
-
-.modal-info {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-info h3 {
-    margin: 0;
-    font-size: 18px;
-}
-
-.share-button {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.share-button:hover {
-    background: #0056b3;
-}
-
-    
 /* Estilos generales */
 .page-container {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f5f5;
 }
 
-/* Estilos del sidebar */
+/* Sidebar */
 .sidebar-menu {
-    flex: 0 0 250px;
-    padding: 20px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    position: sticky;
-    top: 20px;
-    height: fit-content;
+  width: 250px;
+  padding: 20px;
+  background-color: white;
+  border-right: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
-/* Estilos del buscador */
 .search-container {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .search-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
 }
 
-.search-input {
-    width: 100%;
-    padding: 8px 30px 8px 12px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: all 0.3s ease;
+.search-wrapper input {
+  width: 100%;
+  padding: 8px 30px 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
-.search-input:focus {
-    outline: none;
-    border-color: #666;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+.search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
 }
 
-.clear-button {
-    position: absolute;
-    right: 8px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #666;
-    cursor: pointer;
-    padding: 0 5px;
-    display: none;
-}
-
-.clear-button:hover {
-    color: #333;
-}
-
-.search-results {
-    font-size: 12px;
-    color: #666;
-    margin-top: 5px;
-}
-
-/* Estilos de categorías */
 .category-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
 }
 
-.category-item {
-    padding: 8px 12px;
-    margin: 4px 0;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+.category-list li {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
-.category-item:hover {
-    background: #e0e0e0;
+.category-list li:hover {
+  background-color: #f0f0f0;
 }
 
-.category-item.active {
-    background: #007bff;
-    color: white;
+.category-list li.active {
+  background-color: #007bff;
+  color: white;
 }
 
-/* Estilos de la galería */
+/* Galería */
 .gallery-container {
-    flex: 1;
+  flex: 1;
+  padding: 20px;
 }
 
 .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
 }
 
 .image-container {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
 }
 
 .image-container:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
 }
 
 .image-container img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-    cursor: pointer;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  cursor: pointer;
 }
 
 .image-title {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    font-size: 14px;
-    text-align: center;
+  padding: 10px;
+  text-align: center;
+  background-color: white;
+  border-top: 1px solid #eee;
 }
 
-/* Estilos del modal */
+/* Modal */
 .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.9);
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 
 .modal.show {
-      display: flex;
-      opacity: 1;
-    }
+  display: flex;
+  opacity: 1;
+}
 
 .modal-content {
-      position: relative;
-      width: 90%;
-      max-width: 1200px;
-      margin: auto;
-      background-color: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-    }
+  position: relative;
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
 
 .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-      background-color: #f8f9fa;
-      border-bottom: 1px solid #dee2e6;
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
 
-.modal-content img {
-    max-width: 100%;
-    max-height: 90vh;
-    object-fit: contain;
+.modal-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: black;
+  min-height: 400px;
 }
 
 .image-wrapper {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1rem;
-    }
-
-    #modalImage {
-      max-width: 100%;
-      max-height: 70vh;
-      object-fit: contain;
-    }
-
-.modal-body {
-      position: relative;
-      display: flex;
-      align-items: center;
-      background-color: #000;
-      min-height: 400px;
-    }
-
-.close-modal {
-    position: absolute;
-    top: -40px;
-    right: 0;
-    color: white;
-    font-size: 30px;
-    cursor: pointer;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
 }
 
-/* Utilidades */
-.hidden {
-    display: none !important;
+#modalImage {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 1rem;
+  cursor: pointer;
+  font-size: 2rem;
+  transition: background-color 0.3s;
+  z-index: 2;
+}
+
+.nav-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button.prev {
+  left: 0;
+}
+
+.nav-button.next {
+  right: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #666;
+}
+
+.close-button:hover {
+  color: #000;
+}
+
+.modal-footer {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.share-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.share-btn:hover {
+  opacity: 0.9;
+}
+
+.share-btn.facebook {
+  background-color: #1877f2;
+}
+
+.share-btn.twitter {
+  background-color: #1da1f2;
+}
+
+.share-btn.pinterest {
+  background-color: #e60023;
 }
 
 /* Loader */
 .loader {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #007bff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hidden {
+  display: none;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .page-container {
-        flex-direction: column;
-    }
-
-    .sidebar-menu {
-        position: static;
-        width: 100%;
-    }
-
-    .gallery {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    }
+  .page-container {
+    flex-direction: column;
+  }
+  
+  .sidebar-menu {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  
+  .gallery {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .modal-content {
+    width: 95%;
+  }
+  
+  .nav-button {
+    padding: 0.5rem;
+  }
 }
 </style>
 
 <script>
-    let currentImageId = null;
-const images = new Map();
+// Variables globales
+let currentImageIndex = 0;
+let images = [];
+let currentCategory = 'all';
+let searchTerm = '';
 
-// Inicializar el mapa de imágenes
+// Inicialización
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.image-container').forEach(container => {
-        const id = container.dataset.imageId;
-        images.set(id, {
-            src: container.querySelector('img').src,
-            title: container.dataset.title,
-            element: container
-        });
-    });
-
-    // Verificar si hay una imagen en la URL al cargar
-    const imageId = getImageIdFromUrl();
-    if (imageId && images.has(imageId)) {
-        const image = images.get(imageId);
-        openImage(imageId, image.src, image.title);
-    }
-
-    // Escuchar cambios en el historial
-    window.addEventListener('popstate', (event) => {
-        const imageId = getImageIdFromUrl();
-        if (imageId && images.has(imageId)) {
-            const image = images.get(imageId);
-            openImage(imageId, image.src, image.title, true);
-        } else if (!imageId) {
-            closeImage(true);
-        }
-    });
+  // Recopilar todas las imágenes
+  images = Array.from(document.querySelectorAll('.image-container'));
+  
+  // Event listeners
+  document.addEventListener('keydown', handleKeyPress);
+  setupCategoryFilters();
+  setupSearch();
+  
+  // Inicializar Lazy Loading
+  setupLazyLoading();
 });
 
-function getImageIdFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('imagen');
+// Funciones del modal
+function openImage(imageId, imagePath, title) {
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  const modalTitle = document.getElementById('modalTitle');
+  
+  // Encontrar el índice de la imagen actual
+  currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
+  
+  // Precargar imágenes adyacentes
+  preloadAdjacentImages(currentImageIndex);
+  
+  modalImage.src = imagePath;
+  modalTitle.textContent = title;
+  
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
 }
 
-function openImage(imageId, imageSrc, imageTitle, fromHistory = false) {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    const modalTitle = document.getElementById('modalTitle');
-
-    modalImg.src = imageSrc;
-    modalTitle.textContent = imageTitle;
-    modal.style.display = 'block';
-    currentImageId = imageId;
-
-    if (!fromHistory) {
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set('imagen', imageId);
-        history.pushState({ imageId }, '', newUrl);
-    }
-
-    // Actualizar visibilidad de botones de navegación
-    updateNavigationButtons();
-}
-
-function closeImage(fromHistory = false) {
-    const modal = document.getElementById('imageModal');
-    modal.style.display = 'none';
-    currentImageId = null;
-
-    if (!fromHistory) {
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.delete('imagen');
-        history.pushState({}, '', newUrl);
-    }
+function closeImage() {
+  const modal = document.getElementById('imageModal');
+  modal.classList.remove('show');
+  document.body.style.overflow = 'auto';
 }
 
 function navigateImage(direction) {
-    if (!currentImageId) return;
-
-    const imageIds = Array.from(images.keys());
-    const currentIndex = imageIds.indexOf(currentImageId);
-    let newIndex;
-
-    if (direction === 'prev') {
-        newIndex = currentIndex > 0 ? currentIndex - 1 : imageIds.length - 1;
-    } else {
-        newIndex = currentIndex < imageIds.length - 1 ? currentIndex + 1 : 0;
-    }
-
-    const newImageId = imageIds[newIndex];
-    const image = images.get(newImageId);
-    openImage(newImageId, image.src, image.title);
+  const visibleImages = getVisibleImages();
+  let currentIndexInVisible = visibleImages.findIndex(img => 
+    img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
+  );
+  
+  currentIndexInVisible = (currentIndexInVisible + direction + visibleImages.length) % visibleImages.length;
+  const newImage = visibleImages[currentIndexInVisible];
+  
+  const imageId = newImage.getAttribute('data-id');
+  const imagePath = newImage.querySelector('img').src;
+  const title = newImage.getAttribute('data-title');
+  
+  currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
+  
+  const modalImage = document.getElementById('modalImage');
+  const modalTitle = document.getElementById('modalTitle');
+  
+  modalImage.src = imagePath;
+  modalTitle.textContent = title;
+  
+  // Precargar siguientes imágenes
+  preloadAdjacentImages(currentImageIndex);
 }
 
-function updateNavigationButtons() {
-    const prevButton = document.querySelector('.prev-button');
-    const nextButton = document.querySelector('.next-button');
-    const imageIds = Array.from(images.keys());
-    const currentIndex = imageIds.indexOf(currentImageId);
-
-    prevButton.style.display = imageIds.length > 1 ? 'block' : 'none';
-    nextButton.style.display = imageIds.length > 1 ? 'block' : 'none';
+function handleKeyPress(e) {
+  if (!document.getElementById('imageModal').classList.contains('show')) return;
+  
+  switch(e.key) {
+    case 'Escape':
+      closeImage();
+      break;
+    case 'ArrowLeft':
+      navigateImage(-1);
+      break;
+    case 'ArrowRight':
+      navigateImage(1);
+      break;
+  }
 }
 
-async function shareImage() {
-    const currentUrl = window.location.href;
-    const title = document.getElementById('modalTitle').textContent;
-
-    if (navigator.share) {
-        try {
-            await navigator.share({
-                title: title,
-                url: currentUrl
-            });
-        } catch (err) {
-            fallbackShare();
-        }
-    } else {
-        fallbackShare();
-    }
+// Funciones de compartir
+function shareImage(platform) {
+  const url = window.location.href;
+  const title = document.getElementById('modalTitle').textContent;
+  const imageUrl = document.getElementById('modalImage').src;
+  
+  let shareUrl;
+  switch(platform) {
+    case 'facebook':
+      shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+      break;
+    case 'twitter':
+      shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+      break;
+    case 'pinterest':
+      shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&media=${encodeURIComponent(imageUrl)}&description=${encodeURIComponent(title)}`;
+      break;
+  }
+  
+  window.open(shareUrl, '_blank', 'width=600,height=400');
 }
 
-function fallbackShare() {
-    const currentUrl = window.location.href;
-    navigator.clipboard.writeText(currentUrl).then(() => {
-        alert('URL copiada al portapapeles');
-    }).catch(() => {
-        alert('No se pudo copiar la URL');
+// Funciones de filtrado y búsqueda
+function setupCategoryFilters() {
+  const categoryItems = document.querySelectorAll('.category-list li');
+  categoryItems.forEach(item => {
+    item.addEventListener('click', () => {
+      // Actualizar clase activa
+      categoryItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      
+      // Filtrar imágenes
+      currentCategory = item.getAttribute('data-category');
+      filterImages();
     });
+  });
 }
 
-// Resto del código JavaScript previo...
-// Funciones para el buscador
+function setupSearch() {
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  
+  searchInput.addEventListener('input', (e) => {
+    searchTerm = e.target.value.toLowerCase().trim();
+    filterImages();
+    
+    // Actualizar resultados
+    const visibleCount = getVisibleImages().length;
+    searchResults.textContent = searchTerm ? 
+      `Encontradas ${visibleCount} imágenes para "${searchTerm}"` :
+      'Mostrando todas las imágenes';
+  });
+}
+
 function filterImages() {
-    const searchInput = document.getElementById('searchInput');
-    const clearButton = document.getElementById('clearSearch');
-    const searchResults = document.getElementById('searchResults');
-    const filter = searchInput.value.toLowerCase();
-    const images = document.querySelectorAll('.image-container');
-    let visibleCount = 0;
-
-    clearButton.style.display = filter ? 'block' : 'none';
-
-    images.forEach(image => {
-        const title = image.dataset.title.toLowerCase();
-        const category = image.dataset.category.toLowerCase();
-        
-        if (title.includes(filter) || category.includes(filter)) {
-            image.classList.remove('hidden');
-            visibleCount++;
-        } else {
-            image.classList.add('hidden');
-        }
-    });
-
-    // Actualizar contador de resultados
-    searchResults.textContent = filter 
-        ? `Encontradas ${visibleCount} imágenes` 
-        : 'Mostrando todas las imágenes';
+  const visibleCount = images.filter(image => {
+    const matchesCategory = currentCategory === 'all' || 
+      image.getAttribute('data-category') === currentCategory;
+    
+    const title = image.getAttribute('data-title').toLowerCase();
+    const matchesSearch = !searchTerm || title.includes(searchTerm);
+    
+    image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
+    return matchesCategory && matchesSearch;
+  }).length;
+  
+  // Actualizar contador de resultados
+  const searchResults = document.getElementById('searchResults');
+  let message = 'Mostrando todas las imágenes';
+  
+  if (currentCategory !== 'all' && searchTerm) {
+    message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
+  } else if (currentCategory !== 'all') {
+    message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
+  } else if (searchTerm) {
+    message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
+  }
+  
+  searchResults.textContent = message;
 }
 
 function clearSearch() {
-    const searchInput = document.getElementById('searchInput');
-    searchInput.value = '';
-    filterImages();
+  const searchInput = document.getElementById('searchInput');
+  searchInput.value = '';
+  searchTerm = '';
+  filterImages();
 }
 
-// Funciones para las categorías
-function filterByCategory(category) {
-    const images = document.querySelectorAll('.image-container');
-    const categoryItems = document.querySelectorAll('.category-item');
-
-    // Actualizar categorías activas
-    categoryItems.forEach(item => {
-        item.classList.toggle('active', item.dataset.category === category);
-    });
-
-    images.forEach(image => {
-        if (category === 'all' || image.dataset.category === category) {
-            image.classList.remove('hidden');
-        } else {
-            image.classList.add('hidden');
-        }
-    });
+// Funciones auxiliares
+function getVisibleImages() {
+  return images.filter(img => !img.classList.contains('hidden'));
 }
 
-// Funciones para el modal
-function openModal(imgSrc) {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    modal.style.display = 'block';
-    modalImg.src = imgSrc;
-}
-
-function closeModal() {
-    const modal = document.getElementById('imageModal');
-    modal.style.display = 'none';
-}
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    // Buscador
-    const searchInput = document.getElementById('searchInput');
-    const clearButton = document.getElementById('clearSearch');
+function preloadAdjacentImages(currentIndex) {
+  const visibleImages = getVisibleImages();
+  const preloadCount = 2; // Número de imágenes a precargar en cada dirección
+  
+  for (let i = 1; i <= preloadCount; i++) {
+    // Precargar imágenes siguientes
+    const nextIndex = (currentIndex + i) % visibleImages.length;
+    const nextImage = visibleImages[nextIndex].querySelector('img');
+    if (nextImage) {
+      const img = new Image();
+      img.src = nextImage.src;
+    }
     
-    searchInput.addEventListener('input', filterImages);
-    clearButton.addEventListener('click', clearSearch);
+    // Precargar imágenes anteriores
+    const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
+    const prevImage = visibleImages[prevIndex].querySelector('img');
+    if (prevImage) {
+      const img = new Image();
+      img.src = prevImage.src;
+    }
+  }
+}
 
-    // Categorías
-    const categoryItems = document.querySelectorAll('.category-item');
-    categoryItems.forEach(item => {
-        item.addEventListener('click', () => {
-            filterByCategory(item.dataset.category);
-        });
-    });
-
-    // Modal
-    window.addEventListener('click', (e) => {
-        const modal = document.getElementById('imageModal');
-        if (e.target === modal) {
-            closeModal();
+// Lazy Loading
+function setupLazyLoading() {
+  if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+          }
+          observer.unobserve(img);
         }
+      });
     });
 
-    // Prevenir que se cierre el modal al hacer click en la imagen
-    document.getElementById('modalImage').addEventListener('click', (e) => {
-        e.stopPropagation();
+    document.querySelectorAll('img[data-src]').forEach(img => {
+      imageObserver.observe(img);
     });
-});
+  } else {
+    // Fallback para navegadores que no soportan IntersectionObserver
+    document.querySelectorAll('img[data-src]').forEach(img => {
+      img.src = img.dataset.src;
+      img.removeAttribute('data-src');
+    });
+  }
+}
+
+// Función para manejar errores de carga de imágenes
+function handleImageError(img) {
+  img.src = '/ruta/a/imagen/error.jpg'; // Reemplaza con tu imagen de error
+  img.alt = 'Error al cargar la imagen';
+}
 </script>
