@@ -4,6 +4,11 @@ title: Galería
 permalink: /galeria/
 ---
 
+<!-- Asegúrate de que las URLs sean correctas -->
+<script>
+  const BASE_URL = "https://zgrafic.com";
+</script>
+
 <div class="page-container">
   <!-- Sidebar con búsqueda y categorías -->
   <div class="sidebar-menu">
@@ -64,33 +69,40 @@ permalink: /galeria/
   </div>
 
   <!-- Modal para visualizar imágenes -->
-  <div id="imageModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modalTitle"></h3>
-        <button class="close-button" onclick="closeImage()">×</button>
+<div id="imageModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <button class="close-button" onclick="closeImage()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <button class="nav-button prev" onclick="navigateImage(-1)">
+        <span>‹</span>
+      </button>
+      
+      <div class="image-wrapper">
+        <img id="modalImage" src="" alt="">
       </div>
       
-      <div class="modal-body">
-        <button class="nav-button prev" onclick="navigateImage(-1)">
-          <span>‹</span>
-        </button>
-        
-        <div class="image-wrapper">
-          <img id="modalImage" src="" alt="">
-        </div>
-        
-        <button class="nav-button next" onclick="navigateImage(1)">
-          <span>›</span>
-        </button>
-      </div>
+      <button class="nav-button next" onclick="navigateImage(1)">
+        <span>›</span>
+      </button>
       
-      <div class="modal-footer">
-        <div class="share-buttons">
-          <button onclick="shareImage('facebook')" class="share-btn facebook">Facebook</button>
-          <button onclick="shareImage('twitter')" class="share-btn twitter">Twitter</button>
-          <button onclick="shareImage('pinterest')" class="share-btn pinterest">Pinterest</button>
-        </div>
+      <div class="image-counter">1 de 1</div>
+    </div>
+    
+    <div class="modal-footer">
+      <div class="share-buttons">
+        <button onclick="shareImage('facebook')" class="share-btn facebook">
+          <i class="fab fa-facebook-f"></i> Facebook
+        </button>
+        <button onclick="shareImage('twitter')" class="share-btn twitter">
+          <i class="fab fa-twitter"></i> Twitter
+        </button>
+        <button onclick="shareImage('pinterest')" class="share-btn pinterest">
+          <i class="fab fa-pinterest-p"></i> Pinterest
+        </button>
       </div>
     </div>
   </div>
@@ -202,7 +214,7 @@ permalink: /galeria/
   border-top: 1px solid #eee;
 }
 
-/* Modal */
+/* Estilos mejorados para el popup */
 .modal {
   display: none;
   position: fixed;
@@ -210,10 +222,11 @@ permalink: /galeria/
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.95);
   z-index: 1000;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
 }
 
 .modal.show {
@@ -223,29 +236,44 @@ permalink: /galeria/
 
 .modal-content {
   position: relative;
-  width: 90%;
-  max-width: 1200px;
+  width: 95%;
+  max-width: 1400px;
   margin: auto;
-  background-color: white;
-  border-radius: 8px;
+  background-color: transparent;
+  border-radius: 12px;
   overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.modal.show .modal-content {
+  transform: scale(1);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h3 {
+  color: white;
+  font-size: 1.5rem;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .modal-body {
   position: relative;
   display: flex;
   align-items: center;
-  background-color: black;
-  min-height: 400px;
+  justify-content: center;
+  min-height: 500px;
+  background-color: transparent;
 }
 
 .image-wrapper {
@@ -253,13 +281,25 @@ permalink: /galeria/
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  padding: 2rem;
 }
 
 #modalImage {
-  max-width: 100%;
-  max-height: 70vh;
-  object-fit: contain;
+  animation: fadeIn 0.3s ease;
+}
+
+  /* Contador de imágenes */
+.image-counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  backdrop-filter: blur(5px);
 }
 
 .nav-button {
@@ -269,62 +309,88 @@ permalink: /galeria/
   background: rgba(255, 255, 255, 0.1);
   border: none;
   color: white;
-  padding: 1rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
   cursor: pointer;
   font-size: 2rem;
-  transition: background-color 0.3s;
-  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
 }
 
 .nav-button:hover {
   background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .nav-button.prev {
-  left: 0;
+  left: 20px;
 }
 
 .nav-button.next {
-  right: 0;
+  right: 20px;
 }
 
 .close-button {
-  background: none;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
-  font-size: 2rem;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   cursor: pointer;
-  padding: 0.5rem;
-  color: #666;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
 }
 
 .close-button:hover {
-  color: #000;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
 }
 
 .modal-footer {
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .share-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   justify-content: center;
 }
 
 .share-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 25px;
   cursor: pointer;
   color: white;
-  font-weight: bold;
-  transition: opacity 0.2s;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  backdrop-filter: blur(5px);
+}
+
+.share-btn:before {
+  font-family: "Font Awesome 5 Brands";
+  font-size: 1.2rem;
 }
 
 .share-btn:hover {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .share-btn.facebook {
@@ -337,6 +403,12 @@ permalink: /galeria/
 
 .share-btn.pinterest {
   background-color: #e60023;
+}
+
+  /* Animaciones para las imágenes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Loader */
@@ -366,32 +438,46 @@ permalink: /galeria/
 }
 
 /* Responsive */
+/* Responsive */
 @media (max-width: 768px) {
-  .page-container {
-    flex-direction: column;
-  }
-  
-  .sidebar-menu {
-    width: 100%;
-    height: auto;
-    position: relative;
-  }
-  
-  .gallery {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-  
   .modal-content {
-    width: 95%;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
   }
-  
+
   .nav-button {
-    padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+
+  .nav-button.prev {
+    left: 10px;
+  }
+
+  .nav-button.next {
+    right: 10px;
+  }
+
+  .share-buttons {
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
   }
 }
 </style>
 
 <script>
+// Modificar las funciones de URL y compartir
+function getFullUrl(path) {
+  return `${BASE_URL}${path}`;
+}
+  
 // Variables globales
 let currentImageIndex = 0;
 let images = [];
@@ -412,21 +498,18 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLazyLoading();
 });
 
-// Funciones del modal
+// Modificar la función openImage para incluir el contador
 function openImage(imageId, imagePath, title) {
   const modal = document.getElementById('imageModal');
   const modalImage = document.getElementById('modalImage');
   const modalTitle = document.getElementById('modalTitle');
   
-  // Encontrar el índice de la imagen actual
   currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
-  
-  // Precargar imágenes adyacentes
-  preloadAdjacentImages(currentImageIndex);
   
   modalImage.src = imagePath;
   modalTitle.textContent = title;
   
+  updateImageCounter();
   modal.classList.add('show');
   document.body.style.overflow = 'hidden';
 }
@@ -460,6 +543,7 @@ function navigateImage(direction) {
   
   // Precargar siguientes imágenes
   preloadAdjacentImages(currentImageIndex);
+  updateImageCounter();
 }
 
 function handleKeyPress(e) {
@@ -480,9 +564,9 @@ function handleKeyPress(e) {
 
 // Funciones de compartir
 function shareImage(platform) {
-  const url = window.location.href;
+  const url = getFullUrl(window.location.pathname);
   const title = document.getElementById('modalTitle').textContent;
-  const imageUrl = document.getElementById('modalImage').src;
+  const imageUrl = getFullUrl(document.getElementById('modalImage').getAttribute('src'));
   
   let shareUrl;
   switch(platform) {
@@ -498,6 +582,17 @@ function shareImage(platform) {
   }
   
   window.open(shareUrl, '_blank', 'width=600,height=400');
+}
+
+  // Añadir contador de imágenes
+function updateImageCounter() {
+  const visibleImages = getVisibleImages();
+  const currentPosition = visibleImages.findIndex(img => 
+    img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
+  ) + 1;
+  
+  const counter = document.querySelector('.image-counter');
+  counter.textContent = `${currentPosition} de ${visibleImages.length}`;
 }
 
 // Funciones de filtrado y búsqueda
