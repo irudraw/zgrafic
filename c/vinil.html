@@ -132,21 +132,6 @@ function seleccionarOpcion(tipo) {
   window.location.href = `${window.location.pathname}?cliente=${cliente}`;
 }
 
-
-// Función para detectar la tecla "Enter" y ejecutar la operación
-function detectarEnter(event) {
-  if (event.key === "Enter") {
-    calcular();
-  }
-}
-
-// Asignar el evento de escucha a los campos de entrada
-document.addEventListener('DOMContentLoaded', function() {
-  const inputs = document.querySelectorAll('.input-number');
-  inputs.forEach(input => {
-    input.addEventListener('keydown', detectarEnter);
-  });
-});
 	
 </script>
 
