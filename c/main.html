@@ -146,6 +146,7 @@
                 $.get(page + '.html', function(data) {
                     $('#content').html(data);
                     applyUrlParams();
+                    addEnterListener(); // Agregar el listener para "Enter" después de cargar el contenido
                 });
             }
 
@@ -163,6 +164,27 @@
                 }
             }
 
+            function addEnterListener() {
+                // Agregar el evento de escucha para la tecla "Enter"
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === "Enter") {
+                        // Verificar si estamos en la página de Banner o Vinil
+                        const currentPage = window.location.search.includes('page=banner') ? 'banner' : 'vinil';
+                        if (currentPage === 'banner') {
+                            // Ejecutar la función calcular() de banner.html
+                            if (typeof calcular === 'function') {
+                                calcular();
+                            }
+                        } else if (currentPage === 'vinil') {
+                            // Ejecutar la función calcular() de vinil.html
+                            if (typeof calcular === 'function') {
+                                calcular();
+                            }
+                        }
+                    }
+                });
+            }
+
             $('[data-page]').click(function(e) {
                 e.preventDefault();
                 const page = $(this).data('page');
@@ -177,7 +199,7 @@
                 applyUrlParams();
             });
 
-            // Load initial content based on URL or default to 'banner'
+            // Cargar contenido inicial basado en la URL o por defecto 'banner'
             const initialPage = new URLSearchParams(window.location.search).get('page') || 'banner';
             loadContent(initialPage);
         });
