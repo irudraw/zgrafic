@@ -136,22 +136,6 @@ function seleccionarOpcion(tipo) {
   const cliente = obtenerParametroGET('cliente') || ''; // Mantener el vendedor si ya existe
   window.location.href = `${window.location.pathname}?tipo=${tipo}&cliente=${cliente}`;
 }
-
-
-// Función para detectar la tecla "Enter" y ejecutar la operación
-function detectarEnter(event) {
-  if (event.key === "Enter") {
-    calcular();
-  }
-}
-
-// Asignar el evento de escucha a los campos de entrada
-document.addEventListener('DOMContentLoaded', function() {
-  const inputs = document.querySelectorAll('.input-number');
-  inputs.forEach(input => {
-    input.addEventListener('keydown', detectarEnter);
-  });
-});
 	
 </script>
 
