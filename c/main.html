@@ -133,10 +133,10 @@
     </main>
 
     <div class="bottom-buttons">
-        <a href="#" class="btn" data-tipo="grueso" data-cliente="Cliente"><i class="fas fa-user"></i><span>Clientes</span></a>
-        <a href="#" class="btn" data-tipo="grueso" data-cliente="Diseñador"><i class="fas fa-paint-brush"></i><span>Diseñadores</span></a>
-        <a href="#" class="btn" data-tipo="grueso" data-cliente="Vendedor"><i class="fas fa-store"></i><span>Vendedores</span></a>
-        <a href="#" class="btn" data-tipo="grueso" data-cliente="Casero"><i class="fas fa-ice-cream"></i><span>Helados</span></a>
+        <a href="#" class="btn" data-cliente="Cliente"><i class="fas fa-user"></i><span>Clientes</span></a>
+        <a href="#" class="btn" data-cliente="Diseñador"><i class="fas fa-paint-brush"></i><span>Diseñadores</span></a>
+        <a href="#" class="btn" data-cliente="Vendedor"><i class="fas fa-store"></i><span>Vendedores</span></a>
+        <a href="#" class="btn" data-cliente="Casero"><i class="fas fa-ice-cream"></i><span>Helados</span></a>
     </div>
 
     <script>
@@ -170,9 +170,10 @@
 
             $('.bottom-buttons .btn').click(function(e) {
                 e.preventDefault();
-                const tipo = $(this).data('tipo');
                 const cliente = $(this).data('cliente');
-                window.history.pushState({}, '', '?tipo=' + tipo + '&cliente=' + cliente);
+                const urlParams = new URLSearchParams(window.location.search);
+                const tipo = urlParams.get('tipo') || 'grueso'; // Mantener el tipo actual o usar 'grueso' por defecto
+                window.history.pushState({}, '', `?tipo=${tipo}&cliente=${cliente}`);
                 applyUrlParams();
             });
 
