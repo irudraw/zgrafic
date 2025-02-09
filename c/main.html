@@ -133,7 +133,6 @@
     </main>
 
     <div class="bottom-buttons">
-        <!--<a href="#" class="btn" data-tipo="grueso" data-cliente="Cliente"><i class="fas fa-user"></i><span>Clientes</span></a>-->
         <a href="#" class="btn" data-tipo="grueso" data-cliente="Cliente"><i class="fas fa-user"></i><span>Clientes</span></a>
         <a href="#" class="btn" data-tipo="grueso" data-cliente="Diseñador"><i class="fas fa-paint-brush"></i><span>Diseñadores</span></a>
         <a href="#" class="btn" data-tipo="grueso" data-cliente="Vendedor"><i class="fas fa-store"></i><span>Vendedores</span></a>
@@ -146,7 +145,6 @@
                 $.get(page + '.html', function(data) {
                     $('#content').html(data);
                     applyUrlParams();
-                    addEnterListener(); // Agregar el listener para "Enter" después de cargar el contenido
                 });
             }
 
@@ -162,27 +160,6 @@
                 if (cliente) {
                     $('#vendedor-info').text(cliente);
                 }
-            }
-
-            function addEnterListener() {
-                // Agregar el evento de escucha para la tecla "Enter"
-                document.addEventListener('keydown', function(event) {
-                    if (event.key === "Enter") {
-                        // Verificar si estamos en la página de Banner o Vinil
-                        const currentPage = window.location.search.includes('page=banner') ? 'banner' : 'vinil';
-                        if (currentPage === 'banner') {
-                            // Ejecutar la función calcular() de banner.html
-                            if (typeof calcular === 'function') {
-                                calcular();
-                            }
-                        } else if (currentPage === 'vinil') {
-                            // Ejecutar la función calcular() de vinil.html
-                            if (typeof calcular === 'function') {
-                                calcular();
-                            }
-                        }
-                    }
-                });
             }
 
             $('[data-page]').click(function(e) {
