@@ -40,6 +40,14 @@
         "precio": 140,
         "imagen": "img/roll-screen-100x200.jpg",
         "descripcion": "Display de sistema enrollable de la mejor calidad permite desplegar el banner por medio de un sistema de enrollable y tension, con buena estabilidad para uso interiores no ocupada espacio."
+    },
+    {
+        "id": 7,
+        "nombre": "AJUSTABLE BANNER STAND 3.0 x 2.40",
+        "precio": 700,
+        "imagen": "img/ajustable-banner-stand.jpg",
+        "descripcion": "Display Rack banner ajustable ideal para uso interior por su tamaño es excelente para grandes presentaciones. se puede utilizar a cualquier medida el ancho y el alto, muy fácil de armar."
     }
+    
     
 ]
