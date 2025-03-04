@@ -203,13 +203,14 @@ const parametrosURL = new URLSearchParams(window.location.search);
 // Cambia 'tipo' por el nombre del parámetro que quieres verificar
   const tipo = parametrosURL.get('tipo');
   const cliente = parametrosURL.get('cliente');
-  
+  const baseG = 10; 
+  const baseD = 8; 
 
   let precio
   if(tipo === 'grueso' & cliente === 'Diseñador') {
-    precio = 10;
+    precio = baseG;
   } else if(tipo === 'delgado'& cliente === 'Diseñador') {
-    precio = 8;
+    precio = baseD;
   }
 
   else if(tipo === 'grueso'& cliente === 'Vendedor') {
