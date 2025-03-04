@@ -214,27 +214,27 @@ const parametrosURL = new URLSearchParams(window.location.search);
   }
 
   else if(tipo === 'grueso'& cliente === 'Vendedor') {
-    precio = 11;
+    precio = baseG+1;
   }
   else if(tipo === 'delgado'& cliente === 'Vendedor') {
-    precio = 9;
+    precio = baseD+1;
   }
 
   else if(tipo === 'grueso'& cliente === 'Cliente') {
-    precio = 12;
+    precio = baseG+2;
     adicional = 1;
   }
   else if(tipo === 'delgado'& cliente === 'Cliente') {
-    precio = 10;
+    precio = baseD+2;
     adicional = 1;
   }
 
   else if(tipo === 'grueso'& cliente === 'Casero') {
-    precio = 12;
+    precio = baseG+2;
     adicional = 0.30;
   }
   else if(tipo === 'delgado'& cliente === 'Casero') {
-    precio = 10;
+    precio = baseD+2;
     adicional = 0.30;
   }
 
