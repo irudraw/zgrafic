@@ -52,10 +52,10 @@ permalink: /galeria/
             {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
             {% assign title = file.name | split: '.' | first | replace: '-', ' ' | capitalize %}
             {% assign image_path = file.path | relative_url %}
-            {% assign image_id = file.path | split: '/' | last | split: '.' | first | slugify %}
+            {% assign image_id = file.name | split: '.' | first | generateShortCode %}
 
-            <div class="image-container" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
-              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}', '{{ title }}')">
+            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
+              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}')">
               <div class="image-title">{{ title }}</div>
             </div>
           {% endif %}
@@ -69,589 +69,575 @@ permalink: /galeria/
   </div>
 
   <!-- Modal para visualizar imágenes -->
-<div id="imageModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="modalTitle"></h3>
-      <button class="close-button" onclick="closeImage()">×</button>
-    </div>
-    
-    <div class="modal-body">
-      <button class="nav-button prev" onclick="navigateImage(-1)">
-        <span>‹</span>
-      </button>
-      
-      <div class="image-wrapper">
-        <img id="modalImage" src="" alt="">
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close-button" onclick="closeImage()">×</button>
       </div>
       
-      <button class="nav-button next" onclick="navigateImage(1)">
-        <span>›</span>
-      </button>
-      
-      <div class="image-counter">1 de 1</div>
-    </div>
-    
-    <div class="modal-footer">
-      <!-- Sección de share-buttons eliminada -->
+      <div class="modal-body">
+        <button class="nav-button prev" onclick="navigateImage(-1)">
+          <span>‹</span>
+        </button>
+        
+        <div class="image-wrapper">
+          <img id="modalImage" src="" alt="">
+        </div>
+        
+        <button class="nav-button next" onclick="navigateImage(1)">
+          <span>›</span>
+        </button>
+        
+        <div class="image-counter">1 de 1</div>
+      </div>
     </div>
   </div>
 </div>
 
 <style>
-/* Estilos generales */
-.page-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f5f5f5;
-}
+  /* Estilos generales */
+  .page-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+  }
 
-/* Sidebar */
-.sidebar-menu {
-  width: 250px;
-  padding: 20px;
-  background-color: white;
-  border-right: 1px solid #eee;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-}
+  /* Sidebar */
+  .sidebar-menu {
+    width: 250px;
+    padding: 20px;
+    background-color: white;
+    border-right: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
 
-.search-container {
-  margin-bottom: 20px;
-}
+  .search-container {
+    margin-bottom: 20px;
+  }
 
-.search-wrapper {
-  position: relative;
-}
+  .search-wrapper {
+    position: relative;
+  }
 
-.search-wrapper input {
-  width: 100%;
-  padding: 8px 30px 8px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
+  .search-wrapper input {
+    width: 100%;
+    padding: 8px 30px 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
 
-.search-clear {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #999;
-  cursor: pointer;
-}
+  .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+  }
 
-.category-list {
-  list-style: none;
-  padding: 0;
-}
+  .category-list {
+    list-style: none;
+    padding: 0;
+  }
 
-.category-list li {
-  padding: 8px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
+  .category-list li {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
 
-.category-list li:hover {
-  background-color: #f0f0f0;
-}
+  .category-list li:hover {
+    background-color: #f0f0f0;
+  }
 
-.category-list li.active {
-  background-color: #007bff;
-  color: white;
-}
+  .category-list li.active {
+    background-color: #007bff;
+    color: white;
+  }
 
-/* Galería */
-.gallery-container {
-  flex: 1;
-  padding: 20px;
-}
+  /* Galería */
+  .gallery-container {
+    flex: 1;
+    padding: 20px;
+  }
 
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-}
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
 
-.image-container {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-}
+  .image-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
 
-.image-container:hover {
-  transform: translateY(-5px);
-}
+  .image-container:hover {
+    transform: translateY(-5px);
+  }
 
-.image-container img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  cursor: pointer;
-}
+  .image-container img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    cursor: pointer;
+  }
 
-.image-title {
-  padding: 10px;
-  text-align: center;
-  background-color: white;
-  border-top: 1px solid #eee;
-}
+  .image-title {
+    padding: 10px;
+    text-align: center;
+    background-color: white;
+    border-top: 1px solid #eee;
+  }
 
-/* Estilos mejorados para el popup */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.95);
-  z-index: 1000;
-  opacity: 0;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-}
-
-.modal.show {
-  display: flex;
-  opacity: 1;
-}
-
-.modal-content {
-  position: relative;
-  width: 95%;
-  max-width: 1400px;
-  margin: auto;
-  background-color: transparent;
-  border-radius: 12px;
-  overflow: hidden;
-  transform: scale(0.95);
-  transition: transform 0.3s ease;
-}
-
-.modal.show .modal-content {
-  transform: scale(1);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-header h3 {
-  color: white;
-  font-size: 1.5rem;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.modal-body {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 500px;
-  background-color: transparent;
-}
-
-.image-wrapper {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-}
-
-#modalImage {
-  animation: fadeIn 0.3s ease;
-}
-
-  /* Contador de imágenes */
-.image-counter {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  backdrop-filter: blur(5px);
-}
-
-.nav-button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-}
-
-.nav-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.nav-button.prev {
-  left: 20px;
-}
-
-.nav-button.next {
-  right: 20px;
-}
-
-.close-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-}
-
-.close-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
-
-.modal-footer {
-  padding: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-  /* Animaciones para las imágenes */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Loader */
-.loader {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.hidden {
-  display: none;
-}
-
-/* Responsive */
-/* Responsive */
-@media (max-width: 768px) {
-  .modal-content {
+  /* Estilos mejorados para el popup */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+  }
+
+  .modal.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-content {
+    position: relative;
+    width: 95%;
+    max-width: 1400px;
+    margin: auto;
+    background-color: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .modal.show .modal-content {
+    transform: scale(1);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .modal-body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+    background-color: transparent;
+  }
+
+  .image-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  #modalImage {
+    max-width: 100%;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    animation: fadeIn 0.3s ease;
+  }
+
+  /* Contador de imágenes */
+  .image-counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
   }
 
   .nav-button {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+  }
+
+  .nav-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%) scale(1.1);
   }
 
   .nav-button.prev {
-    left: 10px;
+    left: 20px;
   }
 
   .nav-button.next {
-    right: 10px;
+    right: 20px;
   }
 
-  .share-buttons {
-    flex-wrap: wrap;
-  }
-
-  .share-btn {
-    flex: 1;
-    min-width: 120px;
+  .close-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
   }
-}
+
+  .close-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+  }
+
+  /* Animaciones para las imágenes */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Loader */
+  .loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+
+    .nav-button {
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+    }
+
+    .nav-button.prev {
+      left: 10px;
+    }
+
+    .nav-button.next {
+      right: 10px;
+    }
+  }
 </style>
 
 <script>
-// Modificar las funciones de URL y compartir
-function getFullUrl(path) {
-  return `${BASE_URL}${path}`;
-}
-  
-// Variables globales
-let currentImageIndex = 0;
-let images = [];
-let currentCategory = 'all';
-let searchTerm = '';
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-  // Recopilar todas las imágenes
-  images = Array.from(document.querySelectorAll('.image-container'));
-  
-  // Event listeners
-  document.addEventListener('keydown', handleKeyPress);
-  setupCategoryFilters();
-  setupSearch();
-  
-  // Inicializar Lazy Loading
-  setupLazyLoading();
-});
-
-// Modificar la función openImage para incluir el contador
-function openImage(imageId, imagePath, title) {
-  const modal = document.getElementById('imageModal');
-  const modalImage = document.getElementById('modalImage');
-  const modalTitle = document.getElementById('modalTitle');
-  
-  currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
-  
-  modalImage.src = imagePath;
-  modalTitle.textContent = `${title} (ID: ${imageId})`; // Mostrar el ID en el título
-  
-  updateImageCounter();
-  modal.classList.add('show');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeImage() {
-  const modal = document.getElementById('imageModal');
-  modal.classList.remove('show');
-  document.body.style.overflow = 'auto';
-}
-
-function navigateImage(direction) {
-  const visibleImages = getVisibleImages();
-  let currentIndexInVisible = visibleImages.findIndex(img => 
-    img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
-  );
-  
-  currentIndexInVisible = (currentIndexInVisible + direction + visibleImages.length) % visibleImages.length;
-  const newImage = visibleImages[currentIndexInVisible];
-  
-  const imageId = newImage.getAttribute('data-id');
-  const imagePath = newImage.querySelector('img').src;
-  const title = newImage.getAttribute('data-title');
-  
-  currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
-  
-  const modalImage = document.getElementById('modalImage');
-  const modalTitle = document.getElementById('modalTitle');
-  
-  modalImage.src = imagePath;
-  modalTitle.textContent = `${title} (ID: ${imageId})`; // Mostrar el ID en el título
-  
-  // Precargar siguientes imágenes
-  preloadAdjacentImages(currentImageIndex);
-  updateImageCounter();
-}
-
-function handleKeyPress(e) {
-  if (!document.getElementById('imageModal').classList.contains('show')) return;
-  
-  switch(e.key) {
-    case 'Escape':
-      closeImage();
-      break;
-    case 'ArrowLeft':
-      navigateImage(-1);
-      break;
-    case 'ArrowRight':
-      navigateImage(1);
-      break;
-  }
-}
-
-  // Añadir contador de imágenes
-function updateImageCounter() {
-  const visibleImages = getVisibleImages();
-  const currentPosition = visibleImages.findIndex(img => 
-    img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
-  ) + 1;
-  
-  const counter = document.querySelector('.image-counter');
-  counter.textContent = `${currentPosition} de ${visibleImages.length}`;
-}
-
-// Funciones de filtrado y búsqueda
-function setupCategoryFilters() {
-  const categoryItems = document.querySelectorAll('.category-list li');
-  categoryItems.forEach(item => {
-    item.addEventListener('click', () => {
-      // Actualizar clase activa
-      categoryItems.forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-      
-      // Filtrar imágenes
-      currentCategory = item.getAttribute('data-category');
-      filterImages();
-    });
-  });
-}
-
-function setupSearch() {
-  const searchInput = document.getElementById('searchInput');
-  const searchResults = document.getElementById('searchResults');
-  
-  searchInput.addEventListener('input', (e) => {
-    searchTerm = e.target.value.toLowerCase().trim();
-    filterImages();
-    
-    // Actualizar resultados
-    const visibleCount = getVisibleImages().length;
-    searchResults.textContent = searchTerm ? 
-      `Encontradas ${visibleCount} imágenes para "${searchTerm}"` :
-      'Mostrando todas las imágenes';
-  });
-}
-
-function filterImages() {
-  const visibleCount = images.filter(image => {
-    const matchesCategory = currentCategory === 'all' || 
-      image.getAttribute('data-category') === currentCategory;
-    
-    const title = image.getAttribute('data-title').toLowerCase();
-    const matchesSearch = !searchTerm || title.includes(searchTerm);
-    
-    image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
-    return matchesCategory && matchesSearch;
-  }).length;
-  
-  // Actualizar contador de resultados
-  const searchResults = document.getElementById('searchResults');
-  let message = 'Mostrando todas las imágenes';
-  
-  if (currentCategory !== 'all' && searchTerm) {
-    message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
-  } else if (currentCategory !== 'all') {
-    message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
-  } else if (searchTerm) {
-    message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
-  }
-  
-  searchResults.textContent = message;
-}
-
-function clearSearch() {
-  const searchInput = document.getElementById('searchInput');
-  searchInput.value = '';
-  searchTerm = '';
-  filterImages();
-}
-
-// Funciones auxiliares
-function getVisibleImages() {
-  return images.filter(img => !img.classList.contains('hidden'));
-}
-
-function preloadAdjacentImages(currentIndex) {
-  const visibleImages = getVisibleImages();
-  const preloadCount = 2; // Número de imágenes a precargar en cada dirección
-  
-  for (let i = 1; i <= preloadCount; i++) {
-    // Precargar imágenes siguientes
-    const nextIndex = (currentIndex + i) % visibleImages.length;
-    const nextImage = visibleImages[nextIndex].querySelector('img');
-    if (nextImage) {
-      const img = new Image();
-      img.src = nextImage.src;
-    }
-    
-    // Precargar imágenes anteriores
-    const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
-    const prevImage = visibleImages[prevIndex].querySelector('img');
-    if (prevImage) {
-      const img = new Image();
-      img.src = prevImage.src;
-    }
-  }
-}
-
-// Lazy Loading
-function setupLazyLoading() {
+  // Variables globales
+  let currentImageIndex = 0;
+  let images = [];
+  let currentCategory = 'all';
+  let searchTerm = '';
   let isLoading = false;
   let loadedCount = 0;
   const batchSize = 4;
 
+  // Generador de códigos cortos
+  function generateShortCode(filename) {
+    // Convertir el nombre del archivo a un código corto usando un hash simple
+    let hash = 0;
+    for (let i = 0; i < filename.length; i++) {
+      hash = (hash << 5) - hash + filename.charCodeAt(i);
+      hash |= 0; // Convertir a entero de 32 bits
+    }
+    return Math.abs(hash).toString(36).substring(0, 8); // Código de 8 caracteres
+  }
+
+  // Inicialización
+  document.addEventListener('DOMContentLoaded', () => {
+    // Recopilar todas las imágenes
+    images = Array.from(document.querySelectorAll('.image-container'));
+
+    // Event listeners
+    document.addEventListener('keydown', handleKeyPress);
+    setupCategoryFilters();
+    setupSearch();
+
+    // Cargar el primer lote de imágenes
+    loadNextBatch();
+
+    // Observar el scroll para cargar más imágenes
+    window.addEventListener('scroll', handleScroll);
+
+    // Verificar si hay un identificador en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const imageId = urlParams.get('id');
+    if (imageId) {
+      const image = images.find(img => img.getAttribute('data-id') === imageId);
+      if (image) {
+        const imagePath = image.querySelector('img').src;
+        openImage(imageId, imagePath);
+      }
+    }
+  });
+
+  // Cargar imágenes de 4 en 4
   function loadNextBatch() {
     if (isLoading) return;
     isLoading = true;
 
     const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
     imagesToLoad.forEach(imgContainer => {
-      const img = imgContainer.querySelector('img');
-      if (img.dataset.src) {
-        img.src = img.dataset.src;
-        img.removeAttribute('data-src');
-      }
+      imgContainer.classList.remove('hidden');
     });
 
     loadedCount += batchSize;
     isLoading = false;
   }
 
-  // Cargar el primer lote de imágenes
-  loadNextBatch();
-
-  // Observar el scroll para cargar más imágenes
-  window.addEventListener('scroll', () => {
+  // Manejar el scroll para cargar más imágenes
+  function handleScroll() {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
     if (scrollTop + clientHeight >= scrollHeight - 100) {
       loadNextBatch();
     }
-  });
-}
+  }
 
-// Función para manejar errores de carga de imágenes
-function handleImageError(img) {
-  img.src = '/ruta/a/imagen/error.jpg'; // Reemplaza con tu imagen de error
-  img.alt = 'Error al cargar la imagen';
-}
+  // Modificar la función openImage para quitar el título
+  function openImage(imageId, imagePath) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+
+    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
+
+    modalImage.src = imagePath;
+
+    // Actualizar la URL con el identificador de la imagen
+    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    window.history.pushState({}, '', newUrl);
+
+    updateImageCounter();
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeImage() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+
+    // Limpiar el identificador de la URL al cerrar el modal
+    window.history.pushState({}, '', window.location.pathname);
+  }
+
+  function navigateImage(direction) {
+    const visibleImages = getVisibleImages();
+    let currentIndexInVisible = visibleImages.findIndex(img =>
+      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
+    );
+
+    currentIndexInVisible = (currentIndexInVisible + direction + visibleImages.length) % visibleImages.length;
+    const newImage = visibleImages[currentIndexInVisible];
+
+    const imageId = newImage.getAttribute('data-id');
+    const imagePath = newImage.querySelector('img').src;
+
+    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
+
+    const modalImage = document.getElementById('modalImage');
+
+    modalImage.src = imagePath;
+
+    // Actualizar la URL con el nuevo identificador
+    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    window.history.pushState({}, '', newUrl);
+
+    // Precargar siguientes imágenes
+    preloadAdjacentImages(currentImageIndex);
+    updateImageCounter();
+  }
+
+  function handleKeyPress(e) {
+    if (!document.getElementById('imageModal').classList.contains('show')) return;
+
+    switch (e.key) {
+      case 'Escape':
+        closeImage();
+        break;
+      case 'ArrowLeft':
+        navigateImage(-1);
+        break;
+      case 'ArrowRight':
+        navigateImage(1);
+        break;
+    }
+  }
+
+  // Añadir contador de imágenes
+  function updateImageCounter() {
+    const visibleImages = getVisibleImages();
+    const currentPosition = visibleImages.findIndex(img =>
+      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
+    ) + 1;
+
+    const counter = document.querySelector('.image-counter');
+    counter.textContent = `${currentPosition} de ${visibleImages.length}`;
+  }
+
+  // Funciones de filtrado y búsqueda
+  function setupCategoryFilters() {
+    const categoryItems = document.querySelectorAll('.category-list li');
+    categoryItems.forEach(item => {
+      item.addEventListener('click', () => {
+        // Actualizar clase activa
+        categoryItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        // Filtrar imágenes
+        currentCategory = item.getAttribute('data-category');
+        filterImages();
+      });
+    });
+  }
+
+  function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', (e) => {
+      searchTerm = e.target.value.toLowerCase().trim();
+      filterImages();
+
+      // Actualizar resultados
+      const visibleCount = getVisibleImages().length;
+      searchResults.textContent = searchTerm ?
+        `Encontradas ${visibleCount} imágenes para "${searchTerm}"` :
+        'Mostrando todas las imágenes';
+    });
+  }
+
+  function filterImages() {
+    const visibleCount = images.filter(image => {
+      const matchesCategory = currentCategory === 'all' ||
+        image.getAttribute('data-category') === currentCategory;
+
+      const title = image.getAttribute('data-title').toLowerCase();
+      const matchesSearch = !searchTerm || title.includes(searchTerm);
+
+      image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
+      return matchesCategory && matchesSearch;
+    }).length;
+
+    // Actualizar contador de resultados
+    const searchResults = document.getElementById('searchResults');
+    let message = 'Mostrando todas las imágenes';
+
+    if (currentCategory !== 'all' && searchTerm) {
+      message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
+    } else if (currentCategory !== 'all') {
+      message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
+    } else if (searchTerm) {
+      message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
+    }
+
+    searchResults.textContent = message;
+  }
+
+  function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = '';
+    searchTerm = '';
+    filterImages();
+  }
+
+  // Funciones auxiliares
+  function getVisibleImages() {
+    return images.filter(img => !img.classList.contains('hidden'));
+  }
+
+  function preloadAdjacentImages(currentIndex) {
+    const visibleImages = getVisibleImages();
+    const preloadCount = 2; // Número de imágenes a precargar en cada dirección
+
+    for (let i = 1; i <= preloadCount; i++) {
+      // Precargar imágenes siguientes
+      const nextIndex = (currentIndex + i) % visibleImages.length;
+      const nextImage = visibleImages[nextIndex].querySelector('img');
+      if (nextImage) {
+        const img = new Image();
+        img.src = nextImage.src;
+      }
+
+      // Precargar imágenes anteriores
+      const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
+      const prevImage = visibleImages[prevIndex].querySelector('img');
+      if (prevImage) {
+        const img = new Image();
+        img.src = prevImage.src;
+      }
+    }
+  }
 </script>
