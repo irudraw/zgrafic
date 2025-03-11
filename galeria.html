@@ -71,9 +71,8 @@ permalink: /galeria/
   <!-- Modal para visualizar imágenes -->
   <div id="imageModal" class="modal">
     <div class="modal-content">
-      <div class="modal-header">
-        <button class="close-button" onclick="closeImage()">×</button>
-      </div>
+      <!-- Botón de cerrar flotante -->
+      <button class="close-button" onclick="closeImage()">×</button>
       
       <div class="modal-body">
         <button class="nav-button prev" onclick="navigateImage(-1)">
@@ -236,16 +235,6 @@ permalink: /galeria/
     transform: scale(1);
   }
 
-  .modal-header {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 1.5rem;
-    background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
   .modal-body {
     position: relative;
     display: flex;
@@ -265,7 +254,7 @@ permalink: /galeria/
 
   #modalImage {
     max-width: 100%;
-    max-height: 80vh;
+    max-height: 90vh;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -321,6 +310,9 @@ permalink: /galeria/
   }
 
   .close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
@@ -334,6 +326,7 @@ permalink: /galeria/
     justify-content: center;
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
+    z-index: 1001;
   }
 
   .close-button:hover {
