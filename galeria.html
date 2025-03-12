@@ -582,6 +582,9 @@ permalink: /galeria/
         // Simular clic en la categoría para aplicar el filtro
         categoryItem.click();
       }
+    } else {
+      // Si no hay categoría en la URL, mostrar todas las imágenes
+      filterImages();
     }
   }
 
@@ -599,6 +602,8 @@ permalink: /galeria/
       // Si la imagen está oculta, quitar la clase 'visible'
       if (image.classList.contains('hidden')) {
         image.classList.remove('visible');
+      } else {
+        image.classList.add('visible');
       }
     });
 
