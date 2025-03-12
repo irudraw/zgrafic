@@ -480,7 +480,7 @@ permalink: /galeria/
       <button class="close-button" onclick="closeImage()">×</button>
       
       <!-- Botón de copiar URL -->
-      <button class="copy-url-button" onclick="copyImageUrl()">
+      <button class="copy-url-button" onclick="copyPageUrl()">
         <i class="fas fa-copy"></i> <!-- Ícono de copia de FontAwesome -->
       </button>
       
@@ -622,13 +622,12 @@ permalink: /galeria/
     window.history.pushState({}, '', window.location.pathname);
   }
 
-  // Función para copiar la URL de la imagen
-  function copyImageUrl() {
-    const modalImage = document.getElementById('modalImage');
-    const imageUrl = modalImage.src;
+  // Función para copiar la URL actual de la página
+  function copyPageUrl() {
+    const currentUrl = window.location.href; // Obtener la URL actual
 
     // Copiar la URL al portapapeles
-    navigator.clipboard.writeText(imageUrl)
+    navigator.clipboard.writeText(currentUrl)
       .then(() => {
         // Mostrar el mensaje de URL copiada
         const copyMessage = document.getElementById('copyMessage');
