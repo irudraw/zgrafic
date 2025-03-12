@@ -518,12 +518,12 @@ permalink: /galeria/
       
       <!-- Botón de copiar URL -->
       <button class="copy-url-button" onclick="copyPageUrl()">
-        <i class="fas fa-copy"></i> <!-- Ícono de copia de FontAwesome -->
+        <i class="fas fa-link"></i> <!-- Ícono de enlace de FontAwesome -->
       </button>
       
       <!-- Botón de copiar imagen -->
       <button class="copy-image-button" onclick="copyImageToClipboard()">
-        <i class="fas fa-image"></i> <!-- Ícono de imagen de FontAwesome -->
+        <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
       </button>
       
       <div class="modal-body">
@@ -685,6 +685,7 @@ permalink: /galeria/
       .then(() => {
         // Mostrar el mensaje de URL copiada
         const copyMessage = document.getElementById('copyMessage');
+        copyMessage.textContent = 'URL copiada al portapapeles';
         copyMessage.classList.add('show');
 
         // Ocultar el mensaje después de 2 segundos
