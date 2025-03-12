@@ -570,238 +570,58 @@ permalink: /galeria/
     return Math.abs(hash).toString(36).substring(0, 8); // Código de 8 caracteres
   }
 
-  // Inicialización
-  document.addEventListener('DOMContentLoaded', () => {
-    // Recopilar todas las imágenes
-    images = Array.from(document.querySelectorAll('.image-container'));
-
-    // Event listeners
-    document.addEventListener('keydown', handleKeyPress);
-    setupCategoryFilters();
-    setupSearch();
-
-    // Cargar el primer lote de imágenes
-    loadNextBatch();
-
-    // Observar el scroll para cargar más imágenes
-    window.addEventListener('scroll', handleScroll);
-
-    // Verificar si hay un identificador en la URL
+  // Función para aplicar el filtro de categoría al cargar la página
+  function applyCategoryFilterOnLoad() {
     const urlParams = new URLSearchParams(window.location.search);
-    const imageId = urlParams.get('id');
     const category = urlParams.get('category');
 
     if (category) {
       // Seleccionar la categoría correspondiente
       const categoryItem = document.querySelector(`.category-list li[data-category="${category}"]`);
       if (categoryItem) {
-        categoryItem.click(); // Simular clic en la categoría
+        // Simular clic en la categoría para aplicar el filtro
+        categoryItem.click();
       }
     }
-
-    if (imageId) {
-      const image = images.find(img => img.getAttribute('data-id') === imageId);
-      if (image) {
-        const imagePath = image.querySelector('img').src;
-        openImage(imageId, imagePath);
-      }
-    }
-
-    // Verificar visibilidad de las imágenes al cargar la página
-    checkVisibility();
-  });
-
-  // Cargar imágenes de 4 en 4
-  function loadNextBatch() {
-    if (isLoading) return;
-    isLoading = true;
-
-    const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
-    imagesToLoad.forEach(imgContainer => {
-      imgContainer.classList.remove('hidden');
-      checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
-    });
-
-    loadedCount += batchSize;
-    isLoading = false;
   }
 
-  // Manejar el scroll para cargar más imágenes
-  function handleScroll() {
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
-      loadNextBatch();
-    }
-    checkVisibility(); // Verificar visibilidad al hacer scroll
-  }
-
-  // Verificar visibilidad de las imágenes
-  function checkVisibility() {
-    const images = document.querySelectorAll('.image-container');
+  // Función para filtrar imágenes por categoría y término de búsqueda
+  function filterImages() {
     images.forEach(image => {
-      const rect = image.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
-        image.classList.add('visible');
+      const matchesCategory = currentCategory === 'all' ||
+        image.getAttribute('data-category') === currentCategory;
+
+      const title = image.getAttribute('data-title').toLowerCase();
+      const matchesSearch = !searchTerm || title.includes(searchTerm);
+
+      image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
+      
+      // Si la imagen está oculta, quitar la clase 'visible'
+      if (image.classList.contains('hidden')) {
+        image.classList.remove('visible');
       }
     });
-  }
 
-  // Modificar la función openImage para usar el identificador único
-  function openImage(imageId, imagePath) {
-    const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
+    // Actualizar contador de resultados
+    const visibleCount = getVisibleImages().length;
+    const searchResults = document.getElementById('searchResults');
+    let message = 'Mostrando todas las imágenes';
 
-    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
-
-    modalImage.src = imagePath;
-
-    // Actualizar la URL con el identificador de la imagen y la categoría actual
-    const newUrl = `${window.location.pathname}?id=${imageId}&category=${currentCategory}`;
-    window.history.pushState({}, '', newUrl);
-
-    // Actualizar las etiquetas Open Graph
-    updateOpenGraphTags(imagePath, newUrl);
-
-    updateImageCounter();
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
-
-  // Función para actualizar las etiquetas Open Graph
-  function updateOpenGraphTags(imageUrl, pageUrl) {
-    const ogImage = document.querySelector('meta[property="og:image"]');
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-
-    ogImage.setAttribute('content', imageUrl); // Actualizar la URL de la imagen
-    ogUrl.setAttribute('content', pageUrl); // Actualizar la URL de la página
-  }
-
-  function closeImage() {
-    const modal = document.getElementById('imageModal');
-    modal.classList.remove('show');
-    document.body.style.overflow = 'auto';
-
-    // Limpiar el identificador de la imagen pero mantener la categoría
-    const newUrl = currentCategory === 'all' 
-      ? window.location.pathname 
-      : `${window.location.pathname}?category=${currentCategory}`;
-    window.history.pushState({}, '', newUrl);
-  }
-
-  // Función para copiar la URL actual de la página
-  function copyPageUrl() {
-    const currentUrl = window.location.href; // Obtener la URL actual
-
-    // Copiar la URL al portapapeles
-    navigator.clipboard.writeText(currentUrl)
-      .then(() => {
-        // Mostrar el mensaje de URL copiada
-        const copyMessage = document.getElementById('copyMessage');
-        copyMessage.textContent = 'URL copiada al portapapeles';
-        copyMessage.classList.add('show');
-
-        // Ocultar el mensaje después de 2 segundos
-        setTimeout(() => {
-          copyMessage.classList.remove('show');
-        }, 2000);
-      })
-      .catch(() => {
-        alert('Error al copiar la URL');
-      });
-  }
-
-  // Función para copiar la imagen al portapapeles
-  function copyImageToClipboard() {
-    const modalImage = document.getElementById('modalImage');
-    const imageUrl = modalImage.src;
-
-    // Convertir la imagen en un Blob
-    fetch(imageUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        // Crear un objeto ClipboardItem con la imagen
-        const item = new ClipboardItem({ [blob.type]: blob });
-
-        // Copiar la imagen al portapapeles
-        navigator.clipboard.write([item])
-          .then(() => {
-            // Mostrar el mensaje de éxito
-            const copyMessage = document.getElementById('copyMessage');
-            copyMessage.textContent = 'Imagen copiada al portapapeles';
-            copyMessage.classList.add('show');
-
-            // Ocultar el mensaje después de 2 segundos
-            setTimeout(() => {
-              copyMessage.classList.remove('show');
-            }, 2000);
-          })
-          .catch(() => {
-            alert('Error al copiar la imagen');
-          });
-      })
-      .catch(() => {
-        alert('Error al obtener la imagen');
-      });
-  }
-
-  function navigateImage(direction) {
-    const visibleImages = getVisibleImages();
-    let currentIndexInVisible = visibleImages.findIndex(img =>
-      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
-    );
-
-    currentIndexInVisible = (currentIndexInVisible + direction + visibleImages.length) % visibleImages.length;
-    const newImage = visibleImages[currentIndexInVisible];
-
-    const imageId = newImage.getAttribute('data-id');
-    const imagePath = newImage.querySelector('img').src;
-
-    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
-
-    const modalImage = document.getElementById('modalImage');
-
-    modalImage.src = imagePath;
-
-    // Actualizar la URL con el nuevo identificador y la categoría actual
-    const newUrl = `${window.location.pathname}?id=${imageId}&category=${currentCategory}`;
-    window.history.pushState({}, '', newUrl);
-
-    // Actualizar las etiquetas Open Graph
-    updateOpenGraphTags(imagePath, newUrl);
-
-    // Precargar siguientes imágenes
-    preloadAdjacentImages(currentImageIndex);
-    updateImageCounter();
-  }
-
-  function handleKeyPress(e) {
-    if (!document.getElementById('imageModal').classList.contains('show')) return;
-
-    switch (e.key) {
-      case 'Escape':
-        closeImage();
-        break;
-      case 'ArrowLeft':
-        navigateImage(-1);
-        break;
-      case 'ArrowRight':
-        navigateImage(1);
-        break;
+    if (currentCategory !== 'all' && searchTerm) {
+      message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
+    } else if (currentCategory !== 'all') {
+      message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
+    } else if (searchTerm) {
+      message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
     }
+
+    searchResults.textContent = message;
+
+    // Verificar visibilidad de las imágenes después de filtrar
+    checkVisibility();
   }
 
-  // Añadir contador de imágenes
-  function updateImageCounter() {
-    const visibleImages = getVisibleImages();
-    const currentPosition = visibleImages.findIndex(img =>
-      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
-    ) + 1;
-
-    const counter = document.querySelector('.image-counter');
-    counter.textContent = `${currentPosition} de ${visibleImages.length}`;
-  }
-
-  // Funciones de filtrado y búsqueda
+  // Función para configurar los filtros de categoría
   function setupCategoryFilters() {
     const categoryItems = document.querySelectorAll('.category-list li');
     categoryItems.forEach(item => {
@@ -825,66 +645,7 @@ permalink: /galeria/
     });
   }
 
-  function setupSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-
-    searchInput.addEventListener('input', (e) => {
-      searchTerm = e.target.value.toLowerCase().trim();
-      filterImages();
-
-      // Actualizar resultados
-      const visibleCount = getVisibleImages().length;
-      searchResults.textContent = searchTerm ?
-        `Encontradas ${visibleCount} imágenes para "${searchTerm}"` :
-        'Mostrando todas las imágenes';
-    });
-  }
-
-  function filterImages() {
-    const visibleCount = images.filter(image => {
-      const matchesCategory = currentCategory === 'all' ||
-        image.getAttribute('data-category') === currentCategory;
-
-      const title = image.getAttribute('data-title').toLowerCase();
-      const matchesSearch = !searchTerm || title.includes(searchTerm);
-
-      image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
-      
-      // Si la imagen está oculta, quitar la clase 'visible'
-      if (image.classList.contains('hidden')) {
-        image.classList.remove('visible');
-      }
-
-      return matchesCategory && matchesSearch;
-    }).length;
-
-    // Actualizar contador de resultados
-    const searchResults = document.getElementById('searchResults');
-    let message = 'Mostrando todas las imágenes';
-
-    if (currentCategory !== 'all' && searchTerm) {
-      message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
-    } else if (currentCategory !== 'all') {
-      message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
-    } else if (searchTerm) {
-      message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
-    }
-
-    searchResults.textContent = message;
-
-    // Verificar visibilidad de las imágenes después de filtrar
-    checkVisibility();
-  }
-
-  function clearSearch() {
-    const searchInput = document.getElementById('searchInput');
-    searchInput.value = '';
-    searchTerm = '';
-    filterImages();
-  }
-
-  // Funciones auxiliares
+  // Función para obtener las imágenes visibles
   function getVisibleImages() {
     return images.filter(img => {
       const matchesCategory = currentCategory === 'all' ||
@@ -893,26 +654,73 @@ permalink: /galeria/
     });
   }
 
-  function preloadAdjacentImages(currentIndex) {
-    const visibleImages = getVisibleImages();
-    const preloadCount = 2; // Número de imágenes a precargar en cada dirección
+  // Inicialización
+  document.addEventListener('DOMContentLoaded', () => {
+    // Recopilar todas las imágenes
+    images = Array.from(document.querySelectorAll('.image-container'));
 
-    for (let i = 1; i <= preloadCount; i++) {
-      // Precargar imágenes siguientes
-      const nextIndex = (currentIndex + i) % visibleImages.length;
-      const nextImage = visibleImages[nextIndex].querySelector('img');
-      if (nextImage) {
-        const img = new Image();
-        img.src = nextImage.src;
-      }
+    // Event listeners
+    document.addEventListener('keydown', handleKeyPress);
+    setupCategoryFilters();
+    setupSearch();
 
-      // Precargar imágenes anteriores
-      const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
-      const prevImage = visibleImages[prevIndex].querySelector('img');
-      if (prevImage) {
-        const img = new Image();
-        img.src = prevImage.src;
+    // Aplicar el filtro de categoría al cargar la página
+    applyCategoryFilterOnLoad();
+
+    // Cargar el primer lote de imágenes
+    loadNextBatch();
+
+    // Observar el scroll para cargar más imágenes
+    window.addEventListener('scroll', handleScroll);
+
+    // Verificar si hay un identificador en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const imageId = urlParams.get('id');
+
+    if (imageId) {
+      const image = images.find(img => img.getAttribute('data-id') === imageId);
+      if (image) {
+        const imagePath = image.querySelector('img').src;
+        openImage(imageId, imagePath);
       }
     }
+
+    // Verificar visibilidad de las imágenes al cargar la página
+    checkVisibility();
+  });
+
+  // Función para cargar imágenes de 4 en 4
+  function loadNextBatch() {
+    if (isLoading) return;
+    isLoading = true;
+
+    const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
+    imagesToLoad.forEach(imgContainer => {
+      imgContainer.classList.remove('hidden');
+      checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
+    });
+
+    loadedCount += batchSize;
+    isLoading = false;
+  }
+
+  // Función para manejar el scroll y cargar más imágenes
+  function handleScroll() {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      loadNextBatch();
+    }
+    checkVisibility(); // Verificar visibilidad al hacer scroll
+  }
+
+  // Función para verificar la visibilidad de las imágenes
+  function checkVisibility() {
+    const images = document.querySelectorAll('.image-container');
+    images.forEach(image => {
+      const rect = image.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
+        image.classList.add('visible');
+      }
+    });
   }
 </script>
