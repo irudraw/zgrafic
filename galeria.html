@@ -302,6 +302,32 @@ permalink: /galeria/
     transform: scale(1.1);
   }
 
+  /* Icono de copiar URL */
+  .copy-url-button {
+    position: absolute;
+    top: 20px;
+    right: 70px; /* Ajusta la posición para que no se superponga con el botón de cerrar */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de copiar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .copy-url-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
   /* Animaciones para las imágenes */
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -354,6 +380,10 @@ permalink: /galeria/
 
     .nav-button.next {
       right: 10px;
+    }
+
+    .copy-url-button {
+      right: 60px; /* Ajuste para dispositivos móviles */
     }
   }
 </style>
@@ -429,6 +459,11 @@ permalink: /galeria/
       <!-- Botón de cerrar flotante -->
       <button class="close-button" onclick="closeImage()">×</button>
       
+      <!-- Botón de copiar URL -->
+      <button class="copy-url-button" onclick="copyImageUrl()">
+        <i class="fas fa-copy"></i> <!-- Ícono de copia de FontAwesome -->
+      </button>
+      
       <div class="modal-body">
         <button class="nav-button prev" onclick="navigateImage(-1)">
           ‹
@@ -456,7 +491,7 @@ permalink: /galeria/
   let searchTerm = '';
   let isLoading = false;
   let loadedCount = 0;
-  const batchSize = 9;
+  const batchSize = 4;
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
@@ -560,6 +595,21 @@ permalink: /galeria/
 
     // Limpiar el identificador de la URL al cerrar el modal
     window.history.pushState({}, '', window.location.pathname);
+  }
+
+  // Función para copiar la URL de la imagen
+  function copyImageUrl() {
+    const modalImage = document.getElementById('modalImage');
+    const imageUrl = modalImage.src;
+
+    // Copiar la URL al portapapeles
+    navigator.clipboard.writeText(imageUrl)
+      .then(() => {
+        alert('URL de la imagen copiada al portapapeles');
+      })
+      .catch(() => {
+        alert('Error al copiar la URL');
+      });
   }
 
   function navigateImage(direction) {
