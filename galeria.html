@@ -517,12 +517,12 @@ permalink: /galeria/
       <button class="close-button" onclick="closeImage()">×</button>
       
       <!-- Botón de copiar URL -->
-      <button class="copy-url-button" onclick="copyPageUrl()">
+      <button class="copy-url-button" onclick="copyPageUrl(event)">
         <i class="fas fa-link"></i> <!-- Ícono de enlace de FontAwesome -->
       </button>
       
       <!-- Botón de copiar imagen -->
-      <button class="copy-image-button" onclick="copyImageToClipboard()">
+      <button class="copy-image-button" onclick="copyImageToClipboard(event)">
         <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
       </button>
       
@@ -699,7 +699,8 @@ permalink: /galeria/
   }
 
   // Función para copiar la URL actual de la página
-  function copyPageUrl() {
+  function copyPageUrl(event) {
+    event.stopPropagation(); // Detener la propagación del evento
     const currentUrl = window.location.href; // Obtener la URL actual
 
     // Copiar la URL al portapapeles
@@ -721,7 +722,8 @@ permalink: /galeria/
   }
 
   // Función para copiar la imagen al portapapeles
-  function copyImageToClipboard() {
+  function copyImageToClipboard(event) {
+    event.stopPropagation(); // Detener la propagación del evento
     const modalImage = document.getElementById('modalImage');
     const imageUrl = modalImage.src;
 
