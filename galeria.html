@@ -562,7 +562,6 @@ permalink: /galeria/
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
-    // Convertir el nombre del archivo a un código corto usando un hash simple
     let hash = 0;
     for (let i = 0; i < filename.length; i++) {
       hash = (hash << 5) - hash + filename.charCodeAt(i);
@@ -590,6 +589,16 @@ permalink: /galeria/
     // Verificar si hay un identificador en la URL
     const urlParams = new URLSearchParams(window.location.search);
     const imageId = urlParams.get('id');
+    const category = urlParams.get('category');
+
+    if (category) {
+      // Seleccionar la categoría correspondiente
+      const categoryItem = document.querySelector(`.category-list li[data-category="${category}"]`);
+      if (categoryItem) {
+        categoryItem.click(); // Simular clic en la categoría
+      }
+    }
+
     if (imageId) {
       const image = images.find(img => img.getAttribute('data-id') === imageId);
       if (image) {
@@ -646,8 +655,8 @@ permalink: /galeria/
 
     modalImage.src = imagePath;
 
-    // Actualizar la URL con el identificador de la imagen
-    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    // Actualizar la URL con el identificador de la imagen y la categoría actual
+    const newUrl = `${window.location.pathname}?id=${imageId}&category=${currentCategory}`;
     window.history.pushState({}, '', newUrl);
 
     // Actualizar las etiquetas Open Graph
@@ -672,8 +681,11 @@ permalink: /galeria/
     modal.classList.remove('show');
     document.body.style.overflow = 'auto';
 
-    // Limpiar el identificador de la URL al cerrar el modal
-    window.history.pushState({}, '', window.location.pathname);
+    // Limpiar el identificador de la imagen pero mantener la categoría
+    const newUrl = currentCategory === 'all' 
+      ? window.location.pathname 
+      : `${window.location.pathname}?category=${currentCategory}`;
+    window.history.pushState({}, '', newUrl);
   }
 
   // Función para copiar la URL actual de la página
@@ -750,8 +762,8 @@ permalink: /galeria/
 
     modalImage.src = imagePath;
 
-    // Actualizar la URL con el nuevo identificador
-    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    // Actualizar la URL con el nuevo identificador y la categoría actual
+    const newUrl = `${window.location.pathname}?id=${imageId}&category=${currentCategory}`;
     window.history.pushState({}, '', newUrl);
 
     // Actualizar las etiquetas Open Graph
@@ -798,8 +810,16 @@ permalink: /galeria/
         categoryItems.forEach(i => i.classList.remove('active'));
         item.classList.add('active');
 
-        // Filtrar imágenes
+        // Obtener la categoría seleccionada
         currentCategory = item.getAttribute('data-category');
+
+        // Actualizar la URL con la categoría seleccionada
+        const newUrl = currentCategory === 'all' 
+          ? window.location.pathname 
+          : `${window.location.pathname}?category=${currentCategory}`;
+        window.history.pushState({}, '', newUrl);
+
+        // Filtrar imágenes
         filterImages();
       });
     });
@@ -866,7 +886,11 @@ permalink: /galeria/
 
   // Funciones auxiliares
   function getVisibleImages() {
-    return images.filter(img => !img.classList.contains('hidden'));
+    return images.filter(img => {
+      const matchesCategory = currentCategory === 'all' ||
+        img.getAttribute('data-category') === currentCategory;
+      return !img.classList.contains('hidden') && matchesCategory;
+    });
   }
 
   function preloadAdjacentImages(currentIndex) {
