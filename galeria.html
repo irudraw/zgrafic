@@ -93,34 +93,36 @@ permalink: /galeria/
     cursor: pointer;
   }
 
+  /* Estilos para los botones de categoría */
   .category-list {
-    list-style: none;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Espacio entre los botones */
   }
 
-  .category-list li {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.2s;
+  .category-button {
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
-    background-color: #333; /* Fondo oscuro para los ítems de categoría */
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #333; /* Fondo oscuro para los botones */
     color: #e0e0e0; /* Texto claro */
+    text-decoration: none; /* Quitar subrayado de los enlaces */
     font-size: 12px; /* Reducir el tamaño de la letra */
+    transition: background-color 0.2s;
+    cursor: pointer;
   }
 
-  .category-list li:hover {
+  .category-button:hover {
     background-color: #444; /* Fondo más claro al pasar el mouse */
   }
 
-  .category-list li.active {
+  .category-button.active {
     background-color: #007bff; /* Color azul para la categoría activa */
     color: white;
   }
 
-  .category-list li i {
+  .category-button i {
     font-size: 16px; /* Reducir el tamaño del ícono de carpeta */
     margin-right: 8px; /* Espacio entre el ícono y el texto */
   }
@@ -460,11 +462,11 @@ permalink: /galeria/
 
     <div class="categories">
       <h6>Categorías</h6>
-      <ul class="category-list">
-        <li class="active" data-category="all">
+      <div class="category-list">
+        <a href="#" class="category-button active" data-category="all">
           <i class="fas fa-folder"></i>
           <span>Todas las imágenes</span>
-        </li>
+        </a>
         {% assign categories = "" | split: "" %}
         {% for file in site.static_files %}
           {% if file.path contains '/imagenes/' %}
@@ -476,12 +478,12 @@ permalink: /galeria/
         {% endfor %}
         {% assign sorted_categories = categories | sort %}
         {% for category in sorted_categories %}
-          <li data-category="{{ category | slugify }}">
+          <a href="#" class="category-button" data-category="{{ category | slugify }}">
             <i class="fas fa-folder"></i>
             <span>{{ category | capitalize }}</span>
-          </li>
+          </a>
         {% endfor %}
-      </ul>
+      </div>
     </div>
   </div>
 
@@ -791,15 +793,17 @@ permalink: /galeria/
 
   // Funciones de filtrado y búsqueda
   function setupCategoryFilters() {
-    const categoryItems = document.querySelectorAll('.category-list li');
-    categoryItems.forEach(item => {
-      item.addEventListener('click', () => {
+    const categoryButtons = document.querySelectorAll('.category-button');
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
+
         // Actualizar clase activa
-        categoryItems.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
 
         // Filtrar imágenes
-        currentCategory = item.getAttribute('data-category');
+        currentCategory = button.getAttribute('data-category');
         filterImages();
       });
     });
