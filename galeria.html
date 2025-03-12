@@ -12,108 +12,25 @@ permalink: /galeria/
 <!-- Agrega FontAwesome en el head de tu HTML -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+<!-- Agrega la fuente Poppins de Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
   /* Estilos globales */
   body {
     background-color: #121212; /* Fondo oscuro para el body */
     color: #e0e0e0; /* Texto claro */
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif; /* Cambio de fuente a Poppins */
   }
-</style>
 
-<div class="page-container">
-  <!-- Sidebar con búsqueda y categorías -->
-  <div class="sidebar-menu">
-    <div class="search-container">
-      <div class="search-wrapper">
-        <input type="text" id="searchInput" placeholder="Buscar imágenes...">
-        <button class="search-clear" onclick="clearSearch()">×</button>
-      </div>
-      <div id="searchResults" class="search-results">
-        Mostrando todas las imágenes
-      </div>
-    </div>
+  h6 {
+    font-size: 14px; /* Reducir el tamaño del título de categorías */
+    margin-bottom: 10px;
+    color: #e0e0e0;
+    font-weight: 500;
+  }
 
-    <div class="categories">
-      <h6>Categorías</h6>
-      <ul class="category-list">
-        <li class="active" data-category="all">
-          <i class="fas fa-folder"></i>
-          <span>Todas las imágenes</span>
-        </li>
-        {% assign categories = "" | split: "" %}
-        {% for file in site.static_files %}
-          {% if file.path contains '/imagenes/' %}
-            {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
-            {% unless categories contains folder %}
-              {% assign categories = categories | push: folder %}
-            {% endunless %}
-          {% endif %}
-        {% endfor %}
-        {% assign sorted_categories = categories | sort %}
-        {% for category in sorted_categories %}
-          <li data-category="{{ category | slugify }}">
-            <i class="fas fa-folder"></i>
-            <span>{{ category | capitalize }}</span>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
-
-  <!-- Contenedor de la galería -->
-  <div class="gallery-container">
-    <div class="gallery">
-      {% for file in site.static_files %}
-        {% if file.path contains '/imagenes/' %}
-          {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-            {% assign title = file.name | split: '.' | first | replace: '-', ' ' | capitalize %}
-            {% assign image_path = file.path | relative_url %}
-            {% assign image_id = file.name | split: '.' | first | generateShortCode %}
-
-            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
-              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}')">
-              <div class="image-title">{{ title }}</div>
-            </div>
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-    </div>
-
-    <div class="loader hidden">
-      <div class="spinner"></div>
-    </div>
-  </div>
-
-  <!-- Modal para visualizar imágenes -->
-  <div id="imageModal" class="modal">
-    <div class="modal-content">
-      <!-- Botón de cerrar flotante -->
-      <button class="close-button" onclick="closeImage()">×</button>
-      
-      <div class="modal-body">
-        <button class="nav-button prev" onclick="navigateImage(-1)">
-          ‹
-        </button>
-        
-        <div class="image-wrapper">
-          <img id="modalImage" src="" alt="">
-        </div>
-        
-        <button class="nav-button next" onclick="navigateImage(1)">
-          ›
-        </button>
-        
-        <div class="image-counter">1 de 1</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-  /* Estilos generales */
   .page-container {
     display: flex;
     min-height: 100vh;
@@ -148,6 +65,7 @@ permalink: /galeria/
     border-radius: 4px;
     background-color: #333; /* Fondo oscuro para el input */
     color: #e0e0e0; /* Texto claro */
+    font-size: 14px; /* Reducir el tamaño de la letra */
   }
 
   .search-clear {
@@ -167,17 +85,16 @@ permalink: /galeria/
   }
 
   .category-list li {
-    padding: 12px;
+    padding: 10px;
     cursor: pointer;
     border-radius: 8px;
     transition: background-color 0.2s;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     background-color: #333; /* Fondo oscuro para los ítems de categoría */
     color: #e0e0e0; /* Texto claro */
+    font-size: 12px; /* Reducir el tamaño de la letra */
   }
 
   .category-list li:hover {
@@ -190,8 +107,8 @@ permalink: /galeria/
   }
 
   .category-list li i {
-    font-size: 24px; /* Tamaño del ícono de carpeta */
-    margin-bottom: 8px; /* Espacio entre el ícono y el texto */
+    font-size: 16px; /* Reducir el tamaño del ícono de carpeta */
+    margin-right: 8px; /* Espacio entre el ícono y el texto */
   }
 
   /* Galería */
@@ -202,8 +119,8 @@ permalink: /galeria/
 
   .gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Reducir el tamaño de las imágenes */
+    gap: 15px;
   }
 
   .image-container {
@@ -229,17 +146,18 @@ permalink: /galeria/
 
   .image-container img {
     width: 100%;
-    height: 200px;
+    height: 150px; /* Reducir la altura de las imágenes */
     object-fit: cover;
     cursor: pointer;
   }
 
   .image-title {
-    padding: 10px;
+    padding: 8px;
     text-align: center;
     background-color: #1e1e1e; /* Fondo oscuro para el título */
     border-top: 1px solid #333; /* Borde más oscuro */
     color: #e0e0e0; /* Texto claro */
+    font-size: 12px; /* Reducir el tamaño de la letra */
   }
 
   /* Estilos mejorados para el popup */
@@ -432,6 +350,96 @@ permalink: /galeria/
     }
   }
 </style>
+
+<div class="page-container">
+  <!-- Sidebar con búsqueda y categorías -->
+  <div class="sidebar-menu">
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Buscar imágenes...">
+        <button class="search-clear" onclick="clearSearch()">×</button>
+      </div>
+      <div id="searchResults" class="search-results">
+        Mostrando todas las imágenes
+      </div>
+    </div>
+
+    <div class="categories">
+      <h6>Categorías</h6>
+      <ul class="category-list">
+        <li class="active" data-category="all">
+          <i class="fas fa-folder"></i>
+          <span>Todas las imágenes</span>
+        </li>
+        {% assign categories = "" | split: "" %}
+        {% for file in site.static_files %}
+          {% if file.path contains '/imagenes/' %}
+            {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% unless categories contains folder %}
+              {% assign categories = categories | push: folder %}
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+        {% assign sorted_categories = categories | sort %}
+        {% for category in sorted_categories %}
+          <li data-category="{{ category | slugify }}">
+            <i class="fas fa-folder"></i>
+            <span>{{ category | capitalize }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Contenedor de la galería -->
+  <div class="gallery-container">
+    <div class="gallery">
+      {% for file in site.static_files %}
+        {% if file.path contains '/imagenes/' %}
+          {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% assign title = file.name | split: '.' | first | replace: '-', ' ' | capitalize %}
+            {% assign image_path = file.path | relative_url %}
+            {% assign image_id = file.name | split: '.' | first | generateShortCode %}
+
+            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
+              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}')">
+              <div class="image-title">{{ title }}</div>
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="loader hidden">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- Modal para visualizar imágenes -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <!-- Botón de cerrar flotante -->
+      <button class="close-button" onclick="closeImage()">×</button>
+      
+      <div class="modal-body">
+        <button class="nav-button prev" onclick="navigateImage(-1)">
+          ‹
+        </button>
+        
+        <div class="image-wrapper">
+          <img id="modalImage" src="" alt="">
+        </div>
+        
+        <button class="nav-button next" onclick="navigateImage(1)">
+          ›
+        </button>
+        
+        <div class="image-counter">1 de 1</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   // Variables globales
