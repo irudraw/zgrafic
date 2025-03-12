@@ -127,6 +127,17 @@ permalink: /galeria/
     margin-right: 8px; /* Espacio entre el ícono y el texto */
   }
 
+  /* Estilos para dispositivos móviles */
+  @media (max-width: 768px) {
+    .category-button span {
+      display: inline-block;
+      max-width: 3ch; /* Limitar a 3 caracteres */
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis; /* Añadir puntos suspensivos */
+    }
+  }
+
   /* Galería */
   .gallery-container {
     flex: 1;
