@@ -328,6 +328,26 @@ permalink: /galeria/
     transform: scale(1.1);
   }
 
+  /* Mensaje de URL copiada */
+  .copy-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8); /* Fondo oscuro para el mensaje */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+    z-index: 1002;
+    display: none; /* Oculto por defecto */
+  }
+
+  .copy-message.show {
+    display: block; /* Mostrar el mensaje */
+  }
+
   /* Animaciones para las imágenes */
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -481,6 +501,11 @@ permalink: /galeria/
       </div>
     </div>
   </div>
+
+  <!-- Mensaje de URL copiada -->
+  <div id="copyMessage" class="copy-message">
+    URL copiada al portapapeles
+  </div>
 </div>
 
 <script>
@@ -605,7 +630,14 @@ permalink: /galeria/
     // Copiar la URL al portapapeles
     navigator.clipboard.writeText(imageUrl)
       .then(() => {
-        alert('URL de la imagen copiada al portapapeles');
+        // Mostrar el mensaje de URL copiada
+        const copyMessage = document.getElementById('copyMessage');
+        copyMessage.classList.add('show');
+
+        // Ocultar el mensaje después de 2 segundos
+        setTimeout(() => {
+          copyMessage.classList.remove('show');
+        }, 2000);
       })
       .catch(() => {
         alert('Error al copiar la URL');
