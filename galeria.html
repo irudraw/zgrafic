@@ -19,101 +19,23 @@ permalink: /galeria/
     color: #e0e0e0; /* Texto claro */
     margin: 0;
     font-family: Arial, sans-serif;
+    line-height: 1.6;
   }
-</style>
 
-<div class="page-container">
-  <!-- Sidebar con búsqueda y categorías -->
-  <div class="sidebar-menu">
-    <div class="search-container">
-      <div class="search-wrapper">
-        <input type="text" id="searchInput" placeholder="Buscar imágenes...">
-        <button class="search-clear" onclick="clearSearch()">×</button>
-      </div>
-      <div id="searchResults" class="search-results">
-        Mostrando todas las imágenes
-      </div>
-    </div>
+  a {
+    color: #007bff; /* Color de los enlaces */
+    text-decoration: none;
+  }
 
-    <div class="categories">
-      <h6>Categorías</h6>
-      <ul class="category-list">
-        <li class="active" data-category="all">
-          <i class="fas fa-folder"></i>
-          <span>Todas las imágenes</span>
-        </li>
-        {% assign categories = "" | split: "" %}
-        {% for file in site.static_files %}
-          {% if file.path contains '/imagenes/' %}
-            {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
-            {% unless categories contains folder %}
-              {% assign categories = categories | push: folder %}
-            {% endunless %}
-          {% endif %}
-        {% endfor %}
-        {% assign sorted_categories = categories | sort %}
-        {% for category in sorted_categories %}
-          <li data-category="{{ category | slugify }}">
-            <i class="fas fa-folder"></i>
-            <span>{{ category | capitalize }}</span>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
+  a:hover {
+    text-decoration: underline;
+  }
 
-  <!-- Contenedor de la galería -->
-  <div class="gallery-container">
-    <div class="gallery">
-      {% for file in site.static_files %}
-        {% if file.path contains '/imagenes/' %}
-          {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
-            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
-            {% assign title = file.name | split: '.' | first | replace: '-', ' ' | capitalize %}
-            {% assign image_path = file.path | relative_url %}
-            {% assign image_id = file.name | split: '.' | first | generateShortCode %}
+  h1, h2, h3, h4, h5, h6 {
+    color: #e0e0e0; /* Texto claro para los títulos */
+  }
 
-            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
-              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}')">
-              <div class="image-title">{{ title }}</div>
-            </div>
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-    </div>
-
-    <div class="loader hidden">
-      <div class="spinner"></div>
-    </div>
-  </div>
-
-  <!-- Modal para visualizar imágenes -->
-  <div id="imageModal" class="modal">
-    <div class="modal-content">
-      <!-- Botón de cerrar flotante -->
-      <button class="close-button" onclick="closeImage()">×</button>
-      
-      <div class="modal-body">
-        <button class="nav-button prev" onclick="navigateImage(-1)">
-          ‹
-        </button>
-        
-        <div class="image-wrapper">
-          <img id="modalImage" src="" alt="">
-        </div>
-        
-        <button class="nav-button next" onclick="navigateImage(1)">
-          ›
-        </button>
-        
-        <div class="image-counter">1 de 1</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-  /* Estilos generales */
+  /* Estilos para el contenedor principal */
   .page-container {
     display: flex;
     min-height: 100vh;
@@ -161,9 +83,29 @@ permalink: /galeria/
     cursor: pointer;
   }
 
+  .search-results {
+    font-size: 0.9em; /* Tamaño de fuente más pequeño */
+    color: #aaa; /* Color de texto más suave */
+    margin-top: 10px;
+  }
+
+  /* Estilos para las categorías */
+  .categories {
+    margin-top: 20px;
+  }
+
+  .categories h3 {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    color: #e0e0e0; /* Texto claro */
+  }
+
   .category-list {
     list-style: none;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espacio entre categorías */
   }
 
   .category-list li {
@@ -175,7 +117,6 @@ permalink: /galeria/
     flex-direction: column;
     align-items: center;
     text-align: center;
-    margin-bottom: 10px;
     background-color: #333; /* Fondo oscuro para los ítems de categoría */
     color: #e0e0e0; /* Texto claro */
   }
