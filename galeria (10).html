@@ -1,0 +1,894 @@
+---
+layout: default
+title: Galería
+permalink: /galeria/
+---
+
+<!-- Asegúrate de que las URLs sean correctas -->
+<script>
+  const BASE_URL = "https://zgrafic.com";
+</script>
+
+<!-- Agrega FontAwesome en el head de tu HTML -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Agrega la fuente Poppins de Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- Etiquetas Open Graph dinámicas -->
+<meta property="og:title" content="Galería de Imágenes">
+<meta property="og:description" content="Explora nuestra galería de imágenes.">
+<meta property="og:type" content="website">
+<meta property="og:url" id="og-url" content="{{ site.url }}{{ page.url }}">
+<meta property="og:image" id="og-image" content="{{ site.url }}/ruta/a/imagen-por-defecto.jpg">
+
+<style>
+  /* Estilos globales */
+  body {
+    background-color: #121212; /* Fondo oscuro para el body */
+    color: #e0e0e0; /* Texto claro */
+    margin: 0;
+    font-family: 'Poppins', sans-serif; /* Cambio de fuente a Poppins */
+  }
+
+  h6 {
+    font-size: 14px; /* Reducir el tamaño del título de categorías */
+    margin-bottom: 10px;
+    color: #e0e0e0;
+    font-weight: 500;
+  }
+
+  /* Estilo para el texto de resultados de búsqueda */
+  .search-results {
+    font-size: 12px; /* Reducir el tamaño de la fuente */
+    color: #e0e0e0; /* Color del texto */
+    margin-top: 8px; /* Espaciado superior */
+  }
+
+  .page-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #121212; /* Fondo oscuro */
+    color: #e0e0e0; /* Texto claro */
+  }
+
+  /* Sidebar */
+  .sidebar-menu {
+    width: 250px;
+    padding: 20px;
+    background-color: #1e1e1e; /* Fondo oscuro para el sidebar */
+    border-right: 1px solid #333; /* Borde más oscuro */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .search-container {
+    margin-bottom: 20px;
+  }
+
+  .search-wrapper {
+    position: relative;
+  }
+
+  .search-wrapper input {
+    width: 100%;
+    padding: 8px 30px 8px 10px;
+    border: 1px solid #444; /* Borde más oscuro */
+    border-radius: 4px;
+    background-color: #333; /* Fondo oscuro para el input */
+    color: #e0e0e0; /* Texto claro */
+    font-size: 14px; /* Reducir el tamaño de la letra */
+  }
+
+  .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999; /* Color del ícono de limpiar */
+    cursor: pointer;
+  }
+
+  .category-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .category-list li {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    background-color: #333; /* Fondo oscuro para los ítems de categoría */
+    color: #e0e0e0; /* Texto claro */
+    font-size: 12px; /* Reducir el tamaño de la letra */
+  }
+
+  .category-list li:hover {
+    background-color: #444; /* Fondo más claro al pasar el mouse */
+  }
+
+  .category-list li.active {
+    background-color: #007bff; /* Color azul para la categoría activa */
+    color: white;
+  }
+
+  .category-list li i {
+    font-size: 16px; /* Reducir el tamaño del ícono de carpeta */
+    margin-right: 8px; /* Espacio entre el ícono y el texto */
+  }
+
+  /* Galería */
+  .gallery-container {
+    flex: 1;
+    padding: 20px;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Reducir el tamaño de las imágenes */
+    gap: 15px;
+  }
+
+  .image-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #1e1e1e; /* Fondo oscuro para las imágenes */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
+    transition: transform 0.2s;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .image-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .image-container:hover {
+    transform: translateY(-5px);
+  }
+
+  .image-container img {
+    width: 100%;
+    height: 150px; /* Reducir la altura de las imágenes */
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .image-title {
+    padding: 8px;
+    text-align: center;
+    background-color: #1e1e1e; /* Fondo oscuro para el título */
+    border-top: 1px solid #333; /* Borde más oscuro */
+    color: #e0e0e0; /* Texto claro */
+    font-size: 12px; /* Reducir el tamaño de la letra */
+  }
+
+  /* Estilos mejorados para el popup */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Fondo oscuro para el modal */
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .modal.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-content {
+    position: relative;
+    width: 95%;
+    max-width: 1400px;
+    margin: auto;
+    background-color: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .modal.show .modal-content {
+    transform: scale(1);
+  }
+
+  .modal-body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+    background-color: transparent;
+  }
+
+  .image-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  #modalImage {
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    animation: fadeIn 0.3s ease;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
+  }
+
+  /* Contador de imágenes */
+  .image-counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5); /* Fondo oscuro para el contador */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+  }
+
+  .nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para los botones */
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+  }
+
+  .nav-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .nav-button.prev {
+    left: 20px;
+  }
+
+  .nav-button.next {
+    right: 20px;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de cerrar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .close-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
+  /* Icono de copiar URL */
+  .copy-url-button {
+    position: absolute;
+    top: 20px;
+    right: 70px; /* Ajusta la posición para que no se superponga con el botón de cerrar */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de copiar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .copy-url-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
+  /* Icono de copiar imagen */
+  .copy-image-button {
+    position: absolute;
+    top: 20px;
+    right: 120px; /* Ajusta la posición para que no se superponga con otros botones */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de copiar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .copy-image-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
+  /* Mensaje de URL copiada */
+  .copy-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8); /* Fondo oscuro para el mensaje */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+    z-index: 1002;
+    display: none; /* Oculto por defecto */
+  }
+
+  .copy-message.show {
+    display: block; /* Mostrar el mensaje */
+  }
+
+  /* Animaciones para las imágenes */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Loader */
+  .loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+
+    .nav-button {
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+    }
+
+    .nav-button.prev {
+      left: 10px;
+    }
+
+    .nav-button.next {
+      right: 10px;
+    }
+
+    .copy-url-button {
+      right: 60px; /* Ajuste para dispositivos móviles */
+    }
+
+    .copy-image-button {
+      right: 110px; /* Ajuste para dispositivos móviles */
+    }
+  }
+</style>
+
+<div class="page-container">
+  <!-- Sidebar con búsqueda y categorías -->
+  <div class="sidebar-menu">
+    <div class="search-container">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Buscar imágenes...">
+        <button class="search-clear" onclick="clearSearch()">×</button>
+      </div>
+      <div id="searchResults" class="search-results">
+        Mostrando todas las imágenes
+      </div>
+    </div>
+
+    <div class="categories">
+      <h6>Categorías</h6>
+      <ul class="category-list">
+        <li class="active" data-category="all">
+          <i class="fas fa-folder"></i>
+          <span>Todas las imágenes</span>
+        </li>
+        {% assign categories = "" | split: "" %}
+        {% for file in site.static_files %}
+          {% if file.path contains '/imagenes/' %}
+            {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% unless categories contains folder %}
+              {% assign categories = categories | push: folder %}
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+        {% assign sorted_categories = categories | sort %}
+        {% for category in sorted_categories %}
+          <li data-category="{{ category | slugify }}">
+            <i class="fas fa-folder"></i>
+            <span>{{ category | capitalize }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Contenedor de la galería -->
+  <div class="gallery-container">
+    <div class="gallery">
+      {% for file in site.static_files %}
+        {% if file.path contains '/imagenes/' %}
+          {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% assign title = file.name | split: '.' | first | replace: '-', ' ' | capitalize %}
+            {% assign image_path = file.path | relative_url %}
+            {% assign image_id = file.name | split: '.' | first | generateShortCode %}
+
+            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
+              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}')">
+              <div class="image-title">{{ title }}</div>
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="loader hidden">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- Modal para visualizar imágenes -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <!-- Botón de cerrar flotante -->
+      <button class="close-button" onclick="closeImage()">×</button>
+      
+      <!-- Botón de copiar URL -->
+      <button class="copy-url-button" onclick="copyPageUrl()">
+        <i class="fas fa-link"></i> <!-- Ícono de enlace de FontAwesome -->
+      </button>
+      
+      <!-- Botón de copiar imagen -->
+      <button class="copy-image-button" onclick="copyImageToClipboard()">
+        <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
+      </button>
+      
+      <div class="modal-body">
+        <button class="nav-button prev" onclick="navigateImage(-1)">
+          ‹
+        </button>
+        
+        <div class="image-wrapper">
+          <img id="modalImage" src="" alt="">
+        </div>
+        
+        <button class="nav-button next" onclick="navigateImage(1)">
+          ›
+        </button>
+        
+        <div class="image-counter">1 de 1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de URL copiada -->
+  <div id="copyMessage" class="copy-message">
+    URL copiada al portapapeles
+  </div>
+</div>
+
+<script>
+  // Variables globales
+  let currentImageIndex = 0;
+  let images = [];
+  let currentCategory = 'all';
+  let searchTerm = '';
+  let isLoading = false;
+  let loadedCount = 0;
+  const batchSize = 4;
+
+  // Generador de códigos cortos
+  function generateShortCode(filename) {
+    // Convertir el nombre del archivo a un código corto usando un hash simple
+    let hash = 0;
+    for (let i = 0; i < filename.length; i++) {
+      hash = (hash << 5) - hash + filename.charCodeAt(i);
+      hash |= 0; // Convertir a entero de 32 bits
+    }
+    return Math.abs(hash).toString(36).substring(0, 8); // Código de 8 caracteres
+  }
+
+  // Inicialización
+  document.addEventListener('DOMContentLoaded', () => {
+    // Recopilar todas las imágenes
+    images = Array.from(document.querySelectorAll('.image-container'));
+
+    // Event listeners
+    document.addEventListener('keydown', handleKeyPress);
+    setupCategoryFilters();
+    setupSearch();
+
+    // Cargar el primer lote de imágenes
+    loadNextBatch();
+
+    // Observar el scroll para cargar más imágenes
+    window.addEventListener('scroll', handleScroll);
+
+    // Verificar si hay un identificador en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const imageId = urlParams.get('id');
+    if (imageId) {
+      const image = images.find(img => img.getAttribute('data-id') === imageId);
+      if (image) {
+        const imagePath = image.querySelector('img').src;
+        openImage(imageId, imagePath);
+      }
+    }
+
+    // Verificar visibilidad de las imágenes al cargar la página
+    checkVisibility();
+  });
+
+  // Cargar imágenes de 4 en 4
+  function loadNextBatch() {
+    if (isLoading) return;
+    isLoading = true;
+
+    const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
+    imagesToLoad.forEach(imgContainer => {
+      imgContainer.classList.remove('hidden');
+      checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
+    });
+
+    loadedCount += batchSize;
+    isLoading = false;
+  }
+
+  // Manejar el scroll para cargar más imágenes
+  function handleScroll() {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      loadNextBatch();
+    }
+    checkVisibility(); // Verificar visibilidad al hacer scroll
+  }
+
+  // Verificar visibilidad de las imágenes
+  function checkVisibility() {
+    const images = document.querySelectorAll('.image-container');
+    images.forEach(image => {
+      const rect = image.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
+        image.classList.add('visible');
+      }
+    });
+  }
+
+  // Modificar la función openImage para usar el identificador único
+  function openImage(imageId, imagePath) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+
+    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
+
+    modalImage.src = imagePath;
+
+    // Actualizar la URL con el identificador de la imagen
+    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    window.history.pushState({}, '', newUrl);
+
+    // Actualizar las etiquetas Open Graph
+    updateOpenGraphTags(imagePath, newUrl);
+
+    updateImageCounter();
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Función para actualizar las etiquetas Open Graph
+  function updateOpenGraphTags(imageUrl, pageUrl) {
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+
+    ogImage.setAttribute('content', imageUrl); // Actualizar la URL de la imagen
+    ogUrl.setAttribute('content', pageUrl); // Actualizar la URL de la página
+  }
+
+  function closeImage() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+
+    // Limpiar el identificador de la URL al cerrar el modal
+    window.history.pushState({}, '', window.location.pathname);
+  }
+
+  // Función para copiar la URL actual de la página
+  function copyPageUrl() {
+    const currentUrl = window.location.href; // Obtener la URL actual
+
+    // Copiar la URL al portapapeles
+    navigator.clipboard.writeText(currentUrl)
+      .then(() => {
+        // Mostrar el mensaje de URL copiada
+        const copyMessage = document.getElementById('copyMessage');
+        copyMessage.textContent = 'URL copiada al portapapeles';
+        copyMessage.classList.add('show');
+
+        // Ocultar el mensaje después de 2 segundos
+        setTimeout(() => {
+          copyMessage.classList.remove('show');
+        }, 2000);
+      })
+      .catch(() => {
+        alert('Error al copiar la URL');
+      });
+  }
+
+  // Función para copiar la imagen al portapapeles
+  function copyImageToClipboard() {
+    const modalImage = document.getElementById('modalImage');
+    const imageUrl = modalImage.src;
+
+    // Convertir la imagen en un Blob
+    fetch(imageUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        // Crear un objeto ClipboardItem con la imagen
+        const item = new ClipboardItem({ [blob.type]: blob });
+
+        // Copiar la imagen al portapapeles
+        navigator.clipboard.write([item])
+          .then(() => {
+            // Mostrar el mensaje de éxito
+            const copyMessage = document.getElementById('copyMessage');
+            copyMessage.textContent = 'Imagen copiada al portapapeles';
+            copyMessage.classList.add('show');
+
+            // Ocultar el mensaje después de 2 segundos
+            setTimeout(() => {
+              copyMessage.classList.remove('show');
+            }, 2000);
+          })
+          .catch(() => {
+            alert('Error al copiar la imagen');
+          });
+      })
+      .catch(() => {
+        alert('Error al obtener la imagen');
+      });
+  }
+
+  function navigateImage(direction) {
+    const visibleImages = getVisibleImages();
+    let currentIndexInVisible = visibleImages.findIndex(img =>
+      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
+    );
+
+    currentIndexInVisible = (currentIndexInVisible + direction + visibleImages.length) % visibleImages.length;
+    const newImage = visibleImages[currentIndexInVisible];
+
+    const imageId = newImage.getAttribute('data-id');
+    const imagePath = newImage.querySelector('img').src;
+
+    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
+
+    const modalImage = document.getElementById('modalImage');
+
+    modalImage.src = imagePath;
+
+    // Actualizar la URL con el nuevo identificador
+    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    window.history.pushState({}, '', newUrl);
+
+    // Actualizar las etiquetas Open Graph
+    updateOpenGraphTags(imagePath, newUrl);
+
+    // Precargar siguientes imágenes
+    preloadAdjacentImages(currentImageIndex);
+    updateImageCounter();
+  }
+
+  function handleKeyPress(e) {
+    if (!document.getElementById('imageModal').classList.contains('show')) return;
+
+    switch (e.key) {
+      case 'Escape':
+        closeImage();
+        break;
+      case 'ArrowLeft':
+        navigateImage(-1);
+        break;
+      case 'ArrowRight':
+        navigateImage(1);
+        break;
+    }
+  }
+
+  // Añadir contador de imágenes
+  function updateImageCounter() {
+    const visibleImages = getVisibleImages();
+    const currentPosition = visibleImages.findIndex(img =>
+      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
+    ) + 1;
+
+    const counter = document.querySelector('.image-counter');
+    counter.textContent = `${currentPosition} de ${visibleImages.length}`;
+  }
+
+  // Funciones de filtrado y búsqueda
+  function setupCategoryFilters() {
+    const categoryItems = document.querySelectorAll('.category-list li');
+    categoryItems.forEach(item => {
+      item.addEventListener('click', () => {
+        // Actualizar clase activa
+        categoryItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        // Filtrar imágenes
+        currentCategory = item.getAttribute('data-category');
+        filterImages();
+      });
+    });
+  }
+
+  function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', (e) => {
+      searchTerm = e.target.value.toLowerCase().trim();
+      filterImages();
+
+      // Actualizar resultados
+      const visibleCount = getVisibleImages().length;
+      searchResults.textContent = searchTerm ?
+        `Encontradas ${visibleCount} imágenes para "${searchTerm}"` :
+        'Mostrando todas las imágenes';
+    });
+  }
+
+  function filterImages() {
+    const visibleCount = images.filter(image => {
+      const matchesCategory = currentCategory === 'all' ||
+        image.getAttribute('data-category') === currentCategory;
+
+      const title = image.getAttribute('data-title').toLowerCase();
+      const matchesSearch = !searchTerm || title.includes(searchTerm);
+
+      image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
+      
+      // Si la imagen está oculta, quitar la clase 'visible'
+      if (image.classList.contains('hidden')) {
+        image.classList.remove('visible');
+      }
+
+      return matchesCategory && matchesSearch;
+    }).length;
+
+    // Actualizar contador de resultados
+    const searchResults = document.getElementById('searchResults');
+    let message = 'Mostrando todas las imágenes';
+
+    if (currentCategory !== 'all' && searchTerm) {
+      message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
+    } else if (currentCategory !== 'all') {
+      message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
+    } else if (searchTerm) {
+      message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
+    }
+
+    searchResults.textContent = message;
+
+    // Verificar visibilidad de las imágenes después de filtrar
+    checkVisibility();
+  }
+
+  function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = '';
+    searchTerm = '';
+    filterImages();
+  }
+
+  // Funciones auxiliares
+  function getVisibleImages() {
+    return images.filter(img => !img.classList.contains('hidden'));
+  }
+
+  function preloadAdjacentImages(currentIndex) {
+    const visibleImages = getVisibleImages();
+    const preloadCount = 2; // Número de imágenes a precargar en cada dirección
+
+    for (let i = 1; i <= preloadCount; i++) {
+      // Precargar imágenes siguientes
+      const nextIndex = (currentIndex + i) % visibleImages.length;
+      const nextImage = visibleImages[nextIndex].querySelector('img');
+      if (nextImage) {
+        const img = new Image();
+        img.src = nextImage.src;
+      }
+
+      // Precargar imágenes anteriores
+      const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
+      const prevImage = visibleImages[prevIndex].querySelector('img');
+      if (prevImage) {
+        const img = new Image();
+        img.src = prevImage.src;
+      }
+    }
+  }
+</script>
