@@ -15,6 +15,13 @@ permalink: /galeria/
 <!-- Agrega la fuente Poppins de Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+<!-- Etiquetas Open Graph dinámicas -->
+<meta property="og:title" content="Galería de Imágenes">
+<meta property="og:description" content="Explora nuestra galería de imágenes.">
+<meta property="og:type" content="website">
+<meta property="og:url" id="og-url" content="{{ site.url }}{{ page.url }}">
+<meta property="og:image" id="og-image" content="{{ site.url }}/ruta/a/imagen-por-defecto.jpg">
+
 <style>
   /* Estilos globales */
   body {
@@ -608,9 +615,21 @@ permalink: /galeria/
     const newUrl = `${window.location.pathname}?id=${imageId}`;
     window.history.pushState({}, '', newUrl);
 
+    // Actualizar las etiquetas Open Graph
+    updateOpenGraphTags(imagePath, newUrl);
+
     updateImageCounter();
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
+  }
+
+  // Función para actualizar las etiquetas Open Graph
+  function updateOpenGraphTags(imageUrl, pageUrl) {
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+
+    ogImage.setAttribute('content', imageUrl); // Actualizar la URL de la imagen
+    ogUrl.setAttribute('content', pageUrl); // Actualizar la URL de la página
   }
 
   function closeImage() {
@@ -664,6 +683,9 @@ permalink: /galeria/
     // Actualizar la URL con el nuevo identificador
     const newUrl = `${window.location.pathname}?id=${imageId}`;
     window.history.pushState({}, '', newUrl);
+
+    // Actualizar las etiquetas Open Graph
+    updateOpenGraphTags(imagePath, newUrl);
 
     // Precargar siguientes imágenes
     preloadAdjacentImages(currentImageIndex);
