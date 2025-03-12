@@ -9,6 +9,9 @@ permalink: /galeria/
   const BASE_URL = "https://zgrafic.com";
 </script>
 
+<!-- Agrega FontAwesome en el head de tu HTML -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <div class="page-container">
   <!-- Sidebar con búsqueda y categorías -->
   <div class="sidebar-menu">
@@ -25,7 +28,10 @@ permalink: /galeria/
     <div class="categories">
       <h3>Categorías</h3>
       <ul class="category-list">
-        <li class="active" data-category="all">Todas las imágenes</li>
+        <li class="active" data-category="all">
+          <i class="fas fa-folder"></i>
+          <span>Todas las imágenes</span>
+        </li>
         {% assign categories = "" | split: "" %}
         {% for file in site.static_files %}
           {% if file.path contains '/imagenes/' %}
@@ -37,7 +43,10 @@ permalink: /galeria/
         {% endfor %}
         {% assign sorted_categories = categories | sort %}
         {% for category in sorted_categories %}
-          <li data-category="{{ category | slugify }}">{{ category | capitalize }}</li>
+          <li data-category="{{ category | slugify }}">
+            <i class="fas fa-folder"></i>
+            <span>{{ category | capitalize }}</span>
+          </li>
         {% endfor %}
       </ul>
     </div>
@@ -98,15 +107,16 @@ permalink: /galeria/
   .page-container {
     display: flex;
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: #121212; /* Fondo oscuro */
+    color: #e0e0e0; /* Texto claro */
   }
 
   /* Sidebar */
   .sidebar-menu {
     width: 250px;
     padding: 20px;
-    background-color: white;
-    border-right: 1px solid #eee;
+    background-color: #1e1e1e; /* Fondo oscuro para el sidebar */
+    border-right: 1px solid #333; /* Borde más oscuro */
     position: sticky;
     top: 0;
     height: 100vh;
@@ -124,8 +134,10 @@ permalink: /galeria/
   .search-wrapper input {
     width: 100%;
     padding: 8px 30px 8px 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #444; /* Borde más oscuro */
     border-radius: 4px;
+    background-color: #333; /* Fondo oscuro para el input */
+    color: #e0e0e0; /* Texto claro */
   }
 
   .search-clear {
@@ -135,7 +147,7 @@ permalink: /galeria/
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #999;
+    color: #999; /* Color del ícono de limpiar */
     cursor: pointer;
   }
 
@@ -145,19 +157,31 @@ permalink: /galeria/
   }
 
   .category-list li {
-    padding: 8px 12px;
+    padding: 12px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 8px;
     transition: background-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 10px;
+    background-color: #333; /* Fondo oscuro para los ítems de categoría */
+    color: #e0e0e0; /* Texto claro */
   }
 
   .category-list li:hover {
-    background-color: #f0f0f0;
+    background-color: #444; /* Fondo más claro al pasar el mouse */
   }
 
   .category-list li.active {
-    background-color: #007bff;
+    background-color: #007bff; /* Color azul para la categoría activa */
     color: white;
+  }
+
+  .category-list li i {
+    font-size: 24px; /* Tamaño del ícono de carpeta */
+    margin-bottom: 8px; /* Espacio entre el ícono y el texto */
   }
 
   /* Galería */
@@ -176,8 +200,8 @@ permalink: /galeria/
     position: relative;
     border-radius: 8px;
     overflow: hidden;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #1e1e1e; /* Fondo oscuro para las imágenes */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
     transition: transform 0.2s;
     opacity: 0;
     transform: translateY(20px);
@@ -203,8 +227,9 @@ permalink: /galeria/
   .image-title {
     padding: 10px;
     text-align: center;
-    background-color: white;
-    border-top: 1px solid #eee;
+    background-color: #1e1e1e; /* Fondo oscuro para el título */
+    border-top: 1px solid #333; /* Borde más oscuro */
+    color: #e0e0e0; /* Texto claro */
   }
 
   /* Estilos mejorados para el popup */
@@ -215,7 +240,7 @@ permalink: /galeria/
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
+    background-color: rgba(0, 0, 0, 0.95); /* Fondo oscuro para el modal */
     z-index: 1000;
     opacity: 0;
     transition: all 0.3s ease;
@@ -268,7 +293,7 @@ permalink: /galeria/
     object-fit: contain;
     animation: fadeIn 0.3s ease;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
   }
 
   /* Contador de imágenes */
@@ -277,7 +302,7 @@ permalink: /galeria/
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.5); /* Fondo oscuro para el contador */
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -289,7 +314,7 @@ permalink: /galeria/
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para los botones */
     border: none;
     color: white;
     width: 50px;
@@ -305,7 +330,7 @@ permalink: /galeria/
   }
 
   .nav-button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
     transform: translateY(-50%) scale(1.1);
   }
 
@@ -321,7 +346,7 @@ permalink: /galeria/
     position: absolute;
     top: 20px;
     right: 20px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de cerrar */
     border: none;
     color: white;
     width: 40px;
@@ -338,7 +363,7 @@ permalink: /galeria/
   }
 
   .close-button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
     transform: scale(1.1);
   }
 
