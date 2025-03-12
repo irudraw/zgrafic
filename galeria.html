@@ -891,4 +891,74 @@ permalink: /galeria/
       }
     }
   }
+
+  // Variables para el control de gestos
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let isDragging = false;
+
+  // Detectar el inicio del gesto táctil
+  function handleTouchStart(event) {
+    touchStartX = event.touches[0].clientX;
+  }
+
+  // Detectar el movimiento del gesto táctil
+  function handleTouchMove(event) {
+    if (!isDragging) return;
+    touchEndX = event.touches[0].clientX;
+  }
+
+  // Detectar el final del gesto táctil
+  function handleTouchEnd() {
+    if (!isDragging) return;
+
+    const swipeThreshold = 50; // Sensibilidad del gesto
+    const deltaX = touchEndX - touchStartX;
+
+    if (deltaX > swipeThreshold) {
+      navigateImage(-1); // Navegar a la imagen anterior
+    } else if (deltaX < -swipeThreshold) {
+      navigateImage(1); // Navegar a la siguiente imagen
+    }
+
+    isDragging = false;
+  }
+
+  // Detectar el inicio del arrastre con el mouse
+  function handleMouseDown(event) {
+    touchStartX = event.clientX;
+    isDragging = true;
+  }
+
+  // Detectar el movimiento del arrastre con el mouse
+  function handleMouseMove(event) {
+    if (!isDragging) return;
+    touchEndX = event.clientX;
+  }
+
+  // Detectar el final del arrastre con el mouse
+  function handleMouseUp() {
+    if (!isDragging) return;
+
+    const swipeThreshold = 50; // Sensibilidad del arrastre
+    const deltaX = touchEndX - touchStartX;
+
+    if (deltaX > swipeThreshold) {
+      navigateImage(-1); // Navegar a la imagen anterior
+    } else if (deltaX < -swipeThreshold) {
+      navigateImage(1); // Navegar a la siguiente imagen
+    }
+
+    isDragging = false;
+  }
+
+  // Agregar event listeners para gestos táctiles
+  document.addEventListener('touchstart', handleTouchStart);
+  document.addEventListener('touchmove', handleTouchMove);
+  document.addEventListener('touchend', handleTouchEnd);
+
+  // Agregar event listeners para arrastre con el mouse
+  document.addEventListener('mousedown', handleMouseDown);
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
 </script>
