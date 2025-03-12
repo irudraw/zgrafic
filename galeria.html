@@ -555,7 +555,6 @@ permalink: /galeria/
   let currentImageIndex = 0;
   let images = [];
   let currentCategory = 'all';
-  let lastCategory = 'all'; // Guardar la última categoría seleccionada
   let searchTerm = '';
   let isLoading = false;
   let loadedCount = 0;
@@ -572,36 +571,10 @@ permalink: /galeria/
     return Math.abs(hash).toString(36).substring(0, 8); // Código de 8 caracteres
   }
 
-  // Función para actualizar la URL con la categoría seleccionada
-  function updateCategoryUrl(category) {
-    const newUrl = `${window.location.pathname}?category=${category}`;
-    window.history.pushState({}, '', newUrl);
-  }
-
-  // Función para leer la categoría de la URL
-  function getCategoryFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('category') || 'all';
-  }
-
   // Inicialización
   document.addEventListener('DOMContentLoaded', () => {
     // Recopilar todas las imágenes
     images = Array.from(document.querySelectorAll('.image-container'));
-
-    // Leer la categoría de la URL
-    const categoryFromUrl = getCategoryFromUrl();
-    currentCategory = categoryFromUrl;
-    lastCategory = categoryFromUrl; // Guardar la última categoría
-
-    // Activar la categoría correspondiente
-    const categoryItem = document.querySelector(`.category-list li[data-category="${categoryFromUrl}"]`);
-    if (categoryItem) {
-      categoryItem.classList.add('active');
-    }
-
-    // Filtrar imágenes al cargar la página
-    filterImages();
 
     // Event listeners
     document.addEventListener('keydown', handleKeyPress);
@@ -700,11 +673,7 @@ permalink: /galeria/
     document.body.style.overflow = 'auto';
 
     // Limpiar el identificador de la URL al cerrar el modal
-    window.history.pushState({}, '', `${window.location.pathname}?category=${lastCategory}`);
-
-    // Restaurar la última categoría seleccionada
-    currentCategory = lastCategory;
-    filterImages();
+    window.history.pushState({}, '', window.location.pathname);
   }
 
   // Función para copiar la URL actual de la página
@@ -831,11 +800,7 @@ permalink: /galeria/
 
         // Filtrar imágenes
         currentCategory = item.getAttribute('data-category');
-        lastCategory = currentCategory; // Guardar la última categoría seleccionada
         filterImages();
-
-        // Actualizar la URL con la categoría seleccionada
-        updateCategoryUrl(currentCategory);
       });
     });
   }
