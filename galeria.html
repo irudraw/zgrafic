@@ -335,6 +335,32 @@ permalink: /galeria/
     transform: scale(1.1);
   }
 
+  /* Icono de copiar imagen */
+  .copy-image-button {
+    position: absolute;
+    top: 20px;
+    right: 120px; /* Ajusta la posición para que no se superponga con otros botones */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de copiar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .copy-image-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
   /* Mensaje de URL copiada */
   .copy-message {
     position: fixed;
@@ -411,6 +437,10 @@ permalink: /galeria/
 
     .copy-url-button {
       right: 60px; /* Ajuste para dispositivos móviles */
+    }
+
+    .copy-image-button {
+      right: 110px; /* Ajuste para dispositivos móviles */
     }
   }
 </style>
@@ -489,6 +519,11 @@ permalink: /galeria/
       <!-- Botón de copiar URL -->
       <button class="copy-url-button" onclick="copyPageUrl()">
         <i class="fas fa-copy"></i> <!-- Ícono de copia de FontAwesome -->
+      </button>
+      
+      <!-- Botón de copiar imagen -->
+      <button class="copy-image-button" onclick="copyImageToClipboard()">
+        <i class="fas fa-image"></i> <!-- Ícono de imagen de FontAwesome -->
       </button>
       
       <div class="modal-body">
@@ -659,6 +694,40 @@ permalink: /galeria/
       })
       .catch(() => {
         alert('Error al copiar la URL');
+      });
+  }
+
+  // Función para copiar la imagen al portapapeles
+  function copyImageToClipboard() {
+    const modalImage = document.getElementById('modalImage');
+    const imageUrl = modalImage.src;
+
+    // Convertir la imagen en un Blob
+    fetch(imageUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        // Crear un objeto ClipboardItem con la imagen
+        const item = new ClipboardItem({ [blob.type]: blob });
+
+        // Copiar la imagen al portapapeles
+        navigator.clipboard.write([item])
+          .then(() => {
+            // Mostrar el mensaje de éxito
+            const copyMessage = document.getElementById('copyMessage');
+            copyMessage.textContent = 'Imagen copiada al portapapeles';
+            copyMessage.classList.add('show');
+
+            // Ocultar el mensaje después de 2 segundos
+            setTimeout(() => {
+              copyMessage.classList.remove('show');
+            }, 2000);
+          })
+          .catch(() => {
+            alert('Error al copiar la imagen');
+          });
+      })
+      .catch(() => {
+        alert('Error al obtener la imagen');
       });
   }
 
