@@ -517,12 +517,12 @@ permalink: /galeria/
       <button class="close-button" onclick="closeImage()">×</button>
       
       <!-- Botón de copiar URL -->
-      <button class="copy-url-button" onclick="copyPageUrl(event)">
+      <button class="copy-url-button" onclick="copyPageUrl()">
         <i class="fas fa-link"></i> <!-- Ícono de enlace de FontAwesome -->
       </button>
       
       <!-- Botón de copiar imagen -->
-      <button class="copy-image-button" onclick="copyImageToClipboard(event)">
+      <button class="copy-image-button" onclick="copyImageToClipboard()">
         <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
       </button>
       
@@ -560,13 +560,9 @@ permalink: /galeria/
   let loadedCount = 0;
   const batchSize = 4;
 
-  // Variables para el control de gestos
-  let touchStartX = 0;
-  let touchEndX = 0;
-  let isDragging = false;
-
   // Generador de códigos cortos
   function generateShortCode(filename) {
+    // Convertir el nombre del archivo a un código corto usando un hash simple
     let hash = 0;
     for (let i = 0; i < filename.length; i++) {
       hash = (hash << 5) - hash + filename.charCodeAt(i);
@@ -660,15 +656,6 @@ permalink: /galeria/
     updateImageCounter();
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
-
-    // Agregar event listeners para gestos táctiles y arrastre con el mouse
-    modal.addEventListener('touchstart', handleTouchStart);
-    modal.addEventListener('touchmove', handleTouchMove);
-    modal.addEventListener('touchend', handleTouchEnd);
-
-    modal.addEventListener('mousedown', handleMouseDown);
-    modal.addEventListener('mousemove', handleMouseMove);
-    modal.addEventListener('mouseup', handleMouseUp);
   }
 
   // Función para actualizar las etiquetas Open Graph
@@ -687,20 +674,10 @@ permalink: /galeria/
 
     // Limpiar el identificador de la URL al cerrar el modal
     window.history.pushState({}, '', window.location.pathname);
-
-    // Remover event listeners para gestos táctiles y arrastre con el mouse
-    modal.removeEventListener('touchstart', handleTouchStart);
-    modal.removeEventListener('touchmove', handleTouchMove);
-    modal.removeEventListener('touchend', handleTouchEnd);
-
-    modal.removeEventListener('mousedown', handleMouseDown);
-    modal.removeEventListener('mousemove', handleMouseMove);
-    modal.removeEventListener('mouseup', handleMouseUp);
   }
 
   // Función para copiar la URL actual de la página
-  function copyPageUrl(event) {
-    event.stopPropagation(); // Detener la propagación del evento
+  function copyPageUrl() {
     const currentUrl = window.location.href; // Obtener la URL actual
 
     // Copiar la URL al portapapeles
@@ -722,8 +699,7 @@ permalink: /galeria/
   }
 
   // Función para copiar la imagen al portapapeles
-  function copyImageToClipboard(event) {
-    event.stopPropagation(); // Detener la propagación del evento
+  function copyImageToClipboard() {
     const modalImage = document.getElementById('modalImage');
     const imageUrl = modalImage.src;
 
@@ -916,6 +892,11 @@ permalink: /galeria/
     }
   }
 
+  // Variables para el control de gestos
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let isDragging = false;
+
   // Detectar el inicio del gesto táctil
   function handleTouchStart(event) {
     touchStartX = event.touches[0].clientX;
@@ -971,4 +952,14 @@ permalink: /galeria/
 
     isDragging = false;
   }
+
+  // Agregar event listeners para gestos táctiles
+  document.addEventListener('touchstart', handleTouchStart);
+  document.addEventListener('touchmove', handleTouchMove);
+  document.addEventListener('touchend', handleTouchEnd);
+
+  // Agregar event listeners para arrastre con el mouse
+  document.addEventListener('mousedown', handleMouseDown);
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
 </script>
