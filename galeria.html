@@ -179,6 +179,14 @@ permalink: /galeria/
     background-color: white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.2s;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .image-container.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .image-container:hover {
@@ -437,6 +445,9 @@ permalink: /galeria/
         openImage(imageId, imagePath);
       }
     }
+
+    // Verificar visibilidad de las imágenes al cargar la página
+    checkVisibility();
   });
 
   // Cargar imágenes de 4 en 4
@@ -447,6 +458,7 @@ permalink: /galeria/
     const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
     imagesToLoad.forEach(imgContainer => {
       imgContainer.classList.remove('hidden');
+      checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
     });
 
     loadedCount += batchSize;
@@ -459,6 +471,18 @@ permalink: /galeria/
     if (scrollTop + clientHeight >= scrollHeight - 100) {
       loadNextBatch();
     }
+    checkVisibility(); // Verificar visibilidad al hacer scroll
+  }
+
+  // Verificar visibilidad de las imágenes
+  function checkVisibility() {
+    const images = document.querySelectorAll('.image-container');
+    images.forEach(image => {
+      const rect = image.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
+        image.classList.add('visible');
+      }
+    });
   }
 
   // Modificar la función openImage para usar el identificador único
