@@ -607,6 +607,12 @@ permalink: /galeria/
       const matchesSearch = !searchTerm || title.includes(searchTerm);
 
       image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
+      
+      // Si la imagen está oculta, quitar la clase 'visible'
+      if (image.classList.contains('hidden')) {
+        image.classList.remove('visible');
+      }
+
       return matchesCategory && matchesSearch;
     }).length;
 
@@ -623,6 +629,9 @@ permalink: /galeria/
     }
 
     searchResults.textContent = message;
+
+    // Verificar visibilidad de las imágenes después de filtrar
+    checkVisibility();
   }
 
   function clearSearch() {
