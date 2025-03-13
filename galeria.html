@@ -573,17 +573,6 @@ permalink: /galeria/
   let loadedCount = 0;
   const batchSize = 6;
 
-  // Generador de códigos cortos
-  function generateShortCode(filename) {
-    // Convertir el nombre del archivo a un código corto usando un hash simple
-    let hash = 0;
-    for (let i = 0; i < filename.length; i++) {
-      hash = (hash << 5) - hash + filename.charCodeAt(i);
-      hash |= 0; // Convertir a entero de 32 bits
-    }
-    return Math.abs(hash).toString(36).substring(0, 8); // Código de 8 caracteres
-  }
-
   // Función para obtener el parámetro de la URL
   function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -601,12 +590,14 @@ permalink: /galeria/
       if (categoryButton) {
         categoryButton.classList.add('active');
         currentCategory = categoryFromUrl;
-        filterImages();
       }
     }
 
     // Recopilar todas las imágenes
     images = Array.from(document.querySelectorAll('.image-container'));
+
+    // Filtrar imágenes según la categoría inicial
+    filterImages();
 
     // Event listeners
     document.addEventListener('keydown', handleKeyPress);
@@ -634,236 +625,7 @@ permalink: /galeria/
     checkVisibility();
   });
 
-  // Cargar imágenes de 4 en 4
-  function loadNextBatch() {
-    if (isLoading) return;
-    isLoading = true;
-
-    const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
-    imagesToLoad.forEach(imgContainer => {
-      imgContainer.classList.remove('hidden');
-      checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
-    });
-
-    loadedCount += batchSize;
-    isLoading = false;
-  }
-
-  // Manejar el scroll para cargar más imágenes
-  function handleScroll() {
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
-      loadNextBatch();
-    }
-    checkVisibility(); // Verificar visibilidad al hacer scroll
-  }
-
-  // Verificar visibilidad de las imágenes
-  function checkVisibility() {
-    const images = document.querySelectorAll('.image-container');
-    images.forEach(image => {
-      const rect = image.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
-        image.classList.add('visible');
-      }
-    });
-  }
-
-  // Modificar la función openImage para usar el identificador único
-  function openImage(imageId, imagePath) {
-    const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
-
-    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
-
-    modalImage.src = imagePath;
-
-    // Actualizar la URL con el identificador de la imagen
-    const newUrl = `${window.location.pathname}?id=${imageId}`;
-    window.history.pushState({}, '', newUrl);
-
-    // Actualizar las etiquetas Open Graph
-    updateOpenGraphTags(imagePath, newUrl);
-
-    updateImageCounter();
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
-
-  // Función para actualizar las etiquetas Open Graph
-  function updateOpenGraphTags(imageUrl, pageUrl) {
-    const ogImage = document.querySelector('meta[property="og:image"]');
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-
-    ogImage.setAttribute('content', imageUrl); // Actualizar la URL de la imagen
-    ogUrl.setAttribute('content', pageUrl); // Actualizar la URL de la página
-  }
-
-  function closeImage() {
-    const modal = document.getElementById('imageModal');
-    modal.classList.remove('show');
-    document.body.style.overflow = 'auto';
-
-    // Limpiar el identificador de la URL al cerrar el modal
-    window.history.pushState({}, '', window.location.pathname);
-  }
-
-  // Función para copiar la URL actual de la página
-  function copyPageUrl() {
-    const currentUrl = window.location.href; // Obtener la URL actual
-
-    // Copiar la URL al portapapeles
-    navigator.clipboard.writeText(currentUrl)
-      .then(() => {
-        // Mostrar el mensaje de URL copiada
-        const copyMessage = document.getElementById('copyMessage');
-        copyMessage.textContent = 'URL copiada al portapapeles';
-        copyMessage.classList.add('show');
-
-        // Ocultar el mensaje después de 2 segundos
-        setTimeout(() => {
-          copyMessage.classList.remove('show');
-        }, 2000);
-      })
-      .catch(() => {
-        alert('Error al copiar la URL');
-      });
-  }
-
-  // Función para copiar la imagen al portapapeles
-  function copyImageToClipboard() {
-    const modalImage = document.getElementById('modalImage');
-    const imageUrl = modalImage.src;
-
-    // Convertir la imagen en un Blob
-    fetch(imageUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        // Crear un objeto ClipboardItem con la imagen
-        const item = new ClipboardItem({ [blob.type]: blob });
-
-        // Copiar la imagen al portapapeles
-        navigator.clipboard.write([item])
-          .then(() => {
-            // Mostrar el mensaje de éxito
-            const copyMessage = document.getElementById('copyMessage');
-            copyMessage.textContent = 'Imagen copiada al portapapeles';
-            copyMessage.classList.add('show');
-
-            // Ocultar el mensaje después de 2 segundos
-            setTimeout(() => {
-              copyMessage.classList.remove('show');
-            }, 2000);
-          })
-          .catch(() => {
-            alert('Error al copiar la imagen');
-          });
-      })
-      .catch(() => {
-        alert('Error al obtener la imagen');
-      });
-  }
-
-  function navigateImage(direction) {
-    const visibleImages = getVisibleImages();
-    let currentIndexInVisible = visibleImages.findIndex(img =>
-      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
-    );
-
-    currentIndexInVisible = (currentIndexInVisible + direction + visibleImages.length) % visibleImages.length;
-    const newImage = visibleImages[currentIndexInVisible];
-
-    const imageId = newImage.getAttribute('data-id');
-    const imagePath = newImage.querySelector('img').src;
-
-    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
-
-    const modalImage = document.getElementById('modalImage');
-
-    modalImage.src = imagePath;
-
-    // Actualizar la URL con el nuevo identificador
-    const newUrl = `${window.location.pathname}?id=${imageId}`;
-    window.history.pushState({}, '', newUrl);
-
-    // Actualizar las etiquetas Open Graph
-    updateOpenGraphTags(imagePath, newUrl);
-
-    // Precargar siguientes imágenes
-    preloadAdjacentImages(currentImageIndex);
-    updateImageCounter();
-  }
-
-  function handleKeyPress(e) {
-    if (!document.getElementById('imageModal').classList.contains('show')) return;
-
-    switch (e.key) {
-      case 'Escape':
-        closeImage();
-        break;
-      case 'ArrowLeft':
-        navigateImage(-1);
-        break;
-      case 'ArrowRight':
-        navigateImage(1);
-        break;
-    }
-  }
-
-  // Añadir contador de imágenes
-  function updateImageCounter() {
-    const visibleImages = getVisibleImages();
-    const currentPosition = visibleImages.findIndex(img =>
-      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
-    ) + 1;
-
-    const counter = document.querySelector('.image-counter');
-    counter.textContent = `${currentPosition} de ${visibleImages.length}`;
-  }
-
-  // Funciones de filtrado y búsqueda
-  function setupCategoryFilters() {
-    const categoryButtons = document.querySelectorAll('.category-button');
-    categoryButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
-
-        // Actualizar clase activa
-        categoryButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-
-        // Obtener la categoría seleccionada
-        const selectedCategory = button.getAttribute('data-category');
-
-        // Actualizar la URL con el parámetro de categoría
-        const newUrl = selectedCategory === 'all' ? 
-          `${window.location.pathname}` : 
-          `${window.location.pathname}?category=${selectedCategory}`;
-        window.history.pushState({}, '', newUrl);
-
-        // Filtrar imágenes
-        currentCategory = selectedCategory;
-        filterImages();
-      });
-    });
-  }
-
-  function setupSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-
-    searchInput.addEventListener('input', (e) => {
-      searchTerm = e.target.value.toLowerCase().trim();
-      filterImages();
-
-      // Actualizar resultados
-      const visibleCount = getVisibleImages().length;
-      searchResults.textContent = searchTerm ?
-        `Encontradas ${visibleCount} imágenes para "${searchTerm}"` :
-        'Mostrando todas las imágenes';
-    });
-  }
-
+  // Función para filtrar imágenes
   function filterImages() {
     const visibleCount = images.filter(image => {
       const matchesCategory = currentCategory === 'all' ||
@@ -900,39 +662,31 @@ permalink: /galeria/
     checkVisibility();
   }
 
-  function clearSearch() {
-    const searchInput = document.getElementById('searchInput');
-    searchInput.value = '';
-    searchTerm = '';
-    filterImages();
-  }
+  // Función para configurar los filtros de categoría
+  function setupCategoryFilters() {
+    const categoryButtons = document.querySelectorAll('.category-button');
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
 
-  // Funciones auxiliares
-  function getVisibleImages() {
-    return images.filter(img => !img.classList.contains('hidden'));
-  }
+        // Actualizar clase activa
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
 
-  function preloadAdjacentImages(currentIndex) {
-    const visibleImages = getVisibleImages();
-    const preloadCount = 2; // Número de imágenes a precargar en cada dirección
+        // Obtener la categoría seleccionada
+        const selectedCategory = button.getAttribute('data-category');
 
-    for (let i = 1; i <= preloadCount; i++) {
-      // Precargar imágenes siguientes
-      const nextIndex = (currentIndex + i) % visibleImages.length;
-      const nextImage = visibleImages[nextIndex].querySelector('img');
-      if (nextImage) {
-        const img = new Image();
-        img.src = nextImage.src;
-      }
+        // Actualizar la URL con el parámetro de categoría
+        const newUrl = selectedCategory === 'all' ? 
+          `${window.location.pathname}` : 
+          `${window.location.pathname}?category=${selectedCategory}`;
+        window.history.pushState({}, '', newUrl);
 
-      // Precargar imágenes anteriores
-      const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
-      const prevImage = visibleImages[prevIndex].querySelector('img');
-      if (prevImage) {
-        const img = new Image();
-        img.src = prevImage.src;
-      }
-    }
+        // Filtrar imágenes
+        currentCategory = selectedCategory;
+        filterImages();
+      });
+    });
   }
 
   // Manejar el cambio de estado en la historia del navegador
