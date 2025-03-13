@@ -586,8 +586,26 @@ permalink: /galeria/
 
   // Inicialización
   document.addEventListener('DOMContentLoaded', () => {
+    // Obtener la categoría de la URL
+    const categoryFromUrl = getQueryParam('category');
+
+    // Si hay una categoría en la URL, activar el botón correspondiente
+    if (categoryFromUrl) {
+      const categoryButton = document.querySelector(`.category-button[data-category="${categoryFromUrl}"]`);
+      if (categoryButton) {
+        // Desactivar todas las categorías primero
+        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+        // Activar la categoría correspondiente
+        categoryButton.classList.add('active');
+        currentCategory = categoryFromUrl;
+      }
+    }
+
     // Recopilar todas las imágenes
     images = Array.from(document.querySelectorAll('.image-container'));
+
+    // Filtrar imágenes según la categoría inicial
+    filterImages();
 
     // Event listeners
     document.addEventListener('keydown', handleKeyPress);
@@ -613,6 +631,107 @@ permalink: /galeria/
 
     // Verificar visibilidad de las imágenes al cargar la página
     checkVisibility();
+  });
+
+  // Función para obtener el parámetro de la URL
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  // Función para filtrar imágenes
+  function filterImages() {
+    const visibleCount = images.filter(image => {
+      const matchesCategory = currentCategory === 'all' ||
+        image.getAttribute('data-category') === currentCategory;
+
+      const title = image.getAttribute('data-title').toLowerCase();
+      const matchesSearch = !searchTerm || title.includes(searchTerm);
+
+      image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
+      
+      // Si la imagen está oculta, quitar la clase 'visible'
+      if (image.classList.contains('hidden')) {
+        image.classList.remove('visible');
+      } else {
+        // Si la imagen no está oculta, agregar la clase 'visible'
+        image.classList.add('visible');
+      }
+
+      return matchesCategory && matchesSearch;
+    }).length;
+
+    // Actualizar contador de resultados
+    const searchResults = document.getElementById('searchResults');
+    let message = 'Mostrando todas las imágenes';
+
+    if (currentCategory !== 'all' && searchTerm) {
+      message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
+    } else if (currentCategory !== 'all') {
+      message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
+    } else if (searchTerm) {
+      message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
+    }
+
+    searchResults.textContent = message;
+
+    // Verificar visibilidad de las imágenes después de filtrar
+    checkVisibility();
+  }
+
+  // Función para configurar los filtros de categoría
+  function setupCategoryFilters() {
+    const categoryButtons = document.querySelectorAll('.category-button');
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
+
+        // Desactivar todas las categorías primero
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+
+        // Activar la categoría seleccionada
+        button.classList.add('active');
+
+        // Obtener la categoría seleccionada
+        const selectedCategory = button.getAttribute('data-category');
+
+        // Actualizar la URL con el parámetro de categoría
+        const newUrl = selectedCategory === 'all' ? 
+          `${window.location.pathname}` : 
+          `${window.location.pathname}?category=${selectedCategory}`;
+        window.history.pushState({}, '', newUrl);
+
+        // Filtrar imágenes
+        currentCategory = selectedCategory;
+        filterImages();
+      });
+    });
+  }
+
+  // Manejar el cambio de estado en la historia del navegador
+  window.addEventListener('popstate', () => {
+    const categoryFromUrl = getQueryParam('category');
+    if (categoryFromUrl) {
+      const categoryButton = document.querySelector(`.category-button[data-category="${categoryFromUrl}"]`);
+      if (categoryButton) {
+        // Desactivar todas las categorías primero
+        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+        // Activar la categoría correspondiente
+        categoryButton.classList.add('active');
+        currentCategory = categoryFromUrl;
+        filterImages();
+      }
+    } else {
+      const allButton = document.querySelector('.category-button[data-category="all"]');
+      if (allButton) {
+        // Desactivar todas las categorías primero
+        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+        // Activar la categoría "Todas las imágenes"
+        allButton.classList.add('active');
+        currentCategory = 'all';
+        filterImages();
+      }
+    }
   });
 
   // Cargar imágenes de 4 en 4
@@ -800,83 +919,6 @@ permalink: /galeria/
 
     const counter = document.querySelector('.image-counter');
     counter.textContent = `${currentPosition} de ${visibleImages.length}`;
-  }
-
-  // Funciones de filtrado y búsqueda
-  function setupCategoryFilters() {
-    const categoryButtons = document.querySelectorAll('.category-button');
-    categoryButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
-
-        // Actualizar clase activa
-        categoryButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-
-        // Filtrar imágenes
-        currentCategory = button.getAttribute('data-category');
-        filterImages();
-      });
-    });
-  }
-
-  function setupSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-
-    searchInput.addEventListener('input', (e) => {
-      searchTerm = e.target.value.toLowerCase().trim();
-      filterImages();
-
-      // Actualizar resultados
-      const visibleCount = getVisibleImages().length;
-      searchResults.textContent = searchTerm ?
-        `Encontradas ${visibleCount} imágenes para "${searchTerm}"` :
-        'Mostrando todas las imágenes';
-    });
-  }
-
-  function filterImages() {
-    const visibleCount = images.filter(image => {
-      const matchesCategory = currentCategory === 'all' ||
-        image.getAttribute('data-category') === currentCategory;
-
-      const title = image.getAttribute('data-title').toLowerCase();
-      const matchesSearch = !searchTerm || title.includes(searchTerm);
-
-      image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
-      
-      // Si la imagen está oculta, quitar la clase 'visible'
-      if (image.classList.contains('hidden')) {
-        image.classList.remove('visible');
-      }
-
-      return matchesCategory && matchesSearch;
-    }).length;
-
-    // Actualizar contador de resultados
-    const searchResults = document.getElementById('searchResults');
-    let message = 'Mostrando todas las imágenes';
-
-    if (currentCategory !== 'all' && searchTerm) {
-      message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
-    } else if (currentCategory !== 'all') {
-      message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
-    } else if (searchTerm) {
-      message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
-    }
-
-    searchResults.textContent = message;
-
-    // Verificar visibilidad de las imágenes después de filtrar
-    checkVisibility();
-  }
-
-  function clearSearch() {
-    const searchInput = document.getElementById('searchInput');
-    searchInput.value = '';
-    searchTerm = '';
-    filterImages();
   }
 
   // Funciones auxiliares
