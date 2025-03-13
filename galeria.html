@@ -38,13 +38,6 @@ permalink: /galeria/
     font-weight: 500;
   }
 
-  /* Estilo para el texto de resultados de búsqueda */
-  .search-results {
-    font-size: 12px; /* Reducir el tamaño de la fuente */
-    color: #e0e0e0; /* Color del texto */
-    margin-top: 8px; /* Espaciado superior */
-  }
-
   .page-container {
     display: flex;
     min-height: 100vh;
@@ -62,35 +55,6 @@ permalink: /galeria/
     top: 0;
     height: 100vh;
     overflow-y: auto;
-  }
-
-  .search-container {
-    margin-bottom: 20px;
-  }
-
-  .search-wrapper {
-    position: relative;
-  }
-
-  .search-wrapper input {
-    width: 100%;
-    padding: 8px 30px 8px 10px;
-    border: 1px solid #444; /* Borde más oscuro */
-    border-radius: 4px;
-    background-color: #333; /* Fondo oscuro para el input */
-    color: #e0e0e0; /* Texto claro */
-    font-size: 14px; /* Reducir el tamaño de la letra */
-  }
-
-  .search-clear {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #999; /* Color del ícono de limpiar */
-    cursor: pointer;
   }
 
   /* Estilos para los botones de categoría */
@@ -459,18 +423,8 @@ permalink: /galeria/
 </style>
 
 <div class="page-container">
-  <!-- Sidebar con búsqueda y categorías -->
+  <!-- Sidebar con categorías -->
   <div class="sidebar-menu">
-    <div class="search-container">
-      <div class="search-wrapper">
-        <input type="text" id="searchInput" placeholder="Buscar imágenes...">
-        <button class="search-clear" onclick="clearSearch()">×</button>
-      </div>
-      <div id="searchResults" class="search-results">
-        Mostrando todas las imágenes
-      </div>
-    </div>
-
     <div class="categories">
       <h6>Carpetas</h6>
       <div class="category-list">
@@ -568,7 +522,6 @@ permalink: /galeria/
   let currentImageIndex = 0;
   let images = [];
   let currentCategory = 'all';
-  let searchTerm = '';
   let isLoading = false;
   let loadedCount = 0;
   const batchSize = 6;
@@ -610,7 +563,6 @@ permalink: /galeria/
     // Event listeners
     document.addEventListener('keydown', handleKeyPress);
     setupCategoryFilters();
-    setupSearch();
 
     // Cargar el primer lote de imágenes
     loadNextBatch();
@@ -641,14 +593,11 @@ permalink: /galeria/
 
   // Función para filtrar imágenes
   function filterImages() {
-    const visibleCount = images.filter(image => {
+    images.forEach(image => {
       const matchesCategory = currentCategory === 'all' ||
         image.getAttribute('data-category') === currentCategory;
 
-      const title = image.getAttribute('data-title').toLowerCase();
-      const matchesSearch = !searchTerm || title.includes(searchTerm.toLowerCase());
-
-      image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
+      image.classList.toggle('hidden', !matchesCategory);
       
       // Si la imagen está oculta, quitar la clase 'visible'
       if (image.classList.contains('hidden')) {
@@ -657,23 +606,7 @@ permalink: /galeria/
         // Si la imagen no está oculta, agregar la clase 'visible'
         image.classList.add('visible');
       }
-
-      return matchesCategory && matchesSearch;
-    }).length;
-
-    // Actualizar contador de resultados
-    const searchResults = document.getElementById('searchResults');
-    let message = 'Mostrando todas las imágenes';
-
-    if (currentCategory !== 'all' && searchTerm) {
-      message = `Encontradas ${visibleCount} imágenes en ${currentCategory} para "${searchTerm}"`;
-    } else if (currentCategory !== 'all') {
-      message = `Mostrando ${visibleCount} imágenes en ${currentCategory}`;
-    } else if (searchTerm) {
-      message = `Encontradas ${visibleCount} imágenes para "${searchTerm}"`;
-    }
-
-    searchResults.textContent = message;
+    });
 
     // Verificar visibilidad de las imágenes después de filtrar
     checkVisibility();
@@ -706,32 +639,6 @@ permalink: /galeria/
         filterImages();
       });
     });
-  }
-
-  // Función para configurar el buscador
-  function setupSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-
-    searchInput.addEventListener('input', (e) => {
-      searchTerm = e.target.value.trim();
-      filterImages();
-    });
-
-    // Limpiar el buscador
-    document.querySelector('.search-clear').addEventListener('click', () => {
-      searchInput.value = '';
-      searchTerm = '';
-      filterImages();
-    });
-  }
-
-  // Función para limpiar el buscador
-  function clearSearch() {
-    const searchInput = document.getElementById('searchInput');
-    searchInput.value = '';
-    searchTerm = '';
-    filterImages();
   }
 
   // Cargar imágenes de 4 en 4
