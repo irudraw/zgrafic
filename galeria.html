@@ -474,7 +474,7 @@ permalink: /galeria/
     <div class="categories">
       <h6>Carpetas</h6>
       <div class="category-list">
-        <a href="#" class="category-button active" data-category="all">
+        <a href="{{ site.url }}/galeria/" class="category-button active" data-category="all">
           <i class="fas fa-folder"></i>
           <span>Todas las imágenes</span>
         </a>
@@ -489,7 +489,7 @@ permalink: /galeria/
         {% endfor %}
         {% assign sorted_categories = categories | sort %}
         {% for category in sorted_categories %}
-          <a href="#" class="category-button" data-category="{{ category | slugify }}">
+          <a href="{{ site.url }}/galeria/?category={{ category | slugify }}" class="category-button" data-category="{{ category | slugify }}">
             <i class="fas fa-folder"></i>
             <span>{{ category | capitalize }}</span>
           </a>
@@ -584,8 +584,27 @@ permalink: /galeria/
     return Math.abs(hash).toString(36).substring(0, 8); // Código de 8 caracteres
   }
 
+  // Función para obtener el parámetro de la URL
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
   // Inicialización
   document.addEventListener('DOMContentLoaded', () => {
+    // Obtener la categoría de la URL
+    const categoryFromUrl = getQueryParam('category');
+
+    // Si hay una categoría en la URL, activar el botón correspondiente
+    if (categoryFromUrl) {
+      const categoryButton = document.querySelector(`.category-button[data-category="${categoryFromUrl}"]`);
+      if (categoryButton) {
+        categoryButton.classList.add('active');
+        currentCategory = categoryFromUrl;
+        filterImages();
+      }
+    }
+
     // Recopilar todas las imágenes
     images = Array.from(document.querySelectorAll('.image-container'));
 
@@ -813,8 +832,17 @@ permalink: /galeria/
         categoryButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
 
+        // Obtener la categoría seleccionada
+        const selectedCategory = button.getAttribute('data-category');
+
+        // Actualizar la URL con el parámetro de categoría
+        const newUrl = selectedCategory === 'all' ? 
+          `${window.location.pathname}` : 
+          `${window.location.pathname}?category=${selectedCategory}`;
+        window.history.pushState({}, '', newUrl);
+
         // Filtrar imágenes
-        currentCategory = button.getAttribute('data-category');
+        currentCategory = selectedCategory;
         filterImages();
       });
     });
@@ -906,4 +934,24 @@ permalink: /galeria/
       }
     }
   }
+
+  // Manejar el cambio de estado en la historia del navegador
+  window.addEventListener('popstate', () => {
+    const categoryFromUrl = getQueryParam('category');
+    if (categoryFromUrl) {
+      const categoryButton = document.querySelector(`.category-button[data-category="${categoryFromUrl}"]`);
+      if (categoryButton) {
+        categoryButton.classList.add('active');
+        currentCategory = categoryFromUrl;
+        filterImages();
+      }
+    } else {
+      const allButton = document.querySelector('.category-button[data-category="all"]');
+      if (allButton) {
+        allButton.classList.add('active');
+        currentCategory = 'all';
+        filterImages();
+      }
+    }
+  });
 </script>
