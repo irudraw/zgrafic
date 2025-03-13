@@ -648,8 +648,10 @@ permalink: /galeria/
 
     const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
     imagesToLoad.forEach(imgContainer => {
-      imgContainer.classList.remove('hidden');
-      checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
+      if (!imgContainer.classList.contains('hidden')) {
+        imgContainer.classList.remove('hidden');
+        checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
+      }
     });
 
     loadedCount += batchSize;
