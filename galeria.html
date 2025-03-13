@@ -588,6 +588,9 @@ permalink: /galeria/
     if (categoryFromUrl) {
       const categoryButton = document.querySelector(`.category-button[data-category="${categoryFromUrl}"]`);
       if (categoryButton) {
+        // Desactivar todas las categorías primero
+        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+        // Activar la categoría correspondiente
         categoryButton.classList.add('active');
         currentCategory = categoryFromUrl;
       }
@@ -669,8 +672,10 @@ permalink: /galeria/
       button.addEventListener('click', (e) => {
         e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
 
-        // Actualizar clase activa
+        // Desactivar todas las categorías primero
         categoryButtons.forEach(btn => btn.classList.remove('active'));
+
+        // Activar la categoría seleccionada
         button.classList.add('active');
 
         // Obtener la categoría seleccionada
@@ -695,6 +700,9 @@ permalink: /galeria/
     if (categoryFromUrl) {
       const categoryButton = document.querySelector(`.category-button[data-category="${categoryFromUrl}"]`);
       if (categoryButton) {
+        // Desactivar todas las categorías primero
+        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+        // Activar la categoría correspondiente
         categoryButton.classList.add('active');
         currentCategory = categoryFromUrl;
         filterImages();
@@ -702,6 +710,9 @@ permalink: /galeria/
     } else {
       const allButton = document.querySelector('.category-button[data-category="all"]');
       if (allButton) {
+        // Desactivar todas las categorías primero
+        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+        // Activar la categoría "Todas las imágenes"
         allButton.classList.add('active');
         currentCategory = 'all';
         filterImages();
