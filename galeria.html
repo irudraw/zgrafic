@@ -646,7 +646,7 @@ permalink: /galeria/
         image.getAttribute('data-category') === currentCategory;
 
       const title = image.getAttribute('data-title').toLowerCase();
-      const matchesSearch = !searchTerm || title.includes(searchTerm);
+      const matchesSearch = !searchTerm || title.includes(searchTerm.toLowerCase());
 
       image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
       
@@ -708,31 +708,31 @@ permalink: /galeria/
     });
   }
 
-  // Manejar el cambio de estado en la historia del navegador
-  window.addEventListener('popstate', () => {
-    const categoryFromUrl = getQueryParam('category');
-    if (categoryFromUrl) {
-      const categoryButton = document.querySelector(`.category-button[data-category="${categoryFromUrl}"]`);
-      if (categoryButton) {
-        // Desactivar todas las categorías primero
-        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
-        // Activar la categoría correspondiente
-        categoryButton.classList.add('active');
-        currentCategory = categoryFromUrl;
-        filterImages();
-      }
-    } else {
-      const allButton = document.querySelector('.category-button[data-category="all"]');
-      if (allButton) {
-        // Desactivar todas las categorías primero
-        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
-        // Activar la categoría "Todas las imágenes"
-        allButton.classList.add('active');
-        currentCategory = 'all';
-        filterImages();
-      }
-    }
-  });
+  // Función para configurar el buscador
+  function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', (e) => {
+      searchTerm = e.target.value.trim();
+      filterImages();
+    });
+
+    // Limpiar el buscador
+    document.querySelector('.search-clear').addEventListener('click', () => {
+      searchInput.value = '';
+      searchTerm = '';
+      filterImages();
+    });
+  }
+
+  // Función para limpiar el buscador
+  function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = '';
+    searchTerm = '';
+    filterImages();
+  }
 
   // Cargar imágenes de 4 en 4
   function loadNextBatch() {
