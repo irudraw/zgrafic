@@ -642,6 +642,9 @@ permalink: /galeria/
       // Si la imagen está oculta, quitar la clase 'visible'
       if (image.classList.contains('hidden')) {
         image.classList.remove('visible');
+      } else {
+        // Si la imagen no está oculta, agregar la clase 'visible'
+        image.classList.add('visible');
       }
 
       return matchesCategory && matchesSearch;
