@@ -690,14 +690,26 @@ permalink: /galeria/
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
-    modalImage.src = imagePath;
+    // Verificar si hay un parámetro de tamaño en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sizeParam = urlParams.get('size'); // Ejemplo: ?size=x400
+
+    let finalImagePath = imagePath;
+
+    // Si hay un parámetro de tamaño, ajustar la ruta de la imagen
+    if (sizeParam && sizeParam.startsWith('x')) {
+      const height = sizeParam.substring(1); // Extraer el número después de 'x'
+      finalImagePath = imagePath.replace(/(\.\w+)$/, `x${height}$1`); // Añadir el tamaño a la ruta de la imagen
+    }
+
+    modalImage.src = finalImagePath;
 
     // Actualizar la URL con el identificador de la imagen
     const newUrl = `${window.location.pathname}?id=${imageId}`;
     window.history.pushState({}, '', newUrl);
 
     // Actualizar las etiquetas Open Graph
-    updateOpenGraphTags(imagePath, newUrl);
+    updateOpenGraphTags(finalImagePath, newUrl);
 
     updateImageCounter();
     modal.classList.add('show');
@@ -788,7 +800,17 @@ permalink: /galeria/
     const newImage = visibleImages[currentIndexInVisible];
 
     const imageId = newImage.getAttribute('data-id');
-    const imagePath = newImage.querySelector('img').src;
+    let imagePath = newImage.querySelector('img').src;
+
+    // Verificar si hay un parámetro de tamaño en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sizeParam = urlParams.get('size'); // Ejemplo: ?size=x400
+
+    // Si hay un parámetro de tamaño, ajustar la ruta de la imagen
+    if (sizeParam && sizeParam.startsWith('x')) {
+      const height = sizeParam.substring(1); // Extraer el número después de 'x'
+      imagePath = imagePath.replace(/(\.\w+)$/, `x${height}$1`); // Añadir el tamaño a la ruta de la imagen
+    }
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
