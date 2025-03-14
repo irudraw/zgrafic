@@ -754,73 +754,73 @@ permalink: /galeria/
 
   // Función para copiar la imagen con marca de agua
   function copyImageToClipboard() {
-    const modalImage = document.getElementById('modalImage');
-    const imageUrl = modalImage.src;
+  const modalImage = document.getElementById('modalImage');
+  const imageUrl = modalImage.src;
 
-    // Crear un nuevo canvas
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+  // Crear un nuevo canvas
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
-    // Cargar la imagen
-    const img = new Image();
-    img.crossOrigin = 'anonymous'; // Permitir el uso de imágenes de diferentes dominios
-    img.src = imageUrl;
+  // Cargar la imagen
+  const img = new Image();
+  img.crossOrigin = 'anonymous'; // Permitir el uso de imágenes de diferentes dominios
+  img.src = imageUrl;
 
-    img.onload = () => {
-      // Configurar el tamaño del canvas
-      canvas.width = img.width;
-      canvas.height = img.height;
+  img.onload = () => {
+    // Configurar el tamaño del canvas
+    canvas.width = img.width;
+    canvas.height = img.height;
 
-      // Dibujar la imagen en el canvas
-      ctx.drawImage(img, 0, 0);
+    // Dibujar la imagen en el canvas
+    ctx.drawImage(img, 0, 0);
 
-      // Configurar el estilo de la marca de agua
-      ctx.textAlign = 'center'; // Centrar el texto horizontalmente
+    // Configurar el estilo de la marca de agua
+    ctx.textAlign = 'center'; // Centrar el texto horizontalmente
 
-      // Agregar la marca de agua en tres posiciones:
-      // 1. Arriba (30px)
-      ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-      ctx.fillText('ZGrafic', canvas.width / 2, 40); // 40 es la posición vertical desde arriba
+    // Agregar la marca de agua en tres posiciones:
+    // 1. Arriba (mitad de la parte superior)
+    ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    ctx.fillText('ZGrafic', canvas.width / 2, canvas.height * 0.25); // 25% desde la parte superior
 
-      // 2. En el medio (50px)
-      ctx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height / 2 + 25); // Ajuste vertical para centrar
+    // 2. En el medio (50px)
+    ctx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    ctx.fillText('ZGrafic', canvas.width / 2, canvas.height / 2 + 25); // Ajuste vertical para centrar
 
-      // 3. Abajo (30px)
-      ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height - 20); // 20 es la posición vertical desde abajo
+    // 3. Abajo (mitad de la parte inferior)
+    ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    ctx.fillText('ZGrafic', canvas.width / 2, canvas.height * 0.75); // 75% desde la parte superior
 
-      // Convertir el canvas a un Blob
-      canvas.toBlob((blob) => {
-        // Crear un objeto ClipboardItem con la imagen
-        const item = new ClipboardItem({ [blob.type]: blob });
+    // Convertir el canvas a un Blob
+    canvas.toBlob((blob) => {
+      // Crear un objeto ClipboardItem con la imagen
+      const item = new ClipboardItem({ [blob.type]: blob });
 
-        // Copiar la imagen al portapapeles
-        navigator.clipboard.write([item])
-          .then(() => {
-            // Mostrar el mensaje de éxito
-            const copyMessage = document.getElementById('copyMessage');
-            copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
-            copyMessage.classList.add('show');
+      // Copiar la imagen al portapapeles
+      navigator.clipboard.write([item])
+        .then(() => {
+          // Mostrar el mensaje de éxito
+          const copyMessage = document.getElementById('copyMessage');
+          copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
+          copyMessage.classList.add('show');
 
-            // Ocultar el mensaje después de 2 segundos
-            setTimeout(() => {
-              copyMessage.classList.remove('show');
-            }, 2000);
-          })
-          .catch(() => {
-            alert('Error al copiar la imagen');
-          });
-      }, 'image/png');
-    };
+          // Ocultar el mensaje después de 2 segundos
+          setTimeout(() => {
+            copyMessage.classList.remove('show');
+          }, 2000);
+        })
+        .catch(() => {
+          alert('Error al copiar la imagen');
+        });
+    }, 'image/png');
+  };
 
-    img.onerror = () => {
-      alert('Error al cargar la imagen');
-    };
-  }
+  img.onerror = () => {
+    alert('Error al cargar la imagen');
+  };
+}
 
   function navigateImage(direction) {
     const visibleImages = getVisibleImages();
