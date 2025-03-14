@@ -12,8 +12,8 @@ permalink: /galeria/
 <!-- Agrega FontAwesome en el head de tu HTML -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-<!-- Agrega la fuente Poppins de Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Agrega la fuente Paytone One de Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" rel="stylesheet">
 
 <!-- Etiquetas Open Graph dinámicas -->
 <meta property="og:title" content="Galería de Imágenes">
@@ -775,18 +775,22 @@ permalink: /galeria/
       ctx.drawImage(img, 0, 0);
 
       // Configurar el estilo de la marca de agua
-      ctx.font = '35px sans-serif';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'center'; // Centrar el texto horizontalmente
 
       // Agregar la marca de agua en tres posiciones:
-      // 1. Arriba
-      ctx.fillText('ZGrafic', canvas.width / 2, 30); // 30 es la posición vertical desde arriba
+      // 1. Arriba (30px)
+      ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+      ctx.fillText('ZGrafic', canvas.width / 2, 40); // 40 es la posición vertical desde arriba
 
-      // 2. En el medio
-      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height / 2);
+      // 2. En el medio (50px)
+      ctx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height / 2 + 25); // Ajuste vertical para centrar
 
-      // 3. Abajo
+      // 3. Abajo (30px)
+      ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
       ctx.fillText('ZGrafic', canvas.width / 2, canvas.height - 20); // 20 es la posición vertical desde abajo
 
       // Convertir el canvas a un Blob
