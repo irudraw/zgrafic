@@ -529,6 +529,15 @@ permalink: /galeria/
             e.preventDefault(); // Evita que se abra el menú contextual
         });
   
+  // Deshabilitar el arrastre de imágenes
+document.addEventListener('dragstart', function(e) {
+    if (e.target.tagName === 'IMG') { // Verifica si el elemento arrastrado es una imagen
+        e.preventDefault(); // Evita que la imagen sea arrastrada
+    }
+});
+
+  
+  
   // Variables globales
   let currentImageIndex = 0;
   let images = [];
