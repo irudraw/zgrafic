@@ -420,6 +420,40 @@ permalink: /galeria/
       right: 110px; /* Ajuste para dispositivos móviles */
     }
   }
+
+  /* Estilos para el buscador */
+  .search-container {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  #searchInput {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    flex: 1;
+  }
+
+  #searchInput::placeholder {
+    color: #888;
+  }
+
+  button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: #333;
+    color: #e0e0e0;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  button:hover {
+    background-color: #444;
+  }
 </style>
 
 <div class="page-container">
@@ -454,6 +488,12 @@ permalink: /galeria/
 
   <!-- Contenedor de la galería -->
   <div class="gallery-container">
+    <!-- Buscador -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Buscar imágenes..." oninput="filterImages()">
+      <button onclick="clearSearch()">Limpiar</button>
+    </div>
+
     <div class="gallery">
       {% for file in site.static_files %}
         {% if file.path contains '/imagenes/' %}
@@ -593,12 +633,17 @@ permalink: /galeria/
 
   // Función para filtrar imágenes
   function filterImages() {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+
     images.forEach(image => {
       const matchesCategory = currentCategory === 'all' ||
         image.getAttribute('data-category') === currentCategory;
 
-      image.classList.toggle('hidden', !matchesCategory);
-      
+      const title = image.getAttribute('data-title').toLowerCase();
+      const matchesSearch = searchText === '' || title.includes(searchText);
+
+      image.classList.toggle('hidden', !(matchesCategory && matchesSearch));
+
       // Si la imagen está oculta, quitar la clase 'visible'
       if (image.classList.contains('hidden')) {
         image.classList.remove('visible');
@@ -610,6 +655,12 @@ permalink: /galeria/
 
     // Verificar visibilidad de las imágenes después de filtrar
     checkVisibility();
+  }
+
+  // Función para limpiar la búsqueda
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    filterImages();
   }
 
   // Función para configurar los filtros de categoría
