@@ -220,18 +220,6 @@ permalink: /galeria/
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
   }
 
-  /* Marca de agua */
-  .watermark {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255, 255, 255, 0.5); /* Color semi-transparente */
-    font-size: 24px;
-    font-weight: bold;
-    pointer-events: none; /* Evita que la marca de agua interfiera con los clics */
-  }
-
   /* Contador de imágenes */
   .image-counter {
     position: absolute;
@@ -515,7 +503,6 @@ permalink: /galeria/
         
         <div class="image-wrapper">
           <img id="modalImage" src="" alt="">
-          <div class="watermark">ZGrafic</div> <!-- Marca de agua -->
         </div>
         
         <button class="nav-button next" onclick="navigateImage(1)">›</button>
