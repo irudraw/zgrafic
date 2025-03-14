@@ -119,7 +119,7 @@ permalink: /galeria/
     gap: 15px;
   }
 
-  .image-container {
+  .image-wrapper {
     position: relative;
     border-radius: 8px;
     overflow: hidden;
@@ -131,20 +131,31 @@ permalink: /galeria/
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   }
 
-  .image-container.visible {
+  .image-wrapper.visible {
     opacity: 1;
     transform: translateY(0);
   }
 
-  .image-container:hover {
+  .image-wrapper:hover {
     transform: translateY(-5px);
   }
 
-  .image-container img {
+  .image-container {
     width: 100%;
     height: 150px; /* Reducir la altura de las imágenes */
-    object-fit: cover;
+    background-size: cover;
+    background-position: center;
     cursor: pointer;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0); /* Capa transparente */
+    pointer-events: none; /* Permite clics a través de la capa */
   }
 
   .image-title {
@@ -201,26 +212,14 @@ permalink: /galeria/
     background-color: transparent;
   }
 
-  .image-wrapper {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
+  .modal-image-container {
+    width: 100%;
+    height: 90vh;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
-  #modalImage {
-    max-width: 100%;
-    max-height: 90vh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    animation: fadeIn 0.3s ease;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
-  }
-
-  /* Contador de imágenes */
   .image-counter {
     position: absolute;
     bottom: 20px;
@@ -468,8 +467,9 @@ permalink: /galeria/
             {% assign image_path = file.path | relative_url %}
             {% assign image_id = file.name | split: '.' | first | generateShortCode %}
 
-            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
-              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}')">
+            <div class="image-wrapper hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
+              <div class="image-container" style="background-image: url('{{ image_path }}');"></div>
+              <div class="overlay"></div>
               <div class="image-title">{{ title }}</div>
             </div>
           {% endif %}
@@ -504,7 +504,8 @@ permalink: /galeria/
         </button>
         
         <div class="image-wrapper">
-          <img id="modalImage" src="" alt="">
+          <div class="modal-image-container" id="modalImage"></div>
+          <div class="overlay"></div>
         </div>
         
         <button class="nav-button next" onclick="navigateImage(1)">
@@ -560,7 +561,7 @@ permalink: /galeria/
     }
 
     // Recopilar todas las imágenes
-    images = Array.from(document.querySelectorAll('.image-container'));
+    images = Array.from(document.querySelectorAll('.image-wrapper'));
 
     // Filtrar imágenes según la categoría inicial
     filterImages();
@@ -581,13 +582,33 @@ permalink: /galeria/
     if (imageId) {
       const image = images.find(img => img.getAttribute('data-id') === imageId);
       if (image) {
-        const imagePath = image.querySelector('img').src;
+        const imagePath = image.querySelector('.image-container').style.backgroundImage.slice(5, -2);
         openImage(imageId, imagePath);
       }
     }
 
     // Verificar visibilidad de las imágenes al cargar la página
     checkVisibility();
+
+    // Deshabilitar clic derecho y arrastrar
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('dragstart', function(e) {
+      if (e.target.classList.contains('image-container') || e.target.classList.contains('modal-image-container')) {
+        e.preventDefault();
+      }
+    });
+
+    // Proteger el modal
+    document.getElementById('imageModal').addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+
+    document.getElementById('imageModal').addEventListener('dragstart', function(e) {
+      e.preventDefault();
+    });
   });
 
   // Función para obtener el parámetro de la URL
@@ -674,7 +695,7 @@ permalink: /galeria/
 
   // Verificar visibilidad de las imágenes
   function checkVisibility() {
-    const images = document.querySelectorAll('.image-container');
+    const images = document.querySelectorAll('.image-wrapper');
     images.forEach(image => {
       const rect = image.getBoundingClientRect();
       if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
@@ -690,7 +711,7 @@ permalink: /galeria/
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
-    modalImage.src = imagePath;
+    modalImage.style.backgroundImage = `url('${imagePath}')`;
 
     // Actualizar la URL con el identificador de la imagen
     const newUrl = `${window.location.pathname}?id=${imageId}`;
@@ -747,7 +768,7 @@ permalink: /galeria/
   // Función para copiar la imagen al portapapeles
   function copyImageToClipboard() {
     const modalImage = document.getElementById('modalImage');
-    const imageUrl = modalImage.src;
+    const imageUrl = modalImage.style.backgroundImage.slice(5, -2);
 
     // Convertir la imagen en un Blob
     fetch(imageUrl)
@@ -788,13 +809,13 @@ permalink: /galeria/
     const newImage = visibleImages[currentIndexInVisible];
 
     const imageId = newImage.getAttribute('data-id');
-    const imagePath = newImage.querySelector('img').src;
+    const imagePath = newImage.querySelector('.image-container').style.backgroundImage.slice(5, -2);
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
     const modalImage = document.getElementById('modalImage');
 
-    modalImage.src = imagePath;
+    modalImage.style.backgroundImage = `url('${imagePath}')`;
 
     // Actualizar la URL con el nuevo identificador
     const newUrl = `${window.location.pathname}?id=${imageId}`;
@@ -847,18 +868,18 @@ permalink: /galeria/
     for (let i = 1; i <= preloadCount; i++) {
       // Precargar imágenes siguientes
       const nextIndex = (currentIndex + i) % visibleImages.length;
-      const nextImage = visibleImages[nextIndex].querySelector('img');
+      const nextImage = visibleImages[nextIndex].querySelector('.image-container');
       if (nextImage) {
         const img = new Image();
-        img.src = nextImage.src;
+        img.src = nextImage.style.backgroundImage.slice(5, -2);
       }
 
       // Precargar imágenes anteriores
       const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
-      const prevImage = visibleImages[prevIndex].querySelector('img');
+      const prevImage = visibleImages[prevIndex].querySelector('.image-container');
       if (prevImage) {
         const img = new Image();
-        img.src = prevImage.src;
+        img.src = prevImage.style.backgroundImage.slice(5, -2);
       }
     }
   }
