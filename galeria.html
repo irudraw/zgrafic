@@ -220,6 +220,18 @@ permalink: /galeria/
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
   }
 
+  /* Marca de agua */
+  .watermark {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.5); /* Color semi-transparente */
+    font-size: 24px;
+    font-weight: bold;
+    pointer-events: none; /* Evita que la marca de agua interfiera con los clics */
+  }
+
   /* Contador de imágenes */
   .image-counter {
     position: absolute;
@@ -499,17 +511,14 @@ permalink: /galeria/
       </button>
       
       <div class="modal-body">
-        <button class="nav-button prev" onclick="navigateImage(-1)">
-          ‹
-        </button>
+        <button class="nav-button prev" onclick="navigateImage(-1)">‹</button>
         
         <div class="image-wrapper">
           <img id="modalImage" src="" alt="">
+          <div class="watermark">ZGrafic</div> <!-- Marca de agua -->
         </div>
         
-        <button class="nav-button next" onclick="navigateImage(1)">
-          ›
-        </button>
+        <button class="nav-button next" onclick="navigateImage(1)">›</button>
         
         <div class="image-counter">1 de 1</div>
       </div>
@@ -523,21 +532,18 @@ permalink: /galeria/
 </div>
 
 <script>
-
   // Deshabilitar el clic derecho en toda la página
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault(); // Evita que se abra el menú contextual
-        });
-  
-  // Deshabilitar el arrastre de imágenes
-document.addEventListener('dragstart', function(e) {
-    if (e.target.tagName === 'IMG') { // Verifica si el elemento arrastrado es una imagen
-        e.preventDefault(); // Evita que la imagen sea arrastrada
-    }
-});
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault(); // Evita que se abra el menú contextual
+  });
 
-  
-  
+  // Deshabilitar el arrastre de imágenes
+  document.addEventListener('dragstart', function(e) {
+    if (e.target.tagName === 'IMG') { // Verifica si el elemento arrastrado es una imagen
+      e.preventDefault(); // Evita que la imagen sea arrastrada
+    }
+  });
+
   // Variables globales
   let currentImageIndex = 0;
   let images = [];
@@ -759,15 +765,36 @@ document.addEventListener('dragstart', function(e) {
       });
   }
 
-  // Función para copiar la imagen al portapapeles
+  // Función para copiar la imagen con marca de agua
   function copyImageToClipboard() {
     const modalImage = document.getElementById('modalImage');
     const imageUrl = modalImage.src;
 
-    // Convertir la imagen en un Blob
-    fetch(imageUrl)
-      .then(response => response.blob())
-      .then(blob => {
+    // Crear un nuevo canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Cargar la imagen
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // Permitir el uso de imágenes de diferentes dominios
+    img.src = imageUrl;
+
+    img.onload = () => {
+      // Configurar el tamaño del canvas
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Dibujar la imagen en el canvas
+      ctx.drawImage(img, 0, 0);
+
+      // Agregar la marca de agua
+      ctx.font = '24px Arial';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.textAlign = 'center';
+      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height - 20);
+
+      // Convertir el canvas a un Blob
+      canvas.toBlob((blob) => {
         // Crear un objeto ClipboardItem con la imagen
         const item = new ClipboardItem({ [blob.type]: blob });
 
@@ -776,7 +803,7 @@ document.addEventListener('dragstart', function(e) {
           .then(() => {
             // Mostrar el mensaje de éxito
             const copyMessage = document.getElementById('copyMessage');
-            copyMessage.textContent = 'Imagen copiada al portapapeles';
+            copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
             copyMessage.classList.add('show');
 
             // Ocultar el mensaje después de 2 segundos
@@ -787,10 +814,12 @@ document.addEventListener('dragstart', function(e) {
           .catch(() => {
             alert('Error al copiar la imagen');
           });
-      })
-      .catch(() => {
-        alert('Error al obtener la imagen');
-      });
+      }, 'image/png');
+    };
+
+    img.onerror = () => {
+      alert('Error al cargar la imagen');
+    };
   }
 
   function navigateImage(direction) {
