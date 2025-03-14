@@ -468,7 +468,7 @@ permalink: /galeria/
             {% assign image_id = file.name | split: '.' | first | generateShortCode %}
 
             <div class="image-wrapper hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
-              <div class="image-container" style="background-image: url('{{ image_path }}');"></div>
+              <div class="image-container" style="background-image: url('{{ image_path }}');" onclick="openImage('{{ image_id }}', '{{ image_path }}')"></div>
               <div class="overlay"></div>
               <div class="image-title">{{ title }}</div>
             </div>
@@ -709,8 +709,10 @@ permalink: /galeria/
     const modal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
 
+    // Encontrar el índice de la imagen actual
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
+    // Actualizar la imagen en el modal
     modalImage.style.backgroundImage = `url('${imagePath}')`;
 
     // Actualizar la URL con el identificador de la imagen
@@ -720,7 +722,10 @@ permalink: /galeria/
     // Actualizar las etiquetas Open Graph
     updateOpenGraphTags(imagePath, newUrl);
 
+    // Actualizar el contador de imágenes
     updateImageCounter();
+
+    // Mostrar el modal
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
