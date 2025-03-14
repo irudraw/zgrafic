@@ -774,11 +774,20 @@ permalink: /galeria/
       // Dibujar la imagen en el canvas
       ctx.drawImage(img, 0, 0);
 
-      // Agregar la marca de agua
+      // Configurar el estilo de la marca de agua
       ctx.font = '24px Arial';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
       ctx.textAlign = 'center';
-      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height - 20);
+
+      // Agregar la marca de agua en tres posiciones:
+      // 1. Arriba
+      ctx.fillText('ZGrafic', canvas.width / 2, 30); // 30 es la posición vertical desde arriba
+
+      // 2. En el medio
+      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height / 2);
+
+      // 3. Abajo
+      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height - 20); // 20 es la posición vertical desde abajo
 
       // Convertir el canvas a un Blob
       canvas.toBlob((blob) => {
