@@ -523,6 +523,12 @@ permalink: /galeria/
 </div>
 
 <script>
+
+  // Deshabilitar el clic derecho en toda la página
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault(); // Evita que se abra el menú contextual
+        });
+  
   // Variables globales
   let currentImageIndex = 0;
   let images = [];
