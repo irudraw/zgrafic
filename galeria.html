@@ -1039,8 +1039,21 @@ permalink: /galeria/
     canvas = document.getElementById('drawingCanvas');
     ctx = canvas.getContext('2d');
 
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
+    // Ajustar las coordenadas del cursor para que coincidan con el canvas
+    const rect = canvas.getBoundingClientRect();
+
+    canvas.addEventListener('mousedown', (e) => {
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      startDrawing({ offsetX: x, offsetY: y });
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      draw({ offsetX: x, offsetY: y });
+    });
+
     canvas.addEventListener('mouseup', stopDrawing);
     canvas.addEventListener('mouseout', stopDrawing);
 
@@ -1059,7 +1072,8 @@ permalink: /galeria/
 
   function startDrawing(e) {
     isDrawing = true;
-    draw(e);
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
   }
 
   function draw(e) {
