@@ -799,13 +799,14 @@ permalink: /galeria/
   // Modificar la función openImage para usar el identificador único
   function openImage(imageId, imagePath) {
     const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
     const canvas = document.getElementById('drawingCanvas');
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
     // Limpiar el canvas antes de dibujar la nueva imagen
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
     // Reiniciar el estado del lápiz
     pencilSize = 5; // Valor inicial del grosor del lápiz
@@ -838,7 +839,10 @@ permalink: /galeria/
     // Actualizar las etiquetas Open Graph
     updateOpenGraphTags(imagePath, newUrl);
 
+    // Actualizar el contador de imágenes
     updateImageCounter();
+
+    // Mostrar el modal
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
@@ -852,6 +856,7 @@ permalink: /galeria/
     ogUrl.setAttribute('content', pageUrl); // Actualizar la URL de la página
   }
 
+  // Función para cerrar el modal
   function closeImage() {
     const modal = document.getElementById('imageModal');
     modal.classList.remove('show');
@@ -939,6 +944,7 @@ permalink: /galeria/
     }, 'image/png');
   }
 
+  // Función para navegar entre imágenes
   function navigateImage(direction) {
     const visibleImages = getVisibleImages();
     let currentIndexInVisible = visibleImages.findIndex(img =>
@@ -956,6 +962,7 @@ permalink: /galeria/
     openImage(imageId, imagePath);
   }
 
+  // Función para manejar las teclas de navegación
   function handleKeyPress(e) {
     if (!document.getElementById('imageModal').classList.contains('show')) return;
 
@@ -972,7 +979,7 @@ permalink: /galeria/
     }
   }
 
-  // Añadir contador de imágenes
+  // Función para actualizar el contador de imágenes
   function updateImageCounter() {
     const visibleImages = getVisibleImages();
     const currentPosition = visibleImages.findIndex(img =>
@@ -983,11 +990,12 @@ permalink: /galeria/
     counter.textContent = `${currentPosition} de ${visibleImages.length}`;
   }
 
-  // Funciones auxiliares
+  // Función para obtener las imágenes visibles
   function getVisibleImages() {
     return images.filter(img => !img.classList.contains('hidden'));
   }
 
+  // Función para precargar imágenes adyacentes
   function preloadAdjacentImages(currentIndex) {
     const visibleImages = getVisibleImages();
     const preloadCount = 2; // Número de imágenes a precargar en cada dirección
@@ -1011,7 +1019,7 @@ permalink: /galeria/
     }
   }
 
-  // Funciones para el dibujo
+  // Función para mostrar/ocultar los controles del lápiz
   function togglePencilControls() {
     const pencilControls = document.querySelector('.pencil-controls');
     const colorPicker = document.querySelector('.color-picker');
@@ -1020,6 +1028,7 @@ permalink: /galeria/
     colorPicker.classList.toggle('hidden');
   }
 
+  // Función para configurar el canvas y los eventos de dibujo
   function setupCanvas() {
     canvas = document.getElementById('drawingCanvas');
     ctx = canvas.getContext('2d');
@@ -1055,12 +1064,14 @@ permalink: /galeria/
     });
   }
 
+  // Función para iniciar el dibujo
   function startDrawing(e) {
     isDrawing = true;
     ctx.beginPath();
     ctx.moveTo(e.offsetX, e.offsetY);
   }
 
+  // Función para dibujar
   function draw(e) {
     if (!isDrawing) return;
 
@@ -1074,6 +1085,7 @@ permalink: /galeria/
     ctx.moveTo(e.offsetX, e.offsetY);
   }
 
+  // Función para detener el dibujo
   function stopDrawing() {
     isDrawing = false;
     ctx.beginPath();
