@@ -1000,28 +1000,13 @@ permalink: /galeria/
     const canvas = document.getElementById('drawingCanvas');
     const pencilControls = document.querySelector('.pencil-controls');
     const colorPicker = document.querySelector('.color-picker');
-    const modalImage = document.getElementById('modalImage');
 
     if (canvas.style.display === 'none') {
-      // Mostrar el canvas y los controles del lápiz
       canvas.style.display = 'block';
       pencilControls.classList.remove('hidden');
       colorPicker.classList.remove('hidden');
-
-      // Redibujar la imagen en el canvas
-      const img = new Image();
-      img.src = modalImage.src;
-      img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0); // Dibujar la imagen en el canvas
-      };
-
-      // Configurar el canvas para el dibujo
       setupCanvas();
     } else {
-      // Ocultar el canvas y los controles del lápiz
       canvas.style.display = 'none';
       pencilControls.classList.add('hidden');
       colorPicker.classList.add('hidden');
