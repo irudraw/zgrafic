@@ -804,6 +804,13 @@ permalink: /galeria/
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
+    // Limpiar el canvas antes de dibujar la nueva imagen
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Reiniciar el estado del lápiz
+    pencilSize = 5; // Valor inicial del grosor del lápiz
+    pencilColor = '#ffffff'; // Color inicial del lápiz
+
     // Cargar la imagen en el canvas
     const img = new Image();
     img.src = imagePath;
