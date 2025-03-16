@@ -395,6 +395,52 @@ permalink: /galeria/
     display: none;
   }
 
+  /* Estilos para el botón de lápiz */
+  .pencil-button {
+    position: absolute;
+    top: 20px;
+    right: 170px; /* Ajusta la posición para que no se superponga con otros botones */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de lápiz */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .pencil-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
+  /* Estilos para los controles de grosor del lápiz */
+  .pencil-controls {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 1001;
+  }
+
+  .pencil-controls label {
+    color: white;
+    font-size: 0.9rem;
+  }
+
+  .pencil-controls input[type="range"] {
+    width: 100px;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     .modal-content {
@@ -423,6 +469,10 @@ permalink: /galeria/
 
     .copy-image-button {
       right: 110px; /* Ajuste para dispositivos móviles */
+    }
+
+    .pencil-button {
+      right: 160px; /* Ajuste para dispositivos móviles */
     }
   }
 </style>
@@ -497,12 +547,25 @@ permalink: /galeria/
       <button class="copy-image-button" onclick="copyImageToClipboard()">
         <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
       </button>
+
+      <!-- Botón de lápiz -->
+      <button class="pencil-button" onclick="togglePencil()">
+        <i class="fas fa-pencil-alt"></i> <!-- Ícono de lápiz de FontAwesome -->
+      </button>
+
+      <!-- Controles de grosor del lápiz -->
+      <div class="pencil-controls hidden">
+        <label for="pencil-size">Grosor:</label>
+        <input type="range" id="pencil-size" min="1" max="20" value="5">
+      </div>
       
       <div class="modal-body">
         <button class="nav-button prev" onclick="navigateImage(-1)">‹</button>
         
         <div class="image-wrapper">
           <img id="modalImage" src="" alt="">
+          <!-- Canvas para dibujar sobre la imagen -->
+          <canvas id="drawingCanvas" style="position: absolute; top: 0; left: 0; z-index: 1000; display: none;"></canvas>
         </div>
         
         <button class="nav-button next" onclick="navigateImage(1)">›</button>
@@ -538,6 +601,11 @@ permalink: /galeria/
   let isLoading = false;
   let loadedCount = 0;
   const batchSize = 6;
+
+  // Variables para el dibujo
+  let isDrawing = false;
+  let pencilSize = 5;
+  let canvas, ctx;
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
@@ -700,6 +768,14 @@ permalink: /galeria/
 
     modalImage.src = imagePath;
 
+    // Ajustar el canvas al tamaño de la imagen
+    modalImage.onload = () => {
+      if (canvas) {
+        canvas.width = modalImage.width;
+        canvas.height = modalImage.height;
+      }
+    };
+
     // Actualizar la URL con el identificador de la imagen
     const newUrl = `${window.location.pathname}?id=${imageId}`;
     window.history.pushState({}, '', newUrl);
@@ -754,73 +830,73 @@ permalink: /galeria/
 
   // Función para copiar la imagen con marca de agua
   function copyImageToClipboard() {
-  const modalImage = document.getElementById('modalImage');
-  const imageUrl = modalImage.src;
+    const modalImage = document.getElementById('modalImage');
+    const imageUrl = modalImage.src;
 
-  // Crear un nuevo canvas
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+    // Crear un nuevo canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
 
-  // Cargar la imagen
-  const img = new Image();
-  img.crossOrigin = 'anonymous'; // Permitir el uso de imágenes de diferentes dominios
-  img.src = imageUrl;
+    // Cargar la imagen
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // Permitir el uso de imágenes de diferentes dominios
+    img.src = imageUrl;
 
-  img.onload = () => {
-    // Configurar el tamaño del canvas
-    canvas.width = img.width;
-    canvas.height = img.height;
+    img.onload = () => {
+      // Configurar el tamaño del canvas
+      canvas.width = img.width;
+      canvas.height = img.height;
 
-    // Dibujar la imagen en el canvas
-    ctx.drawImage(img, 0, 0);
+      // Dibujar la imagen en el canvas
+      ctx.drawImage(img, 0, 0);
 
-    // Configurar el estilo de la marca de agua
-    ctx.textAlign = 'center'; // Centrar el texto horizontalmente
+      // Configurar el estilo de la marca de agua
+      ctx.textAlign = 'center'; // Centrar el texto horizontalmente
 
-    // Agregar la marca de agua en tres posiciones:
-    // 1. Arriba (mitad de la parte superior)
-    ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    ctx.fillText('ZGrafic', canvas.width / 2, canvas.height * 0.25); // 25% desde la parte superior
+      // Agregar la marca de agua en tres posiciones:
+      // 1. Arriba (mitad de la parte superior)
+      ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height * 0.25); // 25% desde la parte superior
 
-    // 2. En el medio (50px)
-    ctx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    ctx.fillText('ZGrafic', canvas.width / 2, canvas.height / 2 + 25); // Ajuste vertical para centrar
+      // 2. En el medio (50px)
+      ctx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height / 2 + 25); // Ajuste vertical para centrar
 
-    // 3. Abajo (mitad de la parte inferior)
-    ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    ctx.fillText('ZGrafic', canvas.width / 2, canvas.height * 0.75); // 75% desde la parte superior
+      // 3. Abajo (mitad de la parte inferior)
+      ctx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+      ctx.fillText('ZGrafic', canvas.width / 2, canvas.height * 0.75); // 75% desde la parte superior
 
-    // Convertir el canvas a un Blob
-    canvas.toBlob((blob) => {
-      // Crear un objeto ClipboardItem con la imagen
-      const item = new ClipboardItem({ [blob.type]: blob });
+      // Convertir el canvas a un Blob
+      canvas.toBlob((blob) => {
+        // Crear un objeto ClipboardItem con la imagen
+        const item = new ClipboardItem({ [blob.type]: blob });
 
-      // Copiar la imagen al portapapeles
-      navigator.clipboard.write([item])
-        .then(() => {
-          // Mostrar el mensaje de éxito
-          const copyMessage = document.getElementById('copyMessage');
-          copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
-          copyMessage.classList.add('show');
+        // Copiar la imagen al portapapeles
+        navigator.clipboard.write([item])
+          .then(() => {
+            // Mostrar el mensaje de éxito
+            const copyMessage = document.getElementById('copyMessage');
+            copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
+            copyMessage.classList.add('show');
 
-          // Ocultar el mensaje después de 2 segundos
-          setTimeout(() => {
-            copyMessage.classList.remove('show');
-          }, 2000);
-        })
-        .catch(() => {
-          alert('Error al copiar la imagen');
-        });
-    }, 'image/png');
-  };
+            // Ocultar el mensaje después de 2 segundos
+            setTimeout(() => {
+              copyMessage.classList.remove('show');
+            }, 2000);
+          })
+          .catch(() => {
+            alert('Error al copiar la imagen');
+          });
+      }, 'image/png');
+    };
 
-  img.onerror = () => {
-    alert('Error al cargar la imagen');
-  };
-}
+    img.onerror = () => {
+      alert('Error al cargar la imagen');
+    };
+  }
 
   function navigateImage(direction) {
     const visibleImages = getVisibleImages();
@@ -905,5 +981,63 @@ permalink: /galeria/
         img.src = prevImage.src;
       }
     }
+  }
+
+  // Funciones para el dibujo
+  function togglePencil() {
+    const canvasElement = document.getElementById('drawingCanvas');
+    const pencilControls = document.querySelector('.pencil-controls');
+
+    if (canvasElement.style.display === 'none') {
+      canvasElement.style.display = 'block';
+      pencilControls.classList.remove('hidden');
+      setupCanvas();
+    } else {
+      canvasElement.style.display = 'none';
+      pencilControls.classList.add('hidden');
+    }
+  }
+
+  function setupCanvas() {
+    canvas = document.getElementById('drawingCanvas');
+    ctx = canvas.getContext('2d');
+
+    const modalImage = document.getElementById('modalImage');
+    canvas.width = modalImage.width;
+    canvas.height = modalImage.height;
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    // Actualizar el grosor del lápiz
+    const pencilSizeInput = document.getElementById('pencil-size');
+    pencilSizeInput.addEventListener('input', (e) => {
+      pencilSize = e.target.value;
+    });
+  }
+
+  function startDrawing(e) {
+    isDrawing = true;
+    draw(e);
+  }
+
+  function draw(e) {
+    if (!isDrawing) return;
+
+    ctx.lineWidth = pencilSize;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#ffffff'; // Color del lápiz
+
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+  }
+
+  function stopDrawing() {
+    isDrawing = false;
+    ctx.beginPath();
   }
 </script>
