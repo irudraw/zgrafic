@@ -580,18 +580,18 @@ permalink: /galeria/
       </button>
 
       <!-- Botón de lápiz -->
-      <button class="pencil-button" onclick="togglePencil()">
+      <button class="pencil-button" onclick="togglePencilControls()">
         <i class="fas fa-pencil-alt"></i> <!-- Ícono de lápiz de FontAwesome -->
       </button>
 
       <!-- Controles de grosor del lápiz -->
-      <div class="pencil-controls">
+      <div class="pencil-controls hidden">
         <label for="pencil-size">Grosor:</label>
         <input type="range" id="pencil-size" min="1" max="20" value="5">
       </div>
 
       <!-- Barra de selección de color -->
-      <div class="color-picker">
+      <div class="color-picker hidden">
         <label for="pencil-color">Color:</label>
         <input type="color" id="pencil-color" value="#ffffff">
       </div>
@@ -1005,37 +1005,12 @@ permalink: /galeria/
   }
 
   // Funciones para el dibujo
-  function togglePencil() {
-    const canvas = document.getElementById('drawingCanvas');
+  function togglePencilControls() {
     const pencilControls = document.querySelector('.pencil-controls');
     const colorPicker = document.querySelector('.color-picker');
 
-    // Verificar si el contexto del canvas está inicializado
-    if (!ctx) {
-      const img = new Image();
-      img.src = images[currentImageIndex].querySelector('img').src;
-      img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0); // Dibujar la imagen en el canvas
-        canvas.style.display = 'block'; // Mostrar el canvas
-        pencilControls.classList.remove('hidden');
-        colorPicker.classList.remove('hidden');
-        setupCanvas();
-      };
-    } else {
-      if (canvas.style.display === 'none') {
-        canvas.style.display = 'block';
-        pencilControls.classList.remove('hidden');
-        colorPicker.classList.remove('hidden');
-        setupCanvas();
-      } else {
-        canvas.style.display = 'none';
-        pencilControls.classList.add('hidden');
-        colorPicker.classList.add('hidden');
-      }
-    }
+    pencilControls.classList.toggle('hidden');
+    colorPicker.classList.toggle('hidden');
   }
 
   function setupCanvas() {
