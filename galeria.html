@@ -210,16 +210,12 @@ permalink: /galeria/
   }
 
   #modalImage {
-    display: none; /* Ocultar la imagen original, ya que el canvas la mostrará */
-  }
-
-  /* Canvas para dibujar sobre la imagen */
-  #drawingCanvas {
     max-width: 100%;
     max-height: 90vh;
     width: auto;
     height: auto;
     object-fit: contain;
+    animation: fadeIn 0.3s ease;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
   }
@@ -600,8 +596,9 @@ permalink: /galeria/
         <button class="nav-button prev" onclick="navigateImage(-1)">‹</button>
         
         <div class="image-wrapper">
+          <img id="modalImage" src="" alt="">
           <!-- Canvas para dibujar sobre la imagen -->
-          <canvas id="drawingCanvas" style="display: none;"></canvas>
+          <canvas id="drawingCanvas" style="position: absolute; top: 0; left: 0; z-index: 1000; display: none;"></canvas>
         </div>
         
         <button class="nav-button next" onclick="navigateImage(1)">›</button>
@@ -800,19 +797,17 @@ permalink: /galeria/
   function openImage(imageId, imagePath) {
     const modal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
-    const canvas = document.getElementById('drawingCanvas');
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
-    // Cargar la imagen en el canvas
-    const img = new Image();
-    img.src = imagePath;
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0); // Dibujar la imagen en el canvas
-      canvas.style.display = 'block'; // Mostrar el canvas
+    modalImage.src = imagePath;
+
+    // Ajustar el canvas al tamaño de la imagen
+    modalImage.onload = () => {
+      if (canvas) {
+        canvas.width = modalImage.width;
+        canvas.height = modalImage.height;
+      }
     };
 
     // Actualizar la URL con el identificador de la imagen
@@ -869,6 +864,7 @@ permalink: /galeria/
 
   // Función para copiar la imagen con las marcas hechas con el lápiz y la marca de agua
   function copyImageWithMarks() {
+    const modalImage = document.getElementById('modalImage');
     const canvas = document.getElementById('drawingCanvas');
 
     // Crear un nuevo canvas para combinar la imagen, las marcas y la marca de agua
@@ -876,10 +872,13 @@ permalink: /galeria/
     const combinedCtx = combinedCanvas.getContext('2d');
 
     // Ajustar el tamaño del canvas combinado al tamaño de la imagen
-    combinedCanvas.width = canvas.width;
-    combinedCanvas.height = canvas.height;
+    combinedCanvas.width = modalImage.width;
+    combinedCanvas.height = modalImage.height;
 
     // Dibujar la imagen en el canvas combinado
+    combinedCtx.drawImage(modalImage, 0, 0);
+
+    // Dibujar las marcas del canvas de dibujo en el canvas combinado
     combinedCtx.drawImage(canvas, 0, 0);
 
     // Agregar la marca de agua
@@ -937,7 +936,20 @@ permalink: /galeria/
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
-    openImage(imageId, imagePath);
+    const modalImage = document.getElementById('modalImage');
+
+    modalImage.src = imagePath;
+
+    // Actualizar la URL con el nuevo identificador
+    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    window.history.pushState({}, '', newUrl);
+
+    // Actualizar las etiquetas Open Graph
+    updateOpenGraphTags(imagePath, newUrl);
+
+    // Precargar siguientes imágenes
+    preloadAdjacentImages(currentImageIndex);
+    updateImageCounter();
   }
 
   function handleKeyPress(e) {
@@ -997,17 +1009,17 @@ permalink: /galeria/
 
   // Funciones para el dibujo
   function togglePencil() {
-    const canvas = document.getElementById('drawingCanvas');
+    const canvasElement = document.getElementById('drawingCanvas');
     const pencilControls = document.querySelector('.pencil-controls');
     const colorPicker = document.querySelector('.color-picker');
 
-    if (canvas.style.display === 'none') {
-      canvas.style.display = 'block';
+    if (canvasElement.style.display === 'none') {
+      canvasElement.style.display = 'block';
       pencilControls.classList.remove('hidden');
       colorPicker.classList.remove('hidden');
       setupCanvas();
     } else {
-      canvas.style.display = 'none';
+      canvasElement.style.display = 'none';
       pencilControls.classList.add('hidden');
       colorPicker.classList.add('hidden');
     }
@@ -1016,6 +1028,10 @@ permalink: /galeria/
   function setupCanvas() {
     canvas = document.getElementById('drawingCanvas');
     ctx = canvas.getContext('2d');
+
+    const modalImage = document.getElementById('modalImage');
+    canvas.width = modalImage.width;
+    canvas.height = modalImage.height;
 
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
