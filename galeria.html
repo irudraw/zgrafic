@@ -862,15 +862,16 @@ permalink: /galeria/
       });
   }
 
-  // Función para copiar la imagen con las marcas hechas con el lápiz
+  // Función para copiar la imagen con las marcas hechas con el lápiz y la marca de agua
   function copyImageWithMarks() {
     const modalImage = document.getElementById('modalImage');
     const canvas = document.getElementById('drawingCanvas');
 
-    // Crear un nuevo canvas para combinar la imagen y las marcas
+    // Crear un nuevo canvas para combinar la imagen, las marcas y la marca de agua
     const combinedCanvas = document.createElement('canvas');
     const combinedCtx = combinedCanvas.getContext('2d');
 
+    // Ajustar el tamaño del canvas combinado al tamaño de la imagen
     combinedCanvas.width = modalImage.width;
     combinedCanvas.height = modalImage.height;
 
@@ -879,6 +880,23 @@ permalink: /galeria/
 
     // Dibujar las marcas del canvas de dibujo en el canvas combinado
     combinedCtx.drawImage(canvas, 0, 0);
+
+    // Agregar la marca de agua
+    combinedCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+    combinedCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    combinedCtx.textAlign = 'center'; // Centrar el texto horizontalmente
+
+    // Agregar la marca de agua en tres posiciones:
+    // 1. Arriba (mitad de la parte superior)
+    combinedCtx.fillText('ZGrafic', combinedCanvas.width / 2, combinedCanvas.height * 0.25); // 25% desde la parte superior
+
+    // 2. En el medio (50px)
+    combinedCtx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
+    combinedCtx.fillText('ZGrafic', combinedCanvas.width / 2, combinedCanvas.height / 2 + 25); // Ajuste vertical para centrar
+
+    // 3. Abajo (mitad de la parte inferior)
+    combinedCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+    combinedCtx.fillText('ZGrafic', combinedCanvas.width / 2, combinedCanvas.height * 0.75); // 75% desde la parte superior
 
     // Convertir el canvas combinado a un Blob
     combinedCanvas.toBlob((blob) => {
@@ -890,7 +908,7 @@ permalink: /galeria/
         .then(() => {
           // Mostrar el mensaje de éxito
           const copyMessage = document.getElementById('copyMessage');
-          copyMessage.textContent = 'Imagen copiada al portapapeles con marcas';
+          copyMessage.textContent = 'Imagen copiada al portapapeles con marcas y marca de agua';
           copyMessage.classList.add('show');
 
           // Ocultar el mensaje después de 2 segundos
