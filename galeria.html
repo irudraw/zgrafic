@@ -341,6 +341,32 @@ permalink: /galeria/
     transform: scale(1.1);
   }
 
+  /* Icono de descargar imagen */
+  .download-image-button {
+    position: absolute;
+    top: 20px;
+    right: 170px; /* Ajusta la posición para que no se superponga con otros botones */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de descargar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .download-image-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
   /* Mensaje de URL copiada */
   .copy-message {
     position: fixed;
@@ -422,6 +448,10 @@ permalink: /galeria/
     .copy-image-button {
       right: 110px; /* Ajuste para dispositivos móviles */
     }
+
+    .download-image-button {
+      right: 160px; /* Ajuste para dispositivos móviles */
+    }
   }
 </style>
 
@@ -495,6 +525,11 @@ permalink: /galeria/
       <!-- Botón de copiar imagen -->
       <button class="copy-image-button" onclick="copyImageToClipboard()">
         <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
+      </button>
+      
+      <!-- Botón de descargar imagen -->
+      <button class="download-image-button" onclick="downloadImageWithWatermark()">
+        <i class="fas fa-download"></i> <!-- Ícono de descarga de FontAwesome -->
       </button>
       
       <div class="modal-body">
@@ -849,6 +884,49 @@ permalink: /galeria/
           alert('Error al copiar la imagen');
         });
     }, 'image/png');
+  }
+
+  // Función para descargar la imagen con marca de agua
+  function downloadImageWithWatermark() {
+    const canvas = document.getElementById('modalCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Crear un nuevo canvas temporal para dibujar la imagen con la marca de agua
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+
+    // Configurar el tamaño del canvas temporal
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+
+    // Dibujar la imagen original en el canvas temporal
+    tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    // Agregar la marca de agua en tres posiciones:
+    // 1. Arriba (mitad de la parte superior)
+    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    tempCtx.textAlign = 'center'; // Centrar el texto horizontalmente
+    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.25); // 25% desde la parte superior
+
+    // 2. En el medio (50px)
+    tempCtx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
+    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height / 2 + 25); // Ajuste vertical para centrar
+
+    // 3. Abajo (mitad de la parte inferior)
+    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.75); // 75% desde la parte superior
+
+    // Convertir el canvas temporal a una URL de imagen
+    const imageUrl = tempCanvas.toDataURL('image/png');
+
+    // Crear un enlace temporal para descargar la imagen
+    const link = document.createElement('a');
+    link.download = 'imagen-con-marca-de-agua.png'; // Nombre del archivo descargado
+    link.href = imageUrl; // URL de la imagen con marca de agua
+    link.click(); // Simular clic en el enlace para descargar la imagen
   }
 
   function navigateImage(direction) {
