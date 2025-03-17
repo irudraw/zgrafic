@@ -145,6 +145,17 @@ function seleccionarOpcion(tipo) {
 <div class="calculator">
 <div id="vendedor-info" class="label-result"></div><br>
 
+<form id="seleccion-form" class="form">
+  <input type="radio" id="grueso" name="opcion" value="grueso" onclick="seleccionarOpcion(this.value)">
+  <label for="premium">Premium</label><br>
+  
+  <input type="radio" id="delgado" name="opcion" value="delgado" onclick="seleccionarOpcion(this.value)">
+  <label for="arclad">Arclad</label><br>
+
+  <input type="radio" id="delgado" name="opcion" value="delgado" onclick="seleccionarOpcion(this.value)">
+  <label for="arclad">Canva</label><br>
+</form>
+
   
 <div class="input-group">
 <input type="number" class="input-number" id="num1" placeholder="mt">
