@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Galería
+title: Diseños
 permalink: /galeria/
 ---
 
@@ -577,6 +577,9 @@ permalink: /galeria/
     document.addEventListener('keydown', handleKeyPress);
     setupCategoryFilters();
 
+    // Configurar los manejadores de clic para las imágenes
+    setupImageClickHandlers();
+
     // Cargar el primer lote de imágenes
     loadNextBatch();
 
@@ -704,6 +707,19 @@ permalink: /galeria/
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
+  }
+
+  // Función para manejar el clic en las imágenes
+  function setupImageClickHandlers() {
+    const imageContainers = document.querySelectorAll('.image-container');
+    imageContainers.forEach(container => {
+      const canvas = container.querySelector('.image-canvas');
+      canvas.addEventListener('click', () => {
+        const imageId = container.getAttribute('data-id');
+        const imagePath = canvas.getAttribute('data-src');
+        openImage(imageId, imagePath);
+      });
+    });
   }
 
   // Modificar la función openImage para usar el canvas
