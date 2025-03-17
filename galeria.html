@@ -468,7 +468,7 @@ permalink: /galeria/
 
             <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
               <!-- Cambiar el img por un canvas -->
-              <canvas class="image-canvas"></canvas>
+              <canvas class="image-canvas" data-src="{{ image_path }}"></canvas>
               <div class="image-title">{{ title }}</div>
             </div>
           {% endif %}
@@ -589,7 +589,7 @@ permalink: /galeria/
     if (imageId) {
       const image = images.find(img => img.getAttribute('data-id') === imageId);
       if (image) {
-        const imagePath = image.querySelector('img').src;
+        const imagePath = image.querySelector('canvas').getAttribute('data-src');
         openImage(imageId, imagePath);
       }
     }
@@ -697,7 +697,7 @@ permalink: /galeria/
     const canvas = imageContainer.querySelector('.image-canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    img.src = imageContainer.querySelector('img').src;
+    img.src = canvas.getAttribute('data-src');
 
     img.onload = () => {
       canvas.width = img.width;
@@ -845,7 +845,7 @@ permalink: /galeria/
     const newImage = visibleImages[currentIndexInVisible];
 
     const imageId = newImage.getAttribute('data-id');
-    const imagePath = newImage.querySelector('img').src;
+    const imagePath = newImage.querySelector('canvas').getAttribute('data-src');
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
@@ -912,18 +912,18 @@ permalink: /galeria/
     for (let i = 1; i <= preloadCount; i++) {
       // Precargar imágenes siguientes
       const nextIndex = (currentIndex + i) % visibleImages.length;
-      const nextImage = visibleImages[nextIndex].querySelector('img');
+      const nextImage = visibleImages[nextIndex].querySelector('canvas');
       if (nextImage) {
         const img = new Image();
-        img.src = nextImage.src;
+        img.src = nextImage.getAttribute('data-src');
       }
 
       // Precargar imágenes anteriores
       const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
-      const prevImage = visibleImages[prevIndex].querySelector('img');
+      const prevImage = visibleImages[prevIndex].querySelector('canvas');
       if (prevImage) {
         const img = new Image();
-        img.src = prevImage.src;
+        img.src = prevImage.getAttribute('data-src');
       }
     }
   }
