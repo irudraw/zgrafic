@@ -1,0 +1,946 @@
+---
+layout: default
+title: Galería
+permalink: /galeria/
+---
+
+<!-- Asegúrate de que las URLs sean correctas -->
+<script>
+  const BASE_URL = "https://zgrafic.com";
+</script>
+
+<!-- Agrega FontAwesome en el head de tu HTML -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Agrega la fuente Paytone One de Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Paytone+One&display=swap" rel="stylesheet">
+
+<!-- Etiquetas Open Graph dinámicas -->
+<meta property="og:title" content="Galería de Imágenes">
+<meta property="og:description" content="Explora nuestra galería de imágenes.">
+<meta property="og:type" content="website">
+<meta property="og:url" id="og-url" content="{{ site.url }}{{ page.url }}">
+<meta property="og:image" id="og-image" content="{{ site.url }}/ruta/a/imagen-por-defecto.jpg">
+
+<style>
+  /* Estilos globales */
+  body {
+    background-color: #121212; /* Fondo oscuro para el body */
+    color: #e0e0e0; /* Texto claro */
+    margin: 0;
+    font-family: 'Poppins', sans-serif; /* Cambio de fuente a Poppins */
+  }
+
+  /* Ocultar la etiqueta h1 */
+  h1 {
+    display: none;
+  }
+
+  h6 {
+    font-size: 14px; /* Reducir el tamaño del título de categorías */
+    margin-bottom: 10px;
+    color: #e0e0e0;
+    font-weight: 500;
+  }
+
+  .page-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #121212; /* Fondo oscuro */
+    color: #e0e0e0; /* Texto claro */
+  }
+
+  /* Sidebar */
+  .sidebar-menu {
+    width: 250px;
+    padding: 20px;
+    background-color: #1e1e1e; /* Fondo oscuro para el sidebar */
+    border-right: 1px solid #333; /* Borde más oscuro */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  /* Estilos para los botones de categoría */
+  .category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Espacio entre los botones */
+  }
+
+  .category-button {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #333; /* Fondo oscuro para los botones */
+    color: #e0e0e0; /* Texto claro */
+    text-decoration: none; /* Quitar subrayado de los enlaces */
+    font-size: 12px; /* Reducir el tamaño de la letra */
+    transition: background-color 0.2s;
+    cursor: pointer;
+  }
+
+  .category-button:hover {
+    background-color: #444; /* Fondo más claro al pasar el mouse */
+  }
+
+  .category-button.active {
+    background-color: #007bff; /* Color azul para la categoría activa */
+    color: white;
+  }
+
+  .category-button i {
+    font-size: 16px; /* Reducir el tamaño del ícono de carpeta */
+    margin-right: 8px; /* Espacio entre el ícono y el texto */
+  }
+
+  /* Estilos para dispositivos móviles */
+  @media (max-width: 768px) {
+    .category-button span {
+      display: inline-block;
+      max-width: 3ch; /* Limitar a 3 caracteres */
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis; /* Añadir puntos suspensivos */
+    }
+  }
+
+  /* Galería */
+  .gallery-container {
+    flex: 1;
+    padding: 20px;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Reducir el tamaño de las imágenes */
+    gap: 15px;
+  }
+
+  .image-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #1e1e1e; /* Fondo oscuro para las imágenes */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
+    transition: transform 0.2s;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .image-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .image-container:hover {
+    transform: translateY(-5px);
+  }
+
+  .image-container canvas {
+    width: 100%;
+    height: 150px; /* Reducir la altura de las imágenes */
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .image-title {
+    padding: 8px;
+    text-align: center;
+    background-color: #1e1e1e; /* Fondo oscuro para el título */
+    border-top: 1px solid #333; /* Borde más oscuro */
+    color: #e0e0e0; /* Texto claro */
+    font-size: 12px; /* Reducir el tamaño de la letra */
+  }
+
+  /* Estilos mejorados para el popup */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Fondo oscuro para el modal */
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .modal.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-content {
+    position: relative;
+    width: 95%;
+    max-width: 1400px;
+    margin: auto;
+    background-color: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .modal.show .modal-content {
+    transform: scale(1);
+  }
+
+  .modal-body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+    background-color: transparent;
+  }
+
+  .image-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  #modalCanvas {
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
+  }
+
+  /* Contador de imágenes */
+  .image-counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.5); /* Fondo oscuro para el contador */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+  }
+
+  .nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para los botones */
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+  }
+
+  .nav-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .nav-button.prev {
+    left: 20px;
+  }
+
+  .nav-button.next {
+    right: 20px;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de cerrar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .close-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
+  /* Icono de copiar URL */
+  .copy-url-button {
+    position: absolute;
+    top: 20px;
+    right: 70px; /* Ajusta la posición para que no se superponga con el botón de cerrar */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de copiar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .copy-url-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
+  /* Icono de copiar imagen */
+  .copy-image-button {
+    position: absolute;
+    top: 20px;
+    right: 120px; /* Ajusta la posición para que no se superponga con otros botones */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de copiar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .copy-image-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
+  /* Mensaje de URL copiada */
+  .copy-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8); /* Fondo oscuro para el mensaje */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+    z-index: 1002;
+    display: none; /* Oculto por defecto */
+  }
+
+  .copy-message.show {
+    display: block; /* Mostrar el mensaje */
+  }
+
+  /* Animaciones para las imágenes */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Loader */
+  .loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+
+    .nav-button {
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+    }
+
+    .nav-button.prev {
+      left: 10px;
+    }
+
+    .nav-button.next {
+      right: 10px;
+    }
+
+    .copy-url-button {
+      right: 60px; /* Ajuste para dispositivos móviles */
+    }
+
+    .copy-image-button {
+      right: 110px; /* Ajuste para dispositivos móviles */
+    }
+  }
+</style>
+
+<div class="page-container">
+  <!-- Sidebar con categorías -->
+  <div class="sidebar-menu">
+    <div class="categories">
+      <h6>Diseños</h6>
+      <div class="category-list">
+        <a href="{{ site.url }}/galeria/" class="category-button active" data-category="all">
+          <i class="fas fa-folder"></i>
+          <span>Todos los Diseños</span>
+        </a>
+        {% assign categories = "" | split: "" %}
+        {% for file in site.static_files %}
+          {% if file.path contains '/imagenes/' %}
+            {% assign folder = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% unless categories contains folder %}
+              {% assign categories = categories | push: folder %}
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+        {% assign sorted_categories = categories | sort %}
+        {% for category in sorted_categories %}
+          <a href="{{ site.url }}/galeria/?category={{ category | slugify }}" class="category-button" data-category="{{ category | slugify }}">
+            <i class="fas fa-folder"></i>
+            <span>{{ category | capitalize }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor de la galería -->
+  <div class="gallery-container">
+    <div class="gallery">
+      {% for file in site.static_files %}
+        {% if file.path contains '/imagenes/' %}
+          {% if file.extname == '.jpg' or file.extname == '.png' or file.extname == '.jpeg' or file.extname == '.gif' or file.extname == '.webp' %}
+            {% assign category = file.path | split: '/imagenes/' | last | split: '/' | first %}
+            {% assign title = file.name | split: '.' | first | replace: '-', ' ' | capitalize %}
+            {% assign image_path = file.path | relative_url %}
+            {% assign image_id = file.name | split: '.' | first | generateShortCode %}
+
+            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
+              <!-- Cambiar el img por un canvas -->
+              <canvas class="image-canvas" data-src="{{ image_path }}"></canvas>
+              <div class="image-title">{{ title }}</div>
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="loader hidden">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- Modal para visualizar imágenes -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <!-- Botón de cerrar flotante -->
+      <button class="close-button" onclick="closeImage()">×</button>
+      
+      <!-- Botón de copiar URL -->
+      <button class="copy-url-button" onclick="copyPageUrl()">
+        <i class="fas fa-link"></i> <!-- Ícono de enlace de FontAwesome -->
+      </button>
+      
+      <!-- Botón de copiar imagen -->
+      <button class="copy-image-button" onclick="copyImageToClipboard()">
+        <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
+      </button>
+      
+      <div class="modal-body">
+        <button class="nav-button prev" onclick="navigateImage(-1)">‹</button>
+        
+        <div class="image-wrapper">
+          <!-- Cambiar el img por un canvas -->
+          <canvas id="modalCanvas"></canvas>
+        </div>
+        
+        <button class="nav-button next" onclick="navigateImage(1)">›</button>
+        
+        <div class="image-counter">1 de 1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de URL copiada -->
+  <div id="copyMessage" class="copy-message">
+    URL copiada al portapapeles
+  </div>
+</div>
+
+<script>
+  // Deshabilitar el clic derecho en toda la página
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault(); // Evita que se abra el menú contextual
+  });
+
+  // Deshabilitar el arrastre de imágenes
+  document.addEventListener('dragstart', function(e) {
+    if (e.target.tagName === 'IMG') { // Verifica si el elemento arrastrado es una imagen
+      e.preventDefault(); // Evita que la imagen sea arrastrada
+    }
+  });
+
+  // Variables globales
+  let currentImageIndex = 0;
+  let images = [];
+  let currentCategory = 'all';
+  let isLoading = false;
+  let loadedCount = 0;
+  const batchSize = 6;
+
+  // Generador de códigos cortos
+  function generateShortCode(filename) {
+    // Convertir el nombre del archivo a un código corto usando un hash simple
+    let hash = 0;
+    for (let i = 0; i < filename.length; i++) {
+      hash = (hash << 5) - hash + filename.charCodeAt(i);
+      hash |= 0; // Convertir a entero de 32 bits
+    }
+    return Math.abs(hash).toString(36).substring(0, 8); // Código de 8 caracteres
+  }
+
+  // Inicialización
+  document.addEventListener('DOMContentLoaded', () => {
+    // Obtener la categoría de la URL
+    const categoryFromUrl = getQueryParam('category');
+
+    // Si hay una categoría en la URL, activar el botón correspondiente
+    if (categoryFromUrl) {
+      const categoryButton = document.querySelector(`.category-button[data-category="${categoryFromUrl}"]`);
+      if (categoryButton) {
+        // Desactivar todas las categorías primero
+        document.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+        // Activar la categoría correspondiente
+        categoryButton.classList.add('active');
+        currentCategory = categoryFromUrl;
+      }
+    }
+
+    // Recopilar todas las imágenes
+    images = Array.from(document.querySelectorAll('.image-container'));
+
+    // Filtrar imágenes según la categoría inicial
+    filterImages();
+
+    // Event listeners
+    document.addEventListener('keydown', handleKeyPress);
+    setupCategoryFilters();
+
+    // Configurar los manejadores de clic para las imágenes
+    setupImageClickHandlers();
+
+    // Cargar el primer lote de imágenes
+    loadNextBatch();
+
+    // Observar el scroll para cargar más imágenes
+    window.addEventListener('scroll', handleScroll);
+
+    // Verificar si hay un identificador en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const imageId = urlParams.get('id');
+    if (imageId) {
+      const image = images.find(img => img.getAttribute('data-id') === imageId);
+      if (image) {
+        const imagePath = image.querySelector('canvas').getAttribute('data-src');
+        openImage(imageId, imagePath);
+      }
+    }
+
+    // Verificar visibilidad de las imágenes al cargar la página
+    checkVisibility();
+  });
+
+  // Función para obtener el parámetro de la URL
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  // Función para filtrar imágenes
+  function filterImages() {
+    images.forEach(image => {
+      const matchesCategory = currentCategory === 'all' ||
+        image.getAttribute('data-category') === currentCategory;
+
+      image.classList.toggle('hidden', !matchesCategory);
+      
+      // Si la imagen está oculta, quitar la clase 'visible'
+      if (image.classList.contains('hidden')) {
+        image.classList.remove('visible');
+      } else {
+        // Si la imagen no está oculta, agregar la clase 'visible'
+        image.classList.add('visible');
+      }
+    });
+
+    // Verificar visibilidad de las imágenes después de filtrar
+    checkVisibility();
+  }
+
+  // Función para configurar los filtros de categoría
+  function setupCategoryFilters() {
+    const categoryButtons = document.querySelectorAll('.category-button');
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
+
+        // Desactivar todas las categorías primero
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+
+        // Activar la categoría seleccionada
+        button.classList.add('active');
+
+        // Obtener la categoría seleccionada
+        const selectedCategory = button.getAttribute('data-category');
+
+        // Actualizar la URL con el parámetro de categoría
+        const newUrl = selectedCategory === 'all' ? 
+          `${window.location.pathname}` : 
+          `${window.location.pathname}?category=${selectedCategory}`;
+        window.history.pushState({}, '', newUrl);
+
+        // Filtrar imágenes
+        currentCategory = selectedCategory;
+        filterImages();
+      });
+    });
+  }
+
+  // Cargar imágenes de 4 en 4
+  function loadNextBatch() {
+    if (isLoading) return;
+    isLoading = true;
+
+    const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
+    imagesToLoad.forEach(imgContainer => {
+      if (!imgContainer.classList.contains('hidden')) {
+        imgContainer.classList.remove('hidden');
+        checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
+      }
+    });
+
+    loadedCount += batchSize;
+    isLoading = false;
+  }
+
+  // Manejar el scroll para cargar más imágenes
+  function handleScroll() {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      loadNextBatch();
+    }
+    checkVisibility(); // Verificar visibilidad al hacer scroll
+  }
+
+  // Verificar visibilidad de las imágenes
+  function checkVisibility() {
+    const images = document.querySelectorAll('.image-container');
+    images.forEach(image => {
+      const rect = image.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
+        image.classList.add('visible');
+        loadImageIntoCanvas(image); // Cargar la imagen en el canvas cuando sea visible
+      }
+    });
+  }
+
+  // Función para cargar la imagen en un canvas
+  function loadImageIntoCanvas(imageContainer) {
+    const canvas = imageContainer.querySelector('.image-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = canvas.getAttribute('data-src');
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+  }
+
+  // Función para manejar el clic en las imágenes
+  function setupImageClickHandlers() {
+    const imageContainers = document.querySelectorAll('.image-container');
+    imageContainers.forEach(container => {
+      const canvas = container.querySelector('.image-canvas');
+      canvas.addEventListener('click', () => {
+        const imageId = container.getAttribute('data-id');
+        const imagePath = canvas.getAttribute('data-src');
+        openImage(imageId, imagePath);
+      });
+    });
+  }
+
+  // Modificar la función openImage para usar el canvas
+  function openImage(imageId, imagePath) {
+    const modal = document.getElementById('imageModal');
+    const canvas = document.getElementById('modalCanvas');
+    const ctx = canvas.getContext('2d');
+
+    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
+
+    // Cargar la imagen y dibujarla en el canvas
+    const img = new Image();
+    img.src = imagePath;
+    img.onload = () => {
+      // Ajustar el tamaño del canvas al tamaño de la imagen
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Dibujar la imagen en el canvas
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+
+    // Actualizar la URL con el identificador de la imagen
+    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    window.history.pushState({}, '', newUrl);
+
+    // Actualizar las etiquetas Open Graph
+    updateOpenGraphTags(imagePath, newUrl);
+
+    updateImageCounter();
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Función para actualizar las etiquetas Open Graph
+  function updateOpenGraphTags(imageUrl, pageUrl) {
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+
+    ogImage.setAttribute('content', imageUrl); // Actualizar la URL de la imagen
+    ogUrl.setAttribute('content', pageUrl); // Actualizar la URL de la página
+  }
+
+  function closeImage() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+
+    // Limpiar el identificador de la URL al cerrar el modal
+    window.history.pushState({}, '', window.location.pathname);
+  }
+
+  // Función para copiar la URL actual de la página
+  function copyPageUrl() {
+    const currentUrl = window.location.href; // Obtener la URL actual
+
+    // Copiar la URL al portapapeles
+    navigator.clipboard.writeText(currentUrl)
+      .then(() => {
+        // Mostrar el mensaje de URL copiada
+        const copyMessage = document.getElementById('copyMessage');
+        copyMessage.textContent = 'URL copiada al portapapeles';
+        copyMessage.classList.add('show');
+
+        // Ocultar el mensaje después de 2 segundos
+        setTimeout(() => {
+          copyMessage.classList.remove('show');
+        }, 2000);
+      })
+      .catch(() => {
+        alert('Error al copiar la URL');
+      });
+  }
+
+  // Función para copiar la imagen con marca de agua
+  function copyImageToClipboard() {
+    const canvas = document.getElementById('modalCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Crear un nuevo canvas temporal para dibujar la imagen con la marca de agua
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+
+    // Configurar el tamaño del canvas temporal
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+
+    // Dibujar la imagen original en el canvas temporal
+    tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    // Agregar la marca de agua en tres posiciones:
+    // 1. Arriba (mitad de la parte superior)
+    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    tempCtx.textAlign = 'center'; // Centrar el texto horizontalmente
+    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.25); // 25% desde la parte superior
+
+    // 2. En el medio (50px)
+    tempCtx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
+    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height / 2 + 25); // Ajuste vertical para centrar
+
+    // 3. Abajo (mitad de la parte inferior)
+    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
+    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
+    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.75); // 75% desde la parte superior
+
+    // Convertir el canvas temporal a un Blob
+    tempCanvas.toBlob((blob) => {
+      // Crear un objeto ClipboardItem con la imagen
+      const item = new ClipboardItem({ [blob.type]: blob });
+
+      // Copiar la imagen al portapapeles
+      navigator.clipboard.write([item])
+        .then(() => {
+          // Mostrar el mensaje de éxito
+          const copyMessage = document.getElementById('copyMessage');
+          copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
+          copyMessage.classList.add('show');
+
+          // Ocultar el mensaje después de 2 segundos
+          setTimeout(() => {
+            copyMessage.classList.remove('show');
+          }, 2000);
+        })
+        .catch(() => {
+          alert('Error al copiar la imagen');
+        });
+    }, 'image/png');
+  }
+
+  function navigateImage(direction) {
+    const visibleImages = getVisibleImages();
+    let currentIndexInVisible = visibleImages.findIndex(img =>
+      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
+    );
+
+    currentIndexInVisible = (currentIndexInVisible + direction + visibleImages.length) % visibleImages.length;
+    const newImage = visibleImages[currentIndexInVisible];
+
+    const imageId = newImage.getAttribute('data-id');
+    const imagePath = newImage.querySelector('canvas').getAttribute('data-src');
+
+    currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
+
+    const canvas = document.getElementById('modalCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Cargar la nueva imagen y dibujarla en el canvas
+    const img = new Image();
+    img.src = imagePath;
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+
+    // Actualizar la URL con el nuevo identificador
+    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    window.history.pushState({}, '', newUrl);
+
+    // Actualizar las etiquetas Open Graph
+    updateOpenGraphTags(imagePath, newUrl);
+
+    // Precargar siguientes imágenes
+    preloadAdjacentImages(currentImageIndex);
+    updateImageCounter();
+  }
+
+  function handleKeyPress(e) {
+    if (!document.getElementById('imageModal').classList.contains('show')) return;
+
+    switch (e.key) {
+      case 'Escape':
+        closeImage();
+        break;
+      case 'ArrowLeft':
+        navigateImage(-1);
+        break;
+      case 'ArrowRight':
+        navigateImage(1);
+        break;
+    }
+  }
+
+  // Añadir contador de imágenes
+  function updateImageCounter() {
+    const visibleImages = getVisibleImages();
+    const currentPosition = visibleImages.findIndex(img =>
+      img.getAttribute('data-id') === images[currentImageIndex].getAttribute('data-id')
+    ) + 1;
+
+    const counter = document.querySelector('.image-counter');
+    counter.textContent = `${currentPosition} de ${visibleImages.length}`;
+  }
+
+  // Funciones auxiliares
+  function getVisibleImages() {
+    return images.filter(img => !img.classList.contains('hidden'));
+  }
+
+  function preloadAdjacentImages(currentIndex) {
+    const visibleImages = getVisibleImages();
+    const preloadCount = 2; // Número de imágenes a precargar en cada dirección
+
+    for (let i = 1; i <= preloadCount; i++) {
+      // Precargar imágenes siguientes
+      const nextIndex = (currentIndex + i) % visibleImages.length;
+      const nextImage = visibleImages[nextIndex].querySelector('canvas');
+      if (nextImage) {
+        const img = new Image();
+        img.src = nextImage.getAttribute('data-src');
+      }
+
+      // Precargar imágenes anteriores
+      const prevIndex = (currentIndex - i + visibleImages.length) % visibleImages.length;
+      const prevImage = visibleImages[prevIndex].querySelector('canvas');
+      if (prevImage) {
+        const img = new Image();
+        img.src = prevImage.getAttribute('data-src');
+      }
+    }
+  }
+</script>
