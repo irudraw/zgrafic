@@ -202,6 +202,7 @@ permalink: /galeria/
   }
 
   .image-wrapper {
+    position: relative;
     flex: 1;
     display: flex;
     justify-content: center;
@@ -213,7 +214,7 @@ permalink: /galeria/
     display: none; /* Ocultar la imagen original, ya que el canvas la mostrará */
   }
 
-  /* Canvas para dibujar sobre la imagen */
+  /* Canvas para mostrar la imagen */
   #drawingCanvas {
     max-width: 100%;
     max-height: 90vh;
@@ -222,6 +223,29 @@ permalink: /galeria/
     object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
+  }
+
+  /* Contenedor de texto editable */
+  .text-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Permitir clics en el canvas */
+  }
+
+  .text-input {
+    position: absolute;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    font-family: 'Arial', sans-serif;
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    pointer-events: all; /* Permitir interacción con el texto */
   }
 
   /* Contador de imágenes */
@@ -398,103 +422,6 @@ permalink: /galeria/
   .hidden {
     display: none;
   }
-
-  /* Estilos para el botón de agregar texto */
-  .add-text-button {
-    position: absolute;
-    top: 20px;
-    right: 170px; /* Ajusta la posición para que no se superponga con otros botones */
-    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de agregar texto */
-    border: none;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-    z-index: 1001;
-  }
-
-  .add-text-button:hover {
-    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
-    transform: scale(1.1);
-  }
-
-  /* Estilos para los controles de texto */
-  .text-controls {
-    position: absolute;
-    top: 70px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    border-radius: 8px;
-    z-index: 1001;
-  }
-
-  .text-controls label {
-    color: white;
-    font-size: 0.9rem;
-  }
-
-  .text-controls input[type="text"] {
-    width: 150px;
-    padding: 5px;
-    border-radius: 4px;
-    border: none;
-    background-color: #333;
-    color: white;
-  }
-
-  .text-controls input[type="color"] {
-    width: 100px;
-    height: 30px;
-    border: none;
-    cursor: pointer;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .modal-content {
-      width: 100%;
-      height: 100%;
-      border-radius: 0;
-    }
-
-    .nav-button {
-      width: 40px;
-      height: 40px;
-      font-size: 1.5rem;
-    }
-
-    .nav-button.prev {
-      left: 10px;
-    }
-
-    .nav-button.next {
-      right: 10px;
-    }
-
-    .copy-url-button {
-      right: 60px; /* Ajuste para dispositivos móviles */
-    }
-
-    .copy-image-button {
-      right: 110px; /* Ajuste para dispositivos móviles */
-    }
-
-    .add-text-button {
-      right: 160px; /* Ajuste para dispositivos móviles */
-    }
-
-    .text-controls {
-      top: 150px; /* Ajuste para dispositivos móviles */
-    }
-  }
 </style>
 
 <div class="page-container">
@@ -568,25 +495,15 @@ permalink: /galeria/
         <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
       </button>
 
-      <!-- Botón de agregar texto -->
-      <button class="add-text-button" onclick="toggleTextControls()">
-        <i class="fas fa-font"></i> <!-- Ícono de texto de FontAwesome -->
-      </button>
-
-      <!-- Controles de texto -->
-      <div class="text-controls hidden">
-        <label for="text-input">Texto:</label>
-        <input type="text" id="text-input" placeholder="Escribe aquí">
-        <label for="text-color">Color:</label>
-        <input type="color" id="text-color" value="#ffffff">
-      </div>
-      
       <div class="modal-body">
         <button class="nav-button prev" onclick="navigateImage(-1)">‹</button>
         
         <div class="image-wrapper">
-          <!-- Canvas para mostrar la imagen y el texto -->
+          <!-- Canvas para mostrar la imagen -->
           <canvas id="drawingCanvas" style="display: block;"></canvas>
+          
+          <!-- Contenedor de texto editable -->
+          <div class="text-overlay" id="textOverlay"></div>
         </div>
         
         <button class="nav-button next" onclick="navigateImage(1)">›</button>
@@ -623,11 +540,9 @@ permalink: /galeria/
   let loadedCount = 0;
   const batchSize = 6;
 
-  // Variables para el texto
-  let isAddingText = false;
-  let textInput = '';
-  let textColor = '#ffffff';
+  // Variables para el texto editable
   let canvas, ctx;
+  let textOverlay;
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
@@ -785,6 +700,7 @@ permalink: /galeria/
   function openImage(imageId, imagePath) {
     const modal = document.getElementById('imageModal');
     const canvas = document.getElementById('drawingCanvas');
+    textOverlay = document.getElementById('textOverlay');
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
@@ -792,6 +708,9 @@ permalink: /galeria/
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
+
+    // Limpiar el contenedor de texto
+    textOverlay.innerHTML = '';
 
     // Cargar la imagen en el canvas
     const img = new Image();
@@ -802,12 +721,6 @@ permalink: /galeria/
       ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0); // Dibujar la imagen en el canvas
       canvas.style.display = 'block'; // Mostrar el canvas
-
-      // Inicializar el contexto del canvas si no está inicializado
-      if (!ctx) {
-        ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-      }
 
       // Configurar eventos para agregar texto
       setupCanvas();
@@ -983,13 +896,6 @@ permalink: /galeria/
     }
   }
 
-  // Función para mostrar/ocultar los controles de texto
-  function toggleTextControls() {
-    const textControls = document.querySelector('.text-controls');
-    textControls.classList.toggle('hidden');
-    isAddingText = !isAddingText;
-  }
-
   // Función para configurar el canvas y los eventos de texto
   function setupCanvas() {
     canvas = document.getElementById('drawingCanvas');
@@ -999,32 +905,28 @@ permalink: /galeria/
     const rect = canvas.getBoundingClientRect();
 
     canvas.addEventListener('click', (e) => {
-      if (isAddingText) {
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        addText(x, y);
-      }
-    });
-
-    // Actualizar el texto y el color
-    const textInputElement = document.getElementById('text-input');
-    const textColorElement = document.getElementById('text-color');
-
-    textInputElement.addEventListener('input', (e) => {
-      textInput = e.target.value;
-    });
-
-    textColorElement.addEventListener('input', (e) => {
-      textColor = e.target.value;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      addTextInput(x, y);
     });
   }
 
-  // Función para agregar texto en la posición especificada
-  function addText(x, y) {
-    if (textInput.trim() === '') return;
+  // Función para agregar un campo de texto editable en la posición especificada
+  function addTextInput(x, y) {
+    const textInput = document.createElement('textarea');
+    textInput.classList.add('text-input');
+    textInput.style.left = `${x}px`;
+    textInput.style.top = `${y}px`;
+    textInput.placeholder = 'Escribe aquí';
 
-    ctx.font = '30px Arial'; // Tamaño y fuente del texto
-    ctx.fillStyle = textColor; // Color del texto
-    ctx.fillText(textInput, x, y); // Dibujar el texto en el canvas
+    // Permitir que el usuario edite el texto
+    textInput.addEventListener('input', (e) => {
+      textInput.style.width = `${textInput.scrollWidth}px`;
+      textInput.style.height = `${textInput.scrollHeight}px`;
+    });
+
+    // Agregar el campo de texto al contenedor de texto
+    textOverlay.appendChild(textInput);
+    textInput.focus();
   }
 </script>
