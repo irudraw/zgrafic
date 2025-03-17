@@ -399,12 +399,12 @@ permalink: /galeria/
     display: none;
   }
 
-  /* Estilos para el botón de lápiz */
-  .pencil-button {
+  /* Estilos para el botón de agregar texto */
+  .add-text-button {
     position: absolute;
     top: 20px;
     right: 170px; /* Ajusta la posición para que no se superponga con otros botones */
-    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de lápiz */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de agregar texto */
     border: none;
     color: white;
     width: 40px;
@@ -420,13 +420,13 @@ permalink: /galeria/
     z-index: 1001;
   }
 
-  .pencil-button:hover {
+  .add-text-button:hover {
     background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
     transform: scale(1.1);
   }
 
-  /* Estilos para los controles de grosor del lápiz */
-  .pencil-controls {
+  /* Estilos para los controles de texto */
+  .text-controls {
     position: absolute;
     top: 70px;
     right: 20px;
@@ -436,32 +436,21 @@ permalink: /galeria/
     z-index: 1001;
   }
 
-  .pencil-controls label {
+  .text-controls label {
     color: white;
     font-size: 0.9rem;
   }
 
-  .pencil-controls input[type="range"] {
-    width: 100px;
-  }
-
-  /* Estilos para la barra de selección de color */
-  .color-picker {
-    position: absolute;
-    top: 110px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    border-radius: 8px;
-    z-index: 1001;
-  }
-
-  .color-picker label {
+  .text-controls input[type="text"] {
+    width: 150px;
+    padding: 5px;
+    border-radius: 4px;
+    border: none;
+    background-color: #333;
     color: white;
-    font-size: 0.9rem;
   }
 
-  .color-picker input[type="color"] {
+  .text-controls input[type="color"] {
     width: 100px;
     height: 30px;
     border: none;
@@ -498,11 +487,11 @@ permalink: /galeria/
       right: 110px; /* Ajuste para dispositivos móviles */
     }
 
-    .pencil-button {
+    .add-text-button {
       right: 160px; /* Ajuste para dispositivos móviles */
     }
 
-    .color-picker {
+    .text-controls {
       top: 150px; /* Ajuste para dispositivos móviles */
     }
   }
@@ -575,32 +564,28 @@ permalink: /galeria/
       </button>
       
       <!-- Botón de copiar imagen -->
-      <button class="copy-image-button" onclick="copyImageWithMarks()">
+      <button class="copy-image-button" onclick="copyImageWithText()">
         <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
       </button>
 
-      <!-- Botón de lápiz -->
-      <button class="pencil-button" onclick="togglePencilControls()">
-        <i class="fas fa-pencil-alt"></i> <!-- Ícono de lápiz de FontAwesome -->
+      <!-- Botón de agregar texto -->
+      <button class="add-text-button" onclick="toggleTextControls()">
+        <i class="fas fa-font"></i> <!-- Ícono de texto de FontAwesome -->
       </button>
 
-      <!-- Controles de grosor del lápiz -->
-      <div class="pencil-controls hidden">
-        <label for="pencil-size">Grosor:</label>
-        <input type="range" id="pencil-size" min="1" max="20" value="5">
-      </div>
-
-      <!-- Barra de selección de color -->
-      <div class="color-picker hidden">
-        <label for="pencil-color">Color:</label>
-        <input type="color" id="pencil-color" value="#ffffff">
+      <!-- Controles de texto -->
+      <div class="text-controls hidden">
+        <label for="text-input">Texto:</label>
+        <input type="text" id="text-input" placeholder="Escribe aquí">
+        <label for="text-color">Color:</label>
+        <input type="color" id="text-color" value="#ffffff">
       </div>
       
       <div class="modal-body">
         <button class="nav-button prev" onclick="navigateImage(-1)">‹</button>
         
         <div class="image-wrapper">
-          <!-- Canvas para dibujar sobre la imagen -->
+          <!-- Canvas para mostrar la imagen y el texto -->
           <canvas id="drawingCanvas" style="display: block;"></canvas>
         </div>
         
@@ -638,10 +623,10 @@ permalink: /galeria/
   let loadedCount = 0;
   const batchSize = 6;
 
-  // Variables para el dibujo
-  let isDrawing = false;
-  let pencilSize = 5;
-  let pencilColor = '#ffffff';
+  // Variables para el texto
+  let isAddingText = false;
+  let textInput = '';
+  let textColor = '#ffffff';
   let canvas, ctx;
 
   // Generador de códigos cortos
@@ -808,10 +793,6 @@ permalink: /galeria/
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Reiniciar el estado del lápiz
-    pencilSize = 5; // Valor inicial del grosor del lápiz
-    pencilColor = '#ffffff'; // Color inicial del lápiz
-
     // Cargar la imagen en el canvas
     const img = new Image();
     img.src = imagePath;
@@ -828,7 +809,7 @@ permalink: /galeria/
         ctx.drawImage(img, 0, 0);
       }
 
-      // Activar el dibujo automáticamente
+      // Configurar eventos para agregar texto
       setupCanvas();
     };
 
@@ -888,11 +869,11 @@ permalink: /galeria/
       });
   }
 
-  // Función para copiar la imagen con las marcas hechas con el lápiz y la marca de agua
-  function copyImageWithMarks() {
+  // Función para copiar la imagen con el texto agregado
+  function copyImageWithText() {
     const canvas = document.getElementById('drawingCanvas');
 
-    // Crear un nuevo canvas para combinar la imagen, las marcas y la marca de agua
+    // Crear un nuevo canvas para combinar la imagen y el texto
     const combinedCanvas = document.createElement('canvas');
     const combinedCtx = combinedCanvas.getContext('2d');
 
@@ -902,23 +883,6 @@ permalink: /galeria/
 
     // Dibujar la imagen en el canvas combinado
     combinedCtx.drawImage(canvas, 0, 0);
-
-    // Agregar la marca de agua
-    combinedCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    combinedCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    combinedCtx.textAlign = 'center'; // Centrar el texto horizontalmente
-
-    // Agregar la marca de agua en tres posiciones:
-    // 1. Arriba (mitad de la parte superior)
-    combinedCtx.fillText('ZGrafic', combinedCanvas.width / 2, combinedCanvas.height * 0.25); // 25% desde la parte superior
-
-    // 2. En el medio (50px)
-    combinedCtx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
-    combinedCtx.fillText('ZGrafic', combinedCanvas.width / 2, combinedCanvas.height / 2 + 25); // Ajuste vertical para centrar
-
-    // 3. Abajo (mitad de la parte inferior)
-    combinedCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    combinedCtx.fillText('ZGrafic', combinedCanvas.width / 2, combinedCanvas.height * 0.75); // 75% desde la parte superior
 
     // Convertir el canvas combinado a un Blob
     combinedCanvas.toBlob((blob) => {
@@ -930,7 +894,7 @@ permalink: /galeria/
         .then(() => {
           // Mostrar el mensaje de éxito
           const copyMessage = document.getElementById('copyMessage');
-          copyMessage.textContent = 'Imagen copiada al portapapeles con marcas y marca de agua';
+          copyMessage.textContent = 'Imagen copiada al portapapeles con texto';
           copyMessage.classList.add('show');
 
           // Ocultar el mensaje después de 2 segundos
@@ -1019,16 +983,14 @@ permalink: /galeria/
     }
   }
 
-  // Función para mostrar/ocultar los controles del lápiz
-  function togglePencilControls() {
-    const pencilControls = document.querySelector('.pencil-controls');
-    const colorPicker = document.querySelector('.color-picker');
-
-    pencilControls.classList.toggle('hidden');
-    colorPicker.classList.toggle('hidden');
+  // Función para mostrar/ocultar los controles de texto
+  function toggleTextControls() {
+    const textControls = document.querySelector('.text-controls');
+    textControls.classList.toggle('hidden');
+    isAddingText = !isAddingText;
   }
 
-  // Función para configurar el canvas y los eventos de dibujo
+  // Función para configurar el canvas y los eventos de texto
   function setupCanvas() {
     canvas = document.getElementById('drawingCanvas');
     ctx = canvas.getContext('2d');
@@ -1036,58 +998,33 @@ permalink: /galeria/
     // Ajustar las coordenadas del cursor para que coincidan con el canvas
     const rect = canvas.getBoundingClientRect();
 
-    canvas.addEventListener('mousedown', (e) => {
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      startDrawing({ offsetX: x, offsetY: y });
+    canvas.addEventListener('click', (e) => {
+      if (isAddingText) {
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        addText(x, y);
+      }
     });
 
-    canvas.addEventListener('mousemove', (e) => {
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      draw({ offsetX: x, offsetY: y });
+    // Actualizar el texto y el color
+    const textInputElement = document.getElementById('text-input');
+    const textColorElement = document.getElementById('text-color');
+
+    textInputElement.addEventListener('input', (e) => {
+      textInput = e.target.value;
     });
 
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseout', stopDrawing);
-
-    // Actualizar el grosor del lápiz
-    const pencilSizeInput = document.getElementById('pencil-size');
-    pencilSizeInput.addEventListener('input', (e) => {
-      pencilSize = e.target.value;
-    });
-
-    // Actualizar el color del lápiz
-    const pencilColorInput = document.getElementById('pencil-color');
-    pencilColorInput.addEventListener('input', (e) => {
-      pencilColor = e.target.value;
+    textColorElement.addEventListener('input', (e) => {
+      textColor = e.target.value;
     });
   }
 
-  // Función para iniciar el dibujo
-  function startDrawing(e) {
-    isDrawing = true;
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX, e.offsetY);
-  }
+  // Función para agregar texto en la posición especificada
+  function addText(x, y) {
+    if (textInput.trim() === '') return;
 
-  // Función para dibujar
-  function draw(e) {
-    if (!isDrawing) return;
-
-    ctx.lineWidth = pencilSize;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = pencilColor;
-
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX, e.offsetY);
-  }
-
-  // Función para detener el dibujo
-  function stopDrawing() {
-    isDrawing = false;
-    ctx.beginPath();
+    ctx.font = '30px Arial'; // Tamaño y fuente del texto
+    ctx.fillStyle = textColor; // Color del texto
+    ctx.fillText(textInput, x, y); // Dibujar el texto en el canvas
   }
 </script>
