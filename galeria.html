@@ -202,7 +202,6 @@ permalink: /galeria/
   }
 
   .image-wrapper {
-    position: relative;
     flex: 1;
     display: flex;
     justify-content: center;
@@ -210,17 +209,11 @@ permalink: /galeria/
     padding: 2rem;
   }
 
-  #modalImage {
-    display: none; /* Ocultar la imagen original, ya que el canvas la mostrará */
-  }
-
-  /* Canvas para mostrar la imagen */
-  #drawingCanvas {
+  #modalCanvas {
     max-width: 100%;
     max-height: 90vh;
     width: auto;
     height: auto;
-    object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
   }
@@ -399,6 +392,37 @@ permalink: /galeria/
   .hidden {
     display: none;
   }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+
+    .nav-button {
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+    }
+
+    .nav-button.prev {
+      left: 10px;
+    }
+
+    .nav-button.next {
+      right: 10px;
+    }
+
+    .copy-url-button {
+      right: 60px; /* Ajuste para dispositivos móviles */
+    }
+
+    .copy-image-button {
+      right: 110px; /* Ajuste para dispositivos móviles */
+    }
+  }
 </style>
 
 <div class="page-container">
@@ -468,16 +492,16 @@ permalink: /galeria/
       </button>
       
       <!-- Botón de copiar imagen -->
-      <button class="copy-image-button" onclick="copyImageWithText()">
+      <button class="copy-image-button" onclick="copyImageToClipboard()">
         <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
       </button>
-
+      
       <div class="modal-body">
         <button class="nav-button prev" onclick="navigateImage(-1)">‹</button>
         
         <div class="image-wrapper">
-          <!-- Canvas para mostrar la imagen -->
-          <canvas id="drawingCanvas" style="display: block;"></canvas>
+          <!-- Cambiar el img por un canvas -->
+          <canvas id="modalCanvas"></canvas>
         </div>
         
         <button class="nav-button next" onclick="navigateImage(1)">›</button>
@@ -513,7 +537,6 @@ permalink: /galeria/
   let isLoading = false;
   let loadedCount = 0;
   const batchSize = 6;
-  let ctx; // Contexto del canvas
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
@@ -667,32 +690,24 @@ permalink: /galeria/
     });
   }
 
-  // Modificar la función openImage para usar el identificador único
+  // Modificar la función openImage para usar el canvas
   function openImage(imageId, imagePath) {
     const modal = document.getElementById('imageModal');
-    const canvas = document.getElementById('drawingCanvas');
+    const canvas = document.getElementById('modalCanvas');
+    const ctx = canvas.getContext('2d');
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
-    // Limpiar el canvas antes de dibujar la nueva imagen
-    if (ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // Cargar la imagen en el canvas
+    // Cargar la imagen y dibujarla en el canvas
     const img = new Image();
     img.src = imagePath;
     img.onload = () => {
+      // Ajustar el tamaño del canvas al tamaño de la imagen
       canvas.width = img.width;
       canvas.height = img.height;
-      ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0); // Dibujar la imagen en el canvas
-      canvas.style.display = 'block'; // Mostrar el canvas
 
-      // Agregar marca de agua
-      ctx.font = '30px Arial';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.fillText('Marca de Agua', 20, 50); // Ajusta la posición del texto
+      // Dibujar la imagen en el canvas
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
 
     // Actualizar la URL con el identificador de la imagen
@@ -702,10 +717,7 @@ permalink: /galeria/
     // Actualizar las etiquetas Open Graph
     updateOpenGraphTags(imagePath, newUrl);
 
-    // Actualizar el contador de imágenes
     updateImageCounter();
-
-    // Mostrar el modal
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
@@ -719,7 +731,6 @@ permalink: /galeria/
     ogUrl.setAttribute('content', pageUrl); // Actualizar la URL de la página
   }
 
-  // Función para cerrar el modal
   function closeImage() {
     const modal = document.getElementById('imageModal');
     modal.classList.remove('show');
@@ -751,28 +762,12 @@ permalink: /galeria/
       });
   }
 
-  // Función para copiar la imagen con la marca de agua
-  function copyImageWithText() {
-    const canvas = document.getElementById('drawingCanvas');
+  // Función para copiar la imagen con marca de agua
+  function copyImageToClipboard() {
+    const canvas = document.getElementById('modalCanvas');
 
-    // Crear un nuevo canvas para combinar la imagen y la marca de agua
-    const combinedCanvas = document.createElement('canvas');
-    const combinedCtx = combinedCanvas.getContext('2d');
-
-    // Ajustar el tamaño del canvas combinado al tamaño de la imagen
-    combinedCanvas.width = canvas.width;
-    combinedCanvas.height = canvas.height;
-
-    // Dibujar la imagen en el canvas combinado
-    combinedCtx.drawImage(canvas, 0, 0);
-
-    // Agregar la marca de agua
-    combinedCtx.font = '30px Arial';
-    combinedCtx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    combinedCtx.fillText('Marca de Agua', 20, 50); // Ajusta la posición del texto
-
-    // Convertir el canvas combinado a un Blob
-    combinedCanvas.toBlob((blob) => {
+    // Convertir el canvas a un Blob
+    canvas.toBlob((blob) => {
       // Crear un objeto ClipboardItem con la imagen
       const item = new ClipboardItem({ [blob.type]: blob });
 
@@ -795,7 +790,6 @@ permalink: /galeria/
     }, 'image/png');
   }
 
-  // Función para navegar entre imágenes
   function navigateImage(direction) {
     const visibleImages = getVisibleImages();
     let currentIndexInVisible = visibleImages.findIndex(img =>
@@ -810,10 +804,30 @@ permalink: /galeria/
 
     currentImageIndex = images.findIndex(img => img.getAttribute('data-id') === imageId);
 
-    openImage(imageId, imagePath);
+    const canvas = document.getElementById('modalCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Cargar la nueva imagen y dibujarla en el canvas
+    const img = new Image();
+    img.src = imagePath;
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+
+    // Actualizar la URL con el nuevo identificador
+    const newUrl = `${window.location.pathname}?id=${imageId}`;
+    window.history.pushState({}, '', newUrl);
+
+    // Actualizar las etiquetas Open Graph
+    updateOpenGraphTags(imagePath, newUrl);
+
+    // Precargar siguientes imágenes
+    preloadAdjacentImages(currentImageIndex);
+    updateImageCounter();
   }
 
-  // Función para manejar las teclas de navegación
   function handleKeyPress(e) {
     if (!document.getElementById('imageModal').classList.contains('show')) return;
 
@@ -830,7 +844,7 @@ permalink: /galeria/
     }
   }
 
-  // Función para actualizar el contador de imágenes
+  // Añadir contador de imágenes
   function updateImageCounter() {
     const visibleImages = getVisibleImages();
     const currentPosition = visibleImages.findIndex(img =>
@@ -841,12 +855,11 @@ permalink: /galeria/
     counter.textContent = `${currentPosition} de ${visibleImages.length}`;
   }
 
-  // Función para obtener las imágenes visibles
+  // Funciones auxiliares
   function getVisibleImages() {
     return images.filter(img => !img.classList.contains('hidden'));
   }
 
-  // Función para precargar imágenes adyacentes
   function preloadAdjacentImages(currentIndex) {
     const visibleImages = getVisibleImages();
     const preloadCount = 2; // Número de imágenes a precargar en cada dirección
