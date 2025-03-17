@@ -36,6 +36,7 @@
         }
 
         #content-container {
+            /*background-color: var(--secondary-bg);*/
             padding: 1rem;
             border-radius: 0.5rem;
             display: flex;
@@ -106,34 +107,13 @@
             z-index: 10;
         }
 
-        .footer-text {
-            position: fixed;
-            bottom: 40px; /* Ajusta la posición vertical */
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 10px; /* Tamaño de la letra pequeño */
-            color: var(--text-color);
-            z-index: 9; /* Asegura que esté debajo de los botones */
-        }
-
-        .header-text {
-            position: fixed;
-            top: 40px; /* Ajusta la posición vertical */
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 10px; /* Tamaño de la letra pequeño */
-            color: var(--text-color);
-            z-index: 9; /* Asegura que esté debajo de los botones */
-        }
-
         @media (max-width: 600px) {
             .btn {
                 min-width: 40px;
             }
             .btn span {
-                display: none;
+                font-size: 0.6rem; /* Tamaño de fuente más pequeño para dispositivos móviles */
+                display: inline; /* Asegúrate de que el texto se muestre */
             }
         }
     </style>
@@ -143,10 +123,6 @@
         <a href="#" class="btn" data-page="banner"><i class="fas fa-image"></i><span>Banner</span></a>
         <a href="#" class="btn" data-page="vinil"><i class="fas fa-record-vinyl"></i><span>Vinil</span></a>
         <a href="#" class="btn" data-page="arclad"><i class="fas fa-record-vinyl"></i><span>Arclad</span></a>
-    </div>
-
-    <div class="header-text">
-        Tu Nombre
     </div>
 
     <main>
@@ -160,10 +136,6 @@
         <a href="#" class="btn" data-cliente="Diseñador"><i class="fas fa-paint-brush"></i><span>Diseñadores</span></a>
         <a href="#" class="btn" data-cliente="Vendedor"><i class="fas fa-store"></i><span>Vendedores</span></a>
         <a href="#" class="btn" data-cliente="Casero"><i class="fas fa-ice-cream"></i><span>Helados</span></a>
-    </div>
-
-    <div class="footer-text">
-        Tu Nombre
     </div>
 
     <script>
