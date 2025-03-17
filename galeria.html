@@ -218,6 +218,18 @@ permalink: /galeria/
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
   }
 
+  /* Marca de agua */
+  #watermark {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-family: 'Paytone One', sans-serif;
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.5); /* Color semi-transparente */
+    z-index: 1001; /* Asegúrate de que esté por encima del canvas */
+    pointer-events: none; /* Evita que la marca de agua interfiera con los clics */
+  }
+
   /* Contador de imágenes */
   .image-counter {
     position: absolute;
@@ -503,6 +515,8 @@ permalink: /galeria/
         <div class="image-wrapper">
           <!-- Cambiar el img por un canvas -->
           <canvas id="modalCanvas"></canvas>
+          <!-- Marca de agua -->
+          <div id="watermark">ZGrafic</div>
         </div>
         
         <button class="nav-button next" onclick="navigateImage(1)">›</button>
@@ -799,7 +813,7 @@ permalink: /galeria/
     const canvas = document.getElementById('modalCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Crear un nuevo canvas temporal para dibujar la imagen con la marca de agua
+    // Crear un nuevo canvas temporal para dibujar la imagen sin la marca de agua
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
 
@@ -809,23 +823,6 @@ permalink: /galeria/
 
     // Dibujar la imagen original en el canvas temporal
     tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
-
-    // Agregar la marca de agua en tres posiciones:
-    // 1. Arriba (mitad de la parte superior)
-    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.textAlign = 'center'; // Centrar el texto horizontalmente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.25); // 25% desde la parte superior
-
-    // 2. En el medio (50px)
-    tempCtx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height / 2 + 25); // Ajuste vertical para centrar
-
-    // 3. Abajo (mitad de la parte inferior)
-    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.75); // 75% desde la parte superior
 
     // Convertir el canvas temporal a un Blob
     tempCanvas.toBlob((blob) => {
@@ -837,7 +834,7 @@ permalink: /galeria/
         .then(() => {
           // Mostrar el mensaje de éxito
           const copyMessage = document.getElementById('copyMessage');
-          copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
+          copyMessage.textContent = 'Imagen copiada al portapapeles';
           copyMessage.classList.add('show');
 
           // Ocultar el mensaje después de 2 segundos
