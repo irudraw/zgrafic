@@ -248,6 +248,35 @@ permalink: /galeria/
     pointer-events: all; /* Permitir interacción con el texto */
   }
 
+  /* Controles de texto */
+  .text-controls {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 1001;
+  }
+
+  .text-controls label {
+    color: white;
+    font-size: 0.9rem;
+  }
+
+  .text-controls input[type="range"] {
+    width: 100px;
+  }
+
+  .text-controls select {
+    width: 100px;
+    padding: 5px;
+    border-radius: 4px;
+    border: none;
+    background-color: #333;
+    color: white;
+  }
+
   /* Contador de imágenes */
   .image-counter {
     position: absolute;
@@ -495,6 +524,19 @@ permalink: /galeria/
         <i class="fas fa-copy"></i> <!-- Ícono de copiar de FontAwesome -->
       </button>
 
+      <!-- Controles de texto -->
+      <div class="text-controls">
+        <label for="font-size">Tamaño de fuente:</label>
+        <input type="range" id="font-size" min="10" max="72" value="24">
+        <label for="font-family">Fuente:</label>
+        <select id="font-family">
+          <option value="Arial">Arial</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Verdana">Verdana</option>
+        </select>
+      </div>
+
       <div class="modal-body">
         <button class="nav-button prev" onclick="navigateImage(-1)">‹</button>
         
@@ -543,6 +585,7 @@ permalink: /galeria/
   // Variables para el texto editable
   let canvas, ctx;
   let textOverlay;
+  let currentTextInput = null;
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
@@ -909,6 +952,22 @@ permalink: /galeria/
       const y = e.clientY - rect.top;
       addTextInput(x, y);
     });
+
+    // Actualizar el tamaño de la fuente
+    const fontSizeInput = document.getElementById('font-size');
+    fontSizeInput.addEventListener('input', (e) => {
+      if (currentTextInput) {
+        currentTextInput.style.fontSize = `${e.target.value}px`;
+      }
+    });
+
+    // Actualizar la fuente
+    const fontFamilyInput = document.getElementById('font-family');
+    fontFamilyInput.addEventListener('change', (e) => {
+      if (currentTextInput) {
+        currentTextInput.style.fontFamily = e.target.value;
+      }
+    });
   }
 
   // Función para agregar un campo de texto editable en la posición especificada
@@ -918,6 +977,8 @@ permalink: /galeria/
     textInput.style.left = `${x}px`;
     textInput.style.top = `${y}px`;
     textInput.placeholder = 'Escribe aquí';
+    textInput.style.fontSize = '24px'; // Tamaño de fuente inicial
+    textInput.style.fontFamily = 'Arial'; // Fuente inicial
 
     // Permitir que el usuario edite el texto
     textInput.addEventListener('input', (e) => {
@@ -925,8 +986,30 @@ permalink: /galeria/
       textInput.style.height = `${textInput.scrollHeight}px`;
     });
 
+    // Permitir que el usuario mueva el texto
+    textInput.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      currentTextInput = textInput;
+      const offsetX = e.clientX - textInput.getBoundingClientRect().left;
+      const offsetY = e.clientY - textInput.getBoundingClientRect().top;
+
+      const moveText = (e) => {
+        textInput.style.left = `${e.clientX - offsetX}px`;
+        textInput.style.top = `${e.clientY - offsetY}px`;
+      };
+
+      const stopMove = () => {
+        document.removeEventListener('mousemove', moveText);
+        document.removeEventListener('mouseup', stopMove);
+      };
+
+      document.addEventListener('mousemove', moveText);
+      document.addEventListener('mouseup', stopMove);
+    });
+
     // Agregar el campo de texto al contenedor de texto
     textOverlay.appendChild(textInput);
     textInput.focus();
+    currentTextInput = textInput;
   }
 </script>
