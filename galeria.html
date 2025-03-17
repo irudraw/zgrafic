@@ -140,7 +140,7 @@ permalink: /galeria/
     transform: translateY(-5px);
   }
 
-  .image-container img {
+  .image-container canvas {
     width: 100%;
     height: 150px; /* Reducir la altura de las imágenes */
     object-fit: cover;
@@ -467,7 +467,8 @@ permalink: /galeria/
             {% assign image_id = file.name | split: '.' | first | generateShortCode %}
 
             <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
-              <img src="{{ image_path }}" alt="{{ title }}" loading="lazy" onclick="openImage('{{ image_id }}', '{{ image_path }}')">
+              <!-- Cambiar el img por un canvas -->
+              <canvas class="image-canvas"></canvas>
               <div class="image-title">{{ title }}</div>
             </div>
           {% endif %}
@@ -686,8 +687,23 @@ permalink: /galeria/
       const rect = image.getBoundingClientRect();
       if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
         image.classList.add('visible');
+        loadImageIntoCanvas(image); // Cargar la imagen en el canvas cuando sea visible
       }
     });
+  }
+
+  // Función para cargar la imagen en un canvas
+  function loadImageIntoCanvas(imageContainer) {
+    const canvas = imageContainer.querySelector('.image-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imageContainer.querySelector('img').src;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
   }
 
   // Modificar la función openImage para usar el canvas
