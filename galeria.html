@@ -513,6 +513,7 @@ permalink: /galeria/
   let isLoading = false;
   let loadedCount = 0;
   const batchSize = 6;
+  let ctx; // Contexto del canvas
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
@@ -687,6 +688,11 @@ permalink: /galeria/
       ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0); // Dibujar la imagen en el canvas
       canvas.style.display = 'block'; // Mostrar el canvas
+
+      // Agregar marca de agua
+      ctx.font = '30px Arial';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.fillText('Marca de Agua', 20, 50); // Ajusta la posición del texto
     };
 
     // Actualizar la URL con el identificador de la imagen
@@ -745,11 +751,11 @@ permalink: /galeria/
       });
   }
 
-  // Función para copiar la imagen con el texto agregado
+  // Función para copiar la imagen con la marca de agua
   function copyImageWithText() {
     const canvas = document.getElementById('drawingCanvas');
 
-    // Crear un nuevo canvas para combinar la imagen y el texto
+    // Crear un nuevo canvas para combinar la imagen y la marca de agua
     const combinedCanvas = document.createElement('canvas');
     const combinedCtx = combinedCanvas.getContext('2d');
 
@@ -759,6 +765,11 @@ permalink: /galeria/
 
     // Dibujar la imagen en el canvas combinado
     combinedCtx.drawImage(canvas, 0, 0);
+
+    // Agregar la marca de agua
+    combinedCtx.font = '30px Arial';
+    combinedCtx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    combinedCtx.fillText('Marca de Agua', 20, 50); // Ajusta la posición del texto
 
     // Convertir el canvas combinado a un Blob
     combinedCanvas.toBlob((blob) => {
@@ -770,7 +781,7 @@ permalink: /galeria/
         .then(() => {
           // Mostrar el mensaje de éxito
           const copyMessage = document.getElementById('copyMessage');
-          copyMessage.textContent = 'Imagen copiada al portapapeles con texto';
+          copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
           copyMessage.classList.add('show');
 
           // Ocultar el mensaje después de 2 segundos
