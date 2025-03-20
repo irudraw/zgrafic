@@ -62,27 +62,6 @@ permalink: /galeria/
     overflow-y: auto;
   }
 
-  /* Estilos para el contenedor del logo */
-  .logo-container {
-    text-align: center; /* Centrar el logo */
-    margin-bottom: 20px; /* Espacio entre el logo y la lista de categorías */
-  }
-
-  /* Estilos para el logo */
-  .logo {
-    max-width: 100%; /* Asegura que el logo no exceda el ancho del contenedor */
-    height: auto; /* Mantiene la proporción del logo */
-    width: 150px; /* Tamaño base del logo */
-    background-color: transparent; /* Asegura que el fondo sea transparente */
-  }
-
-  /* Estilos para dispositivos móviles */
-  @media (max-width: 768px) {
-    .logo {
-      width: 100px; /* Reduce el tamaño del logo en dispositivos móviles */
-    }
-  }
-
   /* Estilos para los botones de categoría */
   .category-list {
     display: flex;
@@ -480,10 +459,6 @@ permalink: /galeria/
   <!-- Sidebar con categorías -->
   <div class="sidebar-menu">
     <div class="categories">
-      <!-- Agrega el logo aquí -->
-      <div class="logo-container">
-        <img src="assets/svg/logo.svg" alt="ZGrafic Logo" class="logo">
-      </div>
       <h6>Diseños</h6>
       <div class="category-list">
         <a href="{{ site.url }}/galeria/" class="category-button active" data-category="all">
@@ -577,10 +552,6 @@ permalink: /galeria/
     URL copiada al portapapeles
   </div>
 </div>
-
-<!-- Resto del código JavaScript... -->
-
-<!-- Resto del código JavaScript... -->
 
 <script>
   // Deshabilitar el clic derecho en toda la página
@@ -858,6 +829,13 @@ permalink: /galeria/
       });
   }
 
+  // Función para cargar el SVG como imagen
+  function loadSVG(url, callback) {
+    const img = new Image();
+    img.onload = () => callback(img);
+    img.src = url;
+  }
+
   // Función para copiar la imagen con marca de agua
   function copyImageToClipboard() {
     const canvas = document.getElementById('modalCanvas');
@@ -874,45 +852,44 @@ permalink: /galeria/
     // Dibujar la imagen original en el canvas temporal
     tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // Agregar la marca de agua en tres posiciones:
-    // 1. Arriba (mitad de la parte superior)
-    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.textAlign = 'center'; // Centrar el texto horizontalmente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.25); // 25% desde la parte superior
+    // Cargar el SVG como marca de agua
+    loadSVG('\assets/svg/logo.svg', (watermark) => {
+      // Tamaños y posiciones de la marca de agua
+      const sizes = [30, 50, 30]; // Tamaños en píxeles
+      const positions = [0.25, 0.5, 0.75]; // Posiciones verticales (25%, 50%, 75%)
 
-    // 2. En el medio (50px)
-    tempCtx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height / 2 + 25); // Ajuste vertical para centrar
+      positions.forEach((position, index) => {
+        const size = sizes[index];
+        const x = tempCanvas.width / 2 - size / 2;
+        const y = tempCanvas.height * position - size / 2;
 
-    // 3. Abajo (mitad de la parte inferior)
-    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.75); // 75% desde la parte superior
+        // Dibujar el SVG en el canvas temporal
+        tempCtx.drawImage(watermark, x, y, size, size);
+      });
 
-    // Convertir el canvas temporal a un Blob
-    tempCanvas.toBlob((blob) => {
-      // Crear un objeto ClipboardItem con la imagen
-      const item = new ClipboardItem({ [blob.type]: blob });
+      // Convertir el canvas temporal a un Blob
+      tempCanvas.toBlob((blob) => {
+        // Crear un objeto ClipboardItem con la imagen
+        const item = new ClipboardItem({ [blob.type]: blob });
 
-      // Copiar la imagen al portapapeles
-      navigator.clipboard.write([item])
-        .then(() => {
-          // Mostrar el mensaje de éxito
-          const copyMessage = document.getElementById('copyMessage');
-          copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
-          copyMessage.classList.add('show');
+        // Copiar la imagen al portapapeles
+        navigator.clipboard.write([item])
+          .then(() => {
+            // Mostrar el mensaje de éxito
+            const copyMessage = document.getElementById('copyMessage');
+            copyMessage.textContent = 'Imagen copiada al portapapeles con marca de agua';
+            copyMessage.classList.add('show');
 
-          // Ocultar el mensaje después de 2 segundos
-          setTimeout(() => {
-            copyMessage.classList.remove('show');
-          }, 2000);
-        })
-        .catch(() => {
-          alert('Error al copiar la imagen');
-        });
-    }, 'image/png');
+            // Ocultar el mensaje después de 2 segundos
+            setTimeout(() => {
+              copyMessage.classList.remove('show');
+            }, 2000);
+          })
+          .catch(() => {
+            alert('Error al copiar la imagen');
+          });
+      }, 'image/png');
+    });
   }
 
   // Función para descargar la imagen con marca de agua
@@ -931,31 +908,30 @@ permalink: /galeria/
     // Dibujar la imagen original en el canvas temporal
     tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // Agregar la marca de agua en tres posiciones:
-    // 1. Arriba (mitad de la parte superior)
-    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.textAlign = 'center'; // Centrar el texto horizontalmente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.25); // 25% desde la parte superior
+    // Cargar el SVG como marca de agua
+    loadSVG('\assets/svg/logo.svg', (watermark) => {
+      // Tamaños y posiciones de la marca de agua
+      const sizes = [30, 50, 30]; // Tamaños en píxeles
+      const positions = [0.25, 0.5, 0.75]; // Posiciones verticales (25%, 50%, 75%)
 
-    // 2. En el medio (50px)
-    tempCtx.font = '50px "Paytone One"'; // Fuente Paytone One, tamaño 50px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height / 2 + 25); // Ajuste vertical para centrar
+      positions.forEach((position, index) => {
+        const size = sizes[index];
+        const x = tempCanvas.width / 2 - size / 2;
+        const y = tempCanvas.height * position - size / 2;
 
-    // 3. Abajo (mitad de la parte inferior)
-    tempCtx.font = '30px "Paytone One"'; // Fuente Paytone One, tamaño 30px
-    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Color semi-transparente
-    tempCtx.fillText('ZGrafic', tempCanvas.width / 2, tempCanvas.height * 0.75); // 75% desde la parte superior
+        // Dibujar el SVG en el canvas temporal
+        tempCtx.drawImage(watermark, x, y, size, size);
+      });
 
-    // Convertir el canvas temporal a una URL de imagen
-    const imageUrl = tempCanvas.toDataURL('image/png');
+      // Convertir el canvas temporal a una URL de imagen
+      const imageUrl = tempCanvas.toDataURL('image/png');
 
-    // Crear un enlace temporal para descargar la imagen
-    const link = document.createElement('a');
-    link.download = 'ZGrafic-DL.png'; // Nombre del archivo descargado
-    link.href = imageUrl; // URL de la imagen con marca de agua
-    link.click(); // Simular clic en el enlace para descargar la imagen
+      // Crear un enlace temporal para descargar la imagen
+      const link = document.createElement('a');
+      link.download = 'ZGrafic-DL.png'; // Nombre del archivo descargado
+      link.href = imageUrl; // URL de la imagen con marca de agua
+      link.click(); // Simular clic en el enlace para descargar la imagen
+    });
   }
 
   function navigateImage(direction) {
