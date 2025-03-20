@@ -854,20 +854,27 @@ permalink: /galeria/
 
     // Cargar el SVG como marca de agua
     loadSVG('../assets/svg/logo.svg', (watermark) => {
-      // Tamaño proporcional del logo (ajusta según sea necesario)
-      const logoWidth = 100; // Ancho deseado del logo
-      const logoHeight = (watermark.height / watermark.width) * logoWidth; // Mantener la proporción
+      // Tamaños de los logos
+      const logoWidthSmall = 80; // Ancho para los logos pequeños (25% y 75%)
+      const logoHeightSmall = (watermark.height / watermark.width) * logoWidthSmall; // Altura proporcional
+
+      const logoWidthCenter = 120; // Ancho para el logo central (50%)
+      const logoHeightCenter = (watermark.height / watermark.width) * logoWidthCenter; // Altura proporcional
 
       // Posiciones de la marca de agua (25%, 50%, 75% de la altura del canvas)
-      const positions = [0.25, 0.5, 0.75];
+      const positions = [
+        { position: 0.25, width: logoWidthSmall, height: logoHeightSmall }, // Logo superior
+        { position: 0.5, width: logoWidthCenter, height: logoHeightCenter }, // Logo central (más grande)
+        { position: 0.75, width: logoWidthSmall, height: logoHeightSmall }, // Logo inferior
+      ];
 
-      positions.forEach((position) => {
-        const x = tempCanvas.width / 2 - logoWidth / 2; // Centrar horizontalmente
-        const y = tempCanvas.height * position - logoHeight / 2; // Posición vertical
+      positions.forEach(({ position, width, height }) => {
+        const x = tempCanvas.width / 2 - width / 2; // Centrar horizontalmente
+        const y = tempCanvas.height * position - height / 2; // Posición vertical
 
         // Dibujar el SVG con transparencia
         tempCtx.globalAlpha = 0.5; // Ajusta la transparencia (0.5 = 50% de opacidad)
-        tempCtx.drawImage(watermark, x, y, logoWidth, logoHeight);
+        tempCtx.drawImage(watermark, x, y, width, height);
         tempCtx.globalAlpha = 1.0; // Restaurar la opacidad
       });
 
@@ -914,20 +921,27 @@ permalink: /galeria/
 
     // Cargar el SVG como marca de agua
     loadSVG('../assets/svg/logo.svg', (watermark) => {
-      // Tamaño proporcional del logo (ajusta según sea necesario)
-      const logoWidth = 100; // Ancho deseado del logo
-      const logoHeight = (watermark.height / watermark.width) * logoWidth; // Mantener la proporción
+      // Tamaños de los logos
+      const logoWidthSmall = 80; // Ancho para los logos pequeños (25% y 75%)
+      const logoHeightSmall = (watermark.height / watermark.width) * logoWidthSmall; // Altura proporcional
+
+      const logoWidthCenter = 120; // Ancho para el logo central (50%)
+      const logoHeightCenter = (watermark.height / watermark.width) * logoWidthCenter; // Altura proporcional
 
       // Posiciones de la marca de agua (25%, 50%, 75% de la altura del canvas)
-      const positions = [0.25, 0.5, 0.75];
+      const positions = [
+        { position: 0.25, width: logoWidthSmall, height: logoHeightSmall }, // Logo superior
+        { position: 0.5, width: logoWidthCenter, height: logoHeightCenter }, // Logo central (más grande)
+        { position: 0.75, width: logoWidthSmall, height: logoHeightSmall }, // Logo inferior
+      ];
 
-      positions.forEach((position) => {
-        const x = tempCanvas.width / 2 - logoWidth / 2; // Centrar horizontalmente
-        const y = tempCanvas.height * position - logoHeight / 2; // Posición vertical
+      positions.forEach(({ position, width, height }) => {
+        const x = tempCanvas.width / 2 - width / 2; // Centrar horizontalmente
+        const y = tempCanvas.height * position - height / 2; // Posición vertical
 
         // Dibujar el SVG con transparencia
         tempCtx.globalAlpha = 0.5; // Ajusta la transparencia (0.5 = 50% de opacidad)
-        tempCtx.drawImage(watermark, x, y, logoWidth, logoHeight);
+        tempCtx.drawImage(watermark, x, y, width, height);
         tempCtx.globalAlpha = 1.0; // Restaurar la opacidad
       });
 
