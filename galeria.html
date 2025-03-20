@@ -62,6 +62,26 @@ permalink: /galeria/
     overflow-y: auto;
   }
 
+  /* Estilos para el contenedor del logo */
+  .logo-container {
+    text-align: center; /* Centrar el logo */
+    margin-bottom: 20px; /* Espacio entre el logo y la lista de categorías */
+  }
+
+  /* Estilos para el logo */
+  .logo {
+    max-width: 100%; /* Asegura que el logo no exceda el ancho del contenedor */
+    height: auto; /* Mantiene la proporción del logo */
+    width: 150px; /* Tamaño base del logo */
+  }
+
+  /* Estilos para dispositivos móviles */
+  @media (max-width: 768px) {
+    .logo {
+      width: 100px; /* Reduce el tamaño del logo en dispositivos móviles */
+    }
+  }
+
   /* Estilos para los botones de categoría */
   .category-list {
     display: flex;
@@ -459,6 +479,10 @@ permalink: /galeria/
   <!-- Sidebar con categorías -->
   <div class="sidebar-menu">
     <div class="categories">
+      <!-- Agrega el logo aquí -->
+      <div class="logo-container">
+        <img src="https://zgrafic.com/assets/svg/logo.svg" alt="ZGrafic Logo" class="logo">
+      </div>
       <h6>Diseños</h6>
       <div class="category-list">
         <a href="{{ site.url }}/galeria/" class="category-button active" data-category="all">
