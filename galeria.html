@@ -497,7 +497,7 @@ permalink: /galeria/
             {% assign image_path = file.path | relative_url %}
             {% assign image_id = file.name | split: '.' | first | generateShortCode %}
 
-            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}">
+            <div class="image-container hidden" data-title="{{ title }}" data-category="{{ category | slugify }}" data-id="{{ image_id }}" data-dominant-color="rgb(255, 100, 50)">
               <!-- Cambiar el img por un canvas -->
               <canvas class="image-canvas" data-src="{{ image_path }}"></canvas>
               <div class="image-title">{{ title }}</div>
@@ -590,14 +590,19 @@ permalink: /galeria/
   function getDominantColor(image) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = image.width;
-    canvas.height = image.height;
+
+    // Reducir la resolución de la imagen para optimizar el cálculo
+    const scaleFactor = 0.1; // Reducir la imagen al 10% de su tamaño original
+    canvas.width = image.width * scaleFactor;
+    canvas.height = image.height * scaleFactor;
+
+    // Dibujar la imagen reducida en el canvas
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     const colorCounts = {};
 
-    // Recorrer los píxeles de la imagen
+    // Recorrer los píxeles de la imagen reducida
     for (let i = 0; i < imageData.length; i += 4) {
       const r = imageData[i];
       const g = imageData[i + 1];
@@ -798,7 +803,7 @@ permalink: /galeria/
       ctx.drawImage(img, x, y, width, height);
 
       // Obtener el color predominante y aplicarlo como fondo del contenedor
-      const dominantColor = getDominantColor(img);
+      const dominantColor = imageContainer.getAttribute('data-dominant-color');
       imageContainer.style.backgroundColor = dominantColor;
     };
   }
