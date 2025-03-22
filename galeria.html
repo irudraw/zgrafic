@@ -145,7 +145,7 @@ permalink: /galeria/
     height: 150px; /* Altura fija para las miniaturas */
     object-fit: contain; /* Ajusta la imagen sin recortar */
     border-radius: 8px;
-    background-color: #1e1e1e; /* Fondo oscuro para el canvas */
+    background-color: transparent; /* Fondo transparente para el canvas */
   }
 
   .image-title {
@@ -586,6 +586,37 @@ permalink: /galeria/
     return Math.abs(hash).toString(36).substring(0, 8); // Código de 8 caracteres
   }
 
+  // Función para obtener el color predominante de una imagen
+  function getDominantColor(image) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const colorCounts = {};
+
+    // Recorrer los píxeles de la imagen
+    for (let i = 0; i < imageData.length; i += 4) {
+      const r = imageData[i];
+      const g = imageData[i + 1];
+      const b = imageData[i + 2];
+      const color = `${r},${g},${b}`;
+
+      // Contar la frecuencia de cada color
+      if (colorCounts[color]) {
+        colorCounts[color]++;
+      } else {
+        colorCounts[color] = 1;
+      }
+    }
+
+    // Encontrar el color más frecuente
+    let dominantColor = Object.keys(colorCounts).reduce((a, b) => colorCounts[a] > colorCounts[b] ? a : b);
+    return `rgb(${dominantColor})`;
+  }
+
   // Inicialización
   document.addEventListener('DOMContentLoaded', () => {
     // Obtener la categoría de la URL
@@ -765,6 +796,10 @@ permalink: /galeria/
 
       // Dibujar la imagen redimensionada en el canvas
       ctx.drawImage(img, x, y, width, height);
+
+      // Obtener el color predominante y aplicarlo como fondo del contenedor
+      const dominantColor = getDominantColor(img);
+      imageContainer.style.backgroundColor = dominantColor;
     };
   }
 
