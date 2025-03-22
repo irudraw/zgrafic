@@ -145,8 +145,6 @@ permalink: /galeria/
     height: 150px; /* Reducir la altura de las imágenes */
     object-fit: cover;
     cursor: pointer;
-    position: relative;
-    z-index: 1; /* Asegura que el canvas esté por encima del fondo */
   }
 
   .image-title {
@@ -732,43 +730,14 @@ permalink: /galeria/
     });
   }
 
-  // Función para obtener el color predominante de una imagen
-  function getDominantColor(image) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = image.width;
-    canvas.height = image.height;
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    const colorCounts = {};
-
-    for (let i = 0; i < imageData.length; i += 4) {
-      const r = imageData[i];
-      const g = imageData[i + 1];
-      const b = imageData[i + 2];
-      const color = `${r},${g},${b}`;
-
-      if (colorCounts[color]) {
-        colorCounts[color]++;
-      } else {
-        colorCounts[color] = 1;
-      }
-    }
-
-    let dominantColor = Object.keys(colorCounts).reduce((a, b) => colorCounts[a] > colorCounts[b] ? a : b);
-    return `rgb(${dominantColor})`;
-  }
-
   // Función para cargar la imagen en un canvas
   function loadImageIntoCanvas(imageContainer) {
     const canvas = imageContainer.querySelector('.image-canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
+    img.src = canvas.getAttribute('data-src');
 
     img.onload = () => {
-      console.log('Imagen cargada correctamente:', img.src);
-
       // Reducir el tamaño de la imagen (por ejemplo, a 200x200 píxeles)
       const maxWidth = 200;
       const maxHeight = 200;
@@ -794,19 +763,7 @@ permalink: /galeria/
 
       // Dibujar la imagen redimensionada en el canvas
       ctx.drawImage(img, 0, 0, width, height);
-
-      // Obtener el color predominante de la imagen
-      const dominantColor = getDominantColor(img);
-
-      // Aplicar el color predominante como fondo
-      imageContainer.style.backgroundColor = dominantColor;
     };
-
-    img.onerror = () => {
-      console.error('Error al cargar la imagen:', img.src);
-    };
-
-    img.src = canvas.getAttribute('data-src');
   }
 
   // Función para manejar el clic en las imágenes
