@@ -738,9 +738,31 @@ permalink: /galeria/
     img.src = canvas.getAttribute('data-src');
 
     img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Reducir el tamaño de la imagen (por ejemplo, a 200x200 píxeles)
+      const maxWidth = 200;
+      const maxHeight = 200;
+      let width = img.width;
+      let height = img.height;
+
+      // Redimensionar manteniendo la proporción
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+      }
+
+      // Establecer el tamaño del canvas
+      canvas.width = width;
+      canvas.height = height;
+
+      // Dibujar la imagen redimensionada en el canvas
+      ctx.drawImage(img, 0, 0, width, height);
     };
   }
 
