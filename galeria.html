@@ -129,8 +129,6 @@ permalink: /galeria/
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-    background-size: cover; /* Asegura que el fondo cubra todo el contenedor */
-    background-position: center; /* Centra la imagen de fondo */
   }
 
   .image-container.visible {
@@ -148,7 +146,7 @@ permalink: /galeria/
     object-fit: cover;
     cursor: pointer;
     position: relative;
-    z-index: 1; /* Asegura que el canvas esté por encima del fondo difuminado */
+    z-index: 1; /* Asegura que el canvas esté por encima del fondo */
   }
 
   .image-title {
@@ -734,6 +732,34 @@ permalink: /galeria/
     });
   }
 
+  // Función para obtener el color predominante de una imagen
+  function getDominantColor(image) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const colorCounts = {};
+
+    for (let i = 0; i < imageData.length; i += 4) {
+      const r = imageData[i];
+      const g = imageData[i + 1];
+      const b = imageData[i + 2];
+      const color = `${r},${g},${b}`;
+
+      if (colorCounts[color]) {
+        colorCounts[color]++;
+      } else {
+        colorCounts[color] = 1;
+      }
+    }
+
+    let dominantColor = Object.keys(colorCounts).reduce((a, b) => colorCounts[a] > colorCounts[b] ? a : b);
+    return `rgb(${dominantColor})`;
+  }
+
   // Función para cargar la imagen en un canvas
   function loadImageIntoCanvas(imageContainer) {
     const canvas = imageContainer.querySelector('.image-canvas');
@@ -769,9 +795,11 @@ permalink: /galeria/
       // Dibujar la imagen redimensionada en el canvas
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Aplicar el fondo difuminado
-      imageContainer.style.backgroundImage = `url(${img.src})`;
-      imageContainer.style.filter = 'blur(10px)'; // Ajusta el nivel de difuminado
+      // Obtener el color predominante de la imagen
+      const dominantColor = getDominantColor(img);
+
+      // Aplicar el color predominante como fondo
+      imageContainer.style.backgroundColor = dominantColor;
     };
 
     img.onerror = () => {
