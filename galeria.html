@@ -141,7 +141,6 @@ permalink: /galeria/
   .gallery-container {
     flex: 1;
     padding: 20px;
-    position: relative;
   }
 
   .gallery {
@@ -156,9 +155,10 @@ permalink: /galeria/
     overflow: hidden;
     background-color: #1e1e1e; /* Fondo oscuro para las imágenes */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra más oscura */
-    transform: translateY(20px);
+    transition: transform 0.2s;
     opacity: 0;
-    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   }
 
   .image-container.visible {
@@ -167,8 +167,7 @@ permalink: /galeria/
   }
 
   .image-container:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    transform: translateY(-5px);
   }
 
   .image-container canvas {
@@ -177,7 +176,6 @@ permalink: /galeria/
     object-fit: contain; /* Ajusta la imagen sin recortar */
     border-radius: 8px;
     background-color: transparent; /* Fondo transparente para el canvas */
-    transition: transform 0.3s ease;
   }
 
   .image-title {
@@ -187,43 +185,6 @@ permalink: /galeria/
     border-top: 1px solid #333; /* Borde más oscuro */
     color: #e0e0e0; /* Texto claro */
     font-size: 12px; /* Reducir el tamaño de la letra */
-    transition: all 0.3s ease;
-  }
-
-  /* Indicador de más imágenes */
-  .load-more-indicator {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(30, 30, 30, 0.9);
-    color: #e0e0e0;
-    padding: 10px 20px;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-  }
-
-  .load-more-indicator.visible {
-    opacity: 1;
-  }
-
-  .load-more-indicator i {
-    animation: bounce 1.5s infinite;
-  }
-
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-    40% {transform: translateY(-6px);}
-    60% {transform: translateY(-3px);}
   }
 
   /* Estilos mejorados para el popup */
@@ -459,8 +420,8 @@ permalink: /galeria/
 
   /* Animaciones para las imágenes */
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   /* Loader */
@@ -521,12 +482,6 @@ permalink: /galeria/
 
     .download-image-button {
       right: 160px; /* Ajuste para dispositivos móviles */
-    }
-
-    .load-more-indicator {
-      bottom: 20px;
-      font-size: 12px;
-      padding: 8px 15px;
     }
   }
 </style>
@@ -593,12 +548,6 @@ permalink: /galeria/
     </div>
   </div>
 
-  <!-- Indicador de más imágenes -->
-  <div class="load-more-indicator hidden" id="loadMoreIndicator">
-    <i class="fas fa-chevron-down"></i>
-    <span>Más imágenes disponibles</span>
-  </div>
-
   <!-- Modal para visualizar imágenes -->
   <div id="imageModal" class="modal">
     <div class="modal-content">
@@ -661,9 +610,6 @@ permalink: /galeria/
   let isLoading = false;
   let loadedCount = 0;
   const batchSize = 6;
-  let allImagesLoaded = false;
-  const loadMoreIndicator = document.getElementById('loadMoreIndicator');
-  let scrollTimeout;
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
@@ -764,9 +710,6 @@ permalink: /galeria/
 
     // Verificar visibilidad de las imágenes al cargar la página
     checkVisibility();
-
-    // Actualizar visibilidad del indicador
-    updateLoadMoreIndicator();
   });
 
   // Configurar el buscador
@@ -794,7 +737,6 @@ permalink: /galeria/
       });
       
       checkVisibility();
-      updateLoadMoreIndicator();
     });
   }
 
@@ -823,7 +765,6 @@ permalink: /galeria/
 
     // Verificar visibilidad de las imágenes después de filtrar
     checkVisibility();
-    updateLoadMoreIndicator();
   }
 
   // Función para configurar los filtros de categoría
@@ -850,8 +791,6 @@ permalink: /galeria/
 
         // Filtrar imágenes
         currentCategory = selectedCategory;
-        loadedCount = 0; // Reiniciar contador al cambiar categoría
-        allImagesLoaded = false;
         filterImages();
       });
     });
@@ -859,80 +798,40 @@ permalink: /galeria/
 
   // Cargar imágenes de 4 en 4
   function loadNextBatch() {
-    if (isLoading || allImagesLoaded) return;
+    if (isLoading) return;
     isLoading = true;
 
     const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
-    let loadedInBatch = 0;
-
     imagesToLoad.forEach(imgContainer => {
       if (!imgContainer.classList.contains('hidden')) {
         imgContainer.classList.remove('hidden');
-        loadedInBatch++;
-        
-        // Aplicar efecto de aparición con retraso escalonado
-        setTimeout(() => {
-          imgContainer.classList.add('visible');
-        }, 100 * loadedInBatch);
+        checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
       }
     });
 
     loadedCount += batchSize;
-    
-    // Verificar si hemos cargado todas las imágenes
-    if (loadedInBatch === 0 || loadedCount >= images.length) {
-      allImagesLoaded = true;
-      loadMoreIndicator.classList.remove('visible');
-    }
-
     isLoading = false;
-    updateLoadMoreIndicator();
   }
 
   // Manejar el scroll para cargar más imágenes
   function handleScroll() {
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
-        loadNextBatch();
-      }
-      checkVisibility();
-      updateLoadMoreIndicator();
-    }, 100);
-  }
-
-  // Actualizar visibilidad del indicador de más imágenes
-  function updateLoadMoreIndicator() {
-    if (allImagesLoaded) {
-      loadMoreIndicator.classList.remove('visible');
-      return;
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      loadNextBatch();
     }
-
-    const visibleImages = Array.from(document.querySelectorAll('.image-container:not(.hidden)'));
-    const loadedImages = Array.from(document.querySelectorAll('.image-container:not(.hidden).visible'));
-    
-    if (visibleImages.length > loadedImages.length) {
-      loadMoreIndicator.classList.remove('hidden');
-      loadMoreIndicator.classList.add('visible');
-    } else {
-      loadMoreIndicator.classList.remove('visible');
-    }
+    checkVisibility(); // Verificar visibilidad al hacer scroll
   }
 
   // Verificar visibilidad de las imágenes
   function checkVisibility() {
-    const images = document.querySelectorAll('.image-container:not(.hidden)');
-    images.forEach((image, index) => {
+    const images = document.querySelectorAll('.image-container');
+    images.forEach(image => {
       const rect = image.getBoundingClientRect();
       if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
-        // Aplicar efecto de aparición con retraso escalonado
-        setTimeout(() => {
-          image.classList.add('visible');
-        }, 50 * index);
+        image.classList.add('visible');
+        loadImageIntoCanvas(image); // Cargar la imagen en el canvas cuando sea visible
       }
     });
-    updateLoadMoreIndicator();
   }
 
   // Función para cargar la imagen en un canvas
