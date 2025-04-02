@@ -141,6 +141,7 @@ permalink: /galeria/
   .gallery-container {
     flex: 1;
     padding: 20px;
+    position: relative;
   }
 
   .gallery {
@@ -185,6 +186,41 @@ permalink: /galeria/
     border-top: 1px solid #333; /* Borde más oscuro */
     color: #e0e0e0; /* Texto claro */
     font-size: 12px; /* Reducir el tamaño de la letra */
+  }
+
+  /* Indicador de más imágenes */
+  .load-more-indicator {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(30, 30, 30, 0.8);
+    color: #e0e0e0;
+    padding: 10px 20px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .load-more-indicator.visible {
+    opacity: 1;
+  }
+
+  .load-more-indicator i {
+    animation: bounce 1.5s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-10px);}
+    60% {transform: translateY(-5px);}
   }
 
   /* Estilos mejorados para el popup */
@@ -483,6 +519,12 @@ permalink: /galeria/
     .download-image-button {
       right: 160px; /* Ajuste para dispositivos móviles */
     }
+
+    .load-more-indicator {
+      bottom: 20px;
+      font-size: 12px;
+      padding: 8px 15px;
+    }
   }
 </style>
 
@@ -548,6 +590,12 @@ permalink: /galeria/
     </div>
   </div>
 
+  <!-- Indicador de más imágenes -->
+  <div class="load-more-indicator hidden" id="loadMoreIndicator">
+    <i class="fas fa-chevron-down"></i>
+    <span>Más imágenes disponibles</span>
+  </div>
+
   <!-- Modal para visualizar imágenes -->
   <div id="imageModal" class="modal">
     <div class="modal-content">
@@ -610,6 +658,8 @@ permalink: /galeria/
   let isLoading = false;
   let loadedCount = 0;
   const batchSize = 6;
+  let allImagesLoaded = false;
+  const loadMoreIndicator = document.getElementById('loadMoreIndicator');
 
   // Generador de códigos cortos
   function generateShortCode(filename) {
@@ -710,6 +760,9 @@ permalink: /galeria/
 
     // Verificar visibilidad de las imágenes al cargar la página
     checkVisibility();
+
+    // Actualizar visibilidad del indicador
+    updateLoadMoreIndicator();
   });
 
   // Configurar el buscador
@@ -737,6 +790,7 @@ permalink: /galeria/
       });
       
       checkVisibility();
+      updateLoadMoreIndicator();
     });
   }
 
@@ -765,6 +819,7 @@ permalink: /galeria/
 
     // Verificar visibilidad de las imágenes después de filtrar
     checkVisibility();
+    updateLoadMoreIndicator();
   }
 
   // Función para configurar los filtros de categoría
@@ -791,6 +846,8 @@ permalink: /galeria/
 
         // Filtrar imágenes
         currentCategory = selectedCategory;
+        loadedCount = 0; // Reiniciar contador al cambiar categoría
+        allImagesLoaded = false;
         filterImages();
       });
     });
@@ -798,19 +855,30 @@ permalink: /galeria/
 
   // Cargar imágenes de 4 en 4
   function loadNextBatch() {
-    if (isLoading) return;
+    if (isLoading || allImagesLoaded) return;
     isLoading = true;
 
     const imagesToLoad = images.slice(loadedCount, loadedCount + batchSize);
+    let loadedInBatch = 0;
+
     imagesToLoad.forEach(imgContainer => {
       if (!imgContainer.classList.contains('hidden')) {
         imgContainer.classList.remove('hidden');
+        loadedInBatch++;
         checkVisibility(); // Verificar visibilidad después de cargar nuevas imágenes
       }
     });
 
     loadedCount += batchSize;
+    
+    // Verificar si hemos cargado todas las imágenes
+    if (loadedInBatch === 0 || loadedCount >= images.length) {
+      allImagesLoaded = true;
+      loadMoreIndicator.classList.remove('visible');
+    }
+
     isLoading = false;
+    updateLoadMoreIndicator();
   }
 
   // Manejar el scroll para cargar más imágenes
@@ -820,11 +888,30 @@ permalink: /galeria/
       loadNextBatch();
     }
     checkVisibility(); // Verificar visibilidad al hacer scroll
+    updateLoadMoreIndicator();
+  }
+
+  // Actualizar visibilidad del indicador de más imágenes
+  function updateLoadMoreIndicator() {
+    if (allImagesLoaded) {
+      loadMoreIndicator.classList.remove('visible');
+      return;
+    }
+
+    const visibleImages = Array.from(document.querySelectorAll('.image-container:not(.hidden)'));
+    const loadedImages = Array.from(document.querySelectorAll('.image-container:not(.hidden).visible'));
+    
+    if (visibleImages.length > loadedImages.length) {
+      loadMoreIndicator.classList.remove('hidden');
+      loadMoreIndicator.classList.add('visible');
+    } else {
+      loadMoreIndicator.classList.remove('visible');
+    }
   }
 
   // Verificar visibilidad de las imágenes
   function checkVisibility() {
-    const images = document.querySelectorAll('.image-container');
+    const images = document.querySelectorAll('.image-container:not(.hidden)');
     images.forEach(image => {
       const rect = image.getBoundingClientRect();
       if (rect.top < window.innerHeight * 0.75 && rect.bottom > 0) {
@@ -832,6 +919,7 @@ permalink: /galeria/
         loadImageIntoCanvas(image); // Cargar la imagen en el canvas cuando sea visible
       }
     });
+    updateLoadMoreIndicator();
   }
 
   // Función para cargar la imagen en un canvas
