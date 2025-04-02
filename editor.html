@@ -16,54 +16,67 @@
         
         .editor-container {
             display: flex;
-            flex-direction: column;
             height: 100vh;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
         }
         
         .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 10px;
+            width: 250px;
+            padding: 15px;
             background-color: #fff;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .tool-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px;
+            background-color: #f8f9fa;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+        }
+        
+        .tool-section-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
         }
         
         .tool-button {
             padding: 8px 12px;
             border: none;
             border-radius: 4px;
-            background-color: #007bff;
-            color: white;
+            background-color: #e9ecef;
+            color: #333;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             font-size: 14px;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
         
         .tool-button:hover {
-            background-color: #0056b3;
+            background-color: #dee2e6;
         }
         
         .tool-button.active {
-            background-color: #0056b3;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+            background-color: #007bff;
+            color: white;
         }
         
         .color-picker {
-            width: 30px;
-            height: 30px;
-            border: none;
-            padding: 0;
+            width: 100%;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             cursor: pointer;
-            background: none;
         }
         
         .slider-container {
@@ -74,6 +87,14 @@
         
         .slider-container label {
             font-size: 14px;
+            min-width: 60px;
+        }
+        
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #e9ecef;
         }
         
         .canvas-container {
@@ -81,17 +102,89 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
         }
         
         #editorCanvas {
             max-width: 100%;
             max-height: 80vh;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #fff;
+            background-image: 
+                linear-gradient(45deg, #f5f5f5 25%, transparent 25%),
+                linear-gradient(-45deg, #f5f5f5 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #f5f5f5 75%),
+                linear-gradient(-45deg, transparent 75%, #f5f5f5 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        
+        .layers-panel {
+            width: 250px;
+            padding: 15px;
+            background-color: #fff;
+            border-left: 1px solid #ddd;
+            overflow-y: auto;
+        }
+        
+        .layers-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .layers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .layer-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .layer-item.active {
+            background-color: #e2f0ff;
+            border: 1px solid #007bff;
+        }
+        
+        .layer-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .layer-thumbnail {
+            width: 40px;
+            height: 40px;
+            background-color: #ddd;
+            margin-right: 10px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .layer-controls {
+            margin-left: auto;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .layer-control {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .layer-control:hover {
+            color: #007bff;
         }
         
         .text-input-container {
@@ -107,13 +200,16 @@
             font-family: 'Poppins', sans-serif;
             font-size: 16px;
             outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         .action-buttons {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
         }
         
         .action-button {
@@ -152,157 +248,324 @@
             background-color: #138496;
         }
         
-        .tool-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        
-        .tool-section-title {
-            font-size: 14px;
-            font-weight: 500;
-            margin-right: 5px;
-        }
-        
-        @media (max-width: 768px) {
-            .toolbar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .tool-section {
-                width: 100%;
-                justify-content: space-between;
-            }
+        .add-layer-button {
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <div class="editor-container">
+        <!-- Panel de herramientas -->
         <div class="toolbar">
             <div class="tool-section">
-                <span class="tool-section-title">Herramientas:</span>
+                <span class="tool-section-title">Herramientas</span>
                 <button id="drawTool" class="tool-button active"><i class="fas fa-pencil-alt"></i> Dibujar</button>
                 <button id="textTool" class="tool-button"><i class="fas fa-font"></i> Texto</button>
                 <button id="eraserTool" class="tool-button"><i class="fas fa-eraser"></i> Borrador</button>
-                <button id="clearTool" class="tool-button"><i class="fas fa-trash-alt"></i> Limpiar</button>
+                <button id="shapeTool" class="tool-button"><i class="fas fa-square"></i> Formas</button>
             </div>
             
             <div class="tool-section">
-                <span class="tool-section-title">Color:</span>
+                <span class="tool-section-title">Color</span>
                 <input type="color" id="colorPicker" class="color-picker" value="#000000">
             </div>
             
             <div class="tool-section">
-                <span class="tool-section-title">Tamaño:</span>
+                <span class="tool-section-title">Pincel</span>
                 <div class="slider-container">
-                    <label for="brushSize">Pincel:</label>
+                    <label for="brushSize">Tamaño:</label>
                     <input type="range" id="brushSize" min="1" max="50" value="5">
                     <span id="brushSizeValue">5</span>
+                </div>
+                <div class="slider-container">
+                    <label for="brushOpacity">Opacidad:</label>
+                    <input type="range" id="brushOpacity" min="1" max="100" value="100">
+                    <span id="brushOpacityValue">100%</span>
                 </div>
             </div>
             
             <div class="tool-section">
-                <span class="tool-section-title">Texto:</span>
+                <span class="tool-section-title">Texto</span>
                 <div class="slider-container">
                     <label for="textSize">Tamaño:</label>
                     <input type="range" id="textSize" min="10" max="72" value="24">
                     <span id="textSizeValue">24</span>
                 </div>
+                <select id="textFont" class="tool-button" style="width: 100%; margin-top: 5px;">
+                    <option value="Arial">Arial</option>
+                    <option value="Poppins" selected>Poppins</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                </select>
+            </div>
+            
+            <div class="tool-section">
+                <span class="tool-section-title">Acciones</span>
+                <button id="clearTool" class="tool-button"><i class="fas fa-trash-alt"></i> Limpiar capa</button>
+                <button id="addLayerTool" class="tool-button"><i class="fas fa-layer-plus"></i> Nueva capa</button>
             </div>
         </div>
         
-        <div class="canvas-container">
-            <canvas id="editorCanvas"></canvas>
-            <div class="text-input-container">
-                <input type="text" id="textInput" placeholder="Escribe tu texto...">
+        <!-- Área del canvas -->
+        <div class="canvas-area">
+            <div class="canvas-container">
+                <canvas id="editorCanvas"></canvas>
+                <div class="text-input-container">
+                    <input type="text" id="textInput" placeholder="Escribe tu texto...">
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="cancelButton" class="action-button cancel-button"><i class="fas fa-times"></i> Cancelar</button>
+                <button id="downloadButton" class="action-button download-button"><i class="fas fa-download"></i> Descargar</button>
+                <button id="saveButton" class="action-button save-button"><i class="fas fa-save"></i> Guardar</button>
             </div>
         </div>
         
-        <div class="action-buttons">
-            <button id="cancelButton" class="action-button cancel-button"><i class="fas fa-times"></i> Cancelar</button>
-            <button id="downloadButton" class="action-button download-button"><i class="fas fa-download"></i> Descargar</button>
-            <button id="saveButton" class="action-button save-button"><i class="fas fa-save"></i> Guardar</button>
+        <!-- Panel de capas -->
+        <div class="layers-panel">
+            <div class="layers-title">
+                <span>Capas</span>
+                <button id="addLayerBtn" class="add-layer-button" title="Añadir capa">+</button>
+            </div>
+            <div class="layers-list" id="layersList">
+                <!-- Las capas se añadirán aquí dinámicamente -->
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Obtener elementos del DOM
+            // Elementos del DOM
             const canvas = document.getElementById('editorCanvas');
             const ctx = canvas.getContext('2d');
-            const colorPicker = document.getElementById('colorPicker');
-            const brushSize = document.getElementById('brushSize');
-            const brushSizeValue = document.getElementById('brushSizeValue');
-            const textSize = document.getElementById('textSize');
-            const textSizeValue = document.getElementById('textSizeValue');
-            const drawTool = document.getElementById('drawTool');
-            const textTool = document.getElementById('textTool');
-            const eraserTool = document.getElementById('eraserTool');
-            const clearTool = document.getElementById('clearTool');
-            const textInputContainer = document.querySelector('.text-input-container');
-            const textInput = document.getElementById('textInput');
-            const saveButton = document.getElementById('saveButton');
-            const cancelButton = document.getElementById('cancelButton');
-            const downloadButton = document.getElementById('downloadButton');
+            const layersList = document.getElementById('layersList');
             
             // Variables de estado
             let isDrawing = false;
             let currentTool = 'draw';
+            let currentLayerIndex = 0;
+            let layers = [];
             let lastX = 0;
             let lastY = 0;
             let textPosition = { x: 0, y: 0 };
+            
+            // Configuración inicial
+            const defaultCanvasWidth = 800;
+            const defaultCanvasHeight = 600;
+            
+            // Clase para representar una capa
+            class Layer {
+                constructor(width, height) {
+                    this.canvas = document.createElement('canvas');
+                    this.canvas.width = width;
+                    this.canvas.height = height;
+                    this.ctx = this.canvas.getContext('2d');
+                    this.visible = true;
+                    this.name = `Capa ${layers.length + 1}`;
+                    this.id = Date.now() + Math.random().toString(36).substr(2, 9);
+                }
+                
+                clear() {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                }
+            }
+            
+            // Función para renderizar todas las capas
+            function renderLayers() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Dibujar todas las capas visibles
+                layers.forEach(layer => {
+                    if (layer.visible) {
+                        ctx.drawImage(layer.canvas, 0, 0);
+                    }
+                });
+                
+                updateLayersList();
+            }
+            
+            // Función para actualizar la lista de capas en el panel
+            function updateLayersList() {
+                layersList.innerHTML = '';
+                
+                layers.forEach((layer, index) => {
+                    const layerItem = document.createElement('div');
+                    layerItem.className = `layer-item ${index === currentLayerIndex ? 'active' : ''}`;
+                    layerItem.innerHTML = `
+                        <div class="layer-thumbnail">
+                            <canvas width="40" height="40" id="thumb-${layer.id}"></canvas>
+                        </div>
+                        <span>${layer.name}</span>
+                        <div class="layer-controls">
+                            <button class="layer-control move-up" data-id="${layer.id}" title="Mover arriba"><i class="fas fa-arrow-up"></i></button>
+                            <button class="layer-control move-down" data-id="${layer.id}" title="Mover abajo"><i class="fas fa-arrow-down"></i></button>
+                            <button class="layer-control delete-layer" data-id="${layer.id}" title="Eliminar capa"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    
+                    layerItem.addEventListener('click', () => {
+                        currentLayerIndex = index;
+                        updateLayersList();
+                    });
+                    
+                    layersList.appendChild(layerItem);
+                    
+                    // Actualizar miniatura
+                    const thumbCanvas = document.getElementById(`thumb-${layer.id}`);
+                    const thumbCtx = thumbCanvas.getContext('2d');
+                    
+                    // Escalar la miniatura
+                    const scale = Math.min(
+                        40 / layer.canvas.width,
+                        40 / layer.canvas.height
+                    );
+                    const thumbWidth = layer.canvas.width * scale;
+                    const thumbHeight = layer.canvas.height * scale;
+                    
+                    thumbCtx.clearRect(0, 0, 40, 40);
+                    thumbCtx.drawImage(
+                        layer.canvas,
+                        0, 0, layer.canvas.width, layer.canvas.height,
+                        (40 - thumbWidth) / 2, (40 - thumbHeight) / 2, thumbWidth, thumbHeight
+                    );
+                });
+                
+                // Agregar eventos a los controles de capa
+                document.querySelectorAll('.move-up').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        moveLayerUp(btn.dataset.id);
+                    });
+                });
+                
+                document.querySelectorAll('.move-down').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        moveLayerDown(btn.dataset.id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-layer').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteLayer(btn.dataset.id);
+                    });
+                });
+            }
+            
+            // Función para mover una capa hacia arriba
+            function moveLayerUp(layerId) {
+                const index = layers.findIndex(l => l.id === layerId);
+                if (index > 0) {
+                    const layer = layers[index];
+                    layers.splice(index, 1);
+                    layers.splice(index - 1, 0, layer);
+                    renderLayers();
+                }
+            }
+            
+            // Función para mover una capa hacia abajo
+            function moveLayerDown(layerId) {
+                const index = layers.findIndex(l => l.id === layerId);
+                if (index < layers.length - 1) {
+                    const layer = layers[index];
+                    layers.splice(index, 1);
+                    layers.splice(index + 1, 0, layer);
+                    renderLayers();
+                }
+            }
+            
+            // Función para eliminar una capa
+            function deleteLayer(layerId) {
+                if (layers.length <= 1) {
+                    alert('Debe haber al menos una capa');
+                    return;
+                }
+                
+                const index = layers.findIndex(l => l.id === layerId);
+                if (index !== -1) {
+                    layers.splice(index, 1);
+                    
+                    if (currentLayerIndex >= index) {
+                        currentLayerIndex = Math.max(0, currentLayerIndex - 1);
+                    }
+                    
+                    renderLayers();
+                }
+            }
+            
+            // Función para añadir una nueva capa
+            function addNewLayer() {
+                const newLayer = new Layer(canvas.width, canvas.height);
+                layers.push(newLayer);
+                currentLayerIndex = layers.length - 1;
+                renderLayers();
+            }
+            
+            // Función para obtener la capa actual
+            function getCurrentLayer() {
+                return layers[currentLayerIndex];
+            }
+            
+            // Inicializar capas
+            function initLayers() {
+                layers = [];
+                addNewLayer(); // Capa base
+            }
             
             // Cargar imagen desde URL
             const urlParams = new URLSearchParams(window.location.search);
             const imageUrl = urlParams.get('image');
             
             if (imageUrl) {
-                loadImage(imageUrl);
-            } else {
-                // Si no hay imagen en la URL, crear un canvas blanco
-                canvas.width = 800;
-                canvas.height = 600;
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-            
-            // Configurar eventos
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            canvas.addEventListener('click', handleCanvasClick);
-            
-            brushSize.addEventListener('input', updateBrushSize);
-            textSize.addEventListener('input', updateTextSize);
-            
-            drawTool.addEventListener('click', () => setActiveTool('draw'));
-            textTool.addEventListener('click', () => setActiveTool('text'));
-            eraserTool.addEventListener('click', () => setActiveTool('eraser'));
-            clearTool.addEventListener('click', clearCanvas);
-            
-            textInput.addEventListener('keypress', handleTextInput);
-            
-            saveButton.addEventListener('click', saveImage);
-            cancelButton.addEventListener('click', cancelEditing);
-            downloadButton.addEventListener('click', downloadImage);
-            
-            // Funciones
-            function loadImage(url) {
                 const img = new Image();
                 img.crossOrigin = 'Anonymous';
                 img.onload = function() {
                     canvas.width = img.width;
                     canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
+                    
+                    initLayers();
+                    
+                    // Dibujar la imagen en la capa base
+                    getCurrentLayer().ctx.drawImage(img, 0, 0);
+                    renderLayers();
                 };
-                img.src = url;
+                img.src = imageUrl;
+            } else {
+                canvas.width = defaultCanvasWidth;
+                canvas.height = defaultCanvasHeight;
+                initLayers();
+                renderLayers();
             }
             
+            // Configurar herramientas
+            const colorPicker = document.getElementById('colorPicker');
+            const brushSize = document.getElementById('brushSize');
+            const brushSizeValue = document.getElementById('brushSizeValue');
+            const brushOpacity = document.getElementById('brushOpacity');
+            const brushOpacityValue = document.getElementById('brushOpacityValue');
+            const textSize = document.getElementById('textSize');
+            const textSizeValue = document.getElementById('textSizeValue');
+            const textFont = document.getElementById('textFont');
+            const drawTool = document.getElementById('drawTool');
+            const textTool = document.getElementById('textTool');
+            const eraserTool = document.getElementById('eraserTool');
+            const shapeTool = document.getElementById('shapeTool');
+            const clearTool = document.getElementById('clearTool');
+            const addLayerTool = document.getElementById('addLayerTool');
+            const textInputContainer = document.querySelector('.text-input-container');
+            const textInput = document.getElementById('textInput');
+            const saveButton = document.getElementById('saveButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const downloadButton = document.getElementById('downloadButton');
+            const addLayerBtn = document.getElementById('addLayerBtn');
+            
+            // Eventos
             function setActiveTool(tool) {
                 currentTool = tool;
                 
@@ -310,6 +573,7 @@
                 drawTool.classList.remove('active');
                 textTool.classList.remove('active');
                 eraserTool.classList.remove('active');
+                shapeTool.classList.remove('active');
                 
                 if (tool === 'draw') {
                     drawTool.classList.add('active');
@@ -320,47 +584,73 @@
                 } else if (tool === 'eraser') {
                     eraserTool.classList.add('active');
                     canvas.style.cursor = 'crosshair';
+                } else if (tool === 'shape') {
+                    shapeTool.classList.add('active');
+                    canvas.style.cursor = 'crosshair';
                 }
             }
             
             function startDrawing(e) {
                 if (currentTool !== 'text') {
                     isDrawing = true;
-                    [lastX, lastY] = [e.offsetX, e.offsetY];
+                    const rect = canvas.getBoundingClientRect();
+                    lastX = e.clientX - rect.left;
+                    lastY = e.clientY - rect.top;
+                    
+                    // Comenzar un nuevo trazo
+                    const layerCtx = getCurrentLayer().ctx;
+                    layerCtx.beginPath();
+                    layerCtx.moveTo(lastX, lastY);
+                    
+                    if (currentTool === 'draw') {
+                        layerCtx.strokeStyle = colorPicker.value;
+                        layerCtx.lineWidth = brushSize.value;
+                        layerCtx.globalAlpha = brushOpacity.value / 100;
+                        layerCtx.lineCap = 'round';
+                        layerCtx.lineJoin = 'round';
+                    } else if (currentTool === 'eraser') {
+                        layerCtx.strokeStyle = '#ffffff';
+                        layerCtx.lineWidth = brushSize.value;
+                        layerCtx.globalAlpha = 1;
+                        layerCtx.lineCap = 'round';
+                        layerCtx.lineJoin = 'round';
+                    }
                 }
             }
             
             function draw(e) {
                 if (!isDrawing) return;
                 
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(e.offsetX, e.offsetY);
+                const rect = canvas.getBoundingClientRect();
+                const currentX = e.clientX - rect.left;
+                const currentY = e.clientY - rect.top;
                 
-                if (currentTool === 'draw') {
-                    ctx.strokeStyle = colorPicker.value;
-                    ctx.lineWidth = brushSize.value;
-                    ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-                    ctx.stroke();
-                } else if (currentTool === 'eraser') {
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = brushSize.value;
-                    ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-                    ctx.stroke();
+                const layerCtx = getCurrentLayer().ctx;
+                
+                if (currentTool === 'draw' || currentTool === 'eraser') {
+                    layerCtx.lineTo(currentX, currentY);
+                    layerCtx.stroke();
                 }
                 
-                [lastX, lastY] = [e.offsetX, e.offsetY];
+                [lastX, lastY] = [currentX, currentY];
+                renderLayers();
             }
             
             function stopDrawing() {
-                isDrawing = false;
+                if (isDrawing) {
+                    isDrawing = false;
+                    getCurrentLayer().ctx.closePath();
+                }
             }
             
             function handleCanvasClick(e) {
                 if (currentTool === 'text') {
-                    textPosition = { x: e.offsetX, y: e.offsetY };
+                    const rect = canvas.getBoundingClientRect();
+                    textPosition = { 
+                        x: e.clientX - rect.left, 
+                        y: e.clientY - rect.top 
+                    };
+                    
                     textInputContainer.style.display = 'block';
                     textInputContainer.style.left = `${e.pageX}px`;
                     textInputContainer.style.top = `${e.pageY}px`;
@@ -370,23 +660,31 @@
             
             function handleTextInput(e) {
                 if (e.key === 'Enter') {
-                    ctx.font = `${textSize.value}px Poppins`;
-                    ctx.fillStyle = colorPicker.value;
-                    ctx.fillText(textInput.value, textPosition.x, textPosition.y);
+                    const layerCtx = getCurrentLayer().ctx;
+                    layerCtx.font = `${textSize.value}px ${textFont.value}`;
+                    layerCtx.fillStyle = colorPicker.value;
+                    layerCtx.globalAlpha = brushOpacity.value / 100;
+                    layerCtx.fillText(textInput.value, textPosition.x, textPosition.y);
+                    
                     textInput.value = '';
                     textInputContainer.style.display = 'none';
+                    renderLayers();
                 }
             }
             
-            function clearCanvas() {
-                if (confirm('¿Estás seguro de que quieres limpiar el lienzo?')) {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+            function clearCurrentLayer() {
+                if (confirm('¿Estás seguro de que quieres limpiar la capa actual?')) {
+                    getCurrentLayer().clear();
+                    renderLayers();
                 }
             }
             
             function updateBrushSize() {
                 brushSizeValue.textContent = brushSize.value;
+            }
+            
+            function updateBrushOpacity() {
+                brushOpacityValue.textContent = `${brushOpacity.value}%`;
             }
             
             function updateTextSize() {
@@ -411,8 +709,34 @@
                 link.click();
             }
             
+            // Configurar eventos
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('click', handleCanvasClick);
+            
+            brushSize.addEventListener('input', updateBrushSize);
+            brushOpacity.addEventListener('input', updateBrushOpacity);
+            textSize.addEventListener('input', updateTextSize);
+            
+            drawTool.addEventListener('click', () => setActiveTool('draw'));
+            textTool.addEventListener('click', () => setActiveTool('text'));
+            eraserTool.addEventListener('click', () => setActiveTool('eraser'));
+            shapeTool.addEventListener('click', () => setActiveTool('shape'));
+            clearTool.addEventListener('click', clearCurrentLayer);
+            addLayerTool.addEventListener('click', addNewLayer);
+            addLayerBtn.addEventListener('click', addNewLayer);
+            
+            textInput.addEventListener('keypress', handleTextInput);
+            
+            saveButton.addEventListener('click', saveImage);
+            cancelButton.addEventListener('click', cancelEditing);
+            downloadButton.addEventListener('click', downloadImage);
+            
             // Inicializar valores
             updateBrushSize();
+            updateBrushOpacity();
             updateTextSize();
             setActiveTool('draw');
         });
