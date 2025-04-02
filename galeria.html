@@ -398,6 +398,32 @@ permalink: /galeria/
     transform: scale(1.1);
   }
 
+  /* Icono de editar imagen */
+  .edit-image-button {
+    position: absolute;
+    top: 20px;
+    right: 220px; /* Ajusta la posición para que no se superponga con otros botones */
+    background: rgba(255, 255, 255, 0.1); /* Fondo oscuro para el botón de editar */
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1001;
+  }
+
+  .edit-image-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Fondo más claro al pasar el mouse */
+    transform: scale(1.1);
+  }
+
   /* Mensaje de URL copiada */
   .copy-message {
     position: fixed;
@@ -483,6 +509,10 @@ permalink: /galeria/
     .download-image-button {
       right: 160px; /* Ajuste para dispositivos móviles */
     }
+
+    .edit-image-button {
+      right: 210px; /* Ajuste para dispositivos móviles */
+    }
   }
 </style>
 
@@ -567,6 +597,11 @@ permalink: /galeria/
       <!-- Botón de descargar imagen -->
       <button class="download-image-button" onclick="downloadImageWithWatermark()">
         <i class="fas fa-download"></i> <!-- Ícono de descarga de FontAwesome -->
+      </button>
+      
+      <!-- Botón de editar imagen -->
+      <button class="edit-image-button" onclick="openImageEditor()">
+        <i class="fas fa-edit"></i> <!-- Ícono de editar de FontAwesome -->
       </button>
       
       <div class="modal-body">
@@ -656,6 +691,16 @@ permalink: /galeria/
     // Encontrar el color más frecuente
     let dominantColor = Object.keys(colorCounts).reduce((a, b) => colorCounts[a] > colorCounts[b] ? a : b);
     return `rgb(${dominantColor})`;
+  }
+
+  // Función para abrir el editor de imágenes
+  function openImageEditor() {
+    const currentImage = images[currentImageIndex];
+    const imagePath = currentImage.querySelector('canvas').getAttribute('data-src');
+    const fullImageUrl = new URL(imagePath, window.location.href).href;
+    
+    // Abrir el editor en una nueva ventana
+    window.open(`/editor.html?image=${encodeURIComponent(fullImageUrl)}`, '_blank', 'width=1200,height=800');
   }
 
   // Inicialización
