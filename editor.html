@@ -287,6 +287,7 @@
             pointer-events: none;
             display: none;
             z-index: 10;
+            box-sizing: border-box;
         }
         
         /* Scrollbar personalizada */
@@ -455,12 +456,16 @@
                 updateSelectionIndicator();
             }
             
-            // Función para actualizar el indicador de selección
+            // Función para actualizar el indicador de selección (CORREGIDA)
             function updateSelectionIndicator() {
                 if (!selectedItem) {
                     selectionIndicator.style.display = 'none';
                     return;
                 }
+                
+                const canvasRect = canvas.getBoundingClientRect();
+                const canvasLeft = canvasRect.left + window.scrollX;
+                const canvasTop = canvasRect.top + window.scrollY;
                 
                 if (selectedItem.type === 'line') {
                     const x1 = selectedItem.points[0].x;
@@ -473,8 +478,8 @@
                     const width = Math.abs(x2 - x1) + 10;
                     const height = Math.abs(y2 - y1) + 10;
                     
-                    selectionIndicator.style.left = `${minX}px`;
-                    selectionIndicator.style.top = `${minY}px`;
+                    selectionIndicator.style.left = `${canvasLeft + minX}px`;
+                    selectionIndicator.style.top = `${canvasTop + minY}px`;
                     selectionIndicator.style.width = `${width}px`;
                     selectionIndicator.style.height = `${height}px`;
                     selectionIndicator.style.display = 'block';
@@ -482,8 +487,8 @@
                     const textWidth = measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`);
                     const textHeight = parseInt(selectedItem.size);
                     
-                    selectionIndicator.style.left = `${selectedItem.x - 5}px`;
-                    selectionIndicator.style.top = `${selectedItem.y - textHeight - 5}px`;
+                    selectionIndicator.style.left = `${canvasLeft + selectedItem.x - 5}px`;
+                    selectionIndicator.style.top = `${canvasTop + selectedItem.y - textHeight - 5}px`;
                     selectionIndicator.style.width = `${textWidth + 10}px`;
                     selectionIndicator.style.height = `${textHeight + 10}px`;
                     selectionIndicator.style.display = 'block';
