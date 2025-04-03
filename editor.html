@@ -280,16 +280,6 @@
             font-size: 20px;
         }
         
-        /* Indicador de selección */
-        .selection-indicator {
-            position: absolute;
-            border: 2px dashed #007bff;
-            pointer-events: none;
-            display: none;
-            z-index: 10;
-            box-sizing: border-box;
-        }
-        
         /* Controles de redimensionamiento */
         .resize-handle {
             position: absolute;
@@ -391,7 +381,6 @@
                 <div class="text-input-container">
                     <input type="text" id="textInput" placeholder="Escribe tu texto...">
                 </div>
-                <div class="selection-indicator" id="selectionIndicator"></div>
             </div>
             
             <div class="action-buttons">
@@ -419,7 +408,6 @@
             const canvas = document.getElementById('editorCanvas');
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
             const layersList = document.getElementById('layersList');
-            const selectionIndicator = document.getElementById('selectionIndicator');
             
             // Variables de estado
             let isDrawing = false;
@@ -443,6 +431,7 @@
             let originalHeight = 0;
             let originalX = 0;
             let originalY = 0;
+            let currentPath = [];
             
             // Configuración inicial
             const defaultCanvasWidth = 800;
@@ -461,11 +450,14 @@
                     this.draggableItems = [];
                     this.opacity = 1;
                     this.activeTextItem = null;
+                    this.isBackground = false;
                 }
                 
                 clear() {
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    this.draggableItems = [];
+                    if (!this.isBackground) {
+                        this.draggableItems = [];
+                    }
                     this.activeTextItem = null;
                 }
             }
@@ -484,52 +476,6 @@
                 });
                 
                 updateLayersList();
-                updateSelectionIndicator();
-            }
-            
-            // Función para actualizar el indicador de selección
-            function updateSelectionIndicator() {
-                if (!selectedItem) {
-                    selectionIndicator.style.display = 'none';
-                    // Eliminar controles de redimensionamiento
-                    document.querySelectorAll('.resize-handle').forEach(el => el.remove());
-                    return;
-                }
-                
-                const canvasRect = canvas.getBoundingClientRect();
-                const canvasLeft = canvasRect.left + window.scrollX;
-                const canvasTop = canvasRect.top + window.scrollY;
-                
-                if (selectedItem.type === 'line') {
-                    const x1 = selectedItem.points[0].x;
-                    const y1 = selectedItem.points[0].y;
-                    const x2 = selectedItem.points[1].x;
-                    const y2 = selectedItem.points[1].y;
-                    
-                    const minX = Math.min(x1, x2) - 5;
-                    const minY = Math.min(y1, y2) - 5;
-                    const width = Math.abs(x2 - x1) + 10;
-                    const height = Math.abs(y2 - y1) + 10;
-                    
-                    selectionIndicator.style.left = `${canvasLeft + minX}px`;
-                    selectionIndicator.style.top = `${canvasTop + minY}px`;
-                    selectionIndicator.style.width = `${width}px`;
-                    selectionIndicator.style.height = `${height}px`;
-                    selectionIndicator.style.display = 'block';
-                } else if (selectedItem.type === 'text') {
-                    const textWidth = measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`);
-                    const textHeight = parseInt(selectedItem.size);
-                    
-                    // Ajustar posición del indicador para que rodee completamente el texto
-                    selectionIndicator.style.left = `${canvasLeft + selectedItem.x - 5}px`;
-                    selectionIndicator.style.top = `${canvasTop + selectedItem.y - textHeight - 5}px`;
-                    selectionIndicator.style.width = `${textWidth + 10}px`;
-                    selectionIndicator.style.height = `${textHeight + 10}px`;
-                    selectionIndicator.style.display = 'block';
-                    
-                    // Mostrar controles de escala si es texto seleccionado
-                    showTextResizeHandles(selectedItem, canvasLeft + selectedItem.x - 5, canvasTop + selectedItem.y - textHeight - 5, textWidth + 10, textHeight + 10);
-                }
             }
             
             // Función para mostrar controles de redimensionamiento de texto
@@ -626,7 +572,7 @@
                     selectedItem.x = originalX + (originalWidth - measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`));
                 }
                 
-                // Redibujar
+                // Redibujar la capa
                 redrawLayerWithItems(getCurrentLayer());
                 renderLayers();
             }
@@ -770,6 +716,12 @@
                 
                 const index = layers.findIndex(l => l.id === layerId);
                 if (index !== -1) {
+                    // No permitir eliminar la capa de fondo si es la única
+                    if (layers[index].isBackground && layers.filter(l => l.isBackground).length === 1) {
+                        alert('No puedes eliminar la capa de fondo principal');
+                        return;
+                    }
+                    
                     layers.splice(index, 1);
                     
                     if (currentLayerIndex >= index) {
@@ -861,9 +813,12 @@
                 for (let i = currentLayer.draggableItems.length - 1; i >= 0; i--) {
                     const item = currentLayer.draggableItems[i];
                     
-                    if (item.type === 'line') {
-                        if (isPointNearLine(x, y, item.points[0], item.points[1], item.width)) {
-                            return item;
+                    if (item.type === 'path') {
+                        // Verificar si el punto está cerca de algún punto del trazo
+                        for (let j = 0; j < item.points.length - 1; j++) {
+                            if (isPointNearLine(x, y, item.points[j], item.points[j+1], item.width)) {
+                                return item;
+                            }
                         }
                     } else if (item.type === 'text') {
                         const textWidth = measureTextWidth(item.text, `${item.size}px ${item.font}`);
@@ -919,19 +874,30 @@
             function redrawLayerWithItems(layer) {
                 layer.ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
                 
+                // Si es la capa de fondo, no limpiar los draggableItems
+                if (layer.isBackground) {
+                    layer.ctx.drawImage(layer.canvas, 0, 0);
+                    return;
+                }
+                
                 layer.draggableItems.forEach(item => {
                     layer.ctx.save();
                     layer.ctx.globalAlpha = item.opacity || 1;
                     
-                    if (item.type === 'line') {
+                    if (item.type === 'path') {
                         layer.ctx.strokeStyle = item.color;
                         layer.ctx.lineWidth = item.width;
                         layer.ctx.lineCap = 'round';
                         layer.ctx.lineJoin = 'round';
                         layer.ctx.beginPath();
-                        layer.ctx.moveTo(item.points[0].x, item.points[0].y);
-                        layer.ctx.lineTo(item.points[1].x, item.points[1].y);
-                        layer.ctx.stroke();
+                        
+                        if (item.points.length > 0) {
+                            layer.ctx.moveTo(item.points[0].x, item.points[0].y);
+                            for (let i = 1; i < item.points.length; i++) {
+                                layer.ctx.lineTo(item.points[i].x, item.points[i].y);
+                            }
+                            layer.ctx.stroke();
+                        }
                     } else if (item.type === 'text') {
                         layer.ctx.font = `${item.size}px ${item.font}`;
                         layer.ctx.fillStyle = item.color;
@@ -945,7 +911,10 @@
             // Inicializar capas
             function initLayers() {
                 layers = [];
-                addNewLayer(); // Capa base
+                const baseLayer = new Layer(canvas.width, canvas.height);
+                baseLayer.isBackground = true;
+                layers.push(baseLayer); // Capa base de fondo
+                addNewLayer(); // Capa para dibujar
             }
             
             // Cargar imagen desde URL
@@ -961,18 +930,9 @@
                     
                     initLayers();
                     
-                    // Dibujar la imagen en la capa base
-                    getCurrentLayer().ctx.drawImage(img, 0, 0);
-                    
-                    // Agregar como elemento movible
-                    getCurrentLayer().draggableItems.push({
-                        type: 'image',
-                        x: 0,
-                        y: 0,
-                        width: img.width,
-                        height: img.height,
-                        image: img
-                    });
+                    // Dibujar la imagen en la capa base de fondo
+                    const baseLayer = layers[0];
+                    baseLayer.ctx.drawImage(img, 0, 0);
                     
                     renderLayers();
                     setupLayerDragAndDrop();
@@ -1022,34 +982,57 @@
                         isMoving = true;
                         selectionStart = { x: mouseX, y: mouseY };
                         
-                        if (selectedItem.type === 'line') {
+                        if (selectedItem.type === 'path') {
+                            // Calcular el centro del trazo para el offset
+                            let sumX = 0, sumY = 0;
+                            selectedItem.points.forEach(point => {
+                                sumX += point.x;
+                                sumY += point.y;
+                            });
+                            const centerX = sumX / selectedItem.points.length;
+                            const centerY = sumY / selectedItem.points.length;
+                            
                             offset = {
-                                x: mouseX - (selectedItem.points[0].x + selectedItem.points[1].x) / 2,
-                                y: mouseY - (selectedItem.points[0].y + selectedItem.points[1].y) / 2
+                                x: mouseX - centerX,
+                                y: mouseY - centerY
                             };
-                        } else {
+                        } else if (selectedItem.type === 'text') {
                             offset = {
                                 x: mouseX - selectedItem.x,
                                 y: mouseY - selectedItem.y
                             };
+                            
+                            // Mostrar controles de redimensionamiento
+                            const textWidth = measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`);
+                            const textHeight = parseInt(selectedItem.size);
+                            const canvasRect = canvas.getBoundingClientRect();
+                            const canvasLeft = canvasRect.left + window.scrollX;
+                            const canvasTop = canvasRect.top + window.scrollY;
+                            
+                            showTextResizeHandles(selectedItem, 
+                                canvasLeft + selectedItem.x - 5, 
+                                canvasTop + selectedItem.y - textHeight - 5, 
+                                textWidth + 10, 
+                                textHeight + 10);
                         }
-                        
-                        updateSelectionIndicator();
                         return;
                     } else {
                         selectedItem = null;
-                        updateSelectionIndicator();
+                        document.querySelectorAll('.resize-handle').forEach(el => el.remove());
                     }
                 }
                 
-                if (currentTool !== 'text' && currentTool !== 'select') {
+                if (currentTool === 'draw' || currentTool === 'eraser') {
                     isDrawing = true;
                     lastX = mouseX;
                     lastY = mouseY;
                     
+                    // Iniciar un nuevo trazo
+                    currentPath = [{x: mouseX, y: mouseY}];
+                    
                     const layerCtx = getCurrentLayer().ctx;
                     layerCtx.beginPath();
-                    layerCtx.moveTo(lastX, lastY);
+                    layerCtx.moveTo(mouseX, mouseY);
                     
                     if (currentTool === 'draw') {
                         layerCtx.strokeStyle = colorPicker.value;
@@ -1074,20 +1057,22 @@
                 
                 if (isMoving && selectedItem) {
                     // Mover el elemento seleccionado
-                    if (selectedItem.type === 'line') {
-                        const dx = mouseX - selectionStart.x - offset.x;
-                        const dy = mouseY - selectionStart.y - offset.y;
-                        
-                        selectedItem.points[0].x += dx;
-                        selectedItem.points[0].y += dy;
-                        selectedItem.points[1].x += dx;
-                        selectedItem.points[1].y += dy;
-                    } else {
+                    const dx = mouseX - selectionStart.x;
+                    const dy = mouseY - selectionStart.y;
+                    
+                    if (selectedItem.type === 'path') {
+                        // Mover todos los puntos del trazo
+                        for (let i = 0; i < selectedItem.points.length; i++) {
+                            selectedItem.points[i].x += dx - offset.x;
+                            selectedItem.points[i].y += dy - offset.y;
+                        }
+                    } else if (selectedItem.type === 'text') {
                         selectedItem.x = mouseX - offset.x;
                         selectedItem.y = mouseY - offset.y;
                     }
                     
                     selectionStart = { x: mouseX, y: mouseY };
+                    offset = { x: dx, y: dy };
                     
                     // Redibujar la capa
                     redrawLayerWithItems(getCurrentLayer());
@@ -1103,29 +1088,31 @@
                     layerCtx.lineTo(mouseX, mouseY);
                     layerCtx.stroke();
                     
-                    // Almacenar el trazo para poder seleccionarlo después
-                    if (currentTool === 'draw') {
-                        getCurrentLayer().draggableItems.push({
-                            type: 'line',
-                            points: [
-                                {x: lastX, y: lastY},
-                                {x: mouseX, y: mouseY}
-                            ],
-                            color: colorPicker.value,
-                            width: brushSize.value,
-                            opacity: brushOpacity.value / 100
-                        });
-                    }
+                    // Agregar punto al trazo actual
+                    currentPath.push({x: mouseX, y: mouseY});
                 }
                 
                 [lastX, lastY] = [mouseX, mouseY];
-                renderLayers();
             }
             
             function stopDrawing() {
                 if (isDrawing) {
                     isDrawing = false;
                     getCurrentLayer().ctx.closePath();
+                    
+                    // Guardar el trazo completo como un solo elemento
+                    if (currentPath.length > 1) {
+                        getCurrentLayer().draggableItems.push({
+                            type: 'path',
+                            points: [...currentPath],
+                            color: currentTool === 'draw' ? colorPicker.value : '#ffffff',
+                            width: brushSize.value,
+                            opacity: currentTool === 'draw' ? brushOpacity.value / 100 : 1
+                        });
+                    }
+                    
+                    currentPath = [];
+                    renderLayers();
                 }
                 
                 if (isMoving) {
@@ -1145,8 +1132,20 @@
                     if (clickedItem && clickedItem.type === 'text') {
                         // Editar texto existente
                         const currentLayer = getCurrentLayer();
-                        currentLayer.activeTextItem = clickedItem;
                         
+                        // Eliminar el texto antiguo de la lista de elementos
+                        const index = currentLayer.draggableItems.findIndex(item => 
+                            item.type === 'text' && item.id === clickedItem.id);
+                        
+                        if (index !== -1) {
+                            currentLayer.draggableItems.splice(index, 1);
+                        }
+                        
+                        // Limpiar y redibujar la capa sin el texto antiguo
+                        redrawLayerWithItems(currentLayer);
+                        renderLayers();
+                        
+                        // Configurar para edición
                         textPosition = { 
                             x: clickedItem.x, 
                             y: clickedItem.y 
@@ -1186,51 +1185,20 @@
                         layer.ctx.font = `${textSize.value}px ${textFont.value}`;
                         layer.ctx.fillStyle = colorPicker.value;
                         layer.ctx.globalAlpha = brushOpacity.value / 100;
+                        layer.ctx.fillText(text, textPosition.x, textPosition.y);
                         
-                        // Si estamos editando texto existente
-                        if (layer.activeTextItem) {
-                            // Eliminar el texto antiguo
-                            const index = layer.draggableItems.findIndex(item => item.id === layer.activeTextItem.id);
-                            if (index !== -1) {
-                                layer.draggableItems.splice(index, 1);
-                            }
-                            
-                            // Usar la posición y tamaño existentes a menos que se cambien
-                            const size = layer.activeTextItem.size;
-                            const font = layer.activeTextItem.font;
-                            
-                            layer.ctx.font = `${size}px ${font}`;
-                            layer.ctx.fillText(text, textPosition.x, textPosition.y);
-                            
-                            layer.draggableItems.push({
-                                type: 'text',
-                                id: Date.now().toString(),
-                                text: text,
-                                x: textPosition.x,
-                                y: textPosition.y,
-                                color: layer.activeTextItem.color,
-                                size: size,
-                                font: font,
-                                opacity: layer.activeTextItem.opacity
-                            });
-                            
-                            layer.activeTextItem = null;
-                        } else {
-                            // Texto nuevo
-                            layer.ctx.fillText(text, textPosition.x, textPosition.y);
-                            
-                            layer.draggableItems.push({
-                                type: 'text',
-                                id: Date.now().toString(),
-                                text: text,
-                                x: textPosition.x,
-                                y: textPosition.y,
-                                color: colorPicker.value,
-                                size: textSize.value,
-                                font: textFont.value,
-                                opacity: brushOpacity.value / 100
-                            });
-                        }
+                        // Guardar el texto como elemento movible
+                        layer.draggableItems.push({
+                            type: 'text',
+                            id: Date.now().toString(),
+                            text: text,
+                            x: textPosition.x,
+                            y: textPosition.y,
+                            color: colorPicker.value,
+                            size: textSize.value,
+                            font: textFont.value,
+                            opacity: brushOpacity.value / 100
+                        });
                     }
                     
                     textInput.value = '';
@@ -1331,7 +1299,7 @@
                 }
                 
                 selectedItem = null;
-                updateSelectionIndicator();
+                document.querySelectorAll('.resize-handle').forEach(el => el.remove());
             }
             
             // Inicializar valores
