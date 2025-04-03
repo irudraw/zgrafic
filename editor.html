@@ -290,6 +290,26 @@
             box-sizing: border-box;
         }
         
+        /* Controles de redimensionamiento */
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #007bff;
+            border: 1px solid white;
+            border-radius: 50%;
+            z-index: 100;
+        }
+        
+        .resize-nw { cursor: nw-resize; }
+        .resize-n { cursor: n-resize; }
+        .resize-ne { cursor: ne-resize; }
+        .resize-e { cursor: e-resize; }
+        .resize-se { cursor: se-resize; }
+        .resize-s { cursor: s-resize; }
+        .resize-sw { cursor: sw-resize; }
+        .resize-w { cursor: w-resize; }
+        
         /* Scrollbar personalizada */
         ::-webkit-scrollbar {
             width: 8px;
@@ -404,6 +424,7 @@
             // Variables de estado
             let isDrawing = false;
             let isMoving = false;
+            let isResizing = false;
             let currentTool = 'draw';
             let currentLayerIndex = 0;
             let layers = [];
@@ -414,6 +435,14 @@
             let selectionStart = { x: 0, y: 0 };
             let offset = { x: 0, y: 0 };
             let draggedLayer = null;
+            let resizeDirection = '';
+            let resizeStartX = 0;
+            let resizeStartY = 0;
+            let originalSize = 0;
+            let originalWidth = 0;
+            let originalHeight = 0;
+            let originalX = 0;
+            let originalY = 0;
             
             // Configuración inicial
             const defaultCanvasWidth = 800;
@@ -431,11 +460,13 @@
                     this.id = Date.now() + Math.random().toString(36).substr(2, 9);
                     this.draggableItems = [];
                     this.opacity = 1;
+                    this.activeTextItem = null;
                 }
                 
                 clear() {
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     this.draggableItems = [];
+                    this.activeTextItem = null;
                 }
             }
             
@@ -456,10 +487,12 @@
                 updateSelectionIndicator();
             }
             
-            // Función para actualizar el indicador de selección (CORREGIDA)
+            // Función para actualizar el indicador de selección
             function updateSelectionIndicator() {
                 if (!selectedItem) {
                     selectionIndicator.style.display = 'none';
+                    // Eliminar controles de redimensionamiento
+                    document.querySelectorAll('.resize-handle').forEach(el => el.remove());
                     return;
                 }
                 
@@ -487,12 +520,121 @@
                     const textWidth = measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`);
                     const textHeight = parseInt(selectedItem.size);
                     
+                    // Ajustar posición del indicador para que rodee completamente el texto
                     selectionIndicator.style.left = `${canvasLeft + selectedItem.x - 5}px`;
                     selectionIndicator.style.top = `${canvasTop + selectedItem.y - textHeight - 5}px`;
                     selectionIndicator.style.width = `${textWidth + 10}px`;
                     selectionIndicator.style.height = `${textHeight + 10}px`;
                     selectionIndicator.style.display = 'block';
+                    
+                    // Mostrar controles de escala si es texto seleccionado
+                    showTextResizeHandles(selectedItem, canvasLeft + selectedItem.x - 5, canvasTop + selectedItem.y - textHeight - 5, textWidth + 10, textHeight + 10);
                 }
+            }
+            
+            // Función para mostrar controles de redimensionamiento de texto
+            function showTextResizeHandles(textItem, x, y, width, height) {
+                // Eliminar controles existentes
+                document.querySelectorAll('.resize-handle').forEach(el => el.remove());
+                
+                // Crear 8 puntos de control (como Photoshop)
+                const positions = [
+                    { pos: 'nw', left: x - 5, top: y - 5 },
+                    { pos: 'n', left: x + width/2 - 5, top: y - 5 },
+                    { pos: 'ne', left: x + width - 5, top: y - 5 },
+                    { pos: 'e', left: x + width - 5, top: y + height/2 - 5 },
+                    { pos: 'se', left: x + width - 5, top: y + height - 5 },
+                    { pos: 's', left: x + width/2 - 5, top: y + height - 5 },
+                    { pos: 'sw', left: x - 5, top: y + height - 5 },
+                    { pos: 'w', left: x - 5, top: y + height/2 - 5 }
+                ];
+                
+                positions.forEach(pos => {
+                    const handle = document.createElement('div');
+                    handle.className = `resize-handle resize-${pos.pos}`;
+                    handle.style.position = 'absolute';
+                    handle.style.left = `${pos.left}px`;
+                    handle.style.top = `${pos.top}px`;
+                    handle.style.width = '10px';
+                    handle.style.height = '10px';
+                    handle.style.backgroundColor = '#007bff';
+                    handle.style.border = '1px solid white';
+                    handle.style.borderRadius = '50%';
+                    handle.style.cursor = `${pos.pos}-resize`;
+                    handle.style.zIndex = '100';
+                    handle.dataset.direction = pos.pos;
+                    handle.dataset.itemId = textItem.id;
+                    
+                    handle.addEventListener('mousedown', startResizeText);
+                    document.body.appendChild(handle);
+                });
+            }
+            
+            // Función para iniciar el redimensionamiento de texto
+            function startResizeText(e) {
+                e.stopPropagation();
+                const direction = e.target.dataset.direction;
+                const itemId = e.target.dataset.itemId;
+                
+                const currentLayer = getCurrentLayer();
+                const textItem = currentLayer.draggableItems.find(item => item.id === itemId);
+                
+                if (!textItem) return;
+                
+                selectedItem = textItem;
+                isResizing = true;
+                resizeDirection = direction;
+                resizeStartX = e.clientX;
+                resizeStartY = e.clientY;
+                originalSize = parseFloat(textItem.size);
+                originalWidth = measureTextWidth(textItem.text, `${textItem.size}px ${textItem.font}`);
+                originalHeight = parseFloat(textItem.size);
+                originalX = textItem.x;
+                originalY = textItem.y;
+                
+                document.addEventListener('mousemove', resizeText);
+                document.addEventListener('mouseup', stopResizeText);
+            }
+            
+            // Función para redimensionar texto
+            function resizeText(e) {
+                if (!isResizing || !selectedItem || selectedItem.type !== 'text') return;
+                
+                const dx = e.clientX - resizeStartX;
+                const dy = e.clientY - resizeStartY;
+                
+                let scale = 1;
+                
+                // Calcular escala basada en la dirección
+                if (resizeDirection.includes('e') || resizeDirection.includes('w')) {
+                    scale = 1 + (dx / originalWidth) * (resizeDirection.includes('e') ? 1 : -1);
+                }
+                
+                if (resizeDirection.includes('n') || resizeDirection.includes('s')) {
+                    scale = 1 + (dy / originalHeight) * (resizeDirection.includes('s') ? 1 : -1);
+                }
+                
+                // Aplicar escala al tamaño del texto (mínimo 8px)
+                selectedItem.size = Math.max(8, originalSize * scale);
+                
+                // Reposicionar si es necesario
+                if (resizeDirection.includes('n')) {
+                    selectedItem.y = originalY + (originalHeight - parseFloat(selectedItem.size));
+                }
+                
+                if (resizeDirection.includes('w')) {
+                    selectedItem.x = originalX + (originalWidth - measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`));
+                }
+                
+                // Redibujar
+                redrawLayerWithItems(getCurrentLayer());
+                renderLayers();
+            }
+            
+            function stopResizeText() {
+                isResizing = false;
+                document.removeEventListener('mousemove', resizeText);
+                document.removeEventListener('mouseup', stopResizeText);
             }
             
             // Función para medir el ancho del texto
@@ -994,14 +1136,43 @@
             function handleCanvasClick(e) {
                 if (currentTool === 'text') {
                     const rect = canvas.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    // Verificar si se hizo clic en texto existente
+                    const clickedItem = getItemAtPosition(mouseX, mouseY);
+                    
+                    if (clickedItem && clickedItem.type === 'text') {
+                        // Editar texto existente
+                        const currentLayer = getCurrentLayer();
+                        currentLayer.activeTextItem = clickedItem;
+                        
+                        textPosition = { 
+                            x: clickedItem.x, 
+                            y: clickedItem.y 
+                        };
+                        
+                        textInputContainer.style.display = 'block';
+                        textInputContainer.style.left = `${clickedItem.x + rect.left}px`;
+                        textInputContainer.style.top = `${clickedItem.y - parseFloat(clickedItem.size) + rect.top}px`;
+                        textInput.value = clickedItem.text;
+                        textInput.focus();
+                        
+                        // Seleccionar el texto para edición fácil
+                        textInput.select();
+                        return;
+                    }
+                    
+                    // Crear nuevo texto
                     textPosition = { 
-                        x: e.clientX - rect.left, 
-                        y: e.clientY - rect.top 
+                        x: mouseX, 
+                        y: mouseY 
                     };
                     
                     textInputContainer.style.display = 'block';
                     textInputContainer.style.left = `${e.pageX}px`;
                     textInputContainer.style.top = `${e.pageY}px`;
+                    textInput.value = '';
                     textInput.focus();
                 }
             }
@@ -1015,19 +1186,51 @@
                         layer.ctx.font = `${textSize.value}px ${textFont.value}`;
                         layer.ctx.fillStyle = colorPicker.value;
                         layer.ctx.globalAlpha = brushOpacity.value / 100;
-                        layer.ctx.fillText(text, textPosition.x, textPosition.y);
                         
-                        // Almacenar el texto como elemento movible
-                        layer.draggableItems.push({
-                            type: 'text',
-                            text: text,
-                            x: textPosition.x,
-                            y: textPosition.y,
-                            color: colorPicker.value,
-                            size: textSize.value,
-                            font: textFont.value,
-                            opacity: brushOpacity.value / 100
-                        });
+                        // Si estamos editando texto existente
+                        if (layer.activeTextItem) {
+                            // Eliminar el texto antiguo
+                            const index = layer.draggableItems.findIndex(item => item.id === layer.activeTextItem.id);
+                            if (index !== -1) {
+                                layer.draggableItems.splice(index, 1);
+                            }
+                            
+                            // Usar la posición y tamaño existentes a menos que se cambien
+                            const size = layer.activeTextItem.size;
+                            const font = layer.activeTextItem.font;
+                            
+                            layer.ctx.font = `${size}px ${font}`;
+                            layer.ctx.fillText(text, textPosition.x, textPosition.y);
+                            
+                            layer.draggableItems.push({
+                                type: 'text',
+                                id: Date.now().toString(),
+                                text: text,
+                                x: textPosition.x,
+                                y: textPosition.y,
+                                color: layer.activeTextItem.color,
+                                size: size,
+                                font: font,
+                                opacity: layer.activeTextItem.opacity
+                            });
+                            
+                            layer.activeTextItem = null;
+                        } else {
+                            // Texto nuevo
+                            layer.ctx.fillText(text, textPosition.x, textPosition.y);
+                            
+                            layer.draggableItems.push({
+                                type: 'text',
+                                id: Date.now().toString(),
+                                text: text,
+                                x: textPosition.x,
+                                y: textPosition.y,
+                                color: colorPicker.value,
+                                size: textSize.value,
+                                font: textFont.value,
+                                opacity: brushOpacity.value / 100
+                            });
+                        }
                     }
                     
                     textInput.value = '';
