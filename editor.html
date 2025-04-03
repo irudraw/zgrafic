@@ -157,7 +157,6 @@
             border: 1px solid transparent;
             position: relative;
             z-index: 1;
-            draggable: true;
         }
         
         .layer-item.active {
@@ -167,12 +166,6 @@
         
         .layer-item:hover {
             background-color: #e9ecef;
-        }
-        
-        .layer-item.dragging {
-            background-color: #e2f0ff;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            opacity: 0.8;
         }
         
         .layer-thumbnail {
@@ -289,7 +282,6 @@
             border: 1px solid white;
             border-radius: 50%;
             z-index: 100;
-            pointer-events: auto;
         }
         
         .resize-nw { cursor: nw-resize; }
@@ -331,7 +323,6 @@
                 <button id="drawTool" class="tool-button active"><i class="fas fa-pencil-alt"></i> Dibujar</button>
                 <button id="textTool" class="tool-button"><i class="fas fa-font"></i> Texto</button>
                 <button id="eraserTool" class="tool-button"><i class="fas fa-eraser"></i> Borrador</button>
-                <button id="shapeTool" class="tool-button"><i class="fas fa-square"></i> Formas</button>
             </div>
             
             <div class="tool-section">
@@ -364,7 +355,6 @@
                     <option value="Arial">Arial</option>
                     <option value="Poppins" selected>Poppins</option>
                     <option value="Times New Roman">Times New Roman</option>
-                    <option value="Courier New">Courier New</option>
                 </select>
             </div>
             
@@ -385,7 +375,6 @@
             </div>
             
             <div class="action-buttons">
-                <button id="cancelButton" class="action-button cancel-button"><i class="fas fa-times"></i> Cancelar</button>
                 <button id="downloadButton" class="action-button download-button"><i class="fas fa-download"></i> Descargar</button>
                 <button id="saveButton" class="action-button save-button"><i class="fas fa-save"></i> Guardar</button>
             </div>
@@ -413,7 +402,6 @@
             // Variables de estado
             let isDrawing = false;
             let isMoving = false;
-            let isResizing = false;
             let currentTool = 'draw';
             let currentLayerIndex = 0;
             let layers = [];
@@ -423,17 +411,7 @@
             let selectedItem = null;
             let selectionStart = { x: 0, y: 0 };
             let offset = { x: 0, y: 0 };
-            let draggedLayer = null;
-            let resizeDirection = '';
-            let resizeStartX = 0;
-            let resizeStartY = 0;
-            let originalSize = 0;
-            let originalWidth = 0;
-            let originalHeight = 0;
-            let originalX = 0;
-            let originalY = 0;
             let currentPath = [];
-            let selectedItemInitialState = null;
             
             // Configuración inicial
             const defaultCanvasWidth = 800;
@@ -451,16 +429,12 @@
                     this.id = Date.now() + Math.random().toString(36).substr(2, 9);
                     this.draggableItems = [];
                     this.opacity = 1;
-                    this.activeTextItem = null;
                     this.isBackground = false;
                 }
                 
                 clear() {
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    if (!this.isBackground) {
-                        this.draggableItems = [];
-                    }
-                    this.activeTextItem = null;
+                    this.draggableItems = [];
                 }
             }
             
@@ -478,179 +452,6 @@
                 });
                 
                 updateLayersList();
-                
-                // Mostrar controles de escala si hay un elemento seleccionado
-                if (selectedItem) {
-                    showResizeHandles(selectedItem);
-                }
-            }
-            
-            // Función para mostrar controles de redimensionamiento
-            function showResizeHandles(item) {
-                // Eliminar controles existentes
-                document.querySelectorAll('.resize-handle').forEach(el => el.remove());
-                
-                if (!item) return;
-                
-                const canvasRect = canvas.getBoundingClientRect();
-                const canvasLeft = canvasRect.left + window.scrollX;
-                const canvasTop = canvasRect.top + window.scrollY;
-                
-                let x, y, width, height;
-                
-                if (item.type === 'path') {
-                    // Calcular el bounding box del trazo
-                    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                    item.points.forEach(point => {
-                        minX = Math.min(minX, point.x);
-                        minY = Math.min(minY, point.y);
-                        maxX = Math.max(maxX, point.x);
-                        maxY = Math.max(maxY, point.y);
-                    });
-                    
-                    x = minX - 5;
-                    y = minY - 5;
-                    width = (maxX - minX) + 10;
-                    height = (maxY - minY) + 10;
-                } else if (item.type === 'text') {
-                    const textWidth = measureTextWidth(item.text, `${item.size}px ${item.font}`);
-                    const textHeight = parseInt(item.size);
-                    
-                    x = item.x - 5;
-                    y = item.y - textHeight - 5;
-                    width = textWidth + 10;
-                    height = textHeight + 10;
-                }
-                
-                // Crear 8 puntos de control (como Photoshop)
-                const positions = [
-                    { pos: 'nw', left: canvasLeft + x, top: canvasTop + y },
-                    { pos: 'n', left: canvasLeft + x + width/2 - 5, top: canvasTop + y },
-                    { pos: 'ne', left: canvasLeft + x + width - 10, top: canvasTop + y },
-                    { pos: 'e', left: canvasLeft + x + width - 10, top: canvasTop + y + height/2 - 5 },
-                    { pos: 'se', left: canvasLeft + x + width - 10, top: canvasTop + y + height - 10 },
-                    { pos: 's', left: canvasLeft + x + width/2 - 5, top: canvasTop + y + height - 10 },
-                    { pos: 'sw', left: canvasLeft + x, top: canvasTop + y + height - 10 },
-                    { pos: 'w', left: canvasLeft + x, top: canvasTop + y + height/2 - 5 }
-                ];
-                
-                positions.forEach(pos => {
-                    const handle = document.createElement('div');
-                    handle.className = `resize-handle resize-${pos.pos}`;
-                    handle.style.position = 'absolute';
-                    handle.style.left = `${pos.left}px`;
-                    handle.style.top = `${pos.top}px`;
-                    handle.style.width = '10px';
-                    handle.style.height = '10px';
-                    handle.style.backgroundColor = '#007bff';
-                    handle.style.border = '1px solid white';
-                    handle.style.borderRadius = '50%';
-                    handle.style.cursor = `${pos.pos}-resize`;
-                    handle.style.zIndex = '100';
-                    handle.dataset.direction = pos.pos;
-                    handle.dataset.itemId = item.id;
-                    
-                    handle.addEventListener('mousedown', startResize);
-                    document.body.appendChild(handle);
-                });
-            }
-            
-            // Función para iniciar el redimensionamiento
-            function startResize(e) {
-                e.stopPropagation();
-                const direction = e.target.dataset.direction;
-                const itemId = e.target.dataset.itemId;
-                
-                const currentLayer = getCurrentLayer();
-                const item = currentLayer.draggableItems.find(i => i.id === itemId);
-                
-                if (!item) return;
-                
-                selectedItem = item;
-                isResizing = true;
-                resizeDirection = direction;
-                resizeStartX = e.clientX;
-                resizeStartY = e.clientY;
-                
-                // Guardar el estado inicial del objeto
-                selectedItemInitialState = JSON.parse(JSON.stringify(item));
-                
-                document.addEventListener('mousemove', resizeItem);
-                document.addEventListener('mouseup', stopResize);
-            }
-            
-            // Función para redimensionar el elemento
-            function resizeItem(e) {
-                if (!isResizing || !selectedItem) return;
-                
-                const dx = e.clientX - resizeStartX;
-                const dy = e.clientY - resizeStartY;
-                
-                // Calcular factores de escala
-                let scaleX = 1, scaleY = 1;
-                
-                if (resizeDirection.includes('e')) {
-                    scaleX = 1 + dx / selectedItemInitialState.width;
-                } else if (resizeDirection.includes('w')) {
-                    scaleX = 1 - dx / selectedItemInitialState.width;
-                }
-                
-                if (resizeDirection.includes('s')) {
-                    scaleY = 1 + dy / selectedItemInitialState.height;
-                } else if (resizeDirection.includes('n')) {
-                    scaleY = 1 - dy / selectedItemInitialState.height;
-                }
-                
-                // Aplicar transformación según el tipo de objeto
-                if (selectedItem.type === 'path') {
-                    // Escalar cada punto del trazo
-                    const centerX = selectedItemInitialState.x + selectedItemInitialState.width / 2;
-                    const centerY = selectedItemInitialState.y + selectedItemInitialState.height / 2;
-                    
-                    selectedItem.points = selectedItemInitialState.points.map(point => {
-                        return {
-                            x: centerX + (point.x - centerX) * scaleX,
-                            y: centerY + (point.y - centerY) * scaleY
-                        };
-                    });
-                } else if (selectedItem.type === 'text') {
-                    // Escalar el texto
-                    selectedItem.size = Math.max(8, selectedItemInitialState.size * (resizeDirection.includes('n') || resizeDirection.includes('s') ? scaleY : scaleX);
-                    
-                    // Reposicionar si es necesario
-                    if (resizeDirection.includes('n')) {
-                        selectedItem.y = selectedItemInitialState.y + (selectedItemInitialState.height - parseInt(selectedItem.size));
-                    }
-                    
-                    if (resizeDirection.includes('w')) {
-                        const textWidth = measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`);
-                        selectedItem.x = selectedItemInitialState.x + (selectedItemInitialState.width - textWidth);
-                    }
-                }
-                
-                // Redibujar la capa
-                redrawLayerWithItems(getCurrentLayer());
-                renderLayers();
-            }
-            
-            function stopResize() {
-                isResizing = false;
-                document.removeEventListener('mousemove', resizeItem);
-                document.removeEventListener('mouseup', stopResize);
-            }
-            
-            // Función para medir el ancho del texto
-            function measureTextWidth(text, font) {
-                const span = document.createElement('span');
-                span.style.font = font;
-                span.style.whiteSpace = 'nowrap';
-                span.style.position = 'absolute';
-                span.style.left = '-9999px';
-                span.textContent = text;
-                document.body.appendChild(span);
-                const width = span.offsetWidth;
-                document.body.removeChild(span);
-                return width;
             }
             
             // Función para actualizar la lista de capas en el panel
@@ -661,15 +462,12 @@
                     const layerItem = document.createElement('div');
                     layerItem.className = `layer-item ${index === currentLayerIndex ? 'active' : ''}`;
                     layerItem.dataset.id = layer.id;
-                    layerItem.draggable = true;
                     layerItem.innerHTML = `
                         <div class="layer-thumbnail">
                             <canvas width="40" height="40" id="thumb-${layer.id}"></canvas>
                         </div>
                         <span>${layer.name}</span>
                         <div class="layer-controls">
-                            <button class="layer-control move-up" data-id="${layer.id}" title="Mover arriba"><i class="fas fa-arrow-up"></i></button>
-                            <button class="layer-control move-down" data-id="${layer.id}" title="Mover abajo"><i class="fas fa-arrow-down"></i></button>
                             <button class="layer-control delete-layer" data-id="${layer.id}" title="Eliminar capa"><i class="fas fa-trash"></i></button>
                         </div>
                     `;
@@ -705,62 +503,12 @@
                 });
                 
                 // Agregar eventos a los controles de capa
-                document.querySelectorAll('.move-up').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        moveLayerUp(btn.dataset.id);
-                    });
-                });
-                
-                document.querySelectorAll('.move-down').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        moveLayerDown(btn.dataset.id);
-                    });
-                });
-                
                 document.querySelectorAll('.delete-layer').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         deleteLayer(btn.dataset.id);
                     });
                 });
-            }
-            
-            // Función para mover una capa hacia arriba
-            function moveLayerUp(layerId) {
-                const index = layers.findIndex(l => l.id === layerId);
-                if (index > 0) {
-                    const layer = layers[index];
-                    layers.splice(index, 1);
-                    layers.splice(index - 1, 0, layer);
-                    
-                    if (currentLayerIndex === index) {
-                        currentLayerIndex = index - 1;
-                    } else if (currentLayerIndex === index - 1) {
-                        currentLayerIndex = index;
-                    }
-                    
-                    renderLayers();
-                }
-            }
-            
-            // Función para mover una capa hacia abajo
-            function moveLayerDown(layerId) {
-                const index = layers.findIndex(l => l.id === layerId);
-                if (index < layers.length - 1) {
-                    const layer = layers[index];
-                    layers.splice(index, 1);
-                    layers.splice(index + 1, 0, layer);
-                    
-                    if (currentLayerIndex === index) {
-                        currentLayerIndex = index + 1;
-                    } else if (currentLayerIndex === index + 1) {
-                        currentLayerIndex = index;
-                    }
-                    
-                    renderLayers();
-                }
             }
             
             // Función para eliminar una capa
@@ -772,12 +520,6 @@
                 
                 const index = layers.findIndex(l => l.id === layerId);
                 if (index !== -1) {
-                    // No permitir eliminar la capa de fondo si es la única
-                    if (layers[index].isBackground && layers.filter(l => l.isBackground).length === 1) {
-                        alert('No puedes eliminar la capa de fondo principal');
-                        return;
-                    }
-                    
                     layers.splice(index, 1);
                     
                     if (currentLayerIndex >= index) {
@@ -803,64 +545,6 @@
                 return layers[currentLayerIndex];
             }
             
-            // Configurar arrastre de capas
-            function setupLayerDragAndDrop() {
-                layersList.addEventListener('dragstart', function(e) {
-                    if (e.target.classList.contains('layer-item')) {
-                        draggedLayer = e.target;
-                        e.dataTransfer.setData('text/plain', draggedLayer.dataset.id);
-                        e.target.classList.add('dragging');
-                    }
-                });
-                
-                layersList.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    const afterElement = getDragAfterElement(layersList, e.clientY);
-                    const draggingItem = document.querySelector('.layer-item.dragging');
-                    
-                    if (draggingItem) {
-                        if (afterElement == null) {
-                            layersList.appendChild(draggingItem);
-                        } else {
-                            layersList.insertBefore(draggingItem, afterElement);
-                        }
-                    }
-                });
-                
-                layersList.addEventListener('dragend', function(e) {
-                    if (draggedLayer) {
-                        draggedLayer.classList.remove('dragging');
-                        
-                        // Actualizar el orden de las capas
-                        const newLayers = [];
-                        document.querySelectorAll('.layer-item').forEach(item => {
-                            const layer = layers.find(l => l.id === item.dataset.id);
-                            if (layer) newLayers.push(layer);
-                        });
-                        
-                        layers = newLayers;
-                        currentLayerIndex = layers.findIndex(l => l.id === draggedLayer.dataset.id);
-                        draggedLayer = null;
-                        renderLayers();
-                    }
-                });
-                
-                function getDragAfterElement(container, y) {
-                    const draggableElements = [...container.querySelectorAll('.layer-item:not(.dragging)')];
-                    
-                    return draggableElements.reduce((closest, child) => {
-                        const box = child.getBoundingClientRect();
-                        const offset = y - box.top - box.height / 2;
-                        
-                        if (offset < 0 && offset > closest.offset) {
-                            return { offset: offset, element: child };
-                        } else {
-                            return closest;
-                        }
-                    }, { offset: Number.NEGATIVE_INFINITY }).element;
-                }
-            }
-            
             // Función para obtener un elemento en una posición específica
             function getItemAtPosition(x, y) {
                 const currentLayer = getCurrentLayer();
@@ -870,22 +554,14 @@
                     const item = currentLayer.draggableItems[i];
                     
                     if (item.type === 'path') {
-                        // Verificar si el punto está dentro del bounding box del trazo
-                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                        item.points.forEach(point => {
-                            minX = Math.min(minX, point.x);
-                            minY = Math.min(minY, point.y);
-                            maxX = Math.max(maxX, point.x);
-                            maxY = Math.max(maxY, point.y);
-                        });
-                        
-                        if (x >= minX - 10 && x <= maxX + 10 && y >= minY - 10 && y <= maxY + 10) {
-                            // Calcular el bounding box para el estado inicial
-                            item.x = minX;
-                            item.y = minY;
-                            item.width = maxX - minX;
-                            item.height = maxY - minY;
-                            return item;
+                        // Verificar si el punto está cerca del trazo
+                        for (let j = 0; j < item.points.length - 1; j++) {
+                            const p1 = item.points[j];
+                            const p2 = item.points[j+1];
+                            const distance = distanceToLine(x, y, p1.x, p1.y, p2.x, p2.y);
+                            if (distance <= item.width / 2 + 5) {
+                                return item;
+                            }
                         }
                     } else if (item.type === 'text') {
                         const textWidth = measureTextWidth(item.text, `${item.size}px ${item.font}`);
@@ -893,9 +569,6 @@
                         
                         if (x >= item.x && x <= item.x + textWidth &&
                             y >= item.y - textHeight && y <= item.y) {
-                            // Calcular el bounding box para el estado inicial
-                            item.width = textWidth;
-                            item.height = textHeight;
                             return item;
                         }
                     }
@@ -904,15 +577,54 @@
                 return null;
             }
             
+            // Función auxiliar para calcular distancia a una línea
+            function distanceToLine(x, y, x1, y1, x2, y2) {
+                const A = x - x1;
+                const B = y - y1;
+                const C = x2 - x1;
+                const D = y2 - y1;
+                
+                const dot = A * C + B * D;
+                const len_sq = C * C + D * D;
+                let param = -1;
+                
+                if (len_sq !== 0) param = dot / len_sq;
+                
+                let xx, yy;
+                
+                if (param < 0) {
+                    xx = x1;
+                    yy = y1;
+                } else if (param > 1) {
+                    xx = x2;
+                    yy = y2;
+                } else {
+                    xx = x1 + param * C;
+                    yy = y1 + param * D;
+                }
+                
+                const dx = x - xx;
+                const dy = y - yy;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            // Función para medir el ancho del texto
+            function measureTextWidth(text, font) {
+                const span = document.createElement('span');
+                span.style.font = font;
+                span.style.whiteSpace = 'nowrap';
+                span.style.position = 'absolute';
+                span.style.left = '-9999px';
+                span.textContent = text;
+                document.body.appendChild(span);
+                const width = span.offsetWidth;
+                document.body.removeChild(span);
+                return width;
+            }
+            
             // Función para redibujar una capa con sus elementos
             function redrawLayerWithItems(layer) {
                 layer.ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
-                
-                // Si es la capa de fondo, no limpiar los draggableItems
-                if (layer.isBackground) {
-                    layer.ctx.drawImage(layer.canvas, 0, 0);
-                    return;
-                }
                 
                 layer.draggableItems.forEach(item => {
                     layer.ctx.save();
@@ -969,7 +681,6 @@
                     baseLayer.ctx.drawImage(img, 0, 0);
                     
                     renderLayers();
-                    setupLayerDragAndDrop();
                 };
                 img.src = imageUrl;
             } else {
@@ -977,7 +688,6 @@
                 canvas.height = defaultCanvasHeight;
                 initLayers();
                 renderLayers();
-                setupLayerDragAndDrop();
             }
             
             // Configurar herramientas
@@ -993,13 +703,11 @@
             const drawTool = document.getElementById('drawTool');
             const textTool = document.getElementById('textTool');
             const eraserTool = document.getElementById('eraserTool');
-            const shapeTool = document.getElementById('shapeTool');
             const clearTool = document.getElementById('clearTool');
             const addLayerTool = document.getElementById('addLayerTool');
             const textInputContainer = document.querySelector('.text-input-container');
             const textInput = document.getElementById('textInput');
             const saveButton = document.getElementById('saveButton');
-            const cancelButton = document.getElementById('cancelButton');
             const downloadButton = document.getElementById('downloadButton');
             const addLayerBtn = document.getElementById('addLayerBtn');
             
@@ -1016,12 +724,19 @@
                         isMoving = true;
                         selectionStart = { x: mouseX, y: mouseY };
                         
-                        // Calcular el offset basado en la posición del click
                         if (selectedItem.type === 'path') {
-                            // Usar el centro del bounding box para el offset
+                            // Calcular el centro del trazo para el offset
+                            let sumX = 0, sumY = 0;
+                            selectedItem.points.forEach(point => {
+                                sumX += point.x;
+                                sumY += point.y;
+                            });
+                            const centerX = sumX / selectedItem.points.length;
+                            const centerY = sumY / selectedItem.points.length;
+                            
                             offset = {
-                                x: mouseX - (selectedItem.x + selectedItem.width / 2),
-                                y: mouseY - (selectedItem.y + selectedItem.height / 2)
+                                x: mouseX - centerX,
+                                y: mouseY - centerY
                             };
                         } else if (selectedItem.type === 'text') {
                             offset = {
@@ -1029,13 +744,9 @@
                                 y: mouseY - selectedItem.y
                             };
                         }
-                        
-                        // Mostrar controles de redimensionamiento
-                        showResizeHandles(selectedItem);
                         return;
                     } else {
                         selectedItem = null;
-                        document.querySelectorAll('.resize-handle').forEach(el => el.remove());
                     }
                 }
                 
@@ -1083,9 +794,6 @@
                             selectedItem.points[i].x += dx;
                             selectedItem.points[i].y += dy;
                         }
-                        // Actualizar la posición del bounding box
-                        selectedItem.x += dx;
-                        selectedItem.y += dy;
                     } else if (selectedItem.type === 'text') {
                         selectedItem.x += dx;
                         selectedItem.y += dy;
@@ -1123,7 +831,6 @@
                     if (currentPath.length > 1) {
                         getCurrentLayer().draggableItems.push({
                             type: 'path',
-                            id: Date.now().toString(),
                             points: [...currentPath],
                             color: currentTool === 'draw' ? colorPicker.value : '#ffffff',
                             width: brushSize.value,
@@ -1146,43 +853,6 @@
                     const mouseX = e.clientX - rect.left;
                     const mouseY = e.clientY - rect.top;
                     
-                    // Verificar si se hizo clic en texto existente
-                    const clickedItem = getItemAtPosition(mouseX, mouseY);
-                    
-                    if (clickedItem && clickedItem.type === 'text') {
-                        // Editar texto existente
-                        const currentLayer = getCurrentLayer();
-                        
-                        // Eliminar el texto antiguo de la lista de elementos
-                        const index = currentLayer.draggableItems.findIndex(item => 
-                            item.type === 'text' && item.id === clickedItem.id);
-                        
-                        if (index !== -1) {
-                            currentLayer.draggableItems.splice(index, 1);
-                        }
-                        
-                        // Limpiar y redibujar la capa sin el texto antiguo
-                        redrawLayerWithItems(currentLayer);
-                        renderLayers();
-                        
-                        // Configurar para edición
-                        textPosition = { 
-                            x: clickedItem.x, 
-                            y: clickedItem.y 
-                        };
-                        
-                        textInputContainer.style.display = 'block';
-                        textInputContainer.style.left = `${clickedItem.x + rect.left}px`;
-                        textInputContainer.style.top = `${clickedItem.y - parseFloat(clickedItem.size) + rect.top}px`;
-                        textInput.value = clickedItem.text;
-                        textInput.focus();
-                        
-                        // Seleccionar el texto para edición fácil
-                        textInput.select();
-                        return;
-                    }
-                    
-                    // Crear nuevo texto
                     textPosition = { 
                         x: mouseX, 
                         y: mouseY 
@@ -1210,7 +880,6 @@
                         // Guardar el texto como elemento movible
                         layer.draggableItems.push({
                             type: 'text',
-                            id: Date.now().toString(),
                             text: text,
                             x: textPosition.x,
                             y: textPosition.y,
@@ -1252,12 +921,6 @@
                 alert('Función de guardar implementada en el servidor');
             }
             
-            function cancelEditing() {
-                if (confirm('¿Estás seguro de que quieres salir sin guardar los cambios?')) {
-                    window.close(); // Cierra la ventana/pestaña
-                }
-            }
-            
             function downloadImage() {
                 const link = document.createElement('a');
                 link.download = 'imagen-editada.png';
@@ -1280,7 +943,6 @@
             drawTool.addEventListener('click', () => setActiveTool('draw'));
             textTool.addEventListener('click', () => setActiveTool('text'));
             eraserTool.addEventListener('click', () => setActiveTool('eraser'));
-            shapeTool.addEventListener('click', () => setActiveTool('shape'));
             clearTool.addEventListener('click', clearCurrentLayer);
             addLayerTool.addEventListener('click', addNewLayer);
             addLayerBtn.addEventListener('click', addNewLayer);
@@ -1288,7 +950,6 @@
             textInput.addEventListener('keypress', handleTextInput);
             
             saveButton.addEventListener('click', saveImage);
-            cancelButton.addEventListener('click', cancelEditing);
             downloadButton.addEventListener('click', downloadImage);
             
             function setActiveTool(tool) {
@@ -1299,7 +960,6 @@
                 drawTool.classList.remove('active');
                 textTool.classList.remove('active');
                 eraserTool.classList.remove('active');
-                shapeTool.classList.remove('active');
                 
                 if (tool === 'select') {
                     selectTool.classList.add('active');
@@ -1313,13 +973,9 @@
                 } else if (tool === 'eraser') {
                     eraserTool.classList.add('active');
                     canvas.style.cursor = 'crosshair';
-                } else if (tool === 'shape') {
-                    shapeTool.classList.add('active');
-                    canvas.style.cursor = 'crosshair';
                 }
                 
                 selectedItem = null;
-                document.querySelectorAll('.resize-handle').forEach(el => el.remove());
             }
             
             // Inicializar valores
