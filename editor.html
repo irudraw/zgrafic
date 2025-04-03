@@ -289,6 +289,7 @@
             border: 1px solid white;
             border-radius: 50%;
             z-index: 100;
+            pointer-events: auto;
         }
         
         .resize-nw { cursor: nw-resize; }
@@ -432,6 +433,7 @@
             let originalX = 0;
             let originalY = 0;
             let currentPath = [];
+            let selectedItemInitialState = null;
             
             // Configuración inicial
             const defaultCanvasWidth = 800;
@@ -476,23 +478,60 @@
                 });
                 
                 updateLayersList();
+                
+                // Mostrar controles de escala si hay un elemento seleccionado
+                if (selectedItem) {
+                    showResizeHandles(selectedItem);
+                }
             }
             
-            // Función para mostrar controles de redimensionamiento de texto
-            function showTextResizeHandles(textItem, x, y, width, height) {
+            // Función para mostrar controles de redimensionamiento
+            function showResizeHandles(item) {
                 // Eliminar controles existentes
                 document.querySelectorAll('.resize-handle').forEach(el => el.remove());
                 
+                if (!item) return;
+                
+                const canvasRect = canvas.getBoundingClientRect();
+                const canvasLeft = canvasRect.left + window.scrollX;
+                const canvasTop = canvasRect.top + window.scrollY;
+                
+                let x, y, width, height;
+                
+                if (item.type === 'path') {
+                    // Calcular el bounding box del trazo
+                    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                    item.points.forEach(point => {
+                        minX = Math.min(minX, point.x);
+                        minY = Math.min(minY, point.y);
+                        maxX = Math.max(maxX, point.x);
+                        maxY = Math.max(maxY, point.y);
+                    });
+                    
+                    x = minX - 5;
+                    y = minY - 5;
+                    width = (maxX - minX) + 10;
+                    height = (maxY - minY) + 10;
+                } else if (item.type === 'text') {
+                    const textWidth = measureTextWidth(item.text, `${item.size}px ${item.font}`);
+                    const textHeight = parseInt(item.size);
+                    
+                    x = item.x - 5;
+                    y = item.y - textHeight - 5;
+                    width = textWidth + 10;
+                    height = textHeight + 10;
+                }
+                
                 // Crear 8 puntos de control (como Photoshop)
                 const positions = [
-                    { pos: 'nw', left: x - 5, top: y - 5 },
-                    { pos: 'n', left: x + width/2 - 5, top: y - 5 },
-                    { pos: 'ne', left: x + width - 5, top: y - 5 },
-                    { pos: 'e', left: x + width - 5, top: y + height/2 - 5 },
-                    { pos: 'se', left: x + width - 5, top: y + height - 5 },
-                    { pos: 's', left: x + width/2 - 5, top: y + height - 5 },
-                    { pos: 'sw', left: x - 5, top: y + height - 5 },
-                    { pos: 'w', left: x - 5, top: y + height/2 - 5 }
+                    { pos: 'nw', left: canvasLeft + x, top: canvasTop + y },
+                    { pos: 'n', left: canvasLeft + x + width/2 - 5, top: canvasTop + y },
+                    { pos: 'ne', left: canvasLeft + x + width - 10, top: canvasTop + y },
+                    { pos: 'e', left: canvasLeft + x + width - 10, top: canvasTop + y + height/2 - 5 },
+                    { pos: 'se', left: canvasLeft + x + width - 10, top: canvasTop + y + height - 10 },
+                    { pos: 's', left: canvasLeft + x + width/2 - 5, top: canvasTop + y + height - 10 },
+                    { pos: 'sw', left: canvasLeft + x, top: canvasTop + y + height - 10 },
+                    { pos: 'w', left: canvasLeft + x, top: canvasTop + y + height/2 - 5 }
                 ];
                 
                 positions.forEach(pos => {
@@ -509,67 +548,84 @@
                     handle.style.cursor = `${pos.pos}-resize`;
                     handle.style.zIndex = '100';
                     handle.dataset.direction = pos.pos;
-                    handle.dataset.itemId = textItem.id;
+                    handle.dataset.itemId = item.id;
                     
-                    handle.addEventListener('mousedown', startResizeText);
+                    handle.addEventListener('mousedown', startResize);
                     document.body.appendChild(handle);
                 });
             }
             
-            // Función para iniciar el redimensionamiento de texto
-            function startResizeText(e) {
+            // Función para iniciar el redimensionamiento
+            function startResize(e) {
                 e.stopPropagation();
                 const direction = e.target.dataset.direction;
                 const itemId = e.target.dataset.itemId;
                 
                 const currentLayer = getCurrentLayer();
-                const textItem = currentLayer.draggableItems.find(item => item.id === itemId);
+                const item = currentLayer.draggableItems.find(i => i.id === itemId);
                 
-                if (!textItem) return;
+                if (!item) return;
                 
-                selectedItem = textItem;
+                selectedItem = item;
                 isResizing = true;
                 resizeDirection = direction;
                 resizeStartX = e.clientX;
                 resizeStartY = e.clientY;
-                originalSize = parseFloat(textItem.size);
-                originalWidth = measureTextWidth(textItem.text, `${textItem.size}px ${textItem.font}`);
-                originalHeight = parseFloat(textItem.size);
-                originalX = textItem.x;
-                originalY = textItem.y;
                 
-                document.addEventListener('mousemove', resizeText);
-                document.addEventListener('mouseup', stopResizeText);
+                // Guardar el estado inicial del objeto
+                selectedItemInitialState = JSON.parse(JSON.stringify(item));
+                
+                document.addEventListener('mousemove', resizeItem);
+                document.addEventListener('mouseup', stopResize);
             }
             
-            // Función para redimensionar texto
-            function resizeText(e) {
-                if (!isResizing || !selectedItem || selectedItem.type !== 'text') return;
+            // Función para redimensionar el elemento
+            function resizeItem(e) {
+                if (!isResizing || !selectedItem) return;
                 
                 const dx = e.clientX - resizeStartX;
                 const dy = e.clientY - resizeStartY;
                 
-                let scale = 1;
+                // Calcular factores de escala
+                let scaleX = 1, scaleY = 1;
                 
-                // Calcular escala basada en la dirección
-                if (resizeDirection.includes('e') || resizeDirection.includes('w')) {
-                    scale = 1 + (dx / originalWidth) * (resizeDirection.includes('e') ? 1 : -1);
+                if (resizeDirection.includes('e')) {
+                    scaleX = 1 + dx / selectedItemInitialState.width;
+                } else if (resizeDirection.includes('w')) {
+                    scaleX = 1 - dx / selectedItemInitialState.width;
                 }
                 
-                if (resizeDirection.includes('n') || resizeDirection.includes('s')) {
-                    scale = 1 + (dy / originalHeight) * (resizeDirection.includes('s') ? 1 : -1);
+                if (resizeDirection.includes('s')) {
+                    scaleY = 1 + dy / selectedItemInitialState.height;
+                } else if (resizeDirection.includes('n')) {
+                    scaleY = 1 - dy / selectedItemInitialState.height;
                 }
                 
-                // Aplicar escala al tamaño del texto (mínimo 8px)
-                selectedItem.size = Math.max(8, originalSize * scale);
-                
-                // Reposicionar si es necesario
-                if (resizeDirection.includes('n')) {
-                    selectedItem.y = originalY + (originalHeight - parseFloat(selectedItem.size));
-                }
-                
-                if (resizeDirection.includes('w')) {
-                    selectedItem.x = originalX + (originalWidth - measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`));
+                // Aplicar transformación según el tipo de objeto
+                if (selectedItem.type === 'path') {
+                    // Escalar cada punto del trazo
+                    const centerX = selectedItemInitialState.x + selectedItemInitialState.width / 2;
+                    const centerY = selectedItemInitialState.y + selectedItemInitialState.height / 2;
+                    
+                    selectedItem.points = selectedItemInitialState.points.map(point => {
+                        return {
+                            x: centerX + (point.x - centerX) * scaleX,
+                            y: centerY + (point.y - centerY) * scaleY
+                        };
+                    });
+                } else if (selectedItem.type === 'text') {
+                    // Escalar el texto
+                    selectedItem.size = Math.max(8, selectedItemInitialState.size * (resizeDirection.includes('n') || resizeDirection.includes('s') ? scaleY : scaleX);
+                    
+                    // Reposicionar si es necesario
+                    if (resizeDirection.includes('n')) {
+                        selectedItem.y = selectedItemInitialState.y + (selectedItemInitialState.height - parseInt(selectedItem.size));
+                    }
+                    
+                    if (resizeDirection.includes('w')) {
+                        const textWidth = measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`);
+                        selectedItem.x = selectedItemInitialState.x + (selectedItemInitialState.width - textWidth);
+                    }
                 }
                 
                 // Redibujar la capa
@@ -577,10 +633,10 @@
                 renderLayers();
             }
             
-            function stopResizeText() {
+            function stopResize() {
                 isResizing = false;
-                document.removeEventListener('mousemove', resizeText);
-                document.removeEventListener('mouseup', stopResizeText);
+                document.removeEventListener('mousemove', resizeItem);
+                document.removeEventListener('mouseup', stopResize);
             }
             
             // Función para medir el ancho del texto
@@ -814,11 +870,22 @@
                     const item = currentLayer.draggableItems[i];
                     
                     if (item.type === 'path') {
-                        // Verificar si el punto está cerca de algún punto del trazo
-                        for (let j = 0; j < item.points.length - 1; j++) {
-                            if (isPointNearLine(x, y, item.points[j], item.points[j+1], item.width)) {
-                                return item;
-                            }
+                        // Verificar si el punto está dentro del bounding box del trazo
+                        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                        item.points.forEach(point => {
+                            minX = Math.min(minX, point.x);
+                            minY = Math.min(minY, point.y);
+                            maxX = Math.max(maxX, point.x);
+                            maxY = Math.max(maxY, point.y);
+                        });
+                        
+                        if (x >= minX - 10 && x <= maxX + 10 && y >= minY - 10 && y <= maxY + 10) {
+                            // Calcular el bounding box para el estado inicial
+                            item.x = minX;
+                            item.y = minY;
+                            item.width = maxX - minX;
+                            item.height = maxY - minY;
+                            return item;
                         }
                     } else if (item.type === 'text') {
                         const textWidth = measureTextWidth(item.text, `${item.size}px ${item.font}`);
@@ -826,48 +893,15 @@
                         
                         if (x >= item.x && x <= item.x + textWidth &&
                             y >= item.y - textHeight && y <= item.y) {
+                            // Calcular el bounding box para el estado inicial
+                            item.width = textWidth;
+                            item.height = textHeight;
                             return item;
                         }
                     }
                 }
                 
                 return null;
-            }
-            
-            // Función auxiliar para verificar proximidad a una línea
-            function isPointNearLine(x, y, p1, p2, width) {
-                const distance = distanceToLine(x, y, p1.x, p1.y, p2.x, p2.y);
-                return distance <= width / 2 + 5; // 5px de tolerancia
-            }
-            
-            function distanceToLine(x, y, x1, y1, x2, y2) {
-                const A = x - x1;
-                const B = y - y1;
-                const C = x2 - x1;
-                const D = y2 - y1;
-                
-                const dot = A * C + B * D;
-                const len_sq = C * C + D * D;
-                let param = -1;
-                
-                if (len_sq !== 0) param = dot / len_sq;
-                
-                let xx, yy;
-                
-                if (param < 0) {
-                    xx = x1;
-                    yy = y1;
-                } else if (param > 1) {
-                    xx = x2;
-                    yy = y2;
-                } else {
-                    xx = x1 + param * C;
-                    yy = y1 + param * D;
-                }
-                
-                const dx = x - xx;
-                const dy = y - yy;
-                return Math.sqrt(dx * dx + dy * dy);
             }
             
             // Función para redibujar una capa con sus elementos
@@ -982,39 +1016,22 @@
                         isMoving = true;
                         selectionStart = { x: mouseX, y: mouseY };
                         
+                        // Calcular el offset basado en la posición del click
                         if (selectedItem.type === 'path') {
-                            // Calcular el centro del trazo para el offset
-                            let sumX = 0, sumY = 0;
-                            selectedItem.points.forEach(point => {
-                                sumX += point.x;
-                                sumY += point.y;
-                            });
-                            const centerX = sumX / selectedItem.points.length;
-                            const centerY = sumY / selectedItem.points.length;
-                            
+                            // Usar el centro del bounding box para el offset
                             offset = {
-                                x: mouseX - centerX,
-                                y: mouseY - centerY
+                                x: mouseX - (selectedItem.x + selectedItem.width / 2),
+                                y: mouseY - (selectedItem.y + selectedItem.height / 2)
                             };
                         } else if (selectedItem.type === 'text') {
                             offset = {
                                 x: mouseX - selectedItem.x,
                                 y: mouseY - selectedItem.y
                             };
-                            
-                            // Mostrar controles de redimensionamiento
-                            const textWidth = measureTextWidth(selectedItem.text, `${selectedItem.size}px ${selectedItem.font}`);
-                            const textHeight = parseInt(selectedItem.size);
-                            const canvasRect = canvas.getBoundingClientRect();
-                            const canvasLeft = canvasRect.left + window.scrollX;
-                            const canvasTop = canvasRect.top + window.scrollY;
-                            
-                            showTextResizeHandles(selectedItem, 
-                                canvasLeft + selectedItem.x - 5, 
-                                canvasTop + selectedItem.y - textHeight - 5, 
-                                textWidth + 10, 
-                                textHeight + 10);
                         }
+                        
+                        // Mostrar controles de redimensionamiento
+                        showResizeHandles(selectedItem);
                         return;
                     } else {
                         selectedItem = null;
@@ -1063,16 +1080,18 @@
                     if (selectedItem.type === 'path') {
                         // Mover todos los puntos del trazo
                         for (let i = 0; i < selectedItem.points.length; i++) {
-                            selectedItem.points[i].x += dx - offset.x;
-                            selectedItem.points[i].y += dy - offset.y;
+                            selectedItem.points[i].x += dx;
+                            selectedItem.points[i].y += dy;
                         }
+                        // Actualizar la posición del bounding box
+                        selectedItem.x += dx;
+                        selectedItem.y += dy;
                     } else if (selectedItem.type === 'text') {
-                        selectedItem.x = mouseX - offset.x;
-                        selectedItem.y = mouseY - offset.y;
+                        selectedItem.x += dx;
+                        selectedItem.y += dy;
                     }
                     
                     selectionStart = { x: mouseX, y: mouseY };
-                    offset = { x: dx, y: dy };
                     
                     // Redibujar la capa
                     redrawLayerWithItems(getCurrentLayer());
@@ -1104,6 +1123,7 @@
                     if (currentPath.length > 1) {
                         getCurrentLayer().draggableItems.push({
                             type: 'path',
+                            id: Date.now().toString(),
                             points: [...currentPath],
                             color: currentTool === 'draw' ? colorPicker.value : '#ffffff',
                             width: brushSize.value,
