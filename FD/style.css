@@ -34,7 +34,7 @@ body {
     opacity: 0.5;
 }
 
-#downloadBtn, #downloadVideoBtn {
+#downloadBtn {
     margin-top: 10px;
     font-weight: 500;
 }
@@ -57,16 +57,6 @@ body {
 .btn-primary:hover {
     background-color: #166fe5;
     border-color: #166fe5;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    border-color: #dc3545;
-}
-
-.btn-danger:hover {
-    background-color: #bb2d3b;
-    border-color: #bb2d3b;
 }
 
 .alert {
@@ -96,6 +86,18 @@ body {
 .quality-btn.active {
     font-weight: bold;
     border-width: 2px;
+}
+
+#videoContainer {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+#videoPlayer {
+    border-radius: 6px;
+    background-color: #000;
 }
 
 @media (max-width: 768px) {
