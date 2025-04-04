@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos del DOM con verificaciones
+    // Elementos del DOM
     const elements = {
         findPosterBtn: document.getElementById('findPoster'),
         videoUrlInput: document.getElementById('videoUrl'),
@@ -11,12 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
         directLink: document.getElementById('directLink'),
         qualityOptions: document.getElementById('qualityOptions'),
         videoContainer: document.getElementById('videoContainer'),
-        videoPlayer: document.getElementById('videoPlayer')
+        videoPlayer: document.getElementById('videoPlayer'),
+        videoWrapper: document.querySelector('.video-wrapper')
     };
 
-    // Verificar que todos los elementos esenciales existan
+    // Verificar elementos
     if (Object.values(elements).some(element => !element)) {
-        console.error('Error: Faltan elementos esenciales en el DOM');
+        console.error('Error: Elementos faltantes en el DOM');
         if (elements.errorDiv) {
             elements.errorDiv.textContent = 'Error inicializando la aplicación. Recarga la página.';
             elements.errorDiv.classList.remove('d-none');
@@ -30,19 +31,17 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.findPosterBtn.addEventListener('click', findPoster);
     elements.downloadBtn.addEventListener('click', downloadImage);
     
-    // Manejador delegado para botones de calidad
-    if (elements.qualityOptions) {
-        elements.qualityOptions.addEventListener('click', function(e) {
-            if (e.target.classList.contains('quality-btn')) {
-                const quality = e.target.getAttribute('data-quality');
-                if (currentPosterUrls[quality]) {
-                    changeImageQuality(quality);
-                }
+    // Manejador de calidad
+    elements.qualityOptions.addEventListener('click', function(e) {
+        if (e.target.classList.contains('quality-btn')) {
+            const quality = e.target.getAttribute('data-quality');
+            if (currentPosterUrls[quality]) {
+                changeImageQuality(quality);
             }
-        });
-    }
+        }
+    });
 
-    // Función principal para buscar el poster
+    // Función principal
     async function findPoster() {
         const videoUrl = elements.videoUrlInput.value.trim();
         
@@ -77,18 +76,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Mostrar el reproductor de video
+    // Mostrar reproductor de video
     function showVideoPlayer(videoUrl) {
         try {
-            const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
+            const isReel = detectVideoType(videoUrl) === 'reel';
+            const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500&height=${isReel ? '900' : '500'}`;
+            
             elements.videoPlayer.src = embedUrl;
             elements.videoContainer.classList.remove('d-none');
+            
+            // Ajustar aspect ratio
+            if (isReel) {
+                elements.videoWrapper.classList.remove('horizontal');
+            } else {
+                elements.videoWrapper.classList.add('horizontal');
+            }
         } catch (error) {
-            console.error('Error al cargar el reproductor de video:', error);
+            console.error('Error al cargar el reproductor:', error);
         }
     }
 
-    // Obtener datos del poster desde Facebook
+    // Detectar tipo de video
+    function detectVideoType(url) {
+        return (url.includes('/reel/') || url.includes('/reels/')) ? 'reel' : 'video';
+    }
+
+    // Obtener datos del poster
     async function fetchPosterData(videoUrl) {
         const pluginUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
         const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(pluginUrl)}`;
@@ -101,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return extractAllQualityUrls(data.contents);
     }
 
-    // Extraer URLs en diferentes calidades
+    // Extraer URLs de imagen
     function extractAllQualityUrls(htmlContent) {
         const baseUrl = extractBaseImageUrl(htmlContent);
         if (!baseUrl) throw new Error('No se pudo extraer la imagen del video.');
@@ -114,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Funciones auxiliares para manejo de URLs
+    // Funciones auxiliares para URLs
     function extractBaseImageUrl(htmlContent) {
         const metaMatch = htmlContent.match(/<meta property="og:image" content="([^"]+)"/i);
         if (metaMatch) return metaMatch[1].replace(/&amp;/g, '&');
@@ -156,13 +169,11 @@ document.addEventListener('DOMContentLoaded', function() {
         elements.directLink.href = imageUrl;
         elements.resultDiv.classList.remove('d-none');
         
-        // Activar botones de calidad según disponibilidad
         const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
         qualityBtns.forEach(btn => {
             const quality = btn.getAttribute('data-quality');
             btn.classList.toggle('disabled', !currentPosterUrls[quality]);
             
-            // Activar SD por defecto
             if (quality === 'sd' && currentPosterUrls.sd) {
                 btn.classList.add('active');
             } else {
@@ -173,20 +184,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cambiar calidad de imagen
     function changeImageQuality(quality) {
-        if (!currentPosterUrls[quality] || !elements.posterImage) return;
+        if (!currentPosterUrls[quality]) return;
         
         elements.posterImage.classList.add('loading');
         elements.posterImage.src = currentPosterUrls[quality];
         elements.directLink.href = currentPosterUrls[quality];
         
-        // Actualizar botón activo
         const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
         qualityBtns.forEach(btn => {
-            if (btn.getAttribute('data-quality') === quality) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            btn.classList.toggle('active', btn.getAttribute('data-quality') === quality);
         });
     }
 
@@ -248,15 +254,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Manejar carga/error de imagen
-    if (elements.posterImage) {
-        elements.posterImage.onload = function() {
-            this.classList.remove('loading');
-        };
-        
-        elements.posterImage.onerror = function() {
-            this.onerror = null;
-            this.src = 'https://via.placeholder.com/1000x562?text=Imagen+no+disponible';
-            this.classList.remove('loading');
-        };
-    }
+    elements.posterImage.onload = function() {
+        this.classList.remove('loading');
+    };
+    
+    elements.posterImage.onerror = function() {
+        this.onerror = null;
+        this.src = 'https://via.placeholder.com/1000x562?text=Imagen+no+disponible';
+        this.classList.remove('loading');
+    };
 });
