@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     let currentPosterUrls = {};
+    let currentVideoUrl = '';
 
     // Event Listeners
     elements.findPosterBtn.addEventListener('click', findPoster);
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función principal para buscar el poster
     async function findPoster() {
         const videoUrl = elements.videoUrlInput.value.trim();
+        currentVideoUrl = videoUrl;
         
         if (!videoUrl) {
             showError('Por favor ingresa una URL');
@@ -66,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             currentPosterUrls = posterData;
             displayResult(posterData.original);
+            createVideoViewButton(videoUrl);
         } catch (error) {
             showError(error.message);
             console.error(error);
@@ -176,19 +179,48 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Descargar imagen
+    // Descargar imagen - VERSIÓN CORREGIDA
     function downloadImage() {
         if (!elements.posterImage.src || elements.posterImage.src.includes('placeholder.com')) {
             showError('No hay imagen válida para descargar');
             return;
         }
 
-        const link = document.createElement('a');
-        link.href = elements.posterImage.src;
-        link.download = `fb-poster-${Date.now()}.jpg`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Crear un canvas para asegurar la descarga
+        const canvas = document.createElement('canvas');
+        const img = elements.posterImage;
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        canvas.toBlob(function(blob) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `fb-poster-${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }, 'image/jpeg', 0.95);
+    }
+
+    // Función para crear el botón de ver video
+    function createVideoViewButton(videoUrl) {
+        // Eliminar botón anterior si existe
+        const existingBtn = document.getElementById('viewVideoBtn');
+        if (existingBtn) existingBtn.remove();
+        
+        const videoPluginUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}`;
+        const videoBtn = document.createElement('a');
+        videoBtn.href = videoPluginUrl;
+        videoBtn.target = '_blank';
+        videoBtn.className = 'btn btn-info mt-2';
+        videoBtn.innerHTML = '<i class="bi bi-play-circle"></i> Ver Video en Facebook';
+        videoBtn.id = 'viewVideoBtn';
+        
+        // Insertar después del botón de descarga
+        elements.downloadBtn.parentNode.insertBefore(videoBtn, elements.downloadBtn.nextSibling);
     }
 
     // Helpers para UI
@@ -214,22 +246,26 @@ document.addEventListener('DOMContentLoaded', function() {
             elements.posterImage.src = '';
             elements.posterImage.classList.remove('loading');
         }
+        
+        // Eliminar botón de ver video si existe
+        const videoBtn = document.getElementById('viewVideoBtn');
+        if (videoBtn) videoBtn.remove();
     }
 
     // Validación de URL
     function isValidFacebookUrl(url) {
-    const patterns = [
-        /facebook\.com\/watch\/\?v=\d+/i,
-        /facebook\.com\/.+\/videos\/\d+/i,
-        /facebook\.com\/video\.php\?v=\d+/i,
-        /fb\.watch\/[a-zA-Z0-9_-]+/i,
-        /facebook\.com\/.+\/videos\/.+\/\d+/i,
-        /facebook\.com\/reel\/\d+/i,  // Nuevo patrón para Reels
-        /facebook\.com\/.+\/reels\/\d+/i  // Otro posible formato de Reels
-    ];
-    
-    return patterns.some(pattern => pattern.test(url));
-}
+        const patterns = [
+            /facebook\.com\/watch\/\?v=\d+/i,
+            /facebook\.com\/.+\/videos\/\d+/i,
+            /facebook\.com\/video\.php\?v=\d+/i,
+            /fb\.watch\/[a-zA-Z0-9_-]+/i,
+            /facebook\.com\/.+\/videos\/.+\/\d+/i,
+            /facebook\.com\/reel\/\d+/i,
+            /facebook\.com\/.+\/reels\/\d+/i
+        ];
+        
+        return patterns.some(pattern => pattern.test(url));
+    }
 
     // Manejar carga/error de imagen
     if (elements.posterImage) {
@@ -239,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         elements.posterImage.onerror = function() {
             this.onerror = null;
-            this.src = 'https://via.placeholder.com/1000x562?text=Imagen+no+disponible';
+            this.src = 'https://via.placeholder.com/1000x562.png?text=Imagen+no+disponible';
             this.classList.remove('loading');
         };
     }
