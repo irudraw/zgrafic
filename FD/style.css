@@ -1,101 +1,99 @@
 body {
-    background-color: #f8f9fa;
+    background-color: #f5f6f8;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px 0;
+    padding-bottom: 50px;
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 800px;
+    margin-top: 30px;
 }
 
 .card {
-    border-radius: 10px;
-    overflow: hidden;
+    border-radius: 12px;
     border: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 #posterImage {
     max-width: 100%;
-    border-radius: 8px;
-    transition: opacity 0.3s;
+    width: auto;
+    height: auto;
+    max-height: 70vh;
     border: 1px solid #dee2e6;
-    background-color: #f1f1f1;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    display: block;
+    margin: 0 auto;
+    transition: opacity 0.3s ease;
 }
 
 #posterImage.loading {
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
-.video-responsive {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-    height: 0;
-    overflow: hidden;
-    background: #000;
+#downloadBtn {
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+#loading p {
+    margin-top: 10px;
+    color: #0d6efd;
+    font-weight: 500;
+}
+
+.input-group {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background-color: #1877f2;
+    border-color: #1877f2;
+}
+
+.btn-primary:hover {
+    background-color: #166fe5;
+    border-color: #166fe5;
+}
+
+.alert {
     border-radius: 8px;
 }
 
-.video-responsive.reel-format {
-    padding-bottom: 177.78%; /* 9:16 Aspect Ratio */
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.video-responsive iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
+.text-muted {
+    color: #6c757d !important;
 }
 
 .quality-options {
     text-align: center;
-    margin: 15px 0;
+    margin-top: 10px;
 }
 
 .quality-btn {
     margin: 0 5px;
-    min-width: 60px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
 }
 
-#embedSection {
-    border: 1px solid #dee2e6;
+.quality-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
-#embedCode {
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    resize: none;
-}
-
-#fallbackOptions {
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.btn-warning {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #212529;
+.quality-btn.active {
+    font-weight: bold;
+    border-width: 2px;
 }
 
 @media (max-width: 768px) {
-    .video-responsive.reel-format {
-        max-width: 100%;
-    }
-    
     #posterImage {
-        margin-bottom: 20px;
+        max-height: 50vh;
     }
     
     .quality-options {
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
 }
