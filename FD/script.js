@@ -4,34 +4,27 @@ document.addEventListener('DOMContentLoaded', function() {
         findPosterBtn: document.getElementById('findPoster'),
         videoUrlInput: document.getElementById('videoUrl'),
         errorDiv: document.getElementById('error'),
-        resultDiv: document.getElementById('result'),
         loadingDiv: document.getElementById('loading'),
+        resultDiv: document.getElementById('result'),
         posterImage: document.getElementById('posterImage'),
-        downloadBtn: document.getElementById('downloadBtn'),
-        directLink: document.getElementById('directLink'),
         qualityOptions: document.getElementById('qualityOptions'),
+        downloadBtn: document.getElementById('downloadBtn'),
         videoContainer: document.getElementById('videoContainer'),
         videoPlayer: document.getElementById('videoPlayer'),
-        videoWrapper: document.querySelector('.video-wrapper')
+        videoWrapper: document.querySelector('.video-responsive'),
+        embedSection: document.getElementById('embedSection'),
+        embedCode: document.getElementById('embedCode'),
+        copyEmbed: document.getElementById('copyEmbed')
     };
 
-    // Verificar elementos
-    if (Object.values(elements).some(element => !element)) {
-        console.error('Error: Elementos faltantes en el DOM');
-        if (elements.errorDiv) {
-            elements.errorDiv.textContent = 'Error inicializando la aplicación. Recarga la página.';
-            elements.errorDiv.classList.remove('d-none');
-        }
-        return;
-    }
-
     let currentPosterUrls = {};
+    let currentVideoUrl = '';
 
     // Event Listeners
-    elements.findPosterBtn.addEventListener('click', findPoster);
+    elements.findPosterBtn.addEventListener('click', processFacebookUrl);
     elements.downloadBtn.addEventListener('click', downloadImage);
+    elements.copyEmbed.addEventListener('click', copyEmbedCode);
     
-    // Manejador de calidad
     elements.qualityOptions.addEventListener('click', function(e) {
         if (e.target.classList.contains('quality-btn')) {
             const quality = e.target.getAttribute('data-quality');
@@ -42,16 +35,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Función principal
-    async function findPoster() {
+    async function processFacebookUrl() {
         const videoUrl = elements.videoUrlInput.value.trim();
+        currentVideoUrl = videoUrl;
         
         if (!videoUrl) {
-            showError('Por favor ingresa una URL');
+            showError('Por favor ingresa una URL de Facebook');
             return;
         }
 
         if (!isValidFacebookUrl(videoUrl)) {
-            showError('URL no válida. Ejemplos válidos:<br>• https://www.facebook.com/watch/?v=1234567890<br>• https://fb.watch/abc123def/<br>• https://www.facebook.com/reel/1234567890');
+            showError('Formato de URL no válido. Ejemplos válidos:<br>' + 
+                     '• https://www.facebook.com/watch/?v=1234567890<br>' +
+                     '• https://www.facebook.com/reel/1234567890');
             return;
         }
 
@@ -59,46 +55,62 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoading();
 
         try {
+            // Obtener datos del video
             const posterData = await fetchPosterData(videoUrl);
             
             if (!posterData.original) {
-                throw new Error('No se encontró la imagen poster para este video.');
+                throw new Error('No se pudo obtener la miniatura del video');
             }
 
             currentPosterUrls = posterData;
-            displayResult(posterData.original);
-            showVideoPlayer(videoUrl);
+            displayResults(posterData.original);
+            setupVideoPlayer(videoUrl);
+            generateEmbedCode(videoUrl);
         } catch (error) {
             showError(error.message);
-            console.error(error);
+            console.error('Error:', error);
         } finally {
             hideLoading();
         }
     }
 
-    // Mostrar reproductor de video
-    function showVideoPlayer(videoUrl) {
-        try {
-            const isReel = detectVideoType(videoUrl) === 'reel';
-            const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500&height=${isReel ? '900' : '500'}`;
-            
-            elements.videoPlayer.src = embedUrl;
-            elements.videoContainer.classList.remove('d-none');
-            
-            // Ajustar aspect ratio
-            if (isReel) {
-                elements.videoWrapper.classList.remove('horizontal');
-            } else {
-                elements.videoWrapper.classList.add('horizontal');
-            }
-        } catch (error) {
-            console.error('Error al cargar el reproductor:', error);
+    // Configurar reproductor de video
+    function setupVideoPlayer(videoUrl) {
+        const isReel = videoUrl.includes('/reel/') || videoUrl.includes('/reels/');
+        const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
+        
+        elements.videoPlayer.src = embedUrl;
+        
+        // Ajustar aspecto según el tipo de video
+        if (isReel) {
+            elements.videoWrapper.classList.add('reel-format');
+        } else {
+            elements.videoWrapper.classList.remove('reel-format');
         }
     }
 
-    // Detectar tipo de video
-    function detectVideoType(url) {
-        return (url.includes('/reel/') || url.includes('/reels/')) ? 'reel' : 'video';
+    // Generar código embed
+    function generateEmbedCode(videoUrl) {
+        const isReel = videoUrl.includes('/reel/') || videoUrl.includes('/reels/');
+        const width = isReel ? '350' : '500';
+        const height = isReel ? '623' : '281';
+        
+        const embedHTML = `<iframe src="https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=${width}&height=${height}" width="${width}" height="${height}" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>`;
+        
+        elements.embedCode.value = embedHTML;
+    }
+
+    // Copiar código embed
+    function copyEmbedCode() {
+        elements.embedCode.select();
+        document.execCommand('copy');
+        
+        const originalText = elements.copyEmbed.textContent;
+        elements.copyEmbed.textContent = '¡Copiado!';
+        
+        setTimeout(() => {
+            elements.copyEmbed.textContent = originalText;
+        }, 2000);
     }
 
     // Obtener datos del poster
@@ -109,39 +121,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const response = await fetch(proxyUrl);
         const data = await response.json();
         
-        if (!response.ok) throw new Error('No se pudo acceder al video. Intenta nuevamente.');
+        if (!response.ok) throw new Error('Error al conectar con el servidor');
 
-        return extractAllQualityUrls(data.contents);
+        return extractImageUrls(data.contents);
     }
 
     // Extraer URLs de imagen
-    function extractAllQualityUrls(htmlContent) {
+    function extractImageUrls(htmlContent) {
         const baseUrl = extractBaseImageUrl(htmlContent);
-        if (!baseUrl) throw new Error('No se pudo extraer la imagen del video.');
+        if (!baseUrl) throw new Error('No se encontró la miniatura del video');
 
         return {
-            sd: addQualityParams(baseUrl, 640, 360),
-            hd: addQualityParams(baseUrl, 1280, 720),
-            original: removeQualityParams(baseUrl),
-            base: baseUrl
+            sd: setImageDimensions(baseUrl, 640, 360),
+            hd: setImageDimensions(baseUrl, 1280, 720),
+            original: baseUrl
         };
     }
 
-    // Funciones auxiliares para URLs
-    function extractBaseImageUrl(htmlContent) {
-        const metaMatch = htmlContent.match(/<meta property="og:image" content="([^"]+)"/i);
-        if (metaMatch) return metaMatch[1].replace(/&amp;/g, '&');
-
-        const imgMatch = htmlContent.match(/<img[^>]+(data-src|src)="([^"]+)"/i);
-        if (imgMatch) return imgMatch[2].replace(/&amp;/g, '&');
-
-        const videoMatch = htmlContent.match(/<video[^>]+poster="([^"]+)"/i);
-        if (videoMatch) return videoMatch[1].replace(/&amp;/g, '&');
-
-        return null;
+    // Funciones auxiliares
+    function extractBaseImageUrl(html) {
+        const metaMatch = html.match(/<meta property="og:image" content="([^"]+)"/i);
+        return metaMatch ? metaMatch[1].replace(/&amp;/g, '&') : null;
     }
 
-    function addQualityParams(url, width, height) {
+    function setImageDimensions(url, width, height) {
         try {
             const urlObj = new URL(url);
             urlObj.searchParams.set('width', width);
@@ -152,66 +155,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function removeQualityParams(url) {
-        try {
-            const urlObj = new URL(url);
-            urlObj.searchParams.delete('width');
-            urlObj.searchParams.delete('height');
-            return urlObj.toString();
-        } catch {
-            return url;
-        }
-    }
-
-    // Mostrar resultados
-    function displayResult(imageUrl) {
+    function displayResults(imageUrl) {
         elements.posterImage.src = imageUrl;
-        elements.directLink.href = imageUrl;
         elements.resultDiv.classList.remove('d-none');
         
-        const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
-        qualityBtns.forEach(btn => {
+        // Configurar botones de calidad
+        document.querySelectorAll('.quality-btn').forEach(btn => {
             const quality = btn.getAttribute('data-quality');
             btn.classList.toggle('disabled', !currentPosterUrls[quality]);
-            
-            if (quality === 'sd' && currentPosterUrls.sd) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            btn.classList.toggle('active', quality === 'original');
         });
     }
 
-    // Cambiar calidad de imagen
     function changeImageQuality(quality) {
-        if (!currentPosterUrls[quality]) return;
-        
         elements.posterImage.classList.add('loading');
         elements.posterImage.src = currentPosterUrls[quality];
-        elements.directLink.href = currentPosterUrls[quality];
         
-        const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
-        qualityBtns.forEach(btn => {
+        document.querySelectorAll('.quality-btn').forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-quality') === quality);
         });
     }
 
-    // Descargar imagen
     function downloadImage() {
-        if (!elements.posterImage.src || elements.posterImage.src.includes('placeholder.com')) {
-            showError('No hay imagen válida para descargar');
-            return;
-        }
-
         const link = document.createElement('a');
         link.href = elements.posterImage.src;
-        link.download = `fb-poster-${Date.now()}.jpg`;
+        link.download = `facebook-thumbnail-${Date.now()}.jpg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
 
-    // Helpers para UI
+    // Helpers de UI
     function showLoading() {
         elements.loadingDiv.classList.remove('d-none');
     }
@@ -228,39 +202,30 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetUI() {
         elements.errorDiv.classList.add('d-none');
         elements.resultDiv.classList.add('d-none');
-        elements.videoContainer.classList.add('d-none');
+        elements.posterImage.src = '';
         elements.videoPlayer.src = '';
         currentPosterUrls = {};
-        
-        if (elements.posterImage) {
-            elements.posterImage.src = '';
-            elements.posterImage.classList.remove('loading');
-        }
     }
 
-    // Validación de URL
     function isValidFacebookUrl(url) {
         const patterns = [
             /facebook\.com\/watch\/\?v=\d+/i,
             /facebook\.com\/.+\/videos\/\d+/i,
             /facebook\.com\/video\.php\?v=\d+/i,
             /fb\.watch\/[a-zA-Z0-9_-]+/i,
-            /facebook\.com\/.+\/videos\/.+\/\d+/i,
             /facebook\.com\/reel\/\d+/i,
             /facebook\.com\/.+\/reels\/\d+/i
         ];
-        
         return patterns.some(pattern => pattern.test(url));
     }
 
-    // Manejar carga/error de imagen
+    // Manejo de eventos de imagen
     elements.posterImage.onload = function() {
         this.classList.remove('loading');
     };
     
     elements.posterImage.onerror = function() {
-        this.onerror = null;
-        this.src = 'https://via.placeholder.com/1000x562?text=Imagen+no+disponible';
+        this.src = 'https://via.placeholder.com/500x281?text=Imagen+no+disponible';
         this.classList.remove('loading');
     };
 });
