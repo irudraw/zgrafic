@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const videoUrlInput = document.getElementById('videoUrl');
     const errorDiv = document.getElementById('error');
     const resultDiv = document.getElementById('result');
+    const loadingDiv = document.getElementById('loading');
     const posterImage = document.getElementById('posterImage');
     const downloadBtn = document.getElementById('downloadBtn');
     const directLink = document.getElementById('directLink');
@@ -13,71 +14,78 @@ document.addEventListener('DOMContentLoaded', function() {
     async function findPoster() {
         const videoUrl = videoUrlInput.value.trim();
         
-        // Validar URL
         if (!videoUrl) {
             showError('Por favor ingresa una URL');
             return;
         }
 
         if (!isValidFacebookUrl(videoUrl)) {
-            showError('La URL no parece ser de un video de Facebook');
+            showError('La URL no parece ser de un video de Facebook. Ejemplo válido: https://www.facebook.com/watch/?v=1234567890');
             return;
         }
 
-        // Mostrar carga
-        posterImage.src = '';
-        posterImage.alt = 'Cargando...';
-        resultDiv.classList.remove('d-none');
+        loadingDiv.classList.remove('d-none');
+        resultDiv.classList.add('d-none');
         errorDiv.classList.add('d-none');
 
         try {
-            // Usar un proxy backend para obtener la imagen
-            const posterUrl = await getPosterThroughProxy(videoUrl);
+            // Usamos un servicio proxy público (AllOrigins como ejemplo)
+            const encodedUrl = encodeURIComponent(videoUrl);
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodedUrl}`;
             
-            if (!posterUrl) {
-                showError('No se pudo obtener la imagen poster. El video puede ser privado o la URL incorrecta.');
-                return;
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error('No se pudo acceder al video');
             }
 
-            // Mostrar resultado
+            // Extraemos la imagen del contenido HTML (solución alternativa)
+            const posterUrl = extractPosterFromContent(data.contents);
+            
+            if (!posterUrl) {
+                throw new Error('No se encontró la imagen poster en esta URL');
+            }
+
+            // Verificamos que la imagen sea válida
+            const imgValid = await testImage(posterUrl);
+            if (!imgValid) {
+                throw new Error('La imagen obtenida no es válida');
+            }
+
             posterImage.src = posterUrl;
-            posterImage.alt = 'Poster del video de Facebook';
             directLink.href = posterUrl;
+            resultDiv.classList.remove('d-none');
         } catch (error) {
-            showError('Error al obtener la imagen: ' + error.message);
+            showError('Error: ' + error.message);
             console.error(error);
+        } finally {
+            loadingDiv.classList.add('d-none');
         }
     }
 
-    async function getPosterThroughProxy(videoUrl) {
-        // En una implementación real, aquí llamarías a tu propio backend
-        // Esta es una implementación simulada para demostración
-        
-        // Extraer el ID del video
-        const videoId = extractVideoId(videoUrl);
-        if (!videoId) return null;
-
-        // Intentar con diferentes métodos para obtener la miniatura
-        const methods = [
-            `https://img.facebook.com/${videoId}/picture`,
-            `https://graph.facebook.com/${videoId}/picture`,
-            `https://www.facebook.com/thumbnail.php?vid=${videoId}`
-        ];
-
-        // Probar cada método hasta encontrar uno que funcione
-        for (const url of methods) {
-            try {
-                const response = await fetch(url, { method: 'HEAD' });
-                if (response.ok) {
-                    return url;
-                }
-            } catch (e) {
-                console.log(`Método fallido: ${url}`);
-            }
+    function extractPosterFromContent(htmlContent) {
+        // Solución alternativa: buscar metatags o elementos de imagen
+        const ogImageMatch = htmlContent.match(/<meta property="og:image" content="([^"]+)"/i);
+        if (ogImageMatch && ogImageMatch[1]) {
+            return ogImageMatch[1];
         }
 
-        // Si ningún método directo funciona, requeriría un backend con scraping
+        const videoPosterMatch = htmlContent.match(/<video[^>]+poster="([^"]+)"/i);
+        if (videoPosterMatch && videoPosterMatch[1]) {
+            return videoPosterMatch[1];
+        }
+
         return null;
+    }
+
+    async function testImage(url) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = url;
+        });
     }
 
     function downloadImage() {
@@ -98,25 +106,17 @@ document.addEventListener('DOMContentLoaded', function() {
         errorDiv.textContent = message;
         errorDiv.classList.remove('d-none');
         resultDiv.classList.add('d-none');
+        loadingDiv.classList.add('d-none');
     }
 
     function isValidFacebookUrl(url) {
-        return url.includes('facebook.com') && (url.includes('/watch/') || url.includes('/video/'));
-    }
-
-    function extractVideoId(url) {
-        // Patrones actualizados para extraer ID de video
         const patterns = [
-            /facebook\.com\/watch\/\?v=(\d+)/,
-            /facebook\.com\/.+\/videos\/(\d+)/,
-            /facebook\.com\/video\.php\?v=(\d+)/,
-            /fb\.watch\/([a-zA-Z0-9_-]+)/
+            /facebook\.com\/watch\/\?v=\d+/i,
+            /facebook\.com\/.+\/videos\/\d+/i,
+            /facebook\.com\/video\.php\?v=\d+/i,
+            /fb\.watch\/[a-zA-Z0-9_-]+/i
         ];
         
-        for (const pattern of patterns) {
-            const match = url.match(pattern);
-            if (match) return match[1];
-        }
-        return null;
+        return patterns.some(pattern => pattern.test(url));
     }
 });
