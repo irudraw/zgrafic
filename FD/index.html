@@ -21,7 +21,10 @@
                     <button class="btn btn-primary" id="findPoster"><i class="bi bi-search"></i> Buscar</button>
                 </div>
                 
-                <div id="error" class="alert alert-danger d-none"></div>
+                <div id="error" class="alert alert-danger d-none">
+                    <div class="error-message"></div>
+                    <div class="error-solution mt-2 d-none"></div>
+                </div>
                 
                 <div id="loading" class="d-none text-center my-3">
                     <div class="spinner-border text-primary" role="status">
@@ -48,7 +51,7 @@
                                 <a id="directLink" href="#" target="_blank" class="btn btn-outline-primary"><i class="bi bi-eye"></i> Ver imagen completa</a>
                             </div>
                             <div class="mt-3">
-                                <small class="text-note">Nota: La descarga usa canvas para mejor compatibilidad. Calidad al 95%.</small>
+                                <small class="text-note">Si falla la descarga, intenta con el botón "Ver imagen completa" y descarga manualmente.</small>
                             </div>
                         </div>
                     </div>
