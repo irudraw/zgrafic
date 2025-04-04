@@ -7,40 +7,104 @@
     --secondary-color: #25c2a0;
     --text-light: #f5f5f5;
     --text-muted: #b0b0b0;
+    --error-bg: #3a1a1a;
+    --error-text: #ff9e9e;
+    --error-solution: #ffcccb;
 }
 
 body.dark-theme {
     background-color: var(--dark-bg);
     color: var(--text-light);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin-top: 30px;
+}
+
+h1, h2, h3, h4 {
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.text-intro, .text-loading {
+    color: var(--text-light);
+}
+
+.text-note {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.footer-note {
+    color: var(--text-muted);
 }
 
 .dark-card {
     background-color: var(--dark-card);
     border-color: var(--dark-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .dark-input {
     background-color: var(--darker-bg);
     color: var(--text-light);
     border-color: var(--dark-border);
+    transition: all 0.3s ease;
+}
+
+.dark-input:focus {
+    background-color: var(--darker-bg);
+    color: var(--text-light);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(24, 119, 242, 0.25);
+}
+
+.dark-input::placeholder {
+    color: #888;
+    opacity: 0.7;
 }
 
 .dark-img {
     max-width: 100%;
     border: 1px solid var(--dark-border);
+    border-radius: 8px;
     background-color: var(--darker-bg);
+    transition: opacity 0.3s ease;
 }
 
-/* Botones y elementos interactivos */
+.dark-img.loading {
+    opacity: 0.7;
+    filter: blur(1px);
+}
+
+.alert-danger {
+    background-color: var(--error-bg);
+    border-left: 4px solid #ff6b6b;
+}
+
+.error-message {
+    color: var(--error-text);
+}
+
+.error-solution {
+    color: var(--error-solution);
+    font-weight: bold;
+}
+
 .btn-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
+    font-weight: 500;
 }
 
 .btn-success {
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
+    font-weight: 500;
 }
 
 #viewVideoBtn {
@@ -48,22 +112,23 @@ body.dark-theme {
     border-color: #17a2b8;
 }
 
-/* Textos mejorados */
-.text-intro, .text-loading, .text-note {
-    color: var(--text-light);
+.quality-options {
+    text-align: center;
+    margin-top: 10px;
 }
 
-.text-muted {
-    color: var(--text-muted) !important;
+.quality-btn {
+    margin: 0 5px;
+    padding: 5px 12px;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
 }
 
-/* Efectos de carga */
-.dark-img.loading {
-    opacity: 0.7;
-    filter: blur(1px);
+.quality-btn.active {
+    font-weight: bold;
+    border-width: 2px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .dark-img {
         max-height: 50vh;
