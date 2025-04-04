@@ -218,16 +218,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Validación de URL
     function isValidFacebookUrl(url) {
-        const patterns = [
-            /facebook\.com\/watch\/\?v=\d+/i,
-            /facebook\.com\/.+\/videos\/\d+/i,
-            /facebook\.com\/video\.php\?v=\d+/i,
-            /fb\.watch\/[a-zA-Z0-9_-]+/i,
-            /facebook\.com\/.+\/videos\/.+\/\d+/i
-        ];
-        
-        return patterns.some(pattern => pattern.test(url));
-    }
+    const patterns = [
+        /facebook\.com\/watch\/\?v=\d+/i,
+        /facebook\.com\/.+\/videos\/\d+/i,
+        /facebook\.com\/video\.php\?v=\d+/i,
+        /fb\.watch\/[a-zA-Z0-9_-]+/i,
+        /facebook\.com\/.+\/videos\/.+\/\d+/i,
+        /facebook\.com\/reel\/\d+/i,  // Nuevo patrón para Reels
+        /facebook\.com\/.+\/reels\/\d+/i  // Otro posible formato de Reels
+    ];
+    
+    return patterns.some(pattern => pattern.test(url));
+}
 
     // Manejar carga/error de imagen
     if (elements.posterImage) {
