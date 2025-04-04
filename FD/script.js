@@ -178,20 +178,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Descargar imagen (VERSIÓN FUNCIONAL)
+    // Descargar imagen - VERSIÓN CON CANVAS (FUNCIONAL)
     function downloadImage() {
         if (!elements.posterImage.src || elements.posterImage.src.includes('placeholder.com')) {
             showError('No hay imagen válida para descargar');
             return;
         }
 
-        // Solución directa para descarga
-        const link = document.createElement('a');
-        link.href = elements.posterImage.src;
-        link.download = `facebook-poster-${Date.now()}.jpg`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Crear canvas temporal
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Establecer dimensiones del canvas igual a la imagen
+        canvas.width = elements.posterImage.naturalWidth;
+        canvas.height = elements.posterImage.naturalHeight;
+        
+        // Dibujar la imagen en el canvas
+        ctx.drawImage(elements.posterImage, 0, 0, canvas.width, canvas.height);
+        
+        // Convertir a blob y descargar
+        canvas.toBlob(function(blob) {
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.href = url;
+            link.download = `fb-poster-${Date.now()}.jpg`;
+            link.style.display = 'none';
+            
+            document.body.appendChild(link);
+            link.click();
+            
+            // Limpieza
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }, 'image/jpeg', 0.95);
     }
 
     // Crear botón de ver video
