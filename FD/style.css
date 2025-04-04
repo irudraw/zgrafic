@@ -1,7 +1,36 @@
-body {
-    background-color: #f5f6f8;
+:root {
+    --dark-bg: #121212;
+    --darker-bg: #1e1e1e;
+    --dark-card: #2d2d2d;
+    --dark-border: #444;
+    --primary-color: #1877f2;
+    --text-light: #e0e0e0;
+    --text-muted: #aaa;
+}
+
+body.dark-theme {
+    background-color: var(--dark-bg);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding-bottom: 50px;
+    color: var(--text-light);
+}
+
+.dark-card {
+    background-color: var(--dark-card);
+    border-color: var(--dark-border);
+}
+
+.dark-input {
+    background-color: var(--darker-bg);
+    border-color: var(--dark-border);
+    color: var(--text-light);
+}
+
+.dark-input:focus {
+    background-color: var(--darker-bg);
+    color: var(--text-light);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(24, 119, 242, 0.25);
 }
 
 .container {
@@ -12,25 +41,24 @@ body {
 .card {
     border-radius: 12px;
     border: none;
-    background-color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-#posterImage {
+.dark-img {
     max-width: 100%;
     width: auto;
     height: auto;
     max-height: 70vh;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--dark-border);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f8f9fa;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    background-color: var(--darker-bg);
     display: block;
     margin: 0 auto;
     transition: opacity 0.3s ease;
 }
 
-#posterImage.loading {
+.dark-img.loading {
     opacity: 0.5;
 }
 
@@ -41,17 +69,17 @@ body {
 
 #loading p {
     margin-top: 10px;
-    color: #0d6efd;
+    color: var(--primary-color);
     font-weight: 500;
 }
 
 .input-group {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary {
-    background-color: #1877f2;
-    border-color: #1877f2;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 .btn-primary:hover {
@@ -61,10 +89,6 @@ body {
 
 .alert {
     border-radius: 8px;
-}
-
-.text-muted {
-    color: #6c757d !important;
 }
 
 .quality-options {
@@ -88,8 +112,19 @@ body {
     border-width: 2px;
 }
 
+#viewVideoBtn {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+}
+
+#viewVideoBtn:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+}
+
 @media (max-width: 768px) {
-    #posterImage {
+    .dark-img {
         max-height: 50vh;
     }
     
