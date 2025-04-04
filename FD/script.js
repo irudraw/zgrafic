@@ -14,16 +14,20 @@ document.addEventListener('DOMContentLoaded', function() {
         videoWrapper: document.querySelector('.video-responsive'),
         embedSection: document.getElementById('embedSection'),
         embedCode: document.getElementById('embedCode'),
-        copyEmbed: document.getElementById('copyEmbed')
+        copyEmbed: document.getElementById('copyEmbed'),
+        fallbackOptions: document.getElementById('fallbackOptions'),
+        tryAlternative: document.getElementById('tryAlternative')
     };
 
     let currentPosterUrls = {};
     let currentVideoUrl = '';
+    let retryAttempts = 0;
 
     // Event Listeners
     elements.findPosterBtn.addEventListener('click', processFacebookUrl);
     elements.downloadBtn.addEventListener('click', downloadImage);
     elements.copyEmbed.addEventListener('click', copyEmbedCode);
+    elements.tryAlternative.addEventListener('click', tryAlternativeMethod);
     
     elements.qualityOptions.addEventListener('click', function(e) {
         if (e.target.classList.contains('quality-btn')) {
@@ -38,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function processFacebookUrl() {
         const videoUrl = elements.videoUrlInput.value.trim();
         currentVideoUrl = videoUrl;
+        retryAttempts = 0;
         
         if (!videoUrl) {
             showError('Por favor ingresa una URL de Facebook');
@@ -55,17 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoading();
 
         try {
-            // Obtener datos del video
-            const posterData = await fetchPosterData(videoUrl);
-            
-            if (!posterData.original) {
-                throw new Error('No se pudo obtener la miniatura del video');
-            }
-
-            currentPosterUrls = posterData;
-            displayResults(posterData.original);
-            setupVideoPlayer(videoUrl);
-            generateEmbedCode(videoUrl);
+            await fetchAndDisplayData(videoUrl);
         } catch (error) {
             showError(error.message);
             console.error('Error:', error);
@@ -74,74 +69,82 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Configurar reproductor de video
-    function setupVideoPlayer(videoUrl) {
-        const isReel = videoUrl.includes('/reel/') || videoUrl.includes('/reels/');
-        const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
+    async function fetchAndDisplayData(videoUrl) {
+        const posterData = await fetchPosterData(videoUrl);
         
-        elements.videoPlayer.src = embedUrl;
+        if (!posterData.original) {
+            elements.fallbackOptions.classList.remove('d-none');
+            throw new Error('No se pudo obtener la miniatura del video');
+        }
+
+        currentPosterUrls = posterData;
+        displayResults(posterData.original);
+        setupVideoPlayer(videoUrl);
+        generateEmbedCode(videoUrl);
+    }
+
+    async function tryAlternativeMethod() {
+        if (retryAttempts >= 2) {
+            showError('No se pudo obtener la miniatura después de varios intentos');
+            return;
+        }
         
-        // Ajustar aspecto según el tipo de video
-        if (isReel) {
-            elements.videoWrapper.classList.add('reel-format');
-        } else {
-            elements.videoWrapper.classList.remove('reel-format');
+        showLoading();
+        elements.fallbackOptions.classList.add('d-none');
+        retryAttempts++;
+        
+        try {
+            await fetchAndDisplayData(currentVideoUrl);
+        } catch (error) {
+            showError(error.message);
+        } finally {
+            hideLoading();
         }
     }
 
-    // Generar código embed
-    function generateEmbedCode(videoUrl) {
-        const isReel = videoUrl.includes('/reel/') || videoUrl.includes('/reels/');
-        const width = isReel ? '350' : '500';
-        const height = isReel ? '623' : '281';
-        
-        const embedHTML = `<iframe src="https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=${width}&height=${height}" width="${width}" height="${height}" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>`;
-        
-        elements.embedCode.value = embedHTML;
-    }
-
-    // Copiar código embed
-    function copyEmbedCode() {
-        elements.embedCode.select();
-        document.execCommand('copy');
-        
-        const originalText = elements.copyEmbed.textContent;
-        elements.copyEmbed.textContent = '¡Copiado!';
-        
-        setTimeout(() => {
-            elements.copyEmbed.textContent = originalText;
-        }, 2000);
-    }
-
-    // Obtener datos del poster
     async function fetchPosterData(videoUrl) {
         const pluginUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
         const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(pluginUrl)}`;
         
-        const response = await fetch(proxyUrl);
-        const data = await response.json();
+        try {
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error('Error al conectar con el servidor');
+            
+            const data = await response.json();
+            const htmlContent = data.contents;
+            const imageUrl = extractImageUrl(htmlContent);
+            
+            if (!imageUrl) throw new Error('No se pudo extraer la miniatura');
+            
+            return {
+                sd: setImageDimensions(imageUrl, 640, 360),
+                hd: setImageDimensions(imageUrl, 1280, 720),
+                original: imageUrl
+            };
+        } catch (error) {
+            console.error('Error fetching poster data:', error);
+            throw error;
+        }
+    }
+
+    function extractImageUrl(html) {
+        // Método 1: Meta tags
+        const metaMatch = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i);
+        if (metaMatch) return metaMatch[1].replace(/&amp;/g, '&');
         
-        if (!response.ok) throw new Error('Error al conectar con el servidor');
-
-        return extractImageUrls(data.contents);
-    }
-
-    // Extraer URLs de imagen
-    function extractImageUrls(htmlContent) {
-        const baseUrl = extractBaseImageUrl(htmlContent);
-        if (!baseUrl) throw new Error('No se encontró la miniatura del video');
-
-        return {
-            sd: setImageDimensions(baseUrl, 640, 360),
-            hd: setImageDimensions(baseUrl, 1280, 720),
-            original: baseUrl
-        };
-    }
-
-    // Funciones auxiliares
-    function extractBaseImageUrl(html) {
-        const metaMatch = html.match(/<meta property="og:image" content="([^"]+)"/i);
-        return metaMatch ? metaMatch[1].replace(/&amp;/g, '&') : null;
+        // Método 2: Imágenes con data-visual-completion
+        const imgMatch = html.match(/<img[^>]+(data-src|src)="([^"]+)"[^>]+data-visual-completion=/i);
+        if (imgMatch) return imgMatch[2].replace(/&amp;/g, '&');
+        
+        // Método 3: Atributo poster de video
+        const videoMatch = html.match(/<video[^>]+poster="([^"]+)"/i);
+        if (videoMatch) return videoMatch[1].replace(/&amp;/g, '&');
+        
+        // Método 4: Buscar en JSON
+        const jsonMatch = html.match(/"thumbnail_url":"([^"]+)"/i);
+        if (jsonMatch) return jsonMatch[1].replace(/\\\//g, '/');
+        
+        return null;
     }
 
     function setImageDimensions(url, width, height) {
@@ -155,11 +158,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function setupVideoPlayer(videoUrl) {
+        const isReel = isReelUrl(videoUrl);
+        const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
+        
+        elements.videoPlayer.src = embedUrl;
+        elements.videoWrapper.classList.toggle('reel-format', isReel);
+    }
+
+    function generateEmbedCode(videoUrl) {
+        const isReel = isReelUrl(videoUrl);
+        const width = isReel ? '350' : '500';
+        const height = isReel ? '623' : '281';
+        
+        const embedHTML = `<iframe src="https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=${width}&height=${height}" width="${width}" height="${height}" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>`;
+        
+        elements.embedCode.value = embedHTML;
+    }
+
+    function isReelUrl(url) {
+        return url.includes('/reel/') || url.includes('/reels/');
+    }
+
+    function copyEmbedCode() {
+        elements.embedCode.select();
+        document.execCommand('copy');
+        
+        const originalText = elements.copyEmbed.textContent;
+        elements.copyEmbed.textContent = '¡Copiado!';
+        
+        setTimeout(() => {
+            elements.copyEmbed.textContent = originalText;
+        }, 2000);
+    }
+
     function displayResults(imageUrl) {
         elements.posterImage.src = imageUrl;
         elements.resultDiv.classList.remove('d-none');
         
-        // Configurar botones de calidad
         document.querySelectorAll('.quality-btn').forEach(btn => {
             const quality = btn.getAttribute('data-quality');
             btn.classList.toggle('disabled', !currentPosterUrls[quality]);
@@ -177,6 +213,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function downloadImage() {
+        if (!elements.posterImage.src || elements.posterImage.src.includes('placeholder.com')) {
+            showError('No hay imagen válida para descargar');
+            return;
+        }
+
         const link = document.createElement('a');
         link.href = elements.posterImage.src;
         link.download = `facebook-thumbnail-${Date.now()}.jpg`;
@@ -185,7 +226,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.removeChild(link);
     }
 
-    // Helpers de UI
     function showLoading() {
         elements.loadingDiv.classList.remove('d-none');
     }
@@ -202,8 +242,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetUI() {
         elements.errorDiv.classList.add('d-none');
         elements.resultDiv.classList.add('d-none');
+        elements.fallbackOptions.classList.add('d-none');
         elements.posterImage.src = '';
         elements.videoPlayer.src = '';
+        elements.embedCode.value = '';
         currentPosterUrls = {};
     }
 
