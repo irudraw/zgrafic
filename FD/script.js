@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos del DOM con verificaciones
+    // Elementos del DOM
     const elements = {
         findPosterBtn: document.getElementById('findPoster'),
         videoUrlInput: document.getElementById('videoUrl'),
@@ -9,26 +9,25 @@ document.addEventListener('DOMContentLoaded', function() {
         posterImage: document.getElementById('posterImage'),
         downloadBtn: document.getElementById('downloadBtn'),
         directLink: document.getElementById('directLink'),
-        qualityOptions: document.getElementById('qualityOptions')
+        qualityOptions: document.getElementById('qualityOptions'),
+        framesContainer: document.getElementById('framesContainer'),
+        framesGrid: document.getElementById('framesGrid')
     };
 
-    // Verificar que todos los elementos esenciales existan
-    if (Object.values(elements).some(element => !element)) {
-        console.error('Error: Faltan elementos esenciales en el DOM');
-        if (elements.errorDiv) {
-            elements.errorDiv.textContent = 'Error inicializando la aplicación. Recarga la página.';
-            elements.errorDiv.classList.remove('d-none');
-        }
+    // Verificar elementos esenciales
+    if (!elements.findPosterBtn || !elements.videoUrlInput || !elements.posterImage) {
+        showError('Error inicializando la aplicación. Recarga la página.');
         return;
     }
 
     let currentPosterUrls = {};
+    let videoFrames = [];
 
     // Event Listeners
     elements.findPosterBtn.addEventListener('click', findPoster);
     elements.downloadBtn.addEventListener('click', downloadImage);
     
-    // Manejador delegado para botones de calidad
+    // Delegación de eventos para botones de calidad
     if (elements.qualityOptions) {
         elements.qualityOptions.addEventListener('click', function(e) {
             if (e.target.classList.contains('quality-btn')) {
@@ -40,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Función principal para buscar el poster
+    // Función principal
     async function findPoster() {
         const videoUrl = elements.videoUrlInput.value.trim();
         
@@ -65,7 +64,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             currentPosterUrls = posterData;
-            displayResult(posterData.original);
+            await displayResult(posterData.original);
+            
+            // Generar frames de demostración (mock)
+            await generateMockFrames(posterData.original);
+            
         } catch (error) {
             showError(error.message);
             console.error(error);
@@ -74,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Obtener datos del poster desde Facebook
+    // Obtener datos del poster
     async function fetchPosterData(videoUrl) {
         const pluginUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
         const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(pluginUrl)}`;
@@ -137,43 +140,83 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mostrar resultados
-    function displayResult(imageUrl) {
+    async function displayResult(imageUrl) {
         elements.posterImage.src = imageUrl;
         elements.directLink.href = imageUrl;
         elements.resultDiv.classList.remove('d-none');
         
-        // Activar botones de calidad según disponibilidad
-        const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
-        qualityBtns.forEach(btn => {
-            const quality = btn.getAttribute('data-quality');
-            btn.classList.toggle('disabled', !currentPosterUrls[quality]);
+        // Mostrar sección de frames
+        if (elements.framesContainer) {
+            elements.framesContainer.style.display = 'block';
+        }
+        
+        // Activar botones de calidad
+        if (elements.qualityOptions) {
+            const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
+            qualityBtns.forEach(btn => {
+                const quality = btn.getAttribute('data-quality');
+                btn.classList.toggle('disabled', !currentPosterUrls[quality]);
+                
+                if (quality === 'sd' && currentPosterUrls.sd) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    }
+
+    // Generar frames de demostración (mock)
+    async function generateMockFrames(baseImageUrl) {
+        if (!elements.framesGrid) return;
+        
+        elements.framesGrid.innerHTML = '';
+        videoFrames = [];
+        
+        // Crear 5 frames de ejemplo con variaciones
+        for (let i = 0; i < 5; i++) {
+            const frameUrl = `${baseImageUrl}&mock_frame=${i}&t=${Date.now()}`;
+            videoFrames.push(frameUrl);
             
-            // Activar SD por defecto
-            if (quality === 'sd' && currentPosterUrls.sd) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
+            const frameElement = document.createElement('img');
+            frameElement.src = frameUrl;
+            frameElement.classList.add('frame-thumbnail');
+            frameElement.alt = `Frame ${i+1}`;
+            frameElement.onclick = () => showFullFrame(frameUrl);
+            
+            elements.framesGrid.appendChild(frameElement);
+            
+            // Simular carga progresiva
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+    }
+
+    // Mostrar frame en tamaño completo
+    function showFullFrame(frameUrl) {
+        elements.posterImage.src = frameUrl;
+        elements.directLink.href = frameUrl;
+        
+        // Scroll suave a la imagen principal
+        elements.posterImage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // Cambiar calidad de imagen
     function changeImageQuality(quality) {
-        if (!currentPosterUrls[quality] || !elements.posterImage) return;
+        if (!currentPosterUrls[quality]) return;
         
         elements.posterImage.classList.add('loading');
         elements.posterImage.src = currentPosterUrls[quality];
         elements.directLink.href = currentPosterUrls[quality];
         
         // Actualizar botón activo
-        const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
-        qualityBtns.forEach(btn => {
-            if (btn.getAttribute('data-quality') === quality) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
+        if (elements.qualityOptions) {
+            const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
+            qualityBtns.forEach(btn => {
+                if (btn.getAttribute('data-quality') === quality) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
     }
 
     // Descargar imagen
@@ -193,22 +236,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helpers para UI
     function showLoading() {
-        elements.loadingDiv.classList.remove('d-none');
+        if (elements.loadingDiv) elements.loadingDiv.classList.remove('d-none');
     }
 
     function hideLoading() {
-        elements.loadingDiv.classList.add('d-none');
+        if (elements.loadingDiv) elements.loadingDiv.classList.add('d-none');
     }
 
     function showError(message) {
-        elements.errorDiv.innerHTML = message;
-        elements.errorDiv.classList.remove('d-none');
+        if (elements.errorDiv) {
+            elements.errorDiv.innerHTML = message;
+            elements.errorDiv.classList.remove('d-none');
+        }
     }
 
     function resetUI() {
-        elements.errorDiv.classList.add('d-none');
-        elements.resultDiv.classList.add('d-none');
+        if (elements.errorDiv) elements.errorDiv.classList.add('d-none');
+        if (elements.resultDiv) elements.resultDiv.classList.add('d-none');
+        if (elements.framesContainer) elements.framesContainer.style.display = 'none';
+        if (elements.framesGrid) elements.framesGrid.innerHTML = '';
+        
         currentPosterUrls = {};
+        videoFrames = [];
         
         if (elements.posterImage) {
             elements.posterImage.src = '';
