@@ -33,7 +33,7 @@
                     <h4>Resultado:</h4>
                     <div class="row">
                         <div class="col-md-6">
-                            <img id="posterImage" src="" class="img-fluid rounded shadow" alt="Poster del video" onerror="this.onerror=null;this.src='https://via.placeholder.com/1000x562?text=Imagen+no+disponible';">
+                            <img id="posterImage" src="" class="img-fluid rounded shadow main-poster" alt="Poster del video" onerror="this.onerror=null;this.src='https://via.placeholder.com/1000x562?text=Imagen+no+disponible';">
                             <div class="quality-options mt-2" id="qualityOptions">
                                 <button class="btn btn-sm btn-outline-secondary quality-btn" data-quality="sd">SD</button>
                                 <button class="btn btn-sm btn-outline-primary quality-btn" data-quality="hd">HD</button>
@@ -48,6 +48,16 @@
                             <div class="mt-3">
                                 <small class="text-muted">Nota: Para videos privados o con restricciones, Facebook puede mostrar una imagen genérica.</small>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sección de Frames -->
+                    <div class="row mt-4" id="framesContainer" style="display:none;">
+                        <h5>Frames del video (ejemplo):</h5>
+                        <div class="frames-loading my-2">Generando frames de demostración...</div>
+                        <div class="frames-grid" id="framesGrid"></div>
+                        <div class="text-muted mt-2">
+                            <small>Nota: Para obtener frames reales se requiere un servidor backend con acceso al video.</small>
                         </div>
                     </div>
                 </div>
