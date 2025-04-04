@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.downloadBtn.addEventListener('click', downloadImage);
     elements.qualityOptions.addEventListener('click', handleQualityChange);
 
-    // Función principal
+    // Función principal mejorada
     async function findPoster() {
         const videoUrl = elements.videoUrlInput.value.trim();
         currentVideoUrl = videoUrl;
@@ -53,20 +53,46 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             currentPosterUrls = posterData;
-            displayResult(posterData.original);
+            await loadImageAndDisplay(posterData.original);
             updateVideoButton(videoUrl);
         } catch (error) {
+            console.error('Error:', error);
             showError(
                 error.message, 
-                error.includes('iframe') ? 'Prueba con esta URL alternativa' : 'El video puede ser privado o tener restricciones'
+                error.includes('URL alternativa') ? 'Prueba con esta URL' : 'Intenta con otro video o verifica la URL'
             );
-            console.error('Error:', error);
         } finally {
             hideLoading();
         }
     }
 
-    // Descargar imagen mediante Canvas
+    // Función mejorada para cargar y mostrar imágenes
+    async function loadImageAndDisplay(imageUrl) {
+        return new Promise((resolve, reject) => {
+            // Limpiar URL antes de cargar
+            const cleanUrl = cleanImageUrl(imageUrl);
+            
+            // Configurar manejadores de eventos
+            elements.posterImage.onload = function() {
+                this.classList.remove('loading');
+                elements.resultDiv.classList.remove('d-none');
+                resolve();
+            };
+            
+            elements.posterImage.onerror = function() {
+                this.src = 'https://via.placeholder.com/1000x562.png?text=Imagen+no+disponible';
+                this.classList.remove('loading');
+                reject(new Error('Error al cargar la imagen'));
+            };
+
+            // Cargar la imagen
+            elements.posterImage.classList.add('loading');
+            elements.posterImage.src = cleanUrl;
+            elements.directLink.href = cleanUrl;
+        });
+    }
+
+    // Descargar imagen - Versión optimizada
     function downloadImage() {
         if (!elements.posterImage.src || elements.posterImage.src.includes('placeholder.com')) {
             showError('No hay imagen válida para descargar', 'Busca una imagen primero');
@@ -76,39 +102,27 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoading();
         elements.posterImage.classList.add('loading');
 
-        // Crear canvas temporal
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        // Usar la URL original sin parámetros
+        const imageUrl = cleanImageUrl(elements.posterImage.src);
         
-        // Configurar dimensiones
-        canvas.width = elements.posterImage.naturalWidth;
-        canvas.height = elements.posterImage.naturalHeight;
+        // Crear enlace de descarga
+        const link = document.createElement('a');
+        link.href = imageUrl + '?dl=1';
+        link.download = `fb-poster-${Date.now()}.jpg`;
+        link.style.display = 'none';
         
-        // Dibujar imagen
-        ctx.drawImage(elements.posterImage, 0, 0, canvas.width, canvas.height);
+        document.body.appendChild(link);
+        link.click();
         
-        // Convertir a Blob y descargar
-        canvas.toBlob(blob => {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `fb-poster-${Date.now()}.jpg`;
-            link.style.display = 'none';
-            
-            document.body.appendChild(link);
-            link.click();
-            
-            // Limpieza
-            setTimeout(() => {
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                elements.posterImage.classList.remove('loading');
-                hideLoading();
-            }, 100);
-        }, 'image/jpeg', 0.95);
+        // Limpieza
+        setTimeout(() => {
+            document.body.removeChild(link);
+            elements.posterImage.classList.remove('loading');
+            hideLoading();
+        }, 100);
     }
 
-    // Helper: Mostrar/ocultar carga
+    // Helpers mejorados
     function showLoading() {
         elements.loadingDiv.classList.remove('d-none');
     }
@@ -117,55 +131,29 @@ document.addEventListener('DOMContentLoaded', function() {
         elements.loadingDiv.classList.add('d-none');
     }
 
-    // Helper: Manejo de errores mejorado
     function showError(message, solution) {
         elements.errorMessage.innerHTML = message;
+        elements.errorSolution.innerHTML = solution || '';
+        elements.errorSolution.classList.toggle('d-none', !solution);
         elements.errorDiv.classList.remove('d-none');
-        
-        if (solution) {
-            elements.errorSolution.innerHTML = solution;
-            elements.errorSolution.classList.remove('d-none');
-        } else {
-            elements.errorSolution.classList.add('d-none');
-        }
     }
 
-    // Helper: Reset UI
     function resetUI() {
         elements.errorDiv.classList.add('d-none');
         elements.resultDiv.classList.add('d-none');
         currentPosterUrls = {};
     }
 
-    // Helper: Mostrar resultados
-    function displayResult(imageUrl) {
-        elements.posterImage.onload = function() {
-            this.classList.remove('loading');
-        };
-        
-        elements.posterImage.onerror = function() {
-            this.src = 'https://via.placeholder.com/1000x562.png?text=Imagen+no+disponible';
-            this.classList.remove('loading');
-            showError('Error al cargar la imagen', 'Intenta con otra URL o calidad');
-        };
-
-        elements.posterImage.src = imageUrl;
-        elements.directLink.href = imageUrl;
-        elements.resultDiv.classList.remove('d-none');
-    }
-
-    // Helper: Actualizar botón de video
     function updateVideoButton(videoUrl) {
         elements.viewVideoBtn.href = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}`;
     }
 
-    // Helper: Cambiar calidad
     function handleQualityChange(e) {
         if (e.target.classList.contains('quality-btn')) {
             const quality = e.target.getAttribute('data-quality');
             if (currentPosterUrls[quality]) {
-                elements.posterImage.classList.add('loading');
-                elements.posterImage.src = currentPosterUrls[quality];
+                loadImageAndDisplay(currentPosterUrls[quality])
+                    .catch(error => showError(error.message, 'Intenta con otra calidad'));
                 
                 // Actualizar botón activo
                 document.querySelectorAll('.quality-btn').forEach(btn => {
@@ -175,74 +163,76 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Helper: Validar URL de Facebook (mejorada)
+    // Validación de URL mejorada
     function isValidFacebookUrl(url) {
         const patterns = [
-            /^(https?:\/\/)?(www\.)?facebook\.com\/watch\/\?v=\d+/i,
-            /^(https?:\/\/)?(www\.)?facebook\.com\/.+\/videos\/\d+/i,
-            /^(https?:\/\/)?(www\.)?facebook\.com\/video\.php\?v=\d+/i,
+            /^(https?:\/\/)?(www\.|m\.)?facebook\.com\/watch\/\?v=\d+/i,
+            /^(https?:\/\/)?(www\.|m\.)?facebook\.com\/.+\/videos(?:\/\d+)?\/?\d*/i,
+            /^(https?:\/\/)?(www\.|m\.)?facebook\.com\/video\.php\?(?:.*&)?v=\d+/i,
             /^(https?:\/\/)?(www\.)?fb\.watch\/[a-zA-Z0-9_-]+/i,
-            /^(https?:\/\/)?(www\.)?facebook\.com\/.+\/videos\/.+\/\d+/i,
-            /^(https?:\/\/)?(www\.)?facebook\.com\/reel\/\d+/i,
-            /^(https?:\/\/)?(www\.)?facebook\.com\/.+\/reels\/\d+/i
+            /^(https?:\/\/)?(www\.|m\.)?facebook\.com\/reel\/\d+/i,
+            /^(https?:\/\/)?(www\.|m\.)?facebook\.com\/.+\/reels\/\d+/i
         ];
         return patterns.some(pattern => pattern.test(url));
     }
 
-    // Helper: Obtener datos del poster (mejorado)
+    // Limpiar URL de imagen
+    function cleanImageUrl(url) {
+        if (!url) return '';
+        return url.replace(/&amp;/g, '&')
+                 .split('?')[0]
+                 .replace(/^\/\//, 'https://')
+                 .trim();
+    }
+
+    // Extracción de datos mejorada
     async function fetchPosterData(videoUrl) {
         try {
-            const pluginUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(pluginUrl)}`;
+            const apiUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
             
             const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error('Error al conectar con Facebook');
+            if (!response.ok) throw new Error('Error al conectar con el servidor');
             
-            const data = await response.json();
-            if (!data.contents) throw new Error('No se recibieron datos del video');
-            
-            return extractImageUrls(data.contents);
+            const htmlContent = await response.text();
+            return extractImageUrls(htmlContent);
         } catch (error) {
             console.error('Error en fetchPosterData:', error);
             throw new Error('No se pudo obtener la información del video');
         }
     }
 
-    // Helper: Extraer URLs de imagen (robusta)
+    // Extracción de URLs mejorada
     function extractImageUrls(htmlContent) {
         // Método 1: Meta tag (og:image)
-        let baseUrl = htmlContent.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i)?.[1];
-        
+        const metaMatch = htmlContent.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i);
+        if (metaMatch && metaMatch[1]) {
+            const baseUrl = cleanImageUrl(metaMatch[1]);
+            return generateQualityUrls(baseUrl);
+        }
+
         // Método 2: Etiqueta img
-        if (!baseUrl) {
-            baseUrl = htmlContent.match(/<img[^>]+(data-src|src)="([^"]+)"[^>]*>/i)?.[2];
+        const imgMatch = htmlContent.match(/<img[^>]+(data-src|src)="([^"]+)"/i);
+        if (imgMatch && imgMatch[2]) {
+            const baseUrl = cleanImageUrl(imgMatch[2]);
+            return generateQualityUrls(baseUrl);
         }
-        
+
         // Método 3: Etiqueta video (poster)
-        if (!baseUrl) {
-            baseUrl = htmlContent.match(/<video[^>]+poster="([^"]+)"/i)?.[1];
+        const videoMatch = htmlContent.match(/<video[^>]+poster="([^"]+)"/i);
+        if (videoMatch && videoMatch[1]) {
+            const baseUrl = cleanImageUrl(videoMatch[1]);
+            return generateQualityUrls(baseUrl);
         }
 
-        // Método 4: Iframe (como último recurso)
-        if (!baseUrl) {
-            const iframeSrc = htmlContent.match(/<iframe[^>]+src="([^"]+)"/i)?.[1];
-            if (iframeSrc) {
-                throw new Error(`Intenta con esta URL directa: ${iframeSrc}`);
-            }
-            throw new Error('No se encontró ninguna imagen. El video puede ser privado o tener restricciones.');
-        }
+        throw new Error('No se encontró la imagen del video');
+    }
 
-        // Limpiar y preparar URLs
-        baseUrl = baseUrl.replace(/&amp;/g, '&').split('?')[0];
-        
-        if (!baseUrl.startsWith('http')) {
-            baseUrl = 'https://' + baseUrl.replace(/^\/\//, '');
-        }
-
+    function generateQualityUrls(baseUrl) {
         return {
             sd: `${baseUrl}?width=640&height=360`,
             hd: `${baseUrl}?width=1280&height=720`,
-            original: `${baseUrl}?dl=1`
+            original: baseUrl // Sin parámetros para la versión original
         };
     }
 });
