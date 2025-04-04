@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingDiv: document.getElementById('loading'),
         posterImage: document.getElementById('posterImage'),
         downloadBtn: document.getElementById('downloadBtn'),
+        downloadVideoBtn: document.getElementById('downloadVideoBtn'),
         directLink: document.getElementById('directLink'),
         qualityOptions: document.getElementById('qualityOptions')
     };
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event Listeners
     elements.findPosterBtn.addEventListener('click', findPoster);
     elements.downloadBtn.addEventListener('click', downloadImage);
+    elements.downloadVideoBtn.addEventListener('click', downloadVideo);
     
     // Manejador delegado para botones de calidad
     if (elements.qualityOptions) {
@@ -50,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (!isValidFacebookUrl(videoUrl)) {
-            showError('URL no válida. Ejemplos válidos:<br>• https://www.facebook.com/watch/?v=1234567890<br>• https://fb.watch/abc123def/');
+            showError('URL no válida. Ejemplos válidos:<br>• https://www.facebook.com/watch/?v=1234567890<br>• https://fb.watch/abc123def/<br>• https://www.facebook.com/reel/1234567890');
             return;
         }
 
@@ -98,6 +100,49 @@ document.addEventListener('DOMContentLoaded', function() {
             original: removeQualityParams(baseUrl),
             base: baseUrl
         };
+    }
+
+    // Función para descargar el video
+    async function downloadVideo() {
+        const videoUrl = elements.videoUrlInput.value.trim();
+        
+        if (!videoUrl || !isValidFacebookUrl(videoUrl)) {
+            showError('URL no válida para descargar video');
+            return;
+        }
+
+        showLoading();
+        
+        try {
+            // Usamos un proxy para evitar CORS y obtener el HTML
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(videoUrl)}`;
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            
+            if (!response.ok) throw new Error('No se pudo acceder al video');
+            
+            // Extraemos la URL del video del HTML
+            const videoMatch = data.contents.match(/<video[^>]+src="([^"]+)"/i);
+            if (!videoMatch || !videoMatch[1]) {
+                throw new Error('No se pudo encontrar la URL del video en la página');
+            }
+            
+            let videoSrc = videoMatch[1].replace(/&amp;/g, '&');
+            
+            // Creamos un enlace temporal para descargar
+            const link = document.createElement('a');
+            link.href = videoSrc;
+            link.download = `fb-video-${Date.now()}.mp4`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+        } catch (error) {
+            showError('Error al descargar el video: ' + error.message);
+            console.error(error);
+        } finally {
+            hideLoading();
+        }
     }
 
     // Funciones auxiliares para manejo de URLs
@@ -218,18 +263,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Validación de URL
     function isValidFacebookUrl(url) {
-    const patterns = [
-        /facebook\.com\/watch\/\?v=\d+/i,
-        /facebook\.com\/.+\/videos\/\d+/i,
-        /facebook\.com\/video\.php\?v=\d+/i,
-        /fb\.watch\/[a-zA-Z0-9_-]+/i,
-        /facebook\.com\/.+\/videos\/.+\/\d+/i,
-        /facebook\.com\/reel\/\d+/i,  // Nuevo patrón para Reels
-        /facebook\.com\/.+\/reels\/\d+/i  // Otro posible formato de Reels
-    ];
-    
-    return patterns.some(pattern => pattern.test(url));
-}
+        const patterns = [
+            /facebook\.com\/watch\/\?v=\d+/i,
+            /facebook\.com\/.+\/videos\/\d+/i,
+            /facebook\.com\/video\.php\?v=\d+/i,
+            /fb\.watch\/[a-zA-Z0-9_-]+/i,
+            /facebook\.com\/.+\/videos\/.+\/\d+/i,
+            /facebook\.com\/reel\/\d+/i,
+            /facebook\.com\/.+\/reels\/\d+/i
+        ];
+        
+        return patterns.some(pattern => pattern.test(url));
+    }
 
     // Manejar carga/error de imagen
     if (elements.posterImage) {
