@@ -1,32 +1,48 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos del DOM
-    const findPosterBtn = document.getElementById('findPoster');
-    const videoUrlInput = document.getElementById('videoUrl');
-    const errorDiv = document.getElementById('error');
-    const resultDiv = document.getElementById('result');
-    const loadingDiv = document.getElementById('loading');
-    const posterImage = document.getElementById('posterImage');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const directLink = document.getElementById('directLink');
-    let currentPosterUrls = {}; // Almacenará las URLs de diferentes calidades
+    // Elementos del DOM con verificaciones
+    const elements = {
+        findPosterBtn: document.getElementById('findPoster'),
+        videoUrlInput: document.getElementById('videoUrl'),
+        errorDiv: document.getElementById('error'),
+        resultDiv: document.getElementById('result'),
+        loadingDiv: document.getElementById('loading'),
+        posterImage: document.getElementById('posterImage'),
+        downloadBtn: document.getElementById('downloadBtn'),
+        directLink: document.getElementById('directLink'),
+        qualityOptions: document.getElementById('qualityOptions')
+    };
+
+    // Verificar que todos los elementos esenciales existan
+    if (Object.values(elements).some(element => !element)) {
+        console.error('Error: Faltan elementos esenciales en el DOM');
+        if (elements.errorDiv) {
+            elements.errorDiv.textContent = 'Error inicializando la aplicación. Recarga la página.';
+            elements.errorDiv.classList.remove('d-none');
+        }
+        return;
+    }
+
+    let currentPosterUrls = {};
 
     // Event Listeners
-    findPosterBtn.addEventListener('click', findPoster);
-    downloadBtn.addEventListener('click', downloadImage);
+    elements.findPosterBtn.addEventListener('click', findPoster);
+    elements.downloadBtn.addEventListener('click', downloadImage);
     
-    // Botones de calidad
-    document.querySelectorAll('.quality-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const quality = this.getAttribute('data-quality');
-            if (currentPosterUrls[quality]) {
-                changeImageQuality(quality);
+    // Manejador delegado para botones de calidad
+    if (elements.qualityOptions) {
+        elements.qualityOptions.addEventListener('click', function(e) {
+            if (e.target.classList.contains('quality-btn')) {
+                const quality = e.target.getAttribute('data-quality');
+                if (currentPosterUrls[quality]) {
+                    changeImageQuality(quality);
+                }
             }
         });
-    });
+    }
 
     // Función principal para buscar el poster
     async function findPoster() {
-        const videoUrl = videoUrlInput.value.trim();
+        const videoUrl = elements.videoUrlInput.value.trim();
         
         if (!videoUrl) {
             showError('Por favor ingresa una URL');
@@ -99,10 +115,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function addQualityParams(url, width, height) {
-        const urlObj = new URL(url);
-        urlObj.searchParams.set('width', width);
-        urlObj.searchParams.set('height', height);
-        return urlObj.toString();
+        try {
+            const urlObj = new URL(url);
+            urlObj.searchParams.set('width', width);
+            urlObj.searchParams.set('height', height);
+            return urlObj.toString();
+        } catch {
+            return url;
+        }
     }
 
     function removeQualityParams(url) {
@@ -118,39 +138,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mostrar resultados
     function displayResult(imageUrl) {
-        posterImage.src = imageUrl;
-        directLink.href = imageUrl;
-        resultDiv.classList.remove('d-none');
+        elements.posterImage.src = imageUrl;
+        elements.directLink.href = imageUrl;
+        elements.resultDiv.classList.remove('d-none');
         
-        // Activar botón HD si está disponible
-        if (currentPosterUrls.hd) {
-            document.querySelector('[data-quality="hd"]').classList.remove('disabled');
-        }
+        // Activar botones de calidad según disponibilidad
+        const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
+        qualityBtns.forEach(btn => {
+            const quality = btn.getAttribute('data-quality');
+            btn.classList.toggle('disabled', !currentPosterUrls[quality]);
+            
+            // Activar SD por defecto
+            if (quality === 'sd' && currentPosterUrls.sd) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
     }
 
     // Cambiar calidad de imagen
-    async function changeImageQuality(quality) {
-        if (!currentPosterUrls[quality]) return;
+    function changeImageQuality(quality) {
+        if (!currentPosterUrls[quality] || !elements.posterImage) return;
         
-        showImageLoading();
-        posterImage.src = currentPosterUrls[quality];
-        directLink.href = currentPosterUrls[quality];
+        elements.posterImage.classList.add('loading');
+        elements.posterImage.src = currentPosterUrls[quality];
+        elements.directLink.href = currentPosterUrls[quality];
         
         // Actualizar botón activo
-        document.querySelectorAll('.quality-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-quality') === quality);
+        const qualityBtns = elements.qualityOptions.querySelectorAll('.quality-btn');
+        qualityBtns.forEach(btn => {
+            if (btn.getAttribute('data-quality') === quality) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
         });
     }
 
     // Descargar imagen
     function downloadImage() {
-        if (!posterImage.src || posterImage.src.includes('placeholder.com')) {
+        if (!elements.posterImage.src || elements.posterImage.src.includes('placeholder.com')) {
             showError('No hay imagen válida para descargar');
             return;
         }
 
         const link = document.createElement('a');
-        link.href = posterImage.src;
+        link.href = elements.posterImage.src;
         link.download = `fb-poster-${Date.now()}.jpg`;
         document.body.appendChild(link);
         link.click();
@@ -159,35 +193,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helpers para UI
     function showLoading() {
-        loadingDiv.classList.remove('d-none');
+        elements.loadingDiv.classList.remove('d-none');
     }
 
     function hideLoading() {
-        loadingDiv.classList.add('d-none');
-    }
-
-    function showImageLoading() {
-        posterImage.style.opacity = '0.5';
-    }
-
-    function hideImageLoading() {
-        posterImage.style.opacity = '1';
+        elements.loadingDiv.classList.add('d-none');
     }
 
     function showError(message) {
-        errorDiv.innerHTML = message;
-        errorDiv.classList.remove('d-none');
+        elements.errorDiv.innerHTML = message;
+        elements.errorDiv.classList.remove('d-none');
     }
 
     function resetUI() {
-        errorDiv.classList.add('d-none');
-        resultDiv.classList.add('d-none');
+        elements.errorDiv.classList.add('d-none');
+        elements.resultDiv.classList.add('d-none');
         currentPosterUrls = {};
         
-        // Desactivar botones de calidad
-        document.querySelectorAll('.quality-btn').forEach(btn => {
-            btn.classList.add('disabled');
-        });
+        if (elements.posterImage) {
+            elements.posterImage.src = '';
+            elements.posterImage.classList.remove('loading');
+        }
     }
 
     // Validación de URL
@@ -203,11 +229,16 @@ document.addEventListener('DOMContentLoaded', function() {
         return patterns.some(pattern => pattern.test(url));
     }
 
-    // Verificar carga de imagen
-    posterImage.onload = hideImageLoading;
-    posterImage.onerror = function() {
-        this.onerror = null;
-        this.src = 'https://via.placeholder.com/1000x562?text=Imagen+no+disponible';
-        hideImageLoading();
-    };
+    // Manejar carga/error de imagen
+    if (elements.posterImage) {
+        elements.posterImage.onload = function() {
+            this.classList.remove('loading');
+        };
+        
+        elements.posterImage.onerror = function() {
+            this.onerror = null;
+            this.src = 'https://via.placeholder.com/1000x562?text=Imagen+no+disponible';
+            this.classList.remove('loading');
+        };
+    }
 });
