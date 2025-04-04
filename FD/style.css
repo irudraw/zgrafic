@@ -34,7 +34,7 @@ body {
     opacity: 0.5;
 }
 
-#downloadBtn {
+#downloadBtn, #downloadVideoBtn {
     margin-top: 10px;
     font-weight: 500;
 }
@@ -57,6 +57,16 @@ body {
 .btn-primary:hover {
     background-color: #166fe5;
     border-color: #166fe5;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #bb2d3b;
+    border-color: #bb2d3b;
 }
 
 .alert {
