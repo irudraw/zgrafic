@@ -17,12 +17,21 @@ body {
 }
 
 #posterImage {
-    max-height: 400px;
+    max-width: 100%;
     width: auto;
+    height: auto;
+    max-height: 70vh;
     border: 1px solid #dee2e6;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     background-color: #f8f9fa;
+    display: block;
+    margin: 0 auto;
+    transition: opacity 0.3s ease;
+}
+
+#posterImage.loading {
+    opacity: 0.5;
 }
 
 #downloadBtn {
@@ -56,4 +65,35 @@ body {
 
 .text-muted {
     color: #6c757d !important;
+}
+
+.quality-options {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.quality-btn {
+    margin: 0 5px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
+}
+
+.quality-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.quality-btn.active {
+    font-weight: bold;
+    border-width: 2px;
+}
+
+@media (max-width: 768px) {
+    #posterImage {
+        max-height: 50vh;
+    }
+    
+    .quality-options {
+        margin-bottom: 15px;
+    }
 }
