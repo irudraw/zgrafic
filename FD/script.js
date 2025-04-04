@@ -8,9 +8,10 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingDiv: document.getElementById('loading'),
         posterImage: document.getElementById('posterImage'),
         downloadBtn: document.getElementById('downloadBtn'),
-        downloadVideoBtn: document.getElementById('downloadVideoBtn'),
         directLink: document.getElementById('directLink'),
-        qualityOptions: document.getElementById('qualityOptions')
+        qualityOptions: document.getElementById('qualityOptions'),
+        videoContainer: document.getElementById('videoContainer'),
+        videoPlayer: document.getElementById('videoPlayer')
     };
 
     // Verificar que todos los elementos esenciales existan
@@ -28,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event Listeners
     elements.findPosterBtn.addEventListener('click', findPoster);
     elements.downloadBtn.addEventListener('click', downloadImage);
-    elements.downloadVideoBtn.addEventListener('click', downloadVideo);
     
     // Manejador delegado para botones de calidad
     if (elements.qualityOptions) {
@@ -68,11 +68,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
             currentPosterUrls = posterData;
             displayResult(posterData.original);
+            showVideoPlayer(videoUrl);
         } catch (error) {
             showError(error.message);
             console.error(error);
         } finally {
             hideLoading();
+        }
+    }
+
+    // Mostrar el reproductor de video
+    function showVideoPlayer(videoUrl) {
+        try {
+            const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
+            elements.videoPlayer.src = embedUrl;
+            elements.videoContainer.classList.remove('d-none');
+        } catch (error) {
+            console.error('Error al cargar el reproductor de video:', error);
         }
     }
 
@@ -100,49 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
             original: removeQualityParams(baseUrl),
             base: baseUrl
         };
-    }
-
-    // Función para descargar el video
-    async function downloadVideo() {
-        const videoUrl = elements.videoUrlInput.value.trim();
-        
-        if (!videoUrl || !isValidFacebookUrl(videoUrl)) {
-            showError('URL no válida para descargar video');
-            return;
-        }
-
-        showLoading();
-        
-        try {
-            // Usamos un proxy para evitar CORS y obtener el HTML
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(videoUrl)}`;
-            const response = await fetch(proxyUrl);
-            const data = await response.json();
-            
-            if (!response.ok) throw new Error('No se pudo acceder al video');
-            
-            // Extraemos la URL del video del HTML
-            const videoMatch = data.contents.match(/<video[^>]+src="([^"]+)"/i);
-            if (!videoMatch || !videoMatch[1]) {
-                throw new Error('No se pudo encontrar la URL del video en la página');
-            }
-            
-            let videoSrc = videoMatch[1].replace(/&amp;/g, '&');
-            
-            // Creamos un enlace temporal para descargar
-            const link = document.createElement('a');
-            link.href = videoSrc;
-            link.download = `fb-video-${Date.now()}.mp4`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-        } catch (error) {
-            showError('Error al descargar el video: ' + error.message);
-            console.error(error);
-        } finally {
-            hideLoading();
-        }
     }
 
     // Funciones auxiliares para manejo de URLs
@@ -253,6 +222,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetUI() {
         elements.errorDiv.classList.add('d-none');
         elements.resultDiv.classList.add('d-none');
+        elements.videoContainer.classList.add('d-none');
+        elements.videoPlayer.src = '';
         currentPosterUrls = {};
         
         if (elements.posterImage) {
