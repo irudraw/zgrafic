@@ -22,6 +22,7 @@ body {
     border: 1px solid #dee2e6;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
 }
 
 #downloadBtn {
@@ -47,4 +48,12 @@ body {
 .btn-primary:hover {
     background-color: #166fe5;
     border-color: #166fe5;
+}
+
+.alert {
+    border-radius: 8px;
+}
+
+.text-muted {
+    color: #6c757d !important;
 }
