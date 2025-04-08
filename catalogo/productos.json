@@ -4,7 +4,14 @@
         "nombre": "Tarjetas Personales",
         "precio": 80,
         "imagen": "img/tarjetas.png",
-        "descripcion": "Las tarjetas de presentación son elementos de papelería corporativa básicos para cualquier empresa o empresario.\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 350gr\n► Impreso ambas Caras Full color\n► Medida 9 x 5.5 cm\n► Plastificado Mate\n\n"
+        "descripcion": "Las tarjetas de presentación son elementos de papelería corporativa básicos para cualquier empresa o empresario.\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 350gr\n► Impreso ambas Caras Full color\n► Medida 9 x 5.5 cm\n► Plastificado Mate"
+    },
+    {
+        "id": 0.1,
+        "nombre": "Volantes",
+        "precio": 80,
+        "imagen": "img/volantes.png",
+        "descripcion": "Volante publicitario (también conocido como flyer) para empresas o eventos\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 150gr\n► Impreso ambas Caras Full color\n► Medida 10 x 16 cm"
     },
     {
         "id": 1,
