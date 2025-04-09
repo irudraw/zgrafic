@@ -437,62 +437,69 @@ function configurarCapturaPopup() {
 
 async function capturarPopupConMarcaAgua() {
     return new Promise(async (resolve) => {
-        const popupContent = document.querySelector('#producto-popup .popup-content');
+        const popup = document.getElementById('producto-popup');
+        const popupContent = popup.querySelector('.popup-content');
         
-        // 1. Crear contenedor para clon
+        // 1. Guardar estado original del popup
+        const originalStyles = {
+            transform: popup.style.transform,
+            transition: popup.style.transition
+        };
+
+        // 2. Desactivar transiciones/animaciones temporalmente
+        popup.style.transition = 'none !important';
+        popup.style.transform = 'none !important';
+        
+        // 3. Crear contenedor de captura estático
         const contenedorCaptura = document.createElement('div');
         contenedorCaptura.style.position = 'fixed';
         contenedorCaptura.style.left = '0';
         contenedorCaptura.style.top = '0';
-        contenedorCaptura.style.width = popupContent.offsetWidth + 'px';
-        contenedorCaptura.style.height = popupContent.offsetHeight + 'px';
-        contenedorCaptura.style.overflow = 'hidden';
+        contenedorCaptura.style.width = '100%';
+        contenedorCaptura.style.height = '100%';
         contenedorCaptura.style.visibility = 'hidden';
+        contenedorCaptura.style.zIndex = '99999';
         document.body.appendChild(contenedorCaptura);
 
-        // 2. Clonar el contenido con todos los estilos
+        // 4. Clonar el popup con estilos computados
         const contenidoClonado = popupContent.cloneNode(true);
-        contenidoClonado.style.display = 'block';
-        contenidoClonado.style.opacity = '1';
-        contenidoClonado.style.visibility = 'visible';
         contenedorCaptura.appendChild(contenidoClonado);
 
-        // 3. Añadir marca de agua CON ESTILOS MEJORADOS
+        // 5. Aplicar estilos actuales al clon
+        const estilosComputados = window.getComputedStyle(popupContent);
+        ['opacity', 'transform', 'filter'].forEach(prop => {
+            contenidoClonado.style[prop] = estilosComputados[prop];
+        });
+
+        // 6. Añadir marca de agua
         const marcaAgua = document.createElement('div');
+        marcaAgua.className = 'marca-agua-captura';
         marcaAgua.textContent = 'ZGrafic.com';
-        marcaAgua.style.position = 'absolute';
-        marcaAgua.style.bottom = '20px';
-        marcaAgua.style.right = '20px';
-        marcaAgua.style.color = 'rgba(0, 0, 0, 0.4)';
-        marcaAgua.style.fontSize = '24px'; // Tamaño aumentado
-        marcaAgua.style.fontWeight = 'bold';
-        marcaAgua.style.fontFamily = 'Arial, sans-serif';
-        marcaAgua.style.textShadow = '0 0 5px rgba(255,255,255,0.7)'; // Mejor contraste
-        marcaAgua.style.pointerEvents = 'none';
-        marcaAgua.style.zIndex = '9999';
         contenidoClonado.appendChild(marcaAgua);
 
-        // 4. Configuración de ALTA RESOLUCIÓN
+        // 7. Forzar sincronización
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        // 8. Captura con configuración precisa
         const canvas = await html2canvas(contenidoClonado, {
-            scale: 2, // Doble de resolución
-            logging: true, // Para depuración
+            scale: window.devicePixelRatio || 1,
+            logging: true,
             useCORS: true,
             allowTaint: true,
             backgroundColor: null,
-            windowWidth: contenidoClonado.scrollWidth,
-            windowHeight: contenidoClonado.scrollHeight,
+            ignoreElements: (el) => el === marcaAgua ? false : false,
             onclone: (clonedDoc) => {
-                // Asegurar visibilidad en el clon
-                clonedDoc.querySelector('.popup-content').style.opacity = '1';
+                clonedDoc.querySelector('.popup-content').style.transform = 'none';
             }
         });
 
-        // 5. Limpieza
+        // 9. Limpieza
         document.body.removeChild(contenedorCaptura);
+        Object.assign(popup.style, originalStyles);
+        
         resolve(canvas);
     });
 }
-
 // Parche para imágenes externas (opcional)
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#producto-popup img').forEach(img => {
