@@ -474,76 +474,126 @@ main {
 
 /* ... (todo el contenido previo se mantiene igual) ... */
 
-.popup-botones {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
+/* ===== ESTILOS GENERALES PARA CAPTURAS ===== */
+/* Contenedor invisible para clonar el popup */
+.clon-captura {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  visibility: hidden !important;
+  z-index: 99999 !important;
+  pointer-events: none !important;
 }
 
+/* Marca de agua VISIBLE (alta prioridad) */
+.marca-agua-captura {
+  position: absolute !important;
+  bottom: 25px !important;
+  right: 25px !important;
+  color: rgba(0, 0, 0, 0.55) !important;
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  font-family: 'Arial', sans-serif !important;
+  text-shadow: 
+    1px 1px 2px rgba(255,255,255,0.9),
+    -1px -1px 2px rgba(255,255,255,0.9) !important;
+  z-index: 100000 !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Ajuste para tema oscuro */
+body.dark-theme .marca-agua-captura {
+  color: rgba(255, 255, 255, 0.65) !important;
+  text-shadow: 
+    1px 1px 3px rgba(0,0,0,0.8),
+    -1px -1px 3px rgba(0,0,0,0.8) !important;
+  mix-blend-mode: screen !important;
+}
+
+/* ===== ESTILOS DEL BOTÓN COPIAR ===== */
 #popup-copiar-imagen {
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    padding: 8px;
-    font-size: 18px;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* Aspecto visual */
+  background: none !important;
+  border: 2px solid currentColor !important;
+  color: inherit !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  font-size: 20px !important;
+  border-radius: 50% !important;
+  width: 42px !important;
+  height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 12px !important;
+  
+  /* Transiciones */
+  transition: all 0.3s ease !important;
+  opacity: 0.85 !important;
 }
 
+/* Estados del botón */
 #popup-copiar-imagen:hover {
-    opacity: 1;
-    background-color: rgba(0, 0, 0, 0.05);
+  opacity: 1 !important;
+  transform: scale(1.05) !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
-body.dark-theme #popup-copiar-imagen:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-/* Estilo para la marca de agua en tema oscuro */
-body.dark-theme .popup-content div[style*="ZGrafic.com"] {
-    color: rgba(255, 255, 255, 0.2) !important;
+#popup-copiar-imagen:active {
+  transform: scale(0.95) !important;
 }
 
-
-/* Estilo para la marca de agua en tema oscuro */
-body.dark-theme #marca-agua-temporal {
-    color: rgba(255, 255, 255, 0.3) !important;
+/* Estado "copiado" (feedback visual) */
+#popup-copiar-imagen.copiado {
+  color: #4CAF50 !important;
+  border-color: #4CAF50 !important;
 }
 
-/* Estilo para el spinner de carga */
-.fa-spinner.fa-spin {
-    animation: fa-spin 1s infinite linear;
+/* Spinner de carga */
+#popup-copiar-imagen .fa-spinner {
+  animation: fa-spin 1s infinite linear !important;
 }
 
-/* Estilo para la marca de agua en tema oscuro */
-body.dark-theme [style*="ZGrafic.com"] {
-    color: rgba(255, 255, 255, 0.3) !important;
+/* ===== OPTIMIZACIÓN DE CALIDAD HD ===== */
+.popup-content.para-captura {
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
 }
 
-/* Animación del spinner */
-.fa-spinner.fa-spin {
-    animation: fa-spin 1s infinite linear;
+/* Contenedor de botones */
+.popup-botones {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+  margin-top: 25px !important;
+  padding-top: 15px !important;
+  border-top: 1px solid rgba(0,0,0,0.1) !important;
 }
 
+/* Animaciones */
 @keyframes fa-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Asegurar que el clon sea visible para html2canvas */
-.popup-content.clone-para-captura {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-@keyframes fa-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Feedback visual al copiar */
+.notificacion-copia {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  background: #4CAF50 !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  border-radius: 5px !important;
+  z-index: 100001 !important;
+  animation: fadeIn 0.3s ease-out !important;
 }
