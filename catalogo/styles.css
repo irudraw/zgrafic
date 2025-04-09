@@ -597,3 +597,43 @@ body.dark-theme .marca-agua-captura {
   z-index: 100001 !important;
   animation: fadeIn 0.3s ease-out !important;
 }
+/* Estilos para captura precisa */
+.clon-captura {
+    all: initial !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    visibility: hidden !important;
+    z-index: 99999 !important;
+    contain: strict !important;
+}
+
+.marca-agua-captura {
+    position: absolute !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    color: rgba(0, 0, 0, 0.5) !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    font-family: Arial, sans-serif !important;
+    text-shadow: 
+        0 0 5px rgba(255,255,255,0.7),
+        0 0 10px rgba(255,255,255,0.5) !important;
+    z-index: 100000 !important;
+    pointer-events: none !important;
+}
+
+/* Desactivar transiciones durante captura */
+.no-transiciones {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Popup estático para captura */
+.popup-para-captura {
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
