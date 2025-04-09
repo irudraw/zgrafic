@@ -255,7 +255,67 @@ header h1 {
     cursor: pointer;
 }
 
-/* ===== ESTILOS ESPECÍFICOS PARA CAPTURA ===== */
+/* ===== CARRITO ===== */
+#carrito-items img {
+    width: 50px !important;  /* Miniaturas en el carrito */
+    height: 50px !important;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+#carrito-items div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+/* ===== BOTONES ===== */
+.btn-primario {
+    background-color: #00a884;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primario:hover {
+    background-color: #008f72;
+}
+
+.btn-secundario {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 20px;
+    opacity: 0.8;
+    transition: all 0.3s;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
+
+.btn-secundario:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ===== CAPTURA DE PANTALLA ===== */
 .contenedor-captura-temporal {
     position: fixed !important;
     left: -9999px !important;
@@ -265,7 +325,6 @@ header h1 {
     z-index: -9999 !important;
     opacity: 0 !important;
     overflow: hidden !important;
-    contain: strict !important;
 }
 
 .marca-agua-captura {
@@ -287,35 +346,7 @@ body.dark-theme .marca-agua-captura {
     text-shadow: 0 0 5px rgba(0,0,0,0.7) !important;
 }
 
-/* ===== BOTÓN DE CAPTURA ===== */
-#popup-copiar-imagen {
-    background: none !important;
-    border: none !important;
-    color: inherit !important;
-    cursor: pointer !important;
-    padding: 8px !important;
-    font-size: 20px !important;
-    opacity: 0.8 !important;
-    transition: all 0.3s !important;
-    border-radius: 50% !important;
-    width: 40px !important;
-    height: 40px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-left: 10px !important;
-}
-
-#popup-copiar-imagen:hover {
-    opacity: 1 !important;
-    background-color: rgba(0, 0, 0, 0.05) !important;
-}
-
 /* ===== ANIMACIONES ===== */
-.fa-spinner {
-    animation: fa-spin 1s infinite linear !important;
-}
-
 @keyframes fa-spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
