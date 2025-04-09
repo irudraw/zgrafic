@@ -409,6 +409,18 @@ function configurarCapturaPopup() {
                 // Mostrar mensaje de procesamiento
                 mostrarNotificacion('Preparando captura...');
                 
+                // Crear elemento de marca de agua temporal
+                const marcaAgua = document.createElement('div');
+                marcaAgua.style.position = 'absolute';
+                marcaAgua.style.bottom = '10px';
+                marcaAgua.style.right = '10px';
+                marcaAgua.style.color = 'rgba(0, 0, 0, 0.2)';
+                marcaAgua.style.fontSize = '16px';
+                marcaAgua.style.fontWeight = 'bold';
+                marcaAgua.style.zIndex = '9999';
+                marcaAgua.textContent = 'ZGrafic.com';
+                popupContent.appendChild(marcaAgua);
+                
                 // Capturar el contenido
                 const canvas = await html2canvas(popupContent, {
                     scale: 2,
@@ -417,7 +429,8 @@ function configurarCapturaPopup() {
                     backgroundColor: null
                 });
                 
-                // Restaurar botón de cerrar
+                // Eliminar marca de agua y restaurar botón de cerrar
+                popupContent.removeChild(marcaAgua);
                 cerrarBtn.style.display = originalDisplay;
                 
                 // Copiar al portapapeles
@@ -426,11 +439,11 @@ function configurarCapturaPopup() {
                         await navigator.clipboard.write([
                             new ClipboardItem({ 'image/png': blob })
                         ]);
-                        mostrarNotificacion('Captura lista en el portapapeles');
+                        mostrarNotificacion('Captura con marca de agua lista');
                     } catch (err) {
                         // Alternativa: descargar la imagen
                         const link = document.createElement('a');
-                        link.download = `captura-${document.getElementById('popup-nombre').textContent}.png`;
+                        link.download = `ZGrafic-${document.getElementById('popup-nombre').textContent}.png`;
                         link.href = canvas.toDataURL();
                         link.click();
                         mostrarNotificacion('Captura descargada');
