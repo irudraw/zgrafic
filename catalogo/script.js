@@ -479,5 +479,11 @@ async function capturarPopupConMarcaAgua() {
     document.body.removeChild(contenedorCaptura);
     return canvas;
 }
+// Parche para imágenes externas (opcional)
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('#producto-popup img').forEach(img => {
+        img.setAttribute('crossorigin', 'anonymous');
+    });
+});
 
 // ... (el resto del código se mantiene igual) ...
