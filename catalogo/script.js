@@ -365,3 +365,102 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     });
 });
+
+
+
+// ... (todo el código previo se mantiene igual) ...
+
+function abrirProductoPopup(id) {
+    productoActual = productos.find(p => p.id === id);
+    const popup = document.getElementById('producto-popup');
+    const popupImagen = document.getElementById('popup-imagen');
+    const popupNombre = document.getElementById('popup-nombre');
+    const popupPrecio = document.getElementById('popup-precio');
+    const popupDescripcion = document.getElementById('popup-descripcion');
+    const popupAgregar = document.getElementById('popup-agregar');
+
+    popupImagen.src = productoActual.imagen;
+    popupImagen.alt = productoActual.nombre;
+    popupNombre.textContent = productoActual.nombre;
+    popupPrecio.textContent = productoActual.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${productoActual.precio.toFixed(2)}`;
+    popupDescripcion.innerHTML = productoActual.descripcion.replace(/\n/g, '<br>');
+    popupAgregar.textContent = productoActual.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito';
+    popupAgregar.onclick = () => agregarAlCarrito(productoActual.id);
+
+    popup.style.display = 'block';
+    setTimeout(() => {
+        popup.classList.add('active');
+        configurarCapturaPopup();
+    }, 10);
+}
+
+// Función para configurar el botón de captura
+function configurarCapturaPopup() {
+    const btnCapturar = document.getElementById('popup-copiar-imagen');
+    if (btnCapturar) {
+        btnCapturar.onclick = async () => {
+            try {
+                const popup = document.getElementById('producto-popup');
+                const popupContent = popup.querySelector('.popup-content');
+                
+                // Mostrar mensaje de procesamiento
+                mostrarNotificacion('Procesando captura...');
+                
+                // Ocultar temporalmente el botón de cerrar
+                const cerrarBtn = popup.querySelector('.cerrar-popup');
+                const originalDisplay = cerrarBtn.style.display;
+                cerrarBtn.style.display = 'none';
+                
+                // Aplicar estilos temporales para mejor captura
+                const originalStyles = {
+                    boxShadow: popupContent.style.boxShadow,
+                    transform: popupContent.style.transform
+                };
+                popupContent.style.boxShadow = 'none';
+                popupContent.style.transform = 'none';
+                
+                // Crear la imagen con html2canvas
+                const canvas = await html2canvas(popupContent, {
+                    backgroundColor: null,
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: popupContent.scrollWidth,
+                    windowHeight: popupContent.scrollHeight
+                });
+                
+                // Restaurar estilos originales
+                cerrarBtn.style.display = originalDisplay;
+                popupContent.style.boxShadow = originalStyles.boxShadow;
+                popupContent.style.transform = originalStyles.transform;
+                
+                // Copiar al portapapeles
+                canvas.toBlob(async (blob) => {
+                    try {
+                        await navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]);
+                        mostrarNotificacion('Captura copiada al portapapeles');
+                    } catch (err) {
+                        console.error('Error al copiar:', err);
+                        // Alternativa: descargar la imagen
+                        const link = document.createElement('a');
+                        link.download = `captura-${document.getElementById('popup-nombre').textContent}.png`;
+                        link.href = canvas.toDataURL();
+                        link.click();
+                        mostrarNotificacion('Captura descargada');
+                    }
+                }, 'image/png');
+                
+            } catch (error) {
+                console.error('Error al capturar:', error);
+                mostrarNotificacion('Error al capturar el popup', 'error');
+            }
+        };
+    }
+}
+
+// ... (el resto del código se mantiene igual) ...
