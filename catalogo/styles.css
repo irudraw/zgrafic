@@ -521,6 +521,28 @@ body.dark-theme #marca-agua-temporal {
     animation: fa-spin 1s infinite linear;
 }
 
+/* Estilo para la marca de agua en tema oscuro */
+body.dark-theme [style*="ZGrafic.com"] {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Animación del spinner */
+.fa-spinner.fa-spin {
+    animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Asegurar que el clon sea visible para html2canvas */
+.popup-content.clone-para-captura {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
 @keyframes fa-spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
