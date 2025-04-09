@@ -396,13 +396,13 @@ function abrirProductoPopup(id) {
 function configurarCapturaPopup() {
     const btnCapturar = document.getElementById('popup-copiar-imagen');
     if (btnCapturar) {
-        btnCapturar.onclick = async () => {
+        btnCapturar.addEventListener('click', async () => {
             try {
-                // Feedback visual mejorado
+                // Deshabilitar interacciones durante captura
+                btnCapturar.disabled = true;
                 btnCapturar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                btnCapturar.style.cursor = 'wait';
                 
-                // Captura en alta resolución
+                // Captura precisa
                 const canvas = await capturarPopupConMarcaAgua();
                 
                 // Opción 1: Copiar al portapapeles
@@ -411,30 +411,27 @@ function configurarCapturaPopup() {
                         await navigator.clipboard.write([
                             new ClipboardItem({ 'image/png': blob })
                         ]);
-                        mostrarNotificacion('✔ Captura HD copiada');
-                    }, 'image/png', 1.0); // Máxima calidad
+                        mostrarNotificacion('Captura copiada exacta');
+                    }, 'image/png', 1.0);
                 } 
                 // Opción 2: Descargar
                 catch (err) {
                     const link = document.createElement('a');
-                    link.download = `ZGrafic_HD_${new Date().getTime()}.png`;
-                    link.href = canvas.toDataURL('image/png', 1.0); // Máxima calidad
+                    link.download = `ZGrafic_${new Date().getTime()}.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
                     link.click();
-                    mostrarNotificacion('↓ Captura HD descargada');
                 }
                 
             } catch (error) {
-                console.error('Error:', error);
-                mostrarNotificacion('✖ Error en captura HD', 'error');
+                console.error('Error en captura:', error);
+                mostrarNotificacion('Error en captura', 'error');
             } finally {
-                // Restaurar botón
+                btnCapturar.disabled = false;
                 btnCapturar.innerHTML = '<i class="fas fa-camera"></i>';
-                btnCapturar.style.cursor = 'pointer';
             }
-        };
+        });
     }
 }
-
 async function capturarPopupConMarcaAgua() {
     return new Promise(async (resolve) => {
         const popup = document.getElementById('producto-popup');
