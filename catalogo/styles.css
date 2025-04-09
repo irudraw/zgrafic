@@ -505,8 +505,23 @@ main {
 body.dark-theme #popup-copiar-imagen:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
-/* Estilo para la marca de agua en tema oscuro 
+/* Estilo para la marca de agua en tema oscuro */
 body.dark-theme .popup-content div[style*="ZGrafic.com"] {
     color: rgba(255, 255, 255, 0.2) !important;
 }
-*/
+
+
+/* Estilo para la marca de agua en tema oscuro */
+body.dark-theme #marca-agua-temporal {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Estilo para el spinner de carga */
+.fa-spinner.fa-spin {
+    animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
