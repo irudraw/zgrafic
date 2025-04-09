@@ -7,6 +7,44 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="dark-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Estilos específicos para la funcionalidad de captura */
+        .contenedor-captura-temporal {
+            position: fixed !important;
+            left: -9999px !important;
+            top: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: -9999 !important;
+            opacity: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        .marca-agua-captura {
+            position: absolute !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            color: rgba(0, 0, 0, 0.5) !important;
+            font-size: 22px !important;
+            font-weight: bold !important;
+            font-family: Arial, sans-serif !important;
+            text-shadow: 0 0 5px rgba(255,255,255,0.7) !important;
+            z-index: 99999 !important;
+            pointer-events: none !important;
+            opacity: 0.8 !important;
+        }
+        
+        body.dark-theme .marca-agua-captura {
+            color: rgba(255, 255, 255, 0.6) !important;
+            text-shadow: 0 0 5px rgba(0,0,0,0.7) !important;
+        }
+        
+        /* Animación para el spinner */
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <header>
