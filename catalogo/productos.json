@@ -14,6 +14,13 @@
         "descripcion": "Volante publicitario (Flyer) para empresas o eventos\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 150gr\n► Impreso ambas Caras Full color\n► Medida 10 x 16 cm"
     },
     {
+        "id": 0.2,
+        "nombre": "Trípticos y Dípticos",
+        "precio": 295,
+        "imagen": "img/tripticos.png",
+        "descripcion": "CARACTERISTICAS:\n► x 1 Millar\n► Material: Couché 150 gr.\n► Impreso ambas Caras Full color\n► Medida: A4 u Oficio"
+    },
+    {
         "id": 1,
         "nombre": "Parante Araña Modelo CX",
         "precio": 140,
