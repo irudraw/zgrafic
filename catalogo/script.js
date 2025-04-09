@@ -62,16 +62,14 @@ function abrirProductoPopup(id) {
     popupImagen.alt = productoActual.nombre;
     popupNombre.textContent = productoActual.nombre;
     popupPrecio.textContent = productoActual.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${productoActual.precio.toFixed(2)}`;
-    
-    // Reemplazar '\n' con '<br>' para los saltos de línea
     popupDescripcion.innerHTML = productoActual.descripcion.replace(/\n/g, '<br>');
-    
     popupAgregar.textContent = productoActual.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito';
     popupAgregar.onclick = () => agregarAlCarrito(productoActual.id);
 
     popup.style.display = 'block';
     setTimeout(() => {
         popup.classList.add('active');
+        configurarCapturaPopup();
     }, 10);
 }
 
@@ -403,39 +401,24 @@ function configurarCapturaPopup() {
                 const popup = document.getElementById('producto-popup');
                 const popupContent = popup.querySelector('.popup-content');
                 
-                // Mostrar mensaje de procesamiento
-                mostrarNotificacion('Procesando captura...');
-                
                 // Ocultar temporalmente el botón de cerrar
                 const cerrarBtn = popup.querySelector('.cerrar-popup');
                 const originalDisplay = cerrarBtn.style.display;
                 cerrarBtn.style.display = 'none';
                 
-                // Aplicar estilos temporales para mejor captura
-                const originalStyles = {
-                    boxShadow: popupContent.style.boxShadow,
-                    transform: popupContent.style.transform
-                };
-                popupContent.style.boxShadow = 'none';
-                popupContent.style.transform = 'none';
+                // Mostrar mensaje de procesamiento
+                mostrarNotificacion('Preparando captura...');
                 
-                // Crear la imagen con html2canvas
+                // Capturar el contenido
                 const canvas = await html2canvas(popupContent, {
-                    backgroundColor: null,
                     scale: 2,
                     logging: false,
                     useCORS: true,
-                    allowTaint: true,
-                    scrollX: 0,
-                    scrollY: 0,
-                    windowWidth: popupContent.scrollWidth,
-                    windowHeight: popupContent.scrollHeight
+                    backgroundColor: null
                 });
                 
-                // Restaurar estilos originales
+                // Restaurar botón de cerrar
                 cerrarBtn.style.display = originalDisplay;
-                popupContent.style.boxShadow = originalStyles.boxShadow;
-                popupContent.style.transform = originalStyles.transform;
                 
                 // Copiar al portapapeles
                 canvas.toBlob(async (blob) => {
@@ -443,9 +426,8 @@ function configurarCapturaPopup() {
                         await navigator.clipboard.write([
                             new ClipboardItem({ 'image/png': blob })
                         ]);
-                        mostrarNotificacion('Captura copiada al portapapeles');
+                        mostrarNotificacion('Captura lista en el portapapeles');
                     } catch (err) {
-                        console.error('Error al copiar:', err);
                         // Alternativa: descargar la imagen
                         const link = document.createElement('a');
                         link.download = `captura-${document.getElementById('popup-nombre').textContent}.png`;
@@ -457,7 +439,7 @@ function configurarCapturaPopup() {
                 
             } catch (error) {
                 console.error('Error al capturar:', error);
-                mostrarNotificacion('Error al capturar el popup', 'error');
+                mostrarNotificacion('Error al capturar', 'error');
             }
         };
     }
