@@ -409,28 +409,36 @@ function configurarCapturaPopup() {
                 // Mostrar mensaje de procesamiento
                 mostrarNotificacion('Preparando captura...');
                 
-                // Crear elemento de marca de agua temporal
-                const marcaAgua = document.createElement('div');
-                marcaAgua.style.position = 'absolute';
-                marcaAgua.style.bottom = '10px';
-                marcaAgua.style.right = '10px';
-                marcaAgua.style.color = 'rgba(0, 0, 0, 0.2)';
-                marcaAgua.style.fontSize = '16px';
-                marcaAgua.style.fontWeight = 'bold';
-                marcaAgua.style.zIndex = '9999';
-                marcaAgua.textContent = 'ZGrafic.com';
-                popupContent.appendChild(marcaAgua);
+                // Clonar el contenido para añadir marca de agua
+                const contenidoClonado = popupContent.cloneNode(true);
+                contenidoClonado.style.position = 'absolute';
+                contenidoClonado.style.left = '-9999px';
+                document.body.appendChild(contenidoClonado);
                 
-                // Capturar el contenido
-                const canvas = await html2canvas(popupContent, {
+                // Añadir marca de agua al clon
+                const marcaAgua = document.createElement('div');
+                marcaAgua.textContent = 'ZGrafic.com';
+                marcaAgua.style.position = 'absolute';
+                marcaAgua.style.bottom = '15px';
+                marcaAgua.style.right = '15px';
+                marcaAgua.style.color = 'rgba(0, 0, 0, 0.3)';
+                marcaAgua.style.fontSize = '14px';
+                marcaAgua.style.fontWeight = 'bold';
+                marcaAgua.style.fontFamily = 'Arial, sans-serif';
+                marcaAgua.style.pointerEvents = 'none';
+                contenidoClonado.appendChild(marcaAgua);
+                
+                // Capturar el contenido clonado
+                const canvas = await html2canvas(contenidoClonado, {
                     scale: 2,
                     logging: false,
                     useCORS: true,
-                    backgroundColor: null
+                    backgroundColor: null,
+                    removeContainer: true
                 });
                 
-                // Eliminar marca de agua y restaurar botón de cerrar
-                popupContent.removeChild(marcaAgua);
+                // Limpiar y restaurar
+                document.body.removeChild(contenidoClonado);
                 cerrarBtn.style.display = originalDisplay;
                 
                 // Copiar al portapapeles
