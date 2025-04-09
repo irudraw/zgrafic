@@ -471,3 +471,44 @@ main {
         margin: 10% auto;
     }
 }
+
+/* ... (todo el contenido previo se mantiene igual) ... */
+
+.popup-botones {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+#popup-copiar-imagen {
+    background-color: #4a5568;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+#popup-copiar-imagen:hover {
+    background-color: #2d3748;
+}
+
+#popup-copiar-imagen i {
+    font-size: 14px;
+}
+
+/* Asegurar que el popup tenga fondo para la captura */
+.popup-content {
+    background-color: #fff !important;
+}
+
+/* Estilos para el tema oscuro en la captura */
+body.dark-theme .popup-content {
+    background-color: #202c33 !important;
+    color: #e9edef !important;
+}
