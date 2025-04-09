@@ -505,3 +505,7 @@ main {
 body.dark-theme #popup-copiar-imagen:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
+/* Estilo para la marca de agua en tema oscuro */
+body.dark-theme .popup-content div[style*="ZGrafic.com"] {
+    color: rgba(255, 255, 255, 0.2) !important;
+}
