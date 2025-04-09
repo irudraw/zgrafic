@@ -398,86 +398,109 @@ function configurarCapturaPopup() {
     if (btnCapturar) {
         btnCapturar.onclick = async () => {
             try {
-                mostrarNotificacion('Generando captura con marca de agua...');
+                mostrarNotificacion('Preparando captura...');
                 
-                // 1. Capturar el popup como canvas
+                // Deshabilitar botón temporalmente
+                btnCapturar.disabled = true;
+                btnCapturar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
                 const canvas = await capturarPopupConMarcaAgua();
                 
-                // 2. Opción 1: Copiar al portapapeles
+                // Opción 1: Copiar al portapapeles
                 try {
                     canvas.toBlob(async (blob) => {
                         await navigator.clipboard.write([
                             new ClipboardItem({ 'image/png': blob })
                         ]);
-                        mostrarNotificacion('✅ Captura copiada al portapapeles');
+                        mostrarNotificacion('Captura copiada al portapapeles');
                     });
                 } 
-                // 3. Opción 2 (Fallback): Descargar imagen
+                // Opción 2: Descargar como fallback
                 catch (err) {
                     const link = document.createElement('a');
-                    link.download = `ZGrafic_${document.getElementById('popup-nombre').textContent.replace(/\s+/g, '_')}.png`;
+                    link.download = `ZGrafic-${document.getElementById('popup-nombre').textContent}.png`;
                     link.href = canvas.toDataURL('image/png');
                     link.click();
-                    mostrarNotificacion('📥 Captura descargada');
+                    mostrarNotificacion('Captura descargada');
                 }
                 
             } catch (error) {
                 console.error('Error en captura:', error);
-                mostrarNotificacion('❌ Error al capturar', 'error');
+                mostrarNotificacion('Error al generar captura', 'error');
+            } finally {
+                // Restaurar botón
+                btnCapturar.disabled = false;
+                btnCapturar.innerHTML = '<i class="fas fa-camera"></i>';
             }
         };
     }
 }
 
 async function capturarPopupConMarcaAgua() {
-    const popup = document.getElementById('producto-popup');
-    const popupContent = popup.querySelector('.popup-content');
-    
-    // 1. Crear contenedor oculto para la captura
-    const contenedorCaptura = document.createElement('div');
-    contenedorCaptura.style.position = 'fixed';
-    contenedorCaptura.style.left = '-9999px';
-    contenedorCaptura.style.top = '0';
-    contenedorCaptura.style.zIndex = '99999';
-    document.body.appendChild(contenedorCaptura);
+    return new Promise(async (resolve) => {
+        const popup = document.getElementById('producto-popup');
+        const popupContent = popup.querySelector('.popup-content');
+        
+        // 1. Guardar estilos originales
+        const originalStyles = {
+            display: popup.style.display,
+            position: popup.style.position,
+            left: popup.style.left,
+            top: popup.style.top,
+            zIndex: popup.style.zIndex,
+            transform: popup.style.transform
+        };
 
-    // 2. Clonar el contenido del popup (incluyendo estilos)
-    const contenidoClonado = popupContent.cloneNode(true);
-    contenedorCaptura.appendChild(contenidoClonado);
+        // 2. Posicionar el popup para captura (fuera de pantalla pero renderizable)
+        popup.style.display = 'block';
+        popup.style.position = 'fixed';
+        popup.style.left = '0px';
+        popup.style.top = '0px';
+        popup.style.transform = 'translate(-105%, -105%)';
+        popup.style.zIndex = '99999';
+        popup.style.opacity = '1';
 
-    // 3. Añadir marca de agua al clon
-    const marcaAgua = document.createElement('div');
-    marcaAgua.textContent = 'ZGrafic.com';
-    marcaAgua.style.position = 'absolute';
-    marcaAgua.style.bottom = '20px';
-    marcaAgua.style.right = '20px';
-    marcaAgua.style.color = 'rgba(0, 0, 0, 0.25)';
-    marcaAgua.style.fontSize = '16px';
-    marcaAgua.style.fontWeight = 'bold';
-    marcaAgua.style.fontFamily = 'Arial, sans-serif';
-    marcaAgua.style.pointerEvents = 'none';
-    contenidoClonado.appendChild(marcaAgua);
+        // 3. Añadir marca de agua directamente (no clonar)
+        const marcaAgua = document.createElement('div');
+        marcaAgua.id = 'marca-agua-temporal';
+        marcaAgua.textContent = 'ZGrafic.com';
+        marcaAgua.style.position = 'absolute';
+        marcaAgua.style.bottom = '15px';
+        marcaAgua.style.right = '15px';
+        marcaAgua.style.color = 'rgba(0, 0, 0, 0.3)';
+        marcaAgua.style.fontSize = '14px';
+        marcaAgua.style.fontWeight = 'bold';
+        marcaAgua.style.pointerEvents = 'none';
+        popupContent.appendChild(marcaAgua);
 
-    // 4. Configuración optimizada para html2canvas
-    const canvas = await html2canvas(contenidoClonado, {
-        scale: 1,
-        logging: false,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-        onclone: (documentClone) => {
-            // Forzar estilos en el clon
-            const popupClone = documentClone.getElementById('producto-popup');
-            if (popupClone) {
-                popupClone.style.display = 'block';
-                popupClone.style.opacity = '1';
+        // 4. Pequeño delay para asegurar renderizado
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // 5. Configuración optimizada de html2canvas
+        const canvas = await html2canvas(popupContent, {
+            scale: 1,
+            logging: true, // Para ver errores en consola
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            ignoreElements: (element) => element.id === 'marca-agua-temporal' ? false : false,
+            onclone: (clonedDoc) => {
+                // Asegurar que el popup esté visible en el clon
+                const clonedPopup = clonedDoc.getElementById('producto-popup');
+                if (clonedPopup) {
+                    clonedPopup.style.display = 'block';
+                    clonedPopup.style.opacity = '1';
+                }
             }
-        }
-    });
+        });
 
-    // 5. Limpieza
-    document.body.removeChild(contenedorCaptura);
-    return canvas;
+        // 6. Restaurar estilos originales y limpiar
+        Object.assign(popup.style, originalStyles);
+        const marca = document.getElementById('marca-agua-temporal');
+        if (marca) marca.remove();
+
+        resolve(canvas);
+    });
 }
 // Parche para imágenes externas (opcional)
 document.addEventListener('DOMContentLoaded', () => {
