@@ -205,13 +205,23 @@ body.dark-theme #btn-buscar {
 /* Buscador móvil - Tema oscuro */
 body.dark-theme #mobile-search-container {
     background-color: #202c33;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 body.dark-theme #mobile-buscar-producto {
     background-color: #2a3942;
     color: #e9edef;
+    border: 1px solid #30383d;
 }
 
 body.dark-theme #mobile-buscar-producto::placeholder {
     color: #8696a0;
+}
+
+body.dark-theme #mobile-btn-buscar {
+    background-color: #00a884;
+}
+
+body.dark-theme #mobile-btn-buscar:hover {
+    background-color: #008f72;
 }
