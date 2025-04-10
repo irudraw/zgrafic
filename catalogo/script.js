@@ -510,10 +510,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función para mostrar/ocultar buscador móvil
 function toggleMobileSearch() {
     const mobileSearch = document.getElementById('mobile-search-container');
+    const wasVisible = mobileSearch.classList.contains('mobile-search-visible');
+    
     mobileSearch.classList.toggle('mobile-search-visible');
     
-    if (mobileSearch.classList.contains('mobile-search-visible')) {
+    if (!wasVisible) {
         document.getElementById('mobile-buscar-producto').focus();
+        document.body.style.overflow = 'hidden'; // Evita scroll cuando el buscador está abierto
+    } else {
+        document.body.style.overflow = ''; // Restaura el scroll
     }
 }
 
