@@ -183,3 +183,35 @@ button:hover, #ver-carrito-completo:hover {
 #carrito-items::-webkit-scrollbar-thumb:hover {
     background: #00a884;
 }
+
+/* Buscador PC - Tema oscuro */
+body.dark-theme #buscador {
+    background-color: #2a3942;
+}
+
+body.dark-theme #buscar-producto {
+    color: #e9edef;
+    background-color: transparent;
+}
+
+body.dark-theme #buscar-producto::placeholder {
+    color: #8696a0;
+}
+
+body.dark-theme #btn-buscar {
+    color: #8696a0;
+}
+
+/* Buscador móvil - Tema oscuro */
+body.dark-theme #mobile-search-container {
+    background-color: #202c33;
+}
+
+body.dark-theme #mobile-buscar-producto {
+    background-color: #2a3942;
+    color: #e9edef;
+}
+
+body.dark-theme #mobile-buscar-producto::placeholder {
+    color: #8696a0;
+}
