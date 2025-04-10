@@ -162,3 +162,20 @@ button:hover, #ver-carrito-completo:hover {
     background-color: #00a884;
     color: #e9edef;
 }
+
+/* En dark-theme.css */
+#carrito-items {
+    scrollbar-color: #2a3942 #202c33; /* Para Firefox */
+}
+
+#carrito-items::-webkit-scrollbar-track {
+    background: #2a3942;
+}
+
+#carrito-items::-webkit-scrollbar-thumb {
+    background: #8696a0;
+}
+
+#carrito-items::-webkit-scrollbar-thumb:hover {
+    background: #00a884;
+}
