@@ -13,6 +13,10 @@ header {
     border-color: #30383d;
 }
 
+#carrito-popup h2 {
+    color: #e9edef; /* Color claro para tema oscuro */
+}
+
 .carrito-header {
     background-color: #202c33;
 }
@@ -98,12 +102,12 @@ button:hover, #ver-carrito-completo:hover {
 }
 
 .cerrar-popup {
-    color: #8696a0;
+    color: #8696a0; /* Color más claro para tema oscuro */
 }
 
 .cerrar-popup:hover,
 .cerrar-popup:focus {
-    color: #e9edef;
+    color: #e9edef; /* Color al hacer hover */
 }
 
 /* Estilos específicos para carrito.html */
