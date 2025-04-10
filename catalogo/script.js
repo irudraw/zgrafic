@@ -190,6 +190,7 @@ function cerrarCarritoPopup() {
 // Funciones para la búsqueda y paginación
 function buscarProductos() {
     const textoBusqueda = document.getElementById('buscar-producto').value.toLowerCase();
+    
     if (textoBusqueda.trim() === '') {
         productosFiltrados = [...productos];
     } else {
@@ -198,13 +199,10 @@ function buscarProductos() {
             producto.descripcion.toLowerCase().includes(textoBusqueda)
         );
     }
+    
     paginaActual = 1;
     actualizarPaginacion();
-    
-    const productosActuales = document.querySelectorAll('.producto');
-    productosActuales.forEach(producto => producto.classList.remove('aparecer'));
-    
-    setTimeout(mostrarProductos, 50);
+    mostrarProductos();
 }
 
 function actualizarPaginacion() {
@@ -290,10 +288,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
     document.querySelector('#producto-popup .cerrar-popup').addEventListener('click', cerrarProductoPopup);
-    document.getElementById('buscar-producto').addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
-            buscarProductos();
-        }
+    // Reemplaza el evento keyup por input para tiempo real
+    document.getElementById('buscar-producto').addEventListener('input', (e) => {
+        buscarProductos();
     });
 
     document.getElementById('anterior').addEventListener('click', () => cambiarPagina('anterior'));
