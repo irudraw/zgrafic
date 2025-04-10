@@ -48,18 +48,42 @@
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <h1>Tienda en línea</h1>
+    <div class="header-content">
+        <h1>Tienda en línea</h1>
+        
+        <!-- Buscador para PC -->
+        <div id="buscador-pc">
+            <div id="buscador">
+                <input type="text" id="buscar-producto" placeholder="Buscar productos...">
+                <button id="btn-buscar"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        
+        <!-- Iconos derecha -->
+        <div class="header-icons">
+            <!-- Icono de búsqueda para móvil -->
+            <div id="mobile-search-icon" onclick="toggleMobileSearch()">
+                <i class="fas fa-search"></i>
+            </div>
+            <!-- Carrito -->
             <div id="carrito-contador" onclick="abrirCarritoPopup()">
                 <i class="fas fa-shopping-cart"></i>
                 <span id="contador">0</span>
             </div>
         </div>
-        <div id="buscador">
-            <input type="text" id="buscar-producto" placeholder="Buscar productos...">
-            <button id="btn-buscar"><i class="fas fa-search"></i></button>
+        
+        <!-- Buscador para móvil (oculto por defecto) -->
+        <div id="mobile-search-container" class="mobile-search-hidden">
+            <div id="mobile-search">
+                <button id="mobile-search-back" onclick="toggleMobileSearch()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <input type="text" id="mobile-buscar-producto" placeholder="Buscar productos...">
+                <button id="mobile-btn-buscar"><i class="fas fa-search"></i></button>
+            </div>
         </div>
-    </header>
+    </div>
+</header>
 
     <div class="page-transition"></div>
 
