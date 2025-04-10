@@ -281,8 +281,10 @@ header h1 {
 
 /* ===== POPUP CARRITO (ESTILOS ORIGINALES) ===== */
 #carrito-popup .popup-content {
-    position: relative; /* Asegura que el posicionamiento sea relativo */
-    padding: 20px; /* Añade más padding para espacio */
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Esto evita que aparezca la barra de desplazamiento */
 }
 
 #carrito-items {
