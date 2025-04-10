@@ -106,20 +106,40 @@ header h1 {
     display: none;
     cursor: pointer;
     font-size: 1.2rem;
+    color: white;
+    padding: 0.5rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    text-align: center;
+    line-height: 36px;
+    transition: background 0.3s;
+}
+
+#mobile-search-icon:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+@media (max-width: 768px) {
+    #mobile-search-icon {
+        display: block;
+    }
 }
 
 /* Buscador móvil */
 #mobile-search-container {
-    position: absolute;
+    position: fixed; /* Cambiado a fixed para mejor comportamiento */
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    height: 60px; /* Altura fija */
     background: #00a884;
     z-index: 1001;
     display: none;
     align-items: center;
     padding: 0 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 #mobile-search {
@@ -127,6 +147,7 @@ header h1 {
     width: 100%;
     align-items: center;
     gap: 0.5rem;
+    height: 100%;
 }
 
 #mobile-search-back {
@@ -135,25 +156,53 @@ header h1 {
     color: white;
     font-size: 1.2rem;
     cursor: pointer;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
 }
 
 #mobile-buscar-producto {
     flex-grow: 1;
-    padding: 0.5rem;
+    padding: 0.8rem 1rem;
     border-radius: 20px;
     border: none;
+    font-size: 1rem;
+    height: 40px;
+    box-sizing: border-box;
+    background: white;
 }
 
 #mobile-btn-buscar {
-    background: none;
+    background: #008f72;
     border: none;
     color: white;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 20px;
+    height: 40px;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-/* Estados */
+#mobile-btn-buscar:hover {
+    background: #007a60;
+}
+
+/* Animación suave para mostrar/ocultar */
 .mobile-search-visible {
     display: flex !important;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-60px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Responsive */
