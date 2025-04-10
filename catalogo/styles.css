@@ -283,15 +283,17 @@ header h1 {
     max-height: 70vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Esto evita que aparezca la barra de desplazamiento */
 }
 
 #carrito-items {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* Solo el contenido se desplazará, no el popup completo */
     padding: 10px 0;
     margin: 10px 0;
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
+    scrollbar-width: thin; /* Para Firefox */
 }
 
 #carrito-items div {
@@ -509,4 +511,23 @@ header h1 {
         width: 95%;
         margin: 10% auto;
     }
+}
+
+/* Estilos para la barra de desplazamiento (opcional) */
+#carrito-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+#carrito-items::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#carrito-items::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+#carrito-items::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
