@@ -8,13 +8,20 @@
     },
     {
         "id": 0.1,
-        "nombre": "Volantes",
+        "nombre": "Volantes A6 - 1/4 Oficio",
         "precio": 90,
         "imagen": "img/volantes.png",
         "descripcion": "Volante publicitario (Flyer) para empresas o eventos\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 150gr\n► Impreso ambas Caras Full color\n► Medida 10 x 16 cm"
     },
     {
         "id": 0.2,
+        "nombre": "Volantes A5 – 1/2 Oficio",
+        "precio": 135,
+        "imagen": "img/a6.png",
+        "descripcion": "Volantes - Flyer’s publicitarios.\nLa mejor opción para poder posicionar tu negocio o producto.\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 150gr\n► Impreso ambas Caras Full color\n► Medida 16 x 20 cm"
+    },
+    {
+        "id": 0.3,
         "nombre": "Trípticos y Dípticos",
         "precio": 285,
         "imagen": "img/tripticos.png",
