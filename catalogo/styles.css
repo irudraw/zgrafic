@@ -264,11 +264,14 @@ header h1 {
 }
 
 .cerrar-popup {
+    position: absolute;
+    top: 15px; /* Ajusta esta posición vertical */
+    right: 15px; /* Ajusta esta posición horizontal */
     color: #aaa;
-    float: right;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    z-index: 1; /* Asegura que esté sobre otros elementos */
 }
 
 .cerrar-popup:hover,
@@ -280,10 +283,8 @@ header h1 {
 
 /* ===== POPUP CARRITO (ESTILOS ORIGINALES) ===== */
 #carrito-popup .popup-content {
-    max-height: 70vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Esto evita que aparezca la barra de desplazamiento */
+    position: relative; /* Asegura que el posicionamiento sea relativo */
+    padding: 20px; /* Añade más padding para espacio */
 }
 
 #carrito-items {
@@ -294,6 +295,13 @@ header h1 {
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
     scrollbar-width: thin; /* Para Firefox */
+}
+
+#carrito-popup h2 {
+    margin-top: 0;
+    padding-right: 30px; /* Espacio para la X */
+    text-align: center; /* Centra el título */
+    color: #00a884; /* Color consistente con tu tema */
 }
 
 #carrito-items div {
