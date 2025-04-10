@@ -277,8 +277,6 @@ header h1 {
 .cerrar-popup:hover,
 .cerrar-popup:focus {
     color: #000;
-    text-decoration: none;
-    cursor: pointer;
 }
 
 /* ===== POPUP CARRITO (ESTILOS ORIGINALES) ===== */
