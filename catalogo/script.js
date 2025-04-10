@@ -507,4 +507,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ... (el resto del código se mantiene igual) ...
+// Función para mostrar/ocultar buscador móvil
+function toggleMobileSearch() {
+    const mobileSearch = document.getElementById('mobile-search-container');
+    mobileSearch.classList.toggle('mobile-search-visible');
+    
+    if (mobileSearch.classList.contains('mobile-search-visible')) {
+        document.getElementById('mobile-buscar-producto').focus();
+    }
+}
+
+// Conectar eventos de búsqueda móvil
+document.getElementById('mobile-btn-buscar').addEventListener('click', () => {
+    const query = document.getElementById('mobile-buscar-producto').value;
+    document.getElementById('buscar-producto').value = query;
+    buscarProductos();
+    toggleMobileSearch();
+});
+
+document.getElementById('mobile-buscar-producto').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        const query = document.getElementById('mobile-buscar-producto').value;
+        document.getElementById('buscar-producto').value = query;
+        buscarProductos();
+        toggleMobileSearch();
+    }
+});
