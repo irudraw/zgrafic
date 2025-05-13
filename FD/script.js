@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             showError(
                 error.message, 
-                error.includes('iframe') ? 'Prueba con esta URL alternativa' : 'El video puede ser privado o tener restricciones'
+                'Prueba con otra URL o verifica que el video sea público'
             );
             console.error('Error:', error);
         } finally {
@@ -76,18 +76,12 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoading();
         elements.posterImage.classList.add('loading');
 
-        // Crear canvas temporal
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
-        // Configurar dimensiones
         canvas.width = elements.posterImage.naturalWidth;
         canvas.height = elements.posterImage.naturalHeight;
-        
-        // Dibujar imagen
         ctx.drawImage(elements.posterImage, 0, 0, canvas.width, canvas.height);
         
-        // Convertir a Blob y descargar
         canvas.toBlob(blob => {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -98,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.appendChild(link);
             link.click();
             
-            // Limpieza
             setTimeout(() => {
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
@@ -117,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         elements.loadingDiv.classList.add('d-none');
     }
 
-    // Helper: Manejo de errores mejorado
+    // Helper: Manejo de errores
     function showError(message, solution) {
         elements.errorMessage.innerHTML = message;
         elements.errorDiv.classList.remove('d-none');
@@ -167,7 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 elements.posterImage.classList.add('loading');
                 elements.posterImage.src = currentPosterUrls[quality];
                 
-                // Actualizar botón activo
                 document.querySelectorAll('.quality-btn').forEach(btn => {
                     btn.classList.toggle('active', btn === e.target);
                 });
@@ -192,57 +184,62 @@ document.addEventListener('DOMContentLoaded', function() {
     // Helper: Obtener datos del poster (mejorado)
     async function fetchPosterData(videoUrl) {
         try {
-            const pluginUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(pluginUrl)}`;
+            // Usamos un proxy más confiable
+            const proxyUrl = `https://cors-anywhere.herokuapp.com/https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
             
-            const response = await fetch(proxyUrl);
+            const response = await fetch(proxyUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
             if (!response.ok) throw new Error('Error al conectar con Facebook');
             
-            const data = await response.json();
-            if (!data.contents) throw new Error('No se recibieron datos del video');
+            const htmlContent = await response.text();
             
-            return extractImageUrls(data.contents);
+            // Extraer URL de la imagen con múltiples métodos
+            let imageUrl = extractImageUrlFromHtml(htmlContent);
+            
+            if (!imageUrl) {
+                throw new Error('No se encontró la imagen del video');
+            }
+
+            // Limpiar URL
+            imageUrl = imageUrl.replace(/&amp;/g, '&').split('?')[0];
+            
+            if (!imageUrl.startsWith('http')) {
+                imageUrl = 'https://' + imageUrl.replace(/^\/\//, '');
+            }
+
+            return {
+                sd: `${imageUrl}?width=640&height=360`,
+                hd: `${imageUrl}?width=1280&height=720`,
+                original: `${imageUrl}?dl=1`
+            };
         } catch (error) {
             console.error('Error en fetchPosterData:', error);
-            throw new Error('No se pudo obtener la información del video');
+            throw new Error('No se pudo obtener la información del video. El video puede ser privado o tener restricciones.');
         }
     }
 
-    // Helper: Extraer URLs de imagen (robusta)
-    function extractImageUrls(htmlContent) {
-        // Método 1: Meta tag (og:image)
-        let baseUrl = htmlContent.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i)?.[1];
+    // Helper: Extraer URL de imagen del HTML (mejorado)
+    function extractImageUrlFromHtml(html) {
+        // Intentar con meta tag og:image
+        const metaMatch = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i);
+        if (metaMatch) return metaMatch[1];
         
-        // Método 2: Etiqueta img
-        if (!baseUrl) {
-            baseUrl = htmlContent.match(/<img[^>]+(data-src|src)="([^"]+)"[^>]*>/i)?.[2];
-        }
+        // Intentar con etiqueta img
+        const imgMatch = html.match(/<img[^>]+(data-src|src)="([^"]+)"[^>]*>/i);
+        if (imgMatch) return imgMatch[2];
         
-        // Método 3: Etiqueta video (poster)
-        if (!baseUrl) {
-            baseUrl = htmlContent.match(/<video[^>]+poster="([^"]+)"/i)?.[1];
-        }
-
-        // Método 4: Iframe (como último recurso)
-        if (!baseUrl) {
-            const iframeSrc = htmlContent.match(/<iframe[^>]+src="([^"]+)"/i)?.[1];
-            if (iframeSrc) {
-                throw new Error(`Intenta con esta URL directa: ${iframeSrc}`);
-            }
-            throw new Error('No se encontró ninguna imagen. El video puede ser privado o tener restricciones.');
-        }
-
-        // Limpiar y preparar URLs
-        baseUrl = baseUrl.replace(/&amp;/g, '&').split('?')[0];
+        // Intentar con etiqueta video poster
+        const videoMatch = html.match(/<video[^>]+poster="([^"]+)"/i);
+        if (videoMatch) return videoMatch[1];
         
-        if (!baseUrl.startsWith('http')) {
-            baseUrl = 'https://' + baseUrl.replace(/^\/\//, '');
-        }
-
-        return {
-            sd: `${baseUrl}?width=640&height=360`,
-            hd: `${baseUrl}?width=1280&height=720`,
-            original: `${baseUrl}?dl=1`
-        };
+        // Intentar con JSON embebido
+        const jsonMatch = html.match(/"preferred_thumbnail":{"image":{"uri":"([^"]+)"/i);
+        if (jsonMatch) return jsonMatch[1].replace(/\\\//g, '/');
+        
+        return null;
     }
 });
