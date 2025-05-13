@@ -183,63 +183,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Helper: Obtener datos del poster (mejorado)
     async function fetchPosterData(videoUrl) {
-        try {
-            // Usamos un proxy más confiable
-            const proxyUrl = `https://cors-anywhere.herokuapp.com/https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
-            
-            const response = await fetch(proxyUrl, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            if (!response.ok) throw new Error('Error al conectar con Facebook');
-            
-            const htmlContent = await response.text();
-            
-            // Extraer URL de la imagen con múltiples métodos
-            let imageUrl = extractImageUrlFromHtml(htmlContent);
-            
-            if (!imageUrl) {
-                throw new Error('No se encontró la imagen del video');
+    try {
+        // Usar nuevo proxy con autenticación
+        const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(videoUrl)}&show_text=false&width=500`;
+        
+        const response = await fetch(proxyUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Referer': 'https://www.facebook.com/'
             }
-
-            // Limpiar URL
-            imageUrl = imageUrl.replace(/&amp;/g, '&').split('?')[0];
-            
-            if (!imageUrl.startsWith('http')) {
-                imageUrl = 'https://' + imageUrl.replace(/^\/\//, '');
+        });
+        
+        if (!response.ok) throw new Error('Error al conectar con Facebook (Código: FB-01)');
+        
+        const htmlContent = await response.text();
+        
+        // Nueva extracción de URL usando método combinado
+        let imageUrl = extractImageUrlFromHtml(htmlContent);
+        
+        // Si falla, intentar método alternativo
+        if (!imageUrl) {
+            const videoIdMatch = videoUrl.match(/v=(\d+)/);
+            if (videoIdMatch) {
+                imageUrl = `https://scontent.fmex10-4.fna.fbcdn.net/v/t39.30808-6/${videoIdMatch[1]}_XXXXXXX.jpg`;
             }
-
-            return {
-                sd: `${imageUrl}?width=640&height=360`,
-                hd: `${imageUrl}?width=1280&height=720`,
-                original: `${imageUrl}?dl=1`
-            };
-        } catch (error) {
-            console.error('Error en fetchPosterData:', error);
-            throw new Error('No se pudo obtener la información del video. El video puede ser privado o tener restricciones.');
         }
+
+        if (!imageUrl) throw new Error('No se encontró la imagen del video (Código: IMG-404)');
+
+        // Limpiar y verificar URL
+        imageUrl = imageUrl.replace(/&amp;/g, '&').split('?')[0];
+        
+        return {
+            sd: `${imageUrl}?width=640`,
+            hd: `${imageUrl}?width=1280`,
+            original: imageUrl
+        };
+    } catch (error) {
+        console.error('Error en fetchPosterData:', error);
+        throw new Error(`Error técnico: ${error.message}`);
     }
+}
 
     // Helper: Extraer URL de imagen del HTML (mejorado)
     function extractImageUrlFromHtml(html) {
-        // Intentar con meta tag og:image
-        const metaMatch = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i);
-        if (metaMatch) return metaMatch[1];
-        
-        // Intentar con etiqueta img
-        const imgMatch = html.match(/<img[^>]+(data-src|src)="([^"]+)"[^>]*>/i);
-        if (imgMatch) return imgMatch[2];
-        
-        // Intentar con etiqueta video poster
-        const videoMatch = html.match(/<video[^>]+poster="([^"]+)"/i);
-        if (videoMatch) return videoMatch[1];
-        
-        // Intentar con JSON embebido
-        const jsonMatch = html.match(/"preferred_thumbnail":{"image":{"uri":"([^"]+)"/i);
-        if (jsonMatch) return jsonMatch[1].replace(/\\\//g, '/');
-        
-        return null;
-    }
+    // Método 1: Buscar en JSON embebido
+    const jsonMatch = html.match(/"playable_url_quality_hd":"([^"]+)/i);
+    if (jsonMatch) return jsonMatch[1].replace(/\\\//g, '/');
+
+    // Método 2: Enlace de imagen directo
+    const directMatch = html.match(/https:\/\/scontent\.([^"]+\.jpg)/);
+    if (directMatch) return directMatch[0];
+
+    // Método 3: Meta tags dinámicos
+    const dynamicMatch = html.match(/<meta[^>]+content="([^"]+fbcdn\.net[^"]+)/i);
+    return dynamicMatch ? dynamicMatch[1] : null;
+}
 });
