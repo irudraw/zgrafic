@@ -17,7 +17,6 @@ body.dark-theme {
     color: var(--text-light);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
-    padding-bottom: 30px;
 }
 
 .container {
@@ -32,7 +31,6 @@ h1, h2, h3, h4 {
 
 .text-intro, .text-loading {
     color: var(--text-light);
-    opacity: 0.9;
 }
 
 .text-note {
@@ -72,15 +70,9 @@ h1, h2, h3, h4 {
 
 .dark-img {
     max-width: 100%;
-    width: auto;
-    height: auto;
-    max-height: 70vh;
     border: 1px solid var(--dark-border);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     background-color: var(--darker-bg);
-    display: block;
-    margin: 0 auto;
     transition: opacity 0.3s ease;
 }
 
@@ -89,17 +81,9 @@ h1, h2, h3, h4 {
     filter: blur(1px);
 }
 
-.dark-img[src*="placeholder.com"] {
-    filter: brightness(0.8);
-    background-color: var(--darker-bg);
-    padding: 20px;
-    box-sizing: border-box;
-}
-
 .alert-danger {
     background-color: var(--error-bg);
     border-left: 4px solid #ff6b6b;
-    border-radius: 8px;
 }
 
 .error-message {
@@ -117,31 +101,15 @@ h1, h2, h3, h4 {
     font-weight: 500;
 }
 
-.btn-primary:hover {
-    background-color: #166fe5;
-    border-color: #166fe5;
-}
-
 .btn-success {
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
     font-weight: 500;
 }
 
-.btn-success:hover {
-    background-color: #1daa8e;
-    border-color: #1daa8e;
-}
-
 #viewVideoBtn {
     background-color: #17a2b8;
     border-color: #17a2b8;
-    font-weight: 500;
-}
-
-#viewVideoBtn:hover {
-    background-color: #138496;
-    border-color: #117a8b;
 }
 
 .quality-options {
@@ -156,31 +124,13 @@ h1, h2, h3, h4 {
     transition: all 0.2s ease;
 }
 
-.quality-btn.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
 .quality-btn.active {
     font-weight: bold;
     border-width: 2px;
-    transform: translateY(-1px);
-}
-
-.input-group {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {
     .dark-img {
         max-height: 50vh;
-    }
-    
-    .quality-options {
-        margin-bottom: 15px;
-    }
-    
-    .container {
-        padding: 0 15px;
     }
 }
