@@ -149,11 +149,11 @@ function seleccionarOpcion(tipo) {
 <div id="vendedor-info" class="label-result"></div><br>
 
 <form id="seleccion-form" class="form">
-  <input type="radio" id="grueso" name="opcion" value="grueso" onclick="seleccionarOpcion(this.value)">
-  <label for="grueso">Grueso</label><br>
+  <input type="radio" id="grueso" name="opcion" value="g" onclick="seleccionarOpcion(this.value)">
+  <label for="g">Grueso</label><br>
   
-  <input type="radio" id="delgado" name="opcion" value="delgado" onclick="seleccionarOpcion(this.value)" disabled="disabled">
-  <label for="delgado">Delgado</label><br>
+  <input type="radio" id="delgado" name="opcion" value="d" onclick="seleccionarOpcion(this.value)" disabled="disabled">
+  <label for="d">Delgado</label><br>
 </form>
 
 
@@ -207,33 +207,33 @@ const parametrosURL = new URLSearchParams(window.location.search);
   const baseD = 8; 
 
   let precio
-  if(tipo === 'grueso' & cliente === 'Diseñador') {
+  if(tipo === 'g' & cliente === 'Diseñador') {
     precio = baseG;
-  } else if(tipo === 'delgado'& cliente === 'Diseñador') {
+  } else if(tipo === 'd'& cliente === 'Diseñador') {
     precio = baseD;
   }
 
-  else if(tipo === 'grueso'& cliente === 'Vendedor') {
+  else if(tipo === 'g'& cliente === 'Vendedor') {
     precio = baseG+1;
   }
-  else if(tipo === 'delgado'& cliente === 'Vendedor') {
+  else if(tipo === 'd'& cliente === 'Vendedor') {
     precio = baseD+1;
   }
 
-  else if(tipo === 'grueso'& cliente === 'Cliente') {
+  else if(tipo === 'g'& cliente === 'Cliente') {
     precio = baseG+2;
     adicional = 1;
   }
-  else if(tipo === 'delgado'& cliente === 'Cliente') {
+  else if(tipo === 'd'& cliente === 'Cliente') {
     precio = baseD+2;
     adicional = 1;
   }
 
-  else if(tipo === 'grueso'& cliente === 'Casero') {
+  else if(tipo === 'g'& cliente === 'Casero') {
     precio = baseG+2;
     adicional = 0.30;
   }
-  else if(tipo === 'delgado'& cliente === 'Casero') {
+  else if(tipo === 'd'& cliente === 'Casero') {
     precio = baseD+2;
     adicional = 0.30;
   }
