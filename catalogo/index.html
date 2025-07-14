@@ -45,6 +45,20 @@
             100% { transform: rotate(360deg); }
         }
     </style>
+    <script>
+        // Función para copiar URL del producto
+        function copiarURLProducto() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    mostrarNotificacion('¡Enlace copiado!');
+                })
+                .catch(err => {
+                    console.error('Error al copiar: ', err);
+                    mostrarNotificacion('Error al copiar enlace');
+                });
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -123,6 +137,10 @@
                         <button id="popup-agregar" class="btn-primario"></button>
                         <button id="popup-copiar-imagen" class="btn-secundario" title="Capturar pantalla">
                             <i class="fas fa-camera"></i>
+                        </button>
+                        <!-- Nuevo botón para compartir URL -->
+                        <button id="popup-compartir-url" class="btn-secundario" title="Copiar enlace" onclick="copiarURLProducto()">
+                            <i class="fas fa-link"></i>
                         </button>
                     </div>
                 </div>
