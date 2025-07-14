@@ -49,29 +49,7 @@ function mostrarProductos() {
     });
 }
 
-function abrirProductoPopup(id) {
-    productoActual = productos.find(p => p.id === id);
-    const popup = document.getElementById('producto-popup');
-    const popupImagen = document.getElementById('popup-imagen');
-    const popupNombre = document.getElementById('popup-nombre');
-    const popupPrecio = document.getElementById('popup-precio');
-    const popupDescripcion = document.getElementById('popup-descripcion');
-    const popupAgregar = document.getElementById('popup-agregar');
 
-    popupImagen.src = productoActual.imagen;
-    popupImagen.alt = productoActual.nombre;
-    popupNombre.textContent = productoActual.nombre;
-    popupPrecio.textContent = productoActual.precio === 0 ? 'Cotizar' : `${SIMBOLO_MONEDA}${productoActual.precio.toFixed(2)}`;
-    popupDescripcion.innerHTML = productoActual.descripcion.replace(/\n/g, '<br>');
-    popupAgregar.textContent = productoActual.precio === 0 ? 'Solicitar cotización' : 'Agregar al carrito';
-    popupAgregar.onclick = () => agregarAlCarrito(productoActual.id);
-
-    popup.style.display = 'block';
-    setTimeout(() => {
-        popup.classList.add('active');
-        configurarCapturaPopup();
-    }, 10);
-}
 
 function cerrarProductoPopup() {
     const popup = document.getElementById('producto-popup');
@@ -79,6 +57,9 @@ function cerrarProductoPopup() {
     setTimeout(() => {
         popup.style.display = 'none';
     }, 300);
+    
+    // Limpiar parámetro de producto de la URL
+    window.history.pushState({}, document.title, window.location.pathname);
 }
 
 // Funciones para el manejo del carrito
@@ -283,8 +264,20 @@ function irACarrito() {
 
 // Eventos
 document.addEventListener('DOMContentLoaded', () => {
-    cargarProductos();
+    cargarProductos().then(() => {
+        const productoId = obtenerParametroURL('producto');
+        if (productoId) {
+            const id = parseFloat(productoId);
+            const productoExiste = productos.find(p => p.id === id);
+            if (productoExiste) {
+                abrirProductoPopup(id);
+            }
+        }
+    });
+    
     cargarCarritoDesdeLocalStorage();
+
+    
 
     document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
     document.querySelector('#producto-popup .cerrar-popup').addEventListener('click', cerrarProductoPopup);
@@ -361,10 +354,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Función para actualizar la URL con el ID del producto
+function actualizarURL(id) {
+    const nuevaURL = window.location.origin + window.location.pathname + '?producto=' + id;
+    window.history.pushState({ path: nuevaURL }, '', nuevaURL);
+}
 
+// Función para obtener parámetros de la URL
+function obtenerParametroURL(nombre) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(nombre);
+}
 
 // ... (todo el código previo se mantiene igual) ...
 
+// Modificar abrirProductoPopup para actualizar la URL
 function abrirProductoPopup(id) {
     productoActual = productos.find(p => p.id === id);
     const popup = document.getElementById('producto-popup');
@@ -387,6 +391,9 @@ function abrirProductoPopup(id) {
         popup.classList.add('active');
         configurarCapturaPopup();
     }, 10);
+    
+    // Actualizar URL con el ID del producto
+    actualizarURL(id);
 }
 
 // Función para configurar el botón de captura
