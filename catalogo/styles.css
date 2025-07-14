@@ -663,3 +663,26 @@ header h1 {
 #carrito-items::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+/* Añadir esto al final del archivo */
+#popup-compartir-url {
+    background: none;
+    border: none;
+    color: #111b21;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 20px;
+    opacity: 0.8;
+    transition: all 0.3s;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#popup-compartir-url:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+}
