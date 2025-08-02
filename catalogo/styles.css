@@ -5,10 +5,10 @@ body {
     padding: 0;
     background-color: #f0f2f5;
     color: #111b21;
-    min-height: 70vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding-top: 120px;
+    padding-top: 70px;
 }
 
 /* ===== HEADER ===== */
@@ -686,4 +686,5 @@ header h1 {
     opacity: 1;
     background-color: rgba(0, 0, 0, 0.05);
 }
+
 
