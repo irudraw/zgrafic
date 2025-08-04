@@ -36,22 +36,21 @@ async function cargarProductos() {
 
 // Nueva función para mostrar categorías
 function mostrarCategorias() {
-    const contenedor = document.getElementById('categorias');
+    const contenedor = document.querySelector('#categorias-fixed .categorias-container');
     if (!contenedor) return;
     
     contenedor.innerHTML = '';
     
-    // Obtener categoría actual de la URL
     const categoriaActual = obtenerParametroURL('categoria');
     
-    // Crear botón "Todos"
+    // Botón "Todos"
     const btnTodos = document.createElement('button');
     btnTodos.className = `categoria-btn ${!categoriaActual ? 'active' : ''}`;
     btnTodos.textContent = 'Todos';
     btnTodos.onclick = () => filtrarPorCategoria('');
     contenedor.appendChild(btnTodos);
     
-    // Crear botones para cada categoría
+    // Botones de categorías
     categoriasUnicas.forEach(categoria => {
         const btn = document.createElement('button');
         btn.className = `categoria-btn ${categoriaActual === categoria ? 'active' : ''}`;
@@ -623,4 +622,5 @@ document.getElementById('mobile-buscar-producto').addEventListener('keypress', (
         toggleMobileSearch();
     }
 });
+
 
