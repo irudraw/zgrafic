@@ -34,6 +34,12 @@ async function cargarProductos() {
     mostrarCategorias();
 }
 
+function toggleDarkTheme() {
+    document.body.classList.toggle('dark-theme');
+    // Guardar preferencia en localStorage si es necesario
+    localStorage.setItem('darkTheme', document.body.classList.contains('dark-theme'));
+}
+
 // Nueva función para mostrar categorías
 function mostrarCategorias() {
     const contenedor = document.querySelector('#categorias-fixed .categorias-container');
@@ -622,5 +628,6 @@ document.getElementById('mobile-buscar-producto').addEventListener('keypress', (
         toggleMobileSearch();
     }
 });
+
 
 
