@@ -246,15 +246,11 @@ body.dark-theme .categoria-btn.active {
     color: white;
 } */
 
-/* ===== BARRA FIJA INFERIOR - TEMA OSCURO ===== */
+/* ===== BARRA FIJA DE CATEGORÍAS - TEMA OSCURO ===== */
 body.dark-theme #categorias-fixed {
     background-color: #202c33 !important;
     border-top: 1px solid #30383d !important;
     box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3) !important;
-}
-
-body.dark-theme #categorias-fixed .categorias-container {
-    background-color: transparent !important;
 }
 
 body.dark-theme #categorias-fixed .categoria-btn {
