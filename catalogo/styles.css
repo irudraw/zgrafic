@@ -720,4 +720,27 @@ header h1 {
     color: white;
 }
 
+/* ===== BARRA FIJA DE CATEGORÍAS ===== */
+#categorias-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    z-index: 999;
+    padding: 10px 0;
+    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #e0e0e0;
+}
+
+#categorias-fixed .categorias-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    overflow-x: auto; /* Permite scroll horizontal en móviles */
+    white-space: nowrap;
+    display: flex;
+    gap: 8px;
+}
+
 
