@@ -5,6 +5,7 @@
         "precio": 80,
         "imagen": "img/tarjetas.png",
         "descripcion": "Las tarjetas de presentación son elementos de papelería corporativa básicos para cualquier empresa o empresario.\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 350gr\n► Impreso ambas Caras Full color\n► Medida 9 x 5.5 cm\n► Plastificado Mate"
+        "categoria": "Imprenta"
     },
     {
         "id": 0.1,
@@ -12,6 +13,7 @@
         "precio": 90,
         "imagen": "img/volantes.png",
         "descripcion": "Volante publicitario (Flyer) para empresas o eventos\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 150gr\n► Impreso ambas Caras Full color\n► Medida 10 x 16 cm"
+        "categoria": "Imprenta"
     },
     {
         "id": 0.2,
@@ -19,6 +21,7 @@
         "precio": 135,
         "imagen": "img/a6.png",
         "descripcion": "Volantes - Flyer’s publicitarios.\nLa mejor opción para poder posicionar tu negocio o producto.\n\nCARACTERISTICAS:\n► x 1 Millar\n► Material Couche de 150gr\n► Impreso ambas Caras Full color\n► Medida 16 x 20 cm"
+        "categoria": "Imprenta"
     },
     {
         "id": 0.3,
@@ -26,6 +29,7 @@
         "precio": 285,
         "imagen": "img/tripticos.png",
         "descripcion": "CARACTERISTICAS:\n► x 1 Millar\n► Material: Couché 150 gr.\n► Impreso ambas Caras Full color\n► Medida: A4 u Oficio"
+        "categoria": "Imprenta"
     },
     {
         "id": 1,
@@ -33,6 +37,7 @@
         "precio": 140,
         "imagen": "img/parante-arana.png",
         "descripcion": "Con estructura tipo «araña» o «Stand forma de X» en material de aluminio en color plateado y negro, tiene la ventaja de ser desmontable. incluye el estuche para una mejor movilidad.\n\nTamaño 1.00 x 2.00 Mt. y 1.20 x 2.00 Mt.\nMaterial de Aluminio\nColor Plateado\nIncluye bolso"
+        "categoria": "Display"
     },
     {
         "id": 2,
@@ -40,6 +45,7 @@
         "precio": 850,
         "imagen": "img/roll-modelo-17-extra-wide.jpg",
         "descripcion": "Ideal para grandes presentaciones en publicidad. Estructura de aluminio con 2 varillas que permite dar tensión al banner.\nRoll Screen Extra Wide Producto importado resistente y pesada ideal para exhibir presentaciones. También son una gran opción para la marca de una entrada a un evento, es fácil de transportar.\n<p></p>Tamaño: 2.40 x 2.00 Mt.\nMaterial de Aluminio\nColor Plateado\nIncluye bolso\n"
+        "categoria": "Display"
     },
     {
         "id": 3,
@@ -47,6 +53,7 @@
         "precio": 160,
         "imagen": "img/roll-screen-120x200.jpg",
         "descripcion": "Roll en medida de 1.20 x 2.0 mts de alto ideal para presentación de mayor ancho, contiene 2 soportes en la parte posterior que permite dar estabilidad desde la base su armado es muy practico viene con una funda o maletin para protegerlo y llevarlo con mucha facilidad."
+        "categoria": "Display"
     },
     {
         "id": 4,
@@ -54,6 +61,7 @@
         "precio": 90,
         "imagen": "img/roll-screen-60x160.jpg",
         "descripcion": "Sistema Enrollable\nPeso 2 Kgs.\nIncluye impresion grafica,\nIncluye maletín textil"
+        "categoria": "Display"
     },
     {
         "id": 5,
@@ -61,6 +69,7 @@
         "precio": 120,
         "imagen": "img/roll-screen-85x200.jpg",
         "descripcion": "Producto ideal para la presentación de una promocion o imagen empresarial."
+        "categoria": "Display"
     },
     {
         "id": 6,
@@ -68,6 +77,7 @@
         "precio": 140,
         "imagen": "img/roll-screen-100x200.jpg",
         "descripcion": "Display de sistema enrollable de la mejor calidad permite desplegar el banner por medio de un sistema de enrollable y tension, con buena estabilidad para uso interiores no ocupada espacio."
+        "categoria": "Display"
     },
     {
         "id": 7,
@@ -75,7 +85,9 @@
         "precio": 700,
         "imagen": "img/ajustable-banner-stand.jpg",
         "descripcion": "Display Rack banner ajustable ideal para uso interior por su tamaño es excelente para grandes presentaciones. se puede utilizar a cualquier medida el ancho y el alto, muy fácil de armar."
+        "categoria": "Display"
     }
     
     
 ]
+
