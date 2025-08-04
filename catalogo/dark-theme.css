@@ -246,38 +246,23 @@ body.dark-theme .categoria-btn.active {
     color: white;
 }
 
-/* Tema oscuro */
+/* Tema oscuro para la barra fija de categorías */
 body.dark-theme #categorias-fixed {
-    background: #202c33;
+    background-color: #202c33;
     border-top: 1px solid #30383d;
     box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Botones (conservan el mismo estilo que en tu diseño) */
-#categorias-fixed .categoria-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
-    background: #f0f2f5;
-    border: none;
-    font-weight: 500;
-    cursor: pointer;
-    flex-shrink: 0; /* Evita que se encojan los botones */
-    transition: all 0.3s;
+body.dark-theme #categorias-fixed .categoria-btn {
+    background-color: #2a3942;
+    color: #e9edef;
 }
 
-#categorias-fixed .categoria-btn.active {
-    background: #00a884;
+body.dark-theme #categorias-fixed .categoria-btn:hover {
+    background-color: #30383d;
+}
+
+body.dark-theme #categorias-fixed .categoria-btn.active {
+    background-color: #00a884;
     color: white;
 }
-
-/* Scrollbar personalizada para móviles */
-#categorias-fixed .categorias-container::-webkit-scrollbar {
-    height: 4px;
-}
-
-#categorias-fixed .categorias-container::-webkit-scrollbar-thumb {
-    background: #00a884;
-    border-radius: 2px;
-}
-
-
