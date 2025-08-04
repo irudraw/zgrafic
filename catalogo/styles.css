@@ -737,10 +737,35 @@ header h1 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 15px;
-    overflow-x: auto; /* Permite scroll horizontal en móviles */
+    overflow-x: auto;
     white-space: nowrap;
     display: flex;
     gap: 8px;
 }
 
+#categorias-fixed .categoria-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: #f0f2f5;
+    border: none;
+    color: #111b21;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.3s;
+}
 
+#categorias-fixed .categoria-btn.active {
+    background: #00a884;
+    color: white;
+}
+
+/* Scrollbar para móviles */
+#categorias-fixed .categorias-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+#categorias-fixed .categorias-container::-webkit-scrollbar-thumb {
+    background: #00a884;
+    border-radius: 2px;
+}
