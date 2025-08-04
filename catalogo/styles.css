@@ -694,7 +694,7 @@ header h1 {
     flex-wrap: wrap;
     gap: 10px;
     padding: 1rem;
-    background-color: white;
+    background-color: black;
     border-radius: 8px;
     margin: 1rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -769,4 +769,5 @@ header h1 {
     background: #00a884;
     border-radius: 2px;
 }
+
 
