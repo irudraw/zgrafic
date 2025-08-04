@@ -225,3 +225,25 @@ body.dark-theme #mobile-btn-buscar {
 body.dark-theme #mobile-btn-buscar:hover {
     background-color: #008f72;
 }
+
+/* Estilos para tema oscuro */
+body.dark-theme .categorias-container {
+    background-color: #202c33;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .categoria-btn {
+    background-color: #2a3942;
+    color: #e9edef;
+}
+
+body.dark-theme .categoria-btn:hover {
+    background-color: #30383d;
+}
+
+body.dark-theme .categoria-btn.active {
+    background-color: #00a884;
+    color: white;
+}
+
+
