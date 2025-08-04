@@ -227,7 +227,7 @@ body.dark-theme #mobile-btn-buscar:hover {
 }
 
 /* Estilos para tema oscuro */
-/*body.dark-theme .categorias-container {
+body.dark-theme .categorias-container {
     background-color: #202c33;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
@@ -244,7 +244,7 @@ body.dark-theme .categoria-btn:hover {
 body.dark-theme .categoria-btn.active {
     background-color: #00a884;
     color: white;
-} */
+}
 
 /* ===== BARRA FIJA DE CATEGORÍAS - TEMA OSCURO ===== */
 body.dark-theme #categorias-fixed {
