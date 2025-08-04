@@ -10,6 +10,7 @@ let scrollAccumulator = 0;
 const scrollThreshold = 1000;
 let lastPageChangeTime = 0;
 const pageChangeDelay = 200;
+let categoriasUnicas = [];
 
 // Funciones para cargar y mostrar productos
 async function cargarProductos() {
@@ -17,9 +18,70 @@ async function cargarProductos() {
     const url = `productos.json?v=${versionAleatoria}`;
     const respuesta = await fetch(url);
     productos = await respuesta.json();
-    productosFiltrados = [...productos];
+    
+    // Extraer categorías únicas de los productos
+    categoriasUnicas = [...new Set(productos.map(p => p.categoria))].filter(Boolean).sort();
+    
+    // Obtener categoría de la URL
+    const categoriaURL = obtenerParametroURL('categoria');
+    
+    productosFiltrados = categoriaURL 
+        ? productos.filter(p => p.categoria === categoriaURL) 
+        : [...productos];
+    
     actualizarPaginacion();
     mostrarProductos();
+    mostrarCategorias();
+}
+
+// Nueva función para mostrar categorías
+function mostrarCategorias() {
+    const contenedor = document.getElementById('categorias');
+    if (!contenedor) return;
+    
+    contenedor.innerHTML = '';
+    
+    // Obtener categoría actual de la URL
+    const categoriaActual = obtenerParametroURL('categoria');
+    
+    // Crear botón "Todos"
+    const btnTodos = document.createElement('button');
+    btnTodos.className = `categoria-btn ${!categoriaActual ? 'active' : ''}`;
+    btnTodos.textContent = 'Todos';
+    btnTodos.onclick = () => filtrarPorCategoria('');
+    contenedor.appendChild(btnTodos);
+    
+    // Crear botones para cada categoría
+    categoriasUnicas.forEach(categoria => {
+        const btn = document.createElement('button');
+        btn.className = `categoria-btn ${categoriaActual === categoria ? 'active' : ''}`;
+        btn.textContent = categoria;
+        btn.onclick = () => filtrarPorCategoria(categoria);
+        contenedor.appendChild(btn);
+    });
+}
+
+// Nueva función para filtrar por categoría
+function filtrarPorCategoria(categoria) {
+    // Actualizar URL
+    const nuevaURL = categoria 
+        ? `${window.location.pathname}?categoria=${encodeURIComponent(categoria)}` 
+        : window.location.pathname;
+    
+    window.history.pushState({ path: nuevaURL }, '', nuevaURL);
+    
+    // Filtrar productos
+    productosFiltrados = categoria 
+        ? productos.filter(p => p.categoria === categoria) 
+        : [...productos];
+    
+    paginaActual = 1;
+    actualizarPaginacion();
+    mostrarProductos();
+    mostrarCategorias();
+    
+    // Scroll suave al inicio
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 let productoActual = null;
@@ -274,10 +336,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Manejar cambios de estado (para navegación adelante/atrás)
+    window.addEventListener('popstate', () => {
+        const productoId = obtenerParametroURL('producto');
+        if (productoId) {
+            const id = parseFloat(productoId);
+            const productoExiste = productos.find(p => p.id === id);
+            if (productoExiste) {
+                abrirProductoPopup(id);
+            }
+        } else {
+            const categoriaURL = obtenerParametroURL('categoria');
+            productosFiltrados = categoriaURL 
+                ? productos.filter(p => p.categoria === categoriaURL) 
+                : [...productos];
+            paginaActual = 1;
+            actualizarPaginacion();
+            mostrarProductos();
+            mostrarCategorias();
+        }
+    });
     
     cargarCarritoDesdeLocalStorage();
-
-    
 
     document.getElementById('btn-buscar').addEventListener('click', buscarProductos);
     document.querySelector('#producto-popup .cerrar-popup').addEventListener('click', cerrarProductoPopup);
@@ -295,7 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('ver-carrito-completo').addEventListener('click', irACarrito);
 
     // Cerrar el popup si se hace clic fuera de él
-    // Cerrar el popup si se hace clic fuera de él
     window.addEventListener('click', (event) => {
         const popupCarrito = document.getElementById('carrito-popup');
         const popupProducto = document.getElementById('producto-popup');
@@ -305,8 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
             cerrarProductoPopup();
         }
     });
-
-    
 
     // Manejo del scroll para cambio de página
     window.addEventListener('wheel', (event) => {
@@ -545,3 +623,4 @@ document.getElementById('mobile-buscar-producto').addEventListener('keypress', (
         toggleMobileSearch();
     }
 });
+
