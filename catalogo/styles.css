@@ -688,7 +688,7 @@ header h1 {
 }
 
 /* ===== CATEGORÍAS ===== */
-/* .categorias-container {
+ .categorias-container {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -719,7 +719,6 @@ header h1 {
     background-color: #00a884;
     color: white;
 }
-*/
 
 /* ===== BARRA FIJA DE CATEGORÍAS ===== */
 #categorias-fixed {
@@ -770,6 +769,7 @@ header h1 {
     background: #00a884;
     border-radius: 2px;
 }
+
 
 
 
