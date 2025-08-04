@@ -227,7 +227,7 @@ body.dark-theme #mobile-btn-buscar:hover {
 }
 
 /* Estilos para tema oscuro */
-body.dark-theme .categorias-container {
+/*body.dark-theme .categorias-container {
     background-color: #202c33;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
@@ -244,25 +244,33 @@ body.dark-theme .categoria-btn:hover {
 body.dark-theme .categoria-btn.active {
     background-color: #00a884;
     color: white;
+} */
+
+/* ===== BARRA FIJA INFERIOR - TEMA OSCURO ===== */
+body.dark-theme #categorias-fixed {
+    background-color: #202c33 !important;
+    border-top: 1px solid #30383d !important;
+    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Tema oscuro para la barra fija de categorías */
-body.dark-theme #categorias-fixed {
-    background-color: #202c33;
-    border-top: 1px solid #30383d;
-    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3);
+body.dark-theme #categorias-fixed .categorias-container {
+    background-color: transparent !important;
 }
 
 body.dark-theme #categorias-fixed .categoria-btn {
-    background-color: #2a3942;
-    color: #e9edef;
+    background-color: #2a3942 !important;
+    color: #e9edef !important;
 }
 
 body.dark-theme #categorias-fixed .categoria-btn:hover {
-    background-color: #30383d;
+    background-color: #30383d !important;
 }
 
 body.dark-theme #categorias-fixed .categoria-btn.active {
-    background-color: #00a884;
-    color: white;
+    background-color: #00a884 !important;
+    color: white !important;
+}
+
+body.dark-theme #categorias-fixed .categorias-container::-webkit-scrollbar-thumb {
+    background: #00a884 !important;
 }
