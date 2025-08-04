@@ -329,8 +329,14 @@ function irACarrito() {
     window.location.href = 'carrito.html';
 }
 
+function cargarPreferenciaTema() {
+    const darkTheme = localStorage.getItem('darkTheme') === 'true';
+    document.body.classList.toggle('dark-theme', darkTheme);
+}
+
 // Eventos
 document.addEventListener('DOMContentLoaded', () => {
+    cargarPreferenciaTema();
     cargarProductos().then(() => {
         const productoId = obtenerParametroURL('producto');
         if (productoId) {
@@ -628,6 +634,7 @@ document.getElementById('mobile-buscar-producto').addEventListener('keypress', (
         toggleMobileSearch();
     }
 });
+
 
 
 
