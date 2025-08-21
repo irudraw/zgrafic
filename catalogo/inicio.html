@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZGrafic - Inicio</title>
+    <link rel="stylesheet" href="dark-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Estilos específicos para la página de inicio */
+        .hero-section {
+            position: relative;
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(32, 44, 51, 0.9) 0%, rgba(17, 27, 33, 0.95) 100%);
+        }
+        
+        .hero-content {
+            z-index: 2;
+            max-width: 800px;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #e9edef;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #8696a0;
+        }
+        
+        .hero-cta {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background-color: #00a884;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 168, 132, 0.3);
+        }
+        
+        .hero-cta:hover {
+            background-color: #008f72;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 168, 132, 0.4);
+        }
+        
+        .featured-products {
+            padding: 4rem 2rem;
+            background-color: #111b21;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #e9edef;
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: #00a884;
+            margin: 15px auto;
+            border-radius: 2px;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .featured-product {
+            background-color: #202c33;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .featured-product:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .featured-product:hover .product-image {
+            transform: scale(1.05);
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-name {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #e9edef;
+        }
+        
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #00a884;
+            margin-bottom: 1rem;
+        }
+        
+        .product-description {
+            color: #8696a0;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .product-button {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #00a884;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .product-button:hover {
+            background-color: #008f72;
+        }
+        
+        .features-section {
+            padding: 5rem 2rem;
+            background-color: #202c33;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background-color: #2a3942;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: #00a884;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #e9edef;
+        }
+        
+        .feature-description {
+            color: #8696a0;
+            line-height: 1.6;
+        }
+        
+        .newsletter-section {
+            padding: 5rem 2rem;
+            background-color: #111b21;
+            text-align: center;
+        }
+        
+        .newsletter-form {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .newsletter-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 30px;
+            background-color: #2a3942;
+            color: #e9edef;
+            font-size: 1rem;
+        }
+        
+        .newsletter-input::placeholder {
+            color: #8696a0;
+        }
+        
+        .newsletter-button {
+            padding: 1rem 2rem;
+            background-color: #00a884;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .newsletter-button:hover {
+            background-color: #008f72;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+    <header>
+        <div class="header-content">
+            <h1>ZGrafic</h1>
+            
+            <!-- Buscador para PC -->
+            <div id="buscador-pc">
+                <div id="buscador">
+                    <input type="text" id="buscar-producto" placeholder="Buscar productos...">
+                    <button id="btn-buscar"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            
+            <!-- Iconos derecha -->
+            <div class="header-icons">
+                <!-- Icono de búsqueda para móvil -->
+                <div id="mobile-search-icon" onclick="toggleMobileSearch()">
+                    <i class="fas fa-search"></i>
+                </div>
+                <!-- Carrito -->
+                <div id="carrito-contador" onclick="abrirCarritoPopup()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="contador">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Soluciones Gráficas de Alta Calidad</h1>
+                <p class="hero-subtitle">Imprenta, displays publicitarios y material promocional para tu negocio</p>
+                <a href="#productos-destacados" class="hero-cta">Ver Productos</a>
+            </div>
+        </section>
+
+        <!-- Featured Products Section -->
+        <section class="featured-products" id="productos-destacados">
+            <h2 class="section-title">Productos Destacados</h2>
+            <div class="products-grid" id="featured-products-container">
+                <!-- Los productos se cargarán aquí dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <h2 class="section-title">¿Por qué elegirnos?</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3 class="feature-title">Envío Rápido</h3>
+                    <p class="feature-description">Entregamos tus productos en el menor tiempo posible, garantizando calidad y puntualidad.</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3 class="feature-title">Alta Calidad</h3>
+                    <p class="feature-description">Materiales premium y acabados profesionales para que tu marca se vea impecable.</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="feature-title">Soporte Personalizado</h3>
+                    <p class="feature-description">Asesoramiento especializado para encontrar la mejor solución para tu negocio.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="newsletter-section">
+            <h2 class="section-title">Mantente Informado</h2>
+            <p style="color: #8696a0; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Suscríbete a nuestro newsletter para recibir ofertas exclusivas y novedades sobre nuestros productos.
+            </p>
+            <form class="newsletter-form">
+                <input type="email" class="newsletter-input" placeholder="Tu correo electrónico" required>
+                <button type="submit" class="newsletter-button">Suscribirse</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Barra fija de categorías -->
+    <div id="categorias-fixed">
+        <div class="categorias-container"></div>
+    </div>
+
+    <script>
+        // Función para obtener productos aleatorios del JSON
+        async function cargarProductosDestacados() {
+            try {
+                const response = await fetch('productos.json');
+                const todosProductos = await response.json();
+                
+                // Mezclar array aleatoriamente y tomar 6 productos
+                const productosAleatorios = [...todosProductos]
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 6);
+                
+                mostrarProductosDestacados(productosAleatorios);
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+        
+        // Función para mostrar los productos en el grid
+        function mostrarProductosDestacados(productos) {
+            const container = document.getElementById('featured-products-container');
+            container.innerHTML = '';
+            
+            productos.forEach(producto => {
+                const productElement = document.createElement('div');
+                productElement.className = 'featured-product';
+                
+                productElement.innerHTML = `
+                    <img src="${producto.imagen}" alt="${producto.nombre}" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-name">${producto.nombre}</h3>
+                        <p class="product-price">${producto.precio === 0 ? 'Cotizar' : `S/. ${producto.precio.toFixed(2)}`}</p>
+                        <p class="product-description">${producto.descripcion.split('\n')[0]}</p>
+                        <button class="product-button" onclick="location.href='index.html?producto=${producto.id}'">
+                            ${producto.precio === 0 ? 'Solicitar cotización' : 'Ver detalles'}
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(productElement);
+            });
+        }
+        
+        // Cargar productos al iniciar la página
+        document.addEventListener('DOMContentLoaded', cargarProductosDestacados);
+        
+        // Manejar el formulario de newsletter
+        document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input').value;
+            alert(`¡Gracias por suscribirte con el email: ${email}!`);
+            this.reset();
+        });
+    </script>
+</body>
+</html>
