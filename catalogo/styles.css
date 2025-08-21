@@ -728,7 +728,7 @@ header h1 {
     right: 0;
     z-index: 999;
     padding: 10px 0;
-    background: white;
+    background: #202c33
     border-top: 1px solid #e0e0e0;
     box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
 }
@@ -769,6 +769,7 @@ header h1 {
     background: #00a884;
     border-radius: 2px;
 }
+
 
 
 
