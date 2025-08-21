@@ -4,69 +4,222 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZGrafic - Inicio</title>
-    <link rel="stylesheet" href="dark-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        /* Estilos específicos para la página de inicio */
-        .hero-section {
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111b21;
+            color: #e9edef;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: #202c33;
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00a884;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 25px;
+        }
+        
+        .nav-links a {
+            color: #e9edef;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #00a884;
+        }
+        
+        .header-icons {
+            display: flex;
+            align-items: center;
+        }
+        
+        #carrito-contador {
             position: relative;
-            height: 70vh;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        
+        #carrito-contador i {
+            font-size: 1.3rem;
+            color: #e9edef;
+        }
+        
+        #contador {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #00a884;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            padding: 2rem;
+        }
+        
+        /* Slider */
+        .slider-container {
+            margin-top: 70px;
+            position: relative;
+            height: 500px;
             overflow: hidden;
-            background: linear-gradient(135deg, rgba(32, 44, 51, 0.9) 0%, rgba(17, 27, 33, 0.95) 100%);
         }
         
-        .hero-content {
-            z-index: 2;
-            max-width: 800px;
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
         }
         
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
+        .slide.active {
+            opacity: 1;
+        }
+        
+        .slide-content {
+            max-width: 600px;
+            padding: 30px;
+            background-color: rgba(32, 44, 51, 0.85);
+            border-radius: 10px;
+            margin-left: 50px;
+        }
+        
+        .slide-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #00a884;
+        }
+        
+        .slide-description {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
             color: #e9edef;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         
-        .hero-subtitle {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            color: #8696a0;
-        }
-        
-        .hero-cta {
+        .slide-button {
             display: inline-block;
-            padding: 1rem 2.5rem;
+            padding: 12px 25px;
             background-color: #00a884;
             color: white;
             text-decoration: none;
-            border-radius: 30px;
+            border-radius: 5px;
             font-weight: bold;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 168, 132, 0.3);
+            transition: background-color 0.3s;
         }
         
-        .hero-cta:hover {
+        .slide-button:hover {
             background-color: #008f72;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 168, 132, 0.4);
         }
         
+        .slider-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+        }
+        
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .slider-dot.active {
+            background-color: #00a884;
+        }
+        
+        .slider-arrows {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            transform: translateY(-50%);
+        }
+        
+        .arrow {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(32, 44, 51, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+            transition: background-color 0.3s;
+        }
+        
+        .arrow:hover {
+            background-color: #00a884;
+        }
+        
+        /* Productos destacados */
         .featured-products {
-            padding: 4rem 2rem;
+            padding: 60px 0;
             background-color: #111b21;
         }
         
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
+            font-size: 2.2rem;
+            margin-bottom: 40px;
             color: #e9edef;
             position: relative;
         }
@@ -84,70 +237,53 @@
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 25px;
         }
         
-        .featured-product {
+        .product-card {
             background-color: #202c33;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
-        .featured-product:hover {
+        .product-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
         }
         
         .product-image {
             width: 100%;
-            height: 220px;
+            height: 200px;
             object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .featured-product:hover .product-image {
-            transform: scale(1.05);
         }
         
         .product-info {
-            padding: 1.5rem;
+            padding: 20px;
         }
         
         .product-name {
             font-size: 1.2rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 10px;
             color: #e9edef;
         }
         
         .product-price {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #00a884;
-            margin-bottom: 1rem;
-        }
-        
-        .product-description {
-            color: #8696a0;
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            margin-bottom: 15px;
         }
         
         .product-button {
             display: block;
             width: 100%;
-            padding: 0.8rem;
+            padding: 10px;
             background-color: #00a884;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s ease;
@@ -157,205 +293,365 @@
             background-color: #008f72;
         }
         
-        .features-section {
-            padding: 5rem 2rem;
+        /* Sección de contacto */
+        .contact-section {
+            padding: 60px 0;
             background-color: #202c33;
         }
         
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .feature {
-            text-align: center;
-            padding: 2rem 1.5rem;
-            background-color: #2a3942;
-            border-radius: 12px;
-            transition: transform 0.3s ease;
-        }
-        
-        .feature:hover {
-            transform: translateY(-5px);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
-            color: #00a884;
-            margin-bottom: 1.5rem;
-        }
-        
-        .feature-title {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-            color: #e9edef;
-        }
-        
-        .feature-description {
-            color: #8696a0;
-            line-height: 1.6;
-        }
-        
-        .newsletter-section {
-            padding: 5rem 2rem;
-            background-color: #111b21;
-            text-align: center;
-        }
-        
-        .newsletter-form {
-            max-width: 500px;
-            margin: 0 auto;
+        .contact-container {
             display: flex;
-            gap: 1rem;
+            flex-wrap: wrap;
+            gap: 40px;
         }
         
-        .newsletter-input {
+        .contact-info {
             flex: 1;
-            padding: 1rem 1.5rem;
+            min-width: 300px;
+        }
+        
+        .contact-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #00a884;
+        }
+        
+        .contact-details {
+            margin-bottom: 30px;
+        }
+        
+        .contact-details p {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .contact-details i {
+            margin-right: 10px;
+            color: #00a884;
+            width: 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background-color: #2a3942;
+            border-radius: 50%;
+            color: #e9edef;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .social-link:hover {
+            background-color: #00a884;
+            transform: translateY(-3px);
+        }
+        
+        .contact-form {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
             border: none;
-            border-radius: 30px;
+            border-radius: 5px;
             background-color: #2a3942;
             color: #e9edef;
             font-size: 1rem;
         }
         
-        .newsletter-input::placeholder {
-            color: #8696a0;
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
         }
         
-        .newsletter-button {
-            padding: 1rem 2rem;
+        .submit-btn {
+            padding: 12px 25px;
             background-color: #00a884;
             color: white;
             border: none;
-            border-radius: 30px;
+            border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s;
         }
         
-        .newsletter-button:hover {
+        .submit-btn:hover {
             background-color: #008f72;
         }
         
+        /* Footer */
+        footer {
+            background-color: #111b21;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00a884;
+            margin-bottom: 15px;
+        }
+        
+        .footer-links {
+            display: flex;
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links li {
+            margin: 0 15px;
+        }
+        
+        .footer-links a {
+            color: #8696a0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #00a884;
+        }
+        
+        .copyright {
+            color: #8696a0;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
+            .nav-links {
+                display: none;
             }
             
-            .hero-subtitle {
-                font-size: 1.2rem;
+            .slider-container {
+                height: 400px;
+            }
+            
+            .slide-content {
+                margin-left: 20px;
+                margin-right: 20px;
+                padding: 20px;
+            }
+            
+            .slide-title {
+                font-size: 1.8rem;
             }
             
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
-            
-            .newsletter-form {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
-<body class="dark-theme">
+<body>
+    <!-- Header -->
     <header>
-        <div class="header-content">
-            <h1>ZGrafic</h1>
-            
-            <!-- Buscador para PC -->
-            <div id="buscador-pc">
-                <div id="buscador">
-                    <input type="text" id="buscar-producto" placeholder="Buscar productos...">
-                    <button id="btn-buscar"><i class="fas fa-search"></i></button>
-                </div>
-            </div>
-            
-            <!-- Iconos derecha -->
-            <div class="header-icons">
-                <!-- Icono de búsqueda para móvil -->
-                <div id="mobile-search-icon" onclick="toggleMobileSearch()">
-                    <i class="fas fa-search"></i>
-                </div>
-                <!-- Carrito -->
-                <div id="carrito-contador" onclick="abrirCarritoPopup()">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="contador">0</span>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">ZGrafic</div>
+                
+                <ul class="nav-links">
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#">Productos</a></li>
+                    <li><a href="#">Servicios</a></li>
+                    <li><a href="#">Nosotros</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+                
+                <div class="header-icons">
+                    <div id="carrito-contador">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="contador">0</span>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <main>
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="hero-content">
-                <h1 class="hero-title">Soluciones Gráficas de Alta Calidad</h1>
-                <p class="hero-subtitle">Imprenta, displays publicitarios y material promocional para tu negocio</p>
-                <a href="#productos-destacados" class="hero-cta">Ver Productos</a>
+    <!-- Slider -->
+    <div class="slider-container">
+        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1588200908342-23b585c03e26?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');">
+            <div class="slide-content">
+                <h2 class="slide-title">Soluciones Gráficas Profesionales</h2>
+                <p class="slide-description">Imprenta de alta calidad y displays publicitarios para potenciar tu marca.</p>
+                <a href="#" class="slide-button">Ver Productos</a>
             </div>
-        </section>
-
-        <!-- Featured Products Section -->
-        <section class="featured-products" id="productos-destacados">
-            <h2 class="section-title">Productos Destacados</h2>
-            <div class="products-grid" id="featured-products-container">
-                <!-- Los productos se cargarán aquí dinámicamente -->
+        </div>
+        
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');">
+            <div class="slide-content">
+                <h2 class="slide-title">Tarjetas de Presentación</h2>
+                <p class="slide-description">Diseños exclusivos que reflejan la esencia de tu empresa.</p>
+                <a href="#" class="slide-button">Ver Más</a>
             </div>
-        </section>
-
-        <!-- Features Section -->
-        <section class="features-section">
-            <h2 class="section-title">¿Por qué elegirnos?</h2>
-            <div class="features-grid">
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-shipping-fast"></i>
-                    </div>
-                    <h3 class="feature-title">Envío Rápido</h3>
-                    <p class="feature-description">Entregamos tus productos en el menor tiempo posible, garantizando calidad y puntualidad.</p>
-                </div>
-                
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-medal"></i>
-                    </div>
-                    <h3 class="feature-title">Alta Calidad</h3>
-                    <p class="feature-description">Materiales premium y acabados profesionales para que tu marca se vea impecable.</p>
-                </div>
-                
-                <div class="feature">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3 class="feature-title">Soporte Personalizado</h3>
-                    <p class="feature-description">Asesoramiento especializado para encontrar la mejor solución para tu negocio.</p>
-                </div>
+        </div>
+        
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1634942536746-46b9a6de9231?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');">
+            <div class="slide-content">
+                <h2 class="slide-title">Displays Publicitarios</h2>
+                <p class="slide-description">Maximiza tu presencia en ferias y eventos con nuestros displays.</p>
+                <a href="#" class="slide-button">Ver Catálogo</a>
             </div>
-        </section>
-
-        <!-- Newsletter Section -->
-        <section class="newsletter-section">
-            <h2 class="section-title">Mantente Informado</h2>
-            <p style="color: #8696a0; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-                Suscríbete a nuestro newsletter para recibir ofertas exclusivas y novedades sobre nuestros productos.
-            </p>
-            <form class="newsletter-form">
-                <input type="email" class="newsletter-input" placeholder="Tu correo electrónico" required>
-                <button type="submit" class="newsletter-button">Suscribirse</button>
-            </form>
-        </section>
-    </main>
-
-    <!-- Barra fija de categorías -->
-    <div id="categorias-fixed">
-        <div class="categorias-container"></div>
+        </div>
+        
+        <div class="slider-nav">
+            <div class="slider-dot active"></div>
+            <div class="slider-dot"></div>
+            <div class="slider-dot"></div>
+        </div>
+        
+        <div class="slider-arrows">
+            <div class="arrow prev"><i class="fas fa-chevron-left"></i></div>
+            <div class="arrow next"><i class="fas fa-chevron-right"></i></div>
+        </div>
     </div>
 
+    <!-- Productos destacados -->
+    <section class="featured-products">
+        <div class="container">
+            <h2 class="section-title">Productos Destacados</h2>
+            <div class="products-grid" id="featured-products">
+                <!-- Los productos se cargarán aquí con JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de contacto -->
+    <section class="contact-section">
+        <div class="container">
+            <h2 class="section-title">Contáctanos</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Estamos aquí para ayudarte</h3>
+                    <div class="contact-details">
+                        <p><i class="fas fa-map-marker-alt"></i> Av. Principal 123, Lima, Perú</p>
+                        <p><i class="fas fa-phone"></i> +51 987 654 321</p>
+                        <p><i class="fas fa-envelope"></i> info@zgrafic.com</p>
+                        <p><i class="fas fa-clock"></i> Lun - Vie: 9:00 am - 6:00 pm</p>
+                    </div>
+                    
+                    <h3>Síguenos en redes sociales</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Nombre</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Correo Electrónico</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Mensaje</label>
+                            <textarea id="message" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Enviar Mensaje</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">ZGrafic</div>
+                
+                <ul class="footer-links">
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#">Productos</a></li>
+                    <li><a href="#">Servicios</a></li>
+                    <li><a href="#">Nosotros</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+                
+                <p class="copyright">&copy; 2023 ZGrafic. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        // Función para obtener productos aleatorios del JSON
+        // Slider functionality
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        const prevArrow = document.querySelector('.arrow.prev');
+        const nextArrow = document.querySelector('.arrow.next');
+        let currentSlide = 0;
+        
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            currentSlide = (n + slides.length) % slides.length;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+        
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+        
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+        
+        // Event listeners for slider
+        nextArrow.addEventListener('click', nextSlide);
+        prevArrow.addEventListener('click', prevSlide);
+        
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+            });
+        });
+        
+        // Auto slide
+        setInterval(nextSlide, 5000);
+        
+        // Cargar productos aleatorios
         async function cargarProductosDestacados() {
             try {
                 const response = await fetch('productos.json');
@@ -369,24 +665,28 @@
                 mostrarProductosDestacados(productosAleatorios);
             } catch (error) {
                 console.error('Error al cargar productos:', error);
+                // Contenido de respaldo en caso de error
+                document.getElementById('featured-products').innerHTML = `
+                    <p style="grid-column: 1 / -1; text-align: center; color: #8696a0;">
+                        No se pudieron cargar los productos. Por favor, intenta nuevamente.
+                    </p>
+                `;
             }
         }
         
-        // Función para mostrar los productos en el grid
         function mostrarProductosDestacados(productos) {
-            const container = document.getElementById('featured-products-container');
+            const container = document.getElementById('featured-products');
             container.innerHTML = '';
             
             productos.forEach(producto => {
                 const productElement = document.createElement('div');
-                productElement.className = 'featured-product';
+                productElement.className = 'product-card';
                 
                 productElement.innerHTML = `
                     <img src="${producto.imagen}" alt="${producto.nombre}" class="product-image">
                     <div class="product-info">
                         <h3 class="product-name">${producto.nombre}</h3>
                         <p class="product-price">${producto.precio === 0 ? 'Cotizar' : `S/. ${producto.precio.toFixed(2)}`}</p>
-                        <p class="product-description">${producto.descripcion.split('\n')[0]}</p>
                         <button class="product-button" onclick="location.href='index.html?producto=${producto.id}'">
                             ${producto.precio === 0 ? 'Solicitar cotización' : 'Ver detalles'}
                         </button>
@@ -397,16 +697,15 @@
             });
         }
         
-        // Cargar productos al iniciar la página
-        document.addEventListener('DOMContentLoaded', cargarProductosDestacados);
-        
-        // Manejar el formulario de newsletter
-        document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
+        // Manejar el formulario de contacto
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const email = this.querySelector('input').value;
-            alert(`¡Gracias por suscribirte con el email: ${email}!`);
+            alert('¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.');
             this.reset();
         });
+        
+        // Cargar productos al iniciar la página
+        document.addEventListener('DOMContentLoaded', cargarProductosDestacados);
     </script>
 </body>
 </html>
