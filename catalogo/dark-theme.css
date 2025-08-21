@@ -248,7 +248,7 @@ body.dark-theme #categoria-btn.active {
 
 /* ===== BARRA FIJA DE CATEGORÍAS - TEMA OSCURO ===== */
 body.dark-theme #categorias-fixed {
-    background-color: #202c33 !important;
+    background: #202c33 !important;
     border-top: 1px solid #30383d !important;
     box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3) !important;
 }
