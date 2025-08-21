@@ -50,37 +50,6 @@
             color: #00a884;
         }
         
-        .header-icons {
-            display: flex;
-            align-items: center;
-        }
-        
-        #carrito-contador {
-            position: relative;
-            margin-left: 20px;
-            cursor: pointer;
-        }
-        
-        #carrito-contador i {
-            font-size: 1.3rem;
-            color: #e9edef;
-        }
-        
-        #contador {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: #00a884;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
         /* Slider */
         .slider-container {
             margin-top: 70px;
@@ -283,11 +252,13 @@
             display: flex;
             flex-wrap: wrap;
             gap: 40px;
+            justify-content: center;
         }
         
         .contact-info {
             flex: 1;
             min-width: 300px;
+            text-align: center;
         }
         
         .contact-info h3 {
@@ -304,6 +275,7 @@
             margin-bottom: 15px;
             display: flex;
             align-items: center;
+            justify-content: center;
         }
         
         .contact-details i {
@@ -315,6 +287,7 @@
         .social-links {
             display: flex;
             gap: 15px;
+            justify-content: center;
         }
         
         .social-link {
@@ -334,6 +307,20 @@
         .social-link:hover {
             background-color: #00a884;
             transform: translateY(-3px);
+        }
+        
+        .map-container {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .map-container iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
         }
         
         /* Footer */
@@ -380,6 +367,10 @@
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
+            
+            .contact-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -389,13 +380,6 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo" id="logo-text">ZGrafic</div>
-                
-                <div class="header-icons">
-                    <div id="carrito-contador">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span id="contador">0</span>
-                    </div>
-                </div>
             </div>
         </div>
     </header>
@@ -430,6 +414,10 @@
                     <div class="social-links" id="social-links">
                         <!-- Los enlaces sociales se cargarán con JavaScript -->
                     </div>
+                </div>
+                
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15606.76499126087!2d-77.0362603698249!3d-12.06758237231925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c5f619ee3ec7%3A0x14206cb9c452c7a4!2sLima%2C%20Peru!5e0!3m2!1sen!2sus!4v1664565153829!5m2!1sen!2sus" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
         </div>
