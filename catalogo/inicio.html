@@ -22,6 +22,7 @@
             background-color: #111b21;
             color: #e9edef;
             line-height: 1.6;
+            overflow-x: hidden;
         }
         
         .container {
@@ -94,6 +95,7 @@
             padding: 0;
             margin-top: 70px;
             min-height: calc(100vh - 70px);
+            position: relative;
         }
         
         .slider-container {
@@ -167,6 +169,7 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
+            z-index: 10;
         }
         
         .slider-dot {
@@ -191,6 +194,7 @@
             justify-content: space-between;
             padding: 0 20px;
             transform: translateY(-50%);
+            z-index: 10;
         }
         
         .arrow {
@@ -612,6 +616,10 @@
         // Variables globales para almacenar datos
         let textosPersonalizados = {};
         let productosData = [];
+        let isScrolling = false;
+        let lastScrollTime = 0;
+        let currentSlide = 0;
+        let slideInterval;
 
         // Función para cargar JSON externos
         async function cargarDatosExternos() {
@@ -665,13 +673,13 @@
             sliderHTML += `
                 <div class="slider-nav">
                     ${textosPersonalizados.slider.map((_, index) => 
-                        `<div class="slider-dot ${index === 0 ? 'active' : ''}"></div>`
+                        `<div class="slider-dot ${index === 0 ? 'active' : ''}" data-slide="${index}"></div>`
                     ).join('')}
                 </div>
                 
                 <div class="slider-arrows">
-                    <div class="arrow prev"><i class="fas fa-chevron-left"></i></div>
-                    <div class="arrow next"><i class="fas fa-chevron-right"></i></div>
+                    <div class="arrow prev" id="prev-slide"><i class="fas fa-chevron-left"></i></div>
+                    <div class="arrow next" id="next-slide"><i class="fas fa-chevron-right"></i></div>
                 </div>
             `;
             
@@ -711,16 +719,24 @@
         function inicializarSlider() {
             const slides = document.querySelectorAll('.slide');
             const dots = document.querySelectorAll('.slider-dot');
-            const prevArrow = document.querySelector('.arrow.prev');
-            const nextArrow = document.querySelector('.arrow.next');
-            let currentSlide = 0;
+            const prevArrow = document.getElementById('prev-slide');
+            const nextArrow = document.getElementById('next-slide');
             
             function showSlide(n) {
+                // Asegurarse de que el índice esté dentro de los límites
+                if (n >= slides.length) {
+                    currentSlide = 0;
+                } else if (n < 0) {
+                    currentSlide = slides.length - 1;
+                } else {
+                    currentSlide = n;
+                }
+                
+                // Ocultar todas las slides y quitar clase active de los dots
                 slides.forEach(slide => slide.classList.remove('active'));
                 dots.forEach(dot => dot.classList.remove('active'));
                 
-                currentSlide = (n + slides.length) % slides.length;
-                
+                // Mostrar la slide actual y activar su dot correspondiente
                 slides[currentSlide].classList.add('active');
                 dots[currentSlide].classList.add('active');
             }
@@ -743,8 +759,22 @@
                 });
             });
             
-            // Auto slide
-            setInterval(nextSlide, 5000);
+            // Auto slide - reiniciar el intervalo cuando se interactúa manualmente
+            function startSlideInterval() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 5000);
+            }
+            
+            // Pausar el auto slide cuando el mouse está sobre el slider
+            const slider = document.querySelector('.slider-container');
+            slider.addEventListener('mouseenter', () => {
+                clearInterval(slideInterval);
+            });
+            
+            slider.addEventListener('mouseleave', startSlideInterval);
+            
+            // Iniciar el auto slide
+            startSlideInterval();
         }
         
         // Cargar productos aleatorios
@@ -793,7 +823,96 @@
                 });
             });
             
-            // Navegación por scroll
+            // Navegación por scroll con rueda del mouse
+            let scrollTimeout;
+            window.addEventListener('wheel', function(e) {
+                // Solo procesar si no hay scroll en progreso
+                if (isScrolling) return;
+                
+                // Determinar dirección del scroll
+                const delta = e.deltaY || e.detail || (-e.wheelDelta);
+                
+                // Prevenir comportamiento por defecto
+                e.preventDefault();
+                
+                // Obtener secciones
+                const sections = document.querySelectorAll('.section');
+                let currentSectionIndex = 0;
+                
+                // Encontrar la sección actual
+                for (let i = 0; i < sections.length; i++) {
+                    const rect = sections[i].getBoundingClientRect();
+                    if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+                        currentSectionIndex = i;
+                        break;
+                    }
+                }
+                
+                // Determinar la siguiente sección basándose en la dirección del scroll
+                let nextSectionIndex;
+                if (delta > 0) {
+                    // Scroll hacia abajo
+                    nextSectionIndex = Math.min(currentSectionIndex + 1, sections.length - 1);
+                } else {
+                    // Scroll hacia arriba
+                    nextSectionIndex = Math.max(currentSectionIndex - 1, 0);
+                }
+                
+                // Si ya estamos en la sección correcta, no hacer nada
+                if (nextSectionIndex === currentSectionIndex) return;
+                
+                // Navegar a la siguiente sección
+                const nextSection = sections[nextSectionIndex];
+                scrollToSection(nextSection.id);
+            }, { passive: false });
+            
+            // Navegación por scroll táctil
+            let touchStartY = 0;
+            document.addEventListener('touchstart', function(e) {
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            document.addEventListener('touchend', function(e) {
+                if (isScrolling) return;
+                
+                const touchEndY = e.changedTouches[0].clientY;
+                const diffY = touchEndY - touchStartY;
+                
+                // Solo considerar como deslizamiento si el movimiento es significativo
+                if (Math.abs(diffY) < 50) return;
+                
+                // Obtener secciones
+                const sections = document.querySelectorAll('.section');
+                let currentSectionIndex = 0;
+                
+                // Encontrar la sección actual
+                for (let i = 0; i < sections.length; i++) {
+                    const rect = sections[i].getBoundingClientRect();
+                    if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+                        currentSectionIndex = i;
+                        break;
+                    }
+                }
+                
+                // Determinar la siguiente sección basándose en la dirección del deslizamiento
+                let nextSectionIndex;
+                if (diffY < 0) {
+                    // Deslizamiento hacia arriba (navegar a sección anterior)
+                    nextSectionIndex = Math.max(currentSectionIndex - 1, 0);
+                } else {
+                    // Deslizamiento hacia abajo (navegar a sección siguiente)
+                    nextSectionIndex = Math.min(currentSectionIndex + 1, sections.length - 1);
+                }
+                
+                // Si ya estamos en la sección correcta, no hacer nada
+                if (nextSectionIndex === currentSectionIndex) return;
+                
+                // Navegar a la siguiente sección
+                const nextSection = sections[nextSectionIndex];
+                scrollToSection(nextSection.id);
+            }, { passive: true });
+            
+            // Detectar sección activa durante el scroll
             window.addEventListener('scroll', function() {
                 // Ocultar/mostrar header
                 let lastScrollTop = 0;
@@ -808,21 +927,31 @@
                 
                 lastScrollTop = scrollTop;
                 
-                // Detectar sección activa
-                detectarSeccionActiva();
-                
-                // Activar animaciones al hacer scroll
-                activarAnimacionesScroll();
+                // Usar un timeout para limitar la frecuencia de detección
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {
+                    detectarSeccionActiva();
+                    activarAnimacionesScroll();
+                }, 100);
             }, false);
         }
         
         function scrollToSection(sectionId) {
+            isScrolling = true;
             const section = document.getElementById(sectionId);
             if (section) {
                 window.scrollTo({
                     top: section.offsetTop,
                     behavior: 'smooth'
                 });
+                
+                // Actualizar sección activa
+                setActiveSection(sectionId);
+                
+                // Restablecer isScrolling después de que termine el scroll
+                setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
             }
         }
         
@@ -873,9 +1002,6 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                    } else {
-                        // Opcional: remover la clase visible si quieres que se animen cada vez
-                        // entry.target.classList.remove('visible');
                     }
                 });
             }, observerOptions);
