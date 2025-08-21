@@ -50,26 +50,6 @@
             color: #00a884;
         }
         
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-        
-        .nav-links li {
-            margin-left: 25px;
-        }
-        
-        .nav-links a {
-            color: #e9edef;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: #00a884;
-        }
-        
         .header-icons {
             display: flex;
             align-items: center;
@@ -356,52 +336,6 @@
             transform: translateY(-3px);
         }
         
-        .contact-form {
-            flex: 1;
-            min-width: 300px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: none;
-            border-radius: 5px;
-            background-color: #2a3942;
-            color: #e9edef;
-            font-size: 1rem;
-        }
-        
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .submit-btn {
-            padding: 12px 25px;
-            background-color: #00a884;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .submit-btn:hover {
-            background-color: #008f72;
-        }
-        
         /* Footer */
         footer {
             background-color: #111b21;
@@ -422,26 +356,6 @@
             margin-bottom: 15px;
         }
         
-        .footer-links {
-            display: flex;
-            list-style: none;
-            margin-bottom: 20px;
-        }
-        
-        .footer-links li {
-            margin: 0 15px;
-        }
-        
-        .footer-links a {
-            color: #8696a0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #00a884;
-        }
-        
         .copyright {
             color: #8696a0;
             font-size: 0.9rem;
@@ -449,10 +363,6 @@
         
         /* Responsive */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
             .slider-container {
                 height: 400px;
             }
@@ -478,15 +388,7 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <div class="logo">ZGrafic</div>
-                
-                <ul class="nav-links">
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="#">Productos</a></li>
-                    <li><a href="#">Servicios</a></li>
-                    <li><a href="#">Nosotros</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
+                <div class="logo" id="logo-text">ZGrafic</div>
                 
                 <div class="header-icons">
                     <div id="carrito-contador">
@@ -499,47 +401,14 @@
     </header>
 
     <!-- Slider -->
-    <div class="slider-container">
-        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1588200908342-23b585c03e26?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');">
-            <div class="slide-content">
-                <h2 class="slide-title">Soluciones Gráficas Profesionales</h2>
-                <p class="slide-description">Imprenta de alta calidad y displays publicitarios para potenciar tu marca.</p>
-                <a href="#" class="slide-button">Ver Productos</a>
-            </div>
-        </div>
-        
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');">
-            <div class="slide-content">
-                <h2 class="slide-title">Tarjetas de Presentación</h2>
-                <p class="slide-description">Diseños exclusivos que reflejan la esencia de tu empresa.</p>
-                <a href="#" class="slide-button">Ver Más</a>
-            </div>
-        </div>
-        
-        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1634942536746-46b9a6de9231?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');">
-            <div class="slide-content">
-                <h2 class="slide-title">Displays Publicitarios</h2>
-                <p class="slide-description">Maximiza tu presencia en ferias y eventos con nuestros displays.</p>
-                <a href="#" class="slide-button">Ver Catálogo</a>
-            </div>
-        </div>
-        
-        <div class="slider-nav">
-            <div class="slider-dot active"></div>
-            <div class="slider-dot"></div>
-            <div class="slider-dot"></div>
-        </div>
-        
-        <div class="slider-arrows">
-            <div class="arrow prev"><i class="fas fa-chevron-left"></i></div>
-            <div class="arrow next"><i class="fas fa-chevron-right"></i></div>
-        </div>
+    <div class="slider-container" id="slider-container">
+        <!-- El slider se cargará dinámicamente con JavaScript -->
     </div>
 
     <!-- Productos destacados -->
     <section class="featured-products">
         <div class="container">
-            <h2 class="section-title">Productos Destacados</h2>
+            <h2 class="section-title" id="featured-title">Productos Destacados</h2>
             <div class="products-grid" id="featured-products">
                 <!-- Los productos se cargarán aquí con JavaScript -->
             </div>
@@ -549,45 +418,18 @@
     <!-- Sección de contacto -->
     <section class="contact-section">
         <div class="container">
-            <h2 class="section-title">Contáctanos</h2>
+            <h2 class="section-title" id="contact-title">Contáctanos</h2>
             <div class="contact-container">
                 <div class="contact-info">
-                    <h3>Estamos aquí para ayudarte</h3>
-                    <div class="contact-details">
-                        <p><i class="fas fa-map-marker-alt"></i> Av. Principal 123, Lima, Perú</p>
-                        <p><i class="fas fa-phone"></i> +51 987 654 321</p>
-                        <p><i class="fas fa-envelope"></i> info@zgrafic.com</p>
-                        <p><i class="fas fa-clock"></i> Lun - Vie: 9:00 am - 6:00 pm</p>
+                    <h3 id="contact-subtitle">Estamos aquí para ayudarte</h3>
+                    <div class="contact-details" id="contact-details">
+                        <!-- Los datos de contacto se cargarán con JavaScript -->
                     </div>
                     
-                    <h3>Síguenos en redes sociales</h3>
-                    <div class="social-links">
-                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <h3 id="social-title">Síguenos en redes sociales</h3>
+                    <div class="social-links" id="social-links">
+                        <!-- Los enlaces sociales se cargarán con JavaScript -->
                     </div>
-                </div>
-                
-                <div class="contact-form">
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label for="name">Nombre</label>
-                            <input type="text" id="name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="email">Correo Electrónico</label>
-                            <input type="email" id="email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="message">Mensaje</label>
-                            <textarea id="message" required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="submit-btn">Enviar Mensaje</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -597,59 +439,183 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">ZGrafic</div>
-                
-                <ul class="footer-links">
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="#">Productos</a></li>
-                    <li><a href="#">Servicios</a></li>
-                    <li><a href="#">Nosotros</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-                
-                <p class="copyright">&copy; 2023 ZGrafic. Todos los derechos reservados.</p>
+                <div class="footer-logo" id="footer-logo">ZGrafic</div>
+                <p class="copyright" id="copyright-text">&copy; 2023 ZGrafic. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Slider functionality
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.slider-dot');
-        const prevArrow = document.querySelector('.arrow.prev');
-        const nextArrow = document.querySelector('.arrow.next');
-        let currentSlide = 0;
-        
-        function showSlide(n) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            dots.forEach(dot => dot.classList.remove('active'));
+        // JSON con todos los textos personalizables
+        const textosPersonalizados = {
+            "empresa": {
+                "nombre": "ZGrafic",
+                "slogan": "Soluciones Gráficas Profesionales"
+            },
+            "slider": [
+                {
+                    "titulo": "Soluciones Gráficas Profesionales",
+                    "descripcion": "Imprenta de alta calidad y displays publicitarios para potenciar tu marca.",
+                    "textoBoton": "Ver Productos",
+                    "imagenFondo": "https://images.unsplash.com/photo-1588200908342-23b585c03e26?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+                },
+                {
+                    "titulo": "Tarjetas de Presentación",
+                    "descripcion": "Diseños exclusivos que reflejan la esencia de tu empresa.",
+                    "textoBoton": "Ver Más",
+                    "imagenFondo": "https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+                },
+                {
+                    "titulo": "Displays Publicitarios",
+                    "descripcion": "Maximiza tu presencia en ferias y eventos con nuestros displays.",
+                    "textoBoton": "Ver Catálogo",
+                    "imagenFondo": "https://images.unsplash.com/photo-1634942536746-46b9a6de9231?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+                }
+            ],
+            "secciones": {
+                "productosDestacados": "Productos Destacados",
+                "contacto": "Contáctanos",
+                "contactoSubtitulo": "Estamos aquí para ayudarte",
+                "redesSociales": "Síguenos en redes sociales"
+            },
+            "contacto": {
+                "direccion": "Av. Principal 123, Lima, Perú",
+                "telefono": "+51 987 654 321",
+                "email": "info@zgrafic.com",
+                "horario": "Lun - Vie: 9:00 am - 6:00 pm"
+            },
+            "redesSociales": [
+                {
+                    "icono": "fab fa-facebook-f",
+                    "enlace": "#",
+                    "nombre": "Facebook"
+                },
+                {
+                    "icono": "fab fa-instagram",
+                    "enlace": "#",
+                    "nombre": "Instagram"
+                },
+                {
+                    "icono": "fab fa-whatsapp",
+                    "enlace": "#",
+                    "nombre": "WhatsApp"
+                },
+                {
+                    "icono": "fab fa-linkedin-in",
+                    "enlace": "#",
+                    "nombre": "LinkedIn"
+                }
+            ],
+            "footer": {
+                "textoCopyright": "© 2023 ZGrafic. Todos los derechos reservados."
+            }
+        };
+
+        // Función para cargar todos los textos desde el JSON
+        function cargarTextosPersonalizados() {
+            // Cargar textos del header
+            document.getElementById('logo-text').textContent = textosPersonalizados.empresa.nombre;
             
-            currentSlide = (n + slides.length) % slides.length;
+            // Cargar slider
+            const sliderContainer = document.getElementById('slider-container');
+            let sliderHTML = '';
             
-            slides[currentSlide].classList.add('active');
-            dots[currentSlide].classList.add('active');
-        }
-        
-        function nextSlide() {
-            showSlide(currentSlide + 1);
-        }
-        
-        function prevSlide() {
-            showSlide(currentSlide - 1);
-        }
-        
-        // Event listeners for slider
-        nextArrow.addEventListener('click', nextSlide);
-        prevArrow.addEventListener('click', prevSlide);
-        
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                showSlide(index);
+            textosPersonalizados.slider.forEach((slide, index) => {
+                sliderHTML += `
+                    <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: url('${slide.imagenFondo}');">
+                        <div class="slide-content">
+                            <h2 class="slide-title">${slide.titulo}</h2>
+                            <p class="slide-description">${slide.descripcion}</p>
+                            <a href="#" class="slide-button">${slide.textoBoton}</a>
+                        </div>
+                    </div>
+                `;
             });
-        });
-        
-        // Auto slide
-        setInterval(nextSlide, 5000);
+            
+            // Añadir navegación del slider
+            sliderHTML += `
+                <div class="slider-nav">
+                    ${textosPersonalizados.slider.map((_, index) => 
+                        `<div class="slider-dot ${index === 0 ? 'active' : ''}"></div>`
+                    ).join('')}
+                </div>
+                
+                <div class="slider-arrows">
+                    <div class="arrow prev"><i class="fas fa-chevron-left"></i></div>
+                    <div class="arrow next"><i class="fas fa-chevron-right"></i></div>
+                </div>
+            `;
+            
+            sliderContainer.innerHTML = sliderHTML;
+            
+            // Cargar textos de secciones
+            document.getElementById('featured-title').textContent = textosPersonalizados.secciones.productosDestacados;
+            document.getElementById('contact-title').textContent = textosPersonalizados.secciones.contacto;
+            document.getElementById('contact-subtitle').textContent = textosPersonalizados.secciones.contactoSubtitulo;
+            document.getElementById('social-title').textContent = textosPersonalizados.secciones.redesSociales;
+            
+            // Cargar información de contacto
+            const contactDetails = document.getElementById('contact-details');
+            contactDetails.innerHTML = `
+                <p><i class="fas fa-map-marker-alt"></i> ${textosPersonalizados.contacto.direccion}</p>
+                <p><i class="fas fa-phone"></i> ${textosPersonalizados.contacto.telefono}</p>
+                <p><i class="fas fa-envelope"></i> ${textosPersonalizados.contacto.email}</p>
+                <p><i class="fas fa-clock"></i> ${textosPersonalizados.contacto.horario}</p>
+            `;
+            
+            // Cargar redes sociales
+            const socialLinks = document.getElementById('social-links');
+            socialLinks.innerHTML = textosPersonalizados.redesSociales.map(red => 
+                `<a href="${red.enlace}" class="social-link" title="${red.nombre}"><i class="${red.icono}"></i></a>`
+            ).join('');
+            
+            // Cargar footer
+            document.getElementById('footer-logo').textContent = textosPersonalizados.empresa.nombre;
+            document.getElementById('copyright-text').textContent = textosPersonalizados.footer.textoCopyright;
+            
+            // Inicializar funcionalidad del slider después de cargar los textos
+            inicializarSlider();
+        }
+
+        // Slider functionality
+        function inicializarSlider() {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.slider-dot');
+            const prevArrow = document.querySelector('.arrow.prev');
+            const nextArrow = document.querySelector('.arrow.next');
+            let currentSlide = 0;
+            
+            function showSlide(n) {
+                slides.forEach(slide => slide.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
+                
+                currentSlide = (n + slides.length) % slides.length;
+                
+                slides[currentSlide].classList.add('active');
+                dots[currentSlide].classList.add('active');
+            }
+            
+            function nextSlide() {
+                showSlide(currentSlide + 1);
+            }
+            
+            function prevSlide() {
+                showSlide(currentSlide - 1);
+            }
+            
+            // Event listeners for slider
+            if (nextArrow) nextArrow.addEventListener('click', nextSlide);
+            if (prevArrow) prevArrow.addEventListener('click', prevSlide);
+            
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    showSlide(index);
+                });
+            });
+            
+            // Auto slide
+            setInterval(nextSlide, 5000);
+        }
         
         // Cargar productos aleatorios
         async function cargarProductosDestacados() {
@@ -697,15 +663,11 @@
             });
         }
         
-        // Manejar el formulario de contacto
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.');
-            this.reset();
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarTextosPersonalizados();
+            cargarProductosDestacados();
         });
-        
-        // Cargar productos al iniciar la página
-        document.addEventListener('DOMContentLoaded', cargarProductosDestacados);
     </script>
 </body>
 </html>
