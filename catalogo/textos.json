@@ -1,0 +1,63 @@
+{
+    "empresa": {
+        "nombre": "ZGrafic",
+        "slogan": "Soluciones Gráficas Profesionales"
+    },
+    "slider": [
+        {
+            "titulo": "Soluciones Gráficas Profesionales",
+            "descripcion": "Imprenta de alta calidad y displays publicitarios para potenciar tu marca.",
+            "textoBoton": "Ver Productos",
+            "imagenFondo": "https://images.unsplash.com/photo-1588200908342-23b585c03e26?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+        },
+        {
+            "titulo": "Tarjetas de Presentación",
+            "descripcion": "Diseños exclusivos que reflejan la esencia de tu empresa.",
+            "textoBoton": "Ver Más",
+            "imagenFondo": "https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+        },
+        {
+            "titulo": "Displays Publicitarios",
+            "descripcion": "Maximiza tu presencia en ferias y eventos con nuestros displays.",
+            "textoBoton": "Ver Catálogo",
+            "imagenFondo": "https://images.unsplash.com/photo-1634942536746-46b9a6de9231?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+        }
+    ],
+    "secciones": {
+        "productosDestacados": "Productos Destacados",
+        "contacto": "Contáctanos",
+        "contactoSubtitulo": "Estamos aquí para ayudarte",
+        "redesSociales": "Síguenos en redes sociales"
+    },
+    "contacto": {
+        "direccion": "Av. Principal 123, Lima, Perú",
+        "telefono": "+51 987 654 321",
+        "email": "info@zgrafic.com",
+        "horario": "Lun - Vie: 9:00 am - 6:00 pm"
+    },
+    "redesSociales": [
+        {
+            "icono": "fab fa-facebook-f",
+            "enlace": "#",
+            "nombre": "Facebook"
+        },
+        {
+            "icono": "fab fa-instagram",
+            "enlace": "#",
+            "nombre": "Instagram"
+        },
+        {
+            "icono": "fab fa-whatsapp",
+            "enlace": "#",
+            "nombre": "WhatsApp"
+        },
+        {
+            "icono": "fab fa-linkedin-in",
+            "enlace": "#",
+            "nombre": "LinkedIn"
+        }
+    ],
+    "footer": {
+        "textoCopyright": "© 2023 ZGrafic. Todos los derechos reservados."
+    }
+}
