@@ -3,109 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZGrafic - Inicio</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>ZGrafic - Soluciones Gráficas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos generales */
+        :root {
+            --color-primary: #00a884;
+            --color-primary-dark: #008f72;
+            --color-dark: #111b21;
+            --color-dark-light: #202c33;
+            --color-dark-lighter: #2a3942;
+            --color-text: #e9edef;
+            --color-text-light: #8696a0;
+            --transition: all 0.3s ease;
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
         html {
             scroll-behavior: smooth;
         }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #111b21;
-            color: #e9edef;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--color-dark);
+            color: var(--color-text);
             line-height: 1.6;
             overflow-x: hidden;
         }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .section {
-            padding: 80px 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
         /* Header */
         header {
-            background-color: #202c33;
-            padding: 15px 0;
             position: fixed;
-            width: 100%;
             top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--color-dark-light);
+            padding: 1rem 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            transition: transform 0.4s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: var(--transition);
         }
-        
         header.hidden {
             transform: translateY(-100%);
         }
-        
-        .header-content {
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
         .logo {
             font-size: 1.8rem;
-            font-weight: bold;
-            color: #00a884;
-            cursor: pointer;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
         }
-        
+        .logo i {
+            margin-right: 0.5rem;
+        }
         .nav-menu {
             display: flex;
             list-style: none;
         }
-        
         .nav-item {
-            margin-left: 25px;
+            margin-left: 2rem;
         }
-        
         .nav-link {
-            color: #e9edef;
+            color: var(--color-text);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--color-primary);
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--color-primary);
+            transition: var(--transition);
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--color-text);
+            font-size: 1.5rem;
             cursor: pointer;
         }
-        
-        .nav-link:hover, .nav-link.active {
-            color: #00a884;
+        /* Secciones */
+        section {
+            padding: 6rem 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
         }
-        
-        /* Sección Inicio con Slider */
-        #inicio {
-            padding: 0;
-            margin-top: 70px;
-            min-height: calc(100vh - 70px);
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--color-primary);
             position: relative;
+            padding-bottom: 1rem;
         }
-        
-        .slider-container {
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--color-primary);
+            border-radius: 2px;
+        }
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--color-text-light);
+            margin-bottom: 4rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        /* Hero Slider */
+        #hero {
+            padding: 0;
             position: relative;
             height: 100vh;
+            margin-top: 0;
+        }
+        .hero-slider {
+            height: 100%;
+            position: relative;
             overflow: hidden;
         }
-        
         .slide {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             opacity: 0;
@@ -114,92 +171,101 @@
             background-position: center;
             display: flex;
             align-items: center;
+            justify-content: flex-start;
         }
-        
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(17, 27, 33, 0.9) 0%, rgba(17, 27, 33, 0.7) 100%);
+        }
         .slide.active {
             opacity: 1;
         }
-        
         .slide-content {
-            max-width: 600px;
-            padding: 30px;
-            background-color: rgba(32, 44, 51, 0.85);
-            border-radius: 10px;
-            margin-left: 50px;
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+            padding: 0 2rem;
             transform: translateY(50px);
             opacity: 0;
             transition: all 1s ease 0.5s;
         }
-        
         .slide.active .slide-content {
             transform: translateY(0);
             opacity: 1;
         }
-        
         .slide-title {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #00a884;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--color-text);
+            line-height: 1.2;
         }
-        
         .slide-description {
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-            color: #e9edef;
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            color: var(--color-text-light);
         }
-        
-        .slide-button {
+        .btn {
             display: inline-block;
-            padding: 12px 25px;
-            background-color: #00a884;
+            padding: 1rem 2.5rem;
+            background-color: var(--color-primary);
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 168, 132, 0.3);
         }
-        
-        .slide-button:hover {
-            background-color: #008f72;
+        .btn:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 168, 132, 0.4);
         }
-        
+        .btn i {
+            margin-left: 0.5rem;
+        }
         .slider-nav {
             position: absolute;
-            bottom: 20px;
+            bottom: 2rem;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             z-index: 10;
         }
-        
         .slider-dot {
             width: 12px;
             height: 12px;
             background-color: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
-            margin: 0 5px;
+            margin: 0 0.5rem;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
         }
-        
         .slider-dot.active {
-            background-color: #00a884;
+            background-color: var(--color-primary);
+            transform: scale(1.2);
         }
-        
         .slider-arrows {
             position: absolute;
             top: 50%;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 2rem;
             transform: translateY(-50%);
             z-index: 10;
         }
-        
         .arrow {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             background-color: rgba(32, 44, 51, 0.7);
             border-radius: 50%;
             display: flex;
@@ -207,539 +273,509 @@
             justify-content: center;
             cursor: pointer;
             color: white;
-            font-size: 1.2rem;
-            transition: background-color 0.3s;
+            font-size: 1.5rem;
+            transition: var(--transition);
         }
-        
         .arrow:hover {
-            background-color: #00a884;
+            background-color: var(--color-primary);
         }
-        
-        /* Sección Productos */
+        /* Productos */
         #productos {
-            background-color: #111b21;
+            background-color: var(--color-dark);
         }
-        
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #e9edef;
-            position: relative;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
-        }
-        
-        .section-title.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            margin-bottom: 50px;
-            color: #8696a0;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease 0.2s;
-        }
-        
-        .section-subtitle.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .section-title:after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 4px;
-            background: #00a884;
-            margin: 15px auto;
-            border-radius: 2px;
-        }
-        
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
         }
-        
         .product-card {
-            background-color: #202c33;
+            background-color: var(--color-dark-light);
             border-radius: 10px;
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: var(--transition);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             opacity: 0;
             transform: translateY(50px);
-            transition: all 0.6s ease;
         }
-        
         .product-card.visible {
             opacity: 1;
             transform: translateY(0);
         }
-        
         .product-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
         }
-        
         .product-image {
             width: 100%;
-            height: 200px;
+            height: 220px;
             object-fit: cover;
             transition: transform 0.5s ease;
         }
-        
         .product-card:hover .product-image {
             transform: scale(1.05);
         }
-        
         .product-info {
-            padding: 20px;
+            padding: 1.5rem;
         }
-        
         .product-name {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #e9edef;
-        }
-        
-        .product-price {
             font-size: 1.3rem;
-            font-weight: bold;
-            color: #00a884;
-            margin-bottom: 15px;
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
         }
-        
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+        .product-description {
+            color: var(--color-text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
         .product-button {
-            display: block;
             width: 100%;
-            padding: 10px;
-            background-color: #00a884;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-        
-        .product-button:hover {
-            background-color: #008f72;
-        }
-        
-        /* Sección de contacto */
+        /* Contacto */
         #contacto {
-            background-color: #202c33;
+            background-color: var(--color-dark-light);
         }
-        
         .contact-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 40px;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
         }
-        
         .contact-info {
-            flex: 1;
-            min-width: 300px;
-            text-align: center;
             opacity: 0;
-            transform: translateY(50px);
+            transform: translateX(-50px);
             transition: all 0.8s ease;
         }
-        
         .contact-info.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(0);
         }
-        
         .contact-info h3 {
             font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #00a884;
+            margin-bottom: 1.5rem;
+            color: var(--color-primary);
         }
-        
         .contact-details {
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
         }
-        
         .contact-details p {
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            justify-content: center;
         }
-        
         .contact-details i {
-            margin-right: 10px;
-            color: #00a884;
+            margin-right: 1rem;
+            color: var(--color-primary);
             width: 20px;
+            font-size: 1.2rem;
         }
-        
         .social-links {
             display: flex;
-            gap: 15px;
-            justify-content: center;
+            gap: 1rem;
         }
-        
         .social-link {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 45px;
             height: 45px;
-            background-color: #2a3942;
+            background-color: var(--color-dark-lighter);
             border-radius: 50%;
-            color: #e9edef;
+            color: var(--color-text);
             font-size: 1.2rem;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             text-decoration: none;
         }
-        
         .social-link:hover {
-            background-color: #00a884;
-            transform: translateY(-3px);
+            background-color: var(--color-primary);
+            transform: translateY(-5px);
         }
-        
         .map-container {
-            flex: 1;
-            min-width: 300px;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             opacity: 0;
-            transform: translateY(50px);
+            transform: translateX(50px);
             transition: all 0.8s ease 0.2s;
+            height: 400px;
         }
-        
         .map-container.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(0);
         }
-        
         .map-container iframe {
             width: 100%;
-            height: 300px;
+            height: 100%;
             border: none;
         }
-        
         /* Footer */
         footer {
-            background-color: #111b21;
-            padding: 30px 0;
+            background-color: var(--color-dark);
+            padding: 3rem 0;
             text-align: center;
         }
-        
         .footer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
         }
-        
         .footer-logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #00a884;
-            margin-bottom: 15px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
         }
-        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        .footer-links li {
+            margin: 0 1rem;
+        }
+        .footer-links a {
+            color: var(--color-text-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .footer-links a:hover {
+            color: var(--color-primary);
+        }
         .copyright {
-            color: #8696a0;
+            color: var(--color-text-light);
             font-size: 0.9rem;
-            margin-bottom: 5px;
         }
-        
-        .developed-by {
-            color: #8696a0;
-            font-size: 0.8rem;
-        }
-        
-        /* Efectos de scroll */
+        /* Animaciones */
         .fade-in {
             opacity: 0;
             transform: translateY(50px);
             transition: all 0.8s ease;
         }
-        
         .fade-in.visible {
             opacity: 1;
             transform: translateY(0);
         }
-        
-        /* Indicador de sección activa */
-        .section-indicator {
+        /* Scroll indicator */
+        .scroll-indicator {
             position: fixed;
-            right: 30px;
+            right: 2rem;
             top: 50%;
             transform: translateY(-50%);
             z-index: 999;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 1rem;
         }
-        
         .indicator-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
             background-color: rgba(255, 255, 255, 0.3);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
-        
         .indicator-dot.active {
-            background-color: #00a884;
+            background-color: var(--color-primary);
             transform: scale(1.3);
         }
-        
         .indicator-dot:hover {
-            background-color: #00a884;
+            background-color: var(--color-primary);
         }
-        
         /* Responsive */
+        @media (max-width: 992px) {
+            .slide-title {
+                font-size: 2.8rem;
+            }
+            .section-title {
+                font-size: 2.2rem;
+            }
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            .map-container {
+                height: 300px;
+            }
+        }
         @media (max-width: 768px) {
             .nav-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background-color: var(--color-dark-light);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                transition: var(--transition);
+                z-index: 1000;
+            }
+            .nav-menu.active {
+                right: 0;
+            }
+            .nav-item {
+                margin: 1.5rem 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+                z-index: 1001;
+            }
+            .slide-title {
+                font-size: 2.2rem;
+            }
+            .slide-description {
+                font-size: 1rem;
+            }
+            .slide-content {
+                text-align: center;
+                padding: 0 1rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .section-subtitle {
+                font-size: 1rem;
+            }
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            .scroll-indicator {
                 display: none;
             }
-            
-            .slider-container {
-                height: 400px;
+        }
+        @media (max-width: 576px) {
+            .header-container {
+                padding: 0 1rem;
             }
-            
-            .slide-content {
-                margin-left: 20px;
-                margin-right: 20px;
-                padding: 20px;
-            }
-            
             .slide-title {
                 font-size: 1.8rem;
             }
-            
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            .btn {
+                padding: 0.8rem 1.8rem;
             }
-            
-            .contact-container {
-                flex-direction: column;
+            .section-container {
+                padding: 0 1rem;
             }
-            
-            .section-indicator {
-                display: none;
+            .arrow {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <header id="main-header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo" id="logo-text" data-section="inicio">ZGrafic</div>
-                
-                <ul class="nav-menu">
-                    <li class="nav-item"><a class="nav-link active" data-section="inicio">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="productos">Productos</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="contacto">Contacto</a></li>
-                </ul>
-            </div>
+    <header id="header">
+        <div class="header-container">
+            <a href="#" class="logo"><i class="fas fa-paint-brush"></i> ZGrafic</a>
+            
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item"><a href="#hero" class="nav-link active">Inicio</a></li>
+                <li class="nav-item"><a href="#productos" class="nav-link">Productos</a></li>
+                <li class="nav-item"><a href="#contacto" class="nav-link">Contacto</a></li>
+            </ul>
         </div>
     </header>
-
-    <!-- Indicador de secciones -->
-    <div class="section-indicator">
-        <div class="indicator-dot active" data-section="inicio"></div>
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator">
+        <div class="indicator-dot active" data-section="hero"></div>
         <div class="indicator-dot" data-section="productos"></div>
         <div class="indicator-dot" data-section="contacto"></div>
     </div>
-
-    <!-- Sección Inicio -->
-    <section id="inicio" class="section">
-        <div class="slider-container" id="slider-container">
-            <!-- El slider se cargará dinámicamente con JavaScript -->
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-slider" id="hero-slider">
+            <!-- Slides will be loaded dynamically -->
         </div>
     </section>
-
-    <!-- Sección Productos -->
-    <section id="productos" class="section">
-        <div class="container">
-            <h2 class="section-title" id="productos-title">Nuestros Productos</h2>
-            <p class="section-subtitle" id="productos-subtitle">Descubre nuestra amplia gama de productos gráficos</p>
-            <div class="products-grid" id="featured-products">
-                <!-- Los productos se cargarán aquí con JavaScript -->
+    <!-- Productos Section -->
+    <section id="productos">
+        <div class="section-container">
+            <h2 class="section-title">Nuestros Productos</h2>
+            <p class="section-subtitle">Descubre nuestra amplia gama de productos gráficos de alta calidad</p>
+            
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be loaded dynamically -->
             </div>
         </div>
     </section>
-
-    <!-- Sección Contacto -->
-    <section id="contacto" class="section">
-        <div class="container">
-            <h2 class="section-title" id="contact-title">Contáctanos</h2>
-            <p class="section-subtitle" id="contact-subtitle">Estamos aquí para ayudarte</p>
+    <!-- Contacto Section -->
+    <section id="contacto">
+        <div class="section-container">
+            <h2 class="section-title">Contáctanos</h2>
+            <p class="section-subtitle">Estamos aquí para ayudarte con tus proyectos gráficos</p>
+            
             <div class="contact-container">
                 <div class="contact-info" id="contact-info">
-                    <div class="contact-details" id="contact-details">
-                        <!-- Los datos de contacto se cargarán con JavaScript -->
-                    </div>
-                    
-                    <h3>Síguenos en redes sociales</h3>
-                    <div class="social-links" id="social-links">
-                        <!-- Los enlaces sociales se cargarán con JavaScript -->
-                    </div>
+                    <!-- Contact info will be loaded dynamically -->
                 </div>
                 
-                <div class="map-container" id="map-container">
+                <div class="map-container">
                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15606.76499126087!2d-77.0362603698249!3d-12.06758237231925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c5f619ee3ec7%3A0x14206cb9c452c7a4!2sLima%2C%20Peru!5e0!3m2!1sen!2sus!4v1664565153829!5m2!1sen!2sus" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
         </div>
     </section>
-
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo" id="footer-logo">ZGrafic</div>
-                <p class="copyright" id="copyright-text">&copy; 2023 ZGrafic. Todos los derechos reservados.</p>
-                <p class="developed-by" id="developed-by">Desarrollado con ❤️ por ZGrafic</p>
-            </div>
+        <div class="footer-content">
+            <div class="footer-logo">ZGrafic</div>
+            
+            <ul class="footer-links">
+                <li><a href="#hero">Inicio</a></li>
+                <li><a href="#productos">Productos</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+            
+            <p class="copyright">&copy; 2023 ZGrafic. Todos los derechos reservados.</p>
         </div>
     </footer>
-
     <script>
-        // Datos de ejemplo para el slider (en caso de que el JSON no se cargue)
-        const datosSliderEjemplo = [
-            {
-                "titulo": "Soluciones Gráficas Profesionales",
-                "descripcion": "Imprenta de alta calidad y displays publicitarios para potenciar tu marca.",
-                "textoBoton": "Ver Productos",
-                "imagenFondo": "https://images.unsplash.com/photo-1588200908342-23b585c03e26?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+        // Datos de ejemplo para la página
+        const pageData = {
+            empresa: {
+                nombre: "ZGrafic",
+                slogan: "Soluciones Gráficas Profesionales"
             },
-            {
-                "titulo": "Tarjetas de Presentación",
-                "descripcion": "Diseños exclusivos que reflejan la esencia de tu empresa.",
-                "textoBoton": "Ver Más",
-                "imagenFondo": "https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+            slider: [
+                {
+                    titulo: "Soluciones Gráficas Profesionales",
+                    descripcion: "Imprenta de alta calidad y displays publicitarios para potenciar tu marca.",
+                    textoBoton: "Ver Productos",
+                    imagenFondo: "https://images.unsplash.com/photo-1588200908342-23b585c03e26?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+                },
+                {
+                    titulo: "Tarjetas de Presentación",
+                    descripcion: "Diseños exclusivos que reflejan la esencia de tu empresa.",
+                    textoBoton: "Ver Más",
+                    imagenFondo: "https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+                },
+                {
+                    titulo: "Displays Publicitarios",
+                    descripcion: "Maximiza tu presencia en ferias y eventos con nuestros displays.",
+                    textoBoton: "Ver Catálogo",
+                    imagenFondo: "https://images.unsplash.com/photo-1634942536746-46b9a6de9231?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
+                }
+            ],
+            productos: [
+                {
+                    id: 1,
+                    nombre: "Tarjetas Personales",
+                    precio: 80,
+                    imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                    descripcion: "Tarjetas de presentación de alta calidad con acabado premium."
+                },
+                {
+                    id: 2,
+                    nombre: "Volantes",
+                    precio: 90,
+                    imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                    descripcion: "Volantes publicitarios efectivos para promocionar tu negocio."
+                },
+                {
+                    id: 3,
+                    nombre: "Roll Up",
+                    precio: 160,
+                    imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                    descripcion: "Display roll up profesional para exhibiciones y eventos."
+                },
+                {
+                    id: 4,
+                    nombre: "Trípticos",
+                    precio: 285,
+                    imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                    descripcion: "Trípticos informativos y publicitarios con diseño atractivo."
+                },
+                {
+                    id: 5,
+                    nombre: "Banner Publicitario",
+                    precio: 200,
+                    imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                    descripcion: "Banners de gran formato para exteriores y eventos."
+                },
+                {
+                    id: 6,
+                    nombre: "Folletos",
+                    precio: 150,
+                    imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                    descripcion: "Folletos promocionales full color con diseños personalizados."
+                }
+            ],
+            contacto: {
+                direccion: "Av. Principal 123, Lima, Perú",
+                telefono: "+51 987 654 321",
+                email: "info@zgrafic.com",
+                horario: "Lun - Vie: 9:00 am - 6:00 pm"
             },
-            {
-                "titulo": "Displays Publicitarios",
-                "descripcion": "Maximiza tu presencia en ferias y eventos con nuestros displays.",
-                "textoBoton": "Ver Catálogo",
-                "imagenFondo": "https://images.unsplash.com/photo-1634942536746-46b9a6de9231?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
-            }
-        ];
-
-        // Variables globales para almacenar datos
-        let textosPersonalizados = {};
-        let productosData = [];
-        let isScrolling = false;
+            redesSociales: [
+                {
+                    icono: "fab fa-facebook-f",
+                    enlace: "#",
+                    nombre: "Facebook"
+                },
+                {
+                    icono: "fab fa-instagram",
+                    enlace: "#",
+                    nombre: "Instagram"
+                },
+                {
+                    icono: "fab fa-whatsapp",
+                    enlace: "#",
+                    nombre: "WhatsApp"
+                },
+                {
+                    icono: "fab fa-linkedin-in",
+                    enlace: "#",
+                    nombre: "LinkedIn"
+                }
+            ]
+        };
+        // Variables globales
         let currentSlide = 0;
         let slideInterval;
-
-        // Función para cargar JSON externos
-        async function cargarDatosExternos() {
-            try {
-                // Cargar textos personalizados
-                const responseTextos = await fetch('textos.json');
-                textosPersonalizados = await responseTextos.json();
-                
-                // Cargar productos
-                const responseProductos = await fetch('productos.json');
-                productosData = await responseProductos.json();
-                
-                // Inicializar la página
-                cargarTextosPersonalizados();
-                cargarProductosDestacados();
-                inicializarNavegacion();
-                inicializarEfectosScroll();
-            } catch (error) {
-                console.error('Error al cargar datos:', error);
-                // Usar datos de ejemplo si hay error
-                textosPersonalizados = {
-                    slider: datosSliderEjemplo,
-                    productos: {
-                        titulo: "Nuestros Productos Destacados",
-                        subtitulo: "Descubre nuestra amplia gama de productos gráficos de alta calidad"
-                    },
-                    contacto: {
-                        titulo: "Contáctanos",
-                        subtitulo: "Estamos aquí para ayudarte",
-                        direccion: "Av. Principal 123, Lima, Perú",
-                        telefono: "+51 987 654 321",
-                        email: "info@zgrafic.com",
-                        horario: "Lun - Vie: 9:00 am - 6:00 pm"
-                    },
-                    redesSociales: [
-                        {
-                            "icono": "fab fa-facebook-f",
-                            "enlace": "#",
-                            "nombre": "Facebook"
-                        },
-                        {
-                            "icono": "fab fa-instagram",
-                            "enlace": "#",
-                            "nombre": "Instagram"
-                        },
-                        {
-                            "icono": "fab fa-whatsapp",
-                            "enlace": "#",
-                            "nombre": "WhatsApp"
-                        },
-                        {
-                            "icono": "fab fa-linkedin-in",
-                            "enlace": "#",
-                            "nombre": "LinkedIn"
-                        }
-                    ],
-                    footer: {
-                        textoCopyright: "© 2023 ZGrafic. Todos los derechos reservados.",
-                        desarrolladoPor: "Desarrollado con ❤️ por ZGrafic"
-                    }
-                };
-                
-                cargarTextosPersonalizados();
-                cargarProductosDestacados();
-                inicializarNavegacion();
-                inicializarEfectosScroll();
-            }
+        let isScrolling = false;
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            initializeSlider();
+            initializeNavigation();
+            initializeScrollEffects();
+        });
+        // Función para inicializar la página
+        function initializePage() {
+            loadSlider();
+            loadProducts();
+            loadContactInfo();
         }
-
-        // Función para cargar todos los textos desde el JSON
-        function cargarTextosPersonalizados() {
-            // Cargar textos del header
-            document.getElementById('logo-text').textContent = "ZGrafic";
-            
-            // Cargar navegación
-            document.querySelector('[data-section="inicio"]').textContent = "Inicio";
-            document.querySelector('[data-section="productos"]').textContent = "Productos";
-            document.querySelector('[data-section="contacto"]').textContent = "Contacto";
-            
-            // Cargar slider
-            const sliderContainer = document.getElementById('slider-container');
+        // Cargar slider
+        function loadSlider() {
+            const sliderContainer = document.getElementById('hero-slider');
             let sliderHTML = '';
-            
-            textosPersonalizados.slider.forEach((slide, index) => {
+            pageData.slider.forEach((slide, index) => {
                 sliderHTML += `
-                    <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: url('${slide.imagenFondo}');">
+                    <div class="slide ${index === 0 ? 'active' : ''}" style="background-image: url('${slide.imagenFondo}')">
                         <div class="slide-content">
                             <h2 class="slide-title">${slide.titulo}</h2>
                             <p class="slide-description">${slide.descripcion}</p>
-                            <a href="#productos" class="slide-button">${slide.textoBoton}</a>
+                            <a href="#productos" class="btn">${slide.textoBoton} <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
                 `;
             });
-            
             // Añadir navegación del slider
             sliderHTML += `
                 <div class="slider-nav">
-                    ${textosPersonalizados.slider.map((_, index) => 
+                    ${pageData.slider.map((_, index) => 
                         `<div class="slider-dot ${index === 0 ? 'active' : ''}" data-slide="${index}"></div>`
                     ).join('')}
                 </div>
@@ -749,46 +785,57 @@
                     <div class="arrow next" id="next-slide"><i class="fas fa-chevron-right"></i></div>
                 </div>
             `;
-            
             sliderContainer.innerHTML = sliderHTML;
-            
-            // Cargar textos de secciones
-            document.getElementById('productos-title').textContent = textosPersonalizados.productos.titulo;
-            document.getElementById('productos-subtitle').textContent = textosPersonalizados.productos.subtitulo;
-            document.getElementById('contact-title').textContent = textosPersonalizados.contacto.titulo;
-            document.getElementById('contact-subtitle').textContent = textosPersonalizados.contacto.subtitulo;
-            
-            // Cargar información de contacto
-            const contactDetails = document.getElementById('contact-details');
-            contactDetails.innerHTML = `
-                <p><i class="fas fa-map-marker-alt"></i> ${textosPersonalizados.contacto.direccion}</p>
-                <p><i class="fas fa-phone"></i> ${textosPersonalizados.contacto.telefono}</p>
-                <p><i class="fas fa-envelope"></i> ${textosPersonalizados.contacto.email}</p>
-                <p><i class="fas fa-clock"></i> ${textosPersonalizados.contacto.horario}</p>
-            `;
-            
-            // Cargar redes sociales
-            const socialLinks = document.getElementById('social-links');
-            socialLinks.innerHTML = textosPersonalizados.redesSociales.map(red => 
-                `<a href="${red.enlace}" class="social-link" title="${red.nombre}"><i class="${red.icono}"></i></a>`
-            ).join('');
-            
-            // Cargar footer
-            document.getElementById('footer-logo').textContent = "ZGrafic";
-            document.getElementById('copyright-text').textContent = textosPersonalizados.footer.textoCopyright;
-            document.getElementById('developed-by').textContent = textosPersonalizados.footer.desarrolladoPor;
-            
-            // Inicializar funcionalidad del slider después de cargar los textos
-            inicializarSlider();
         }
-
-        // Slider functionality
-        function inicializarSlider() {
+        // Cargar productos
+        function loadProducts() {
+            const productsContainer = document.getElementById('products-grid');
+            let productsHTML = '';
+            pageData.productos.forEach(producto => {
+                productsHTML += `
+                    <div class="product-card fade-in">
+                        <img src="${producto.imagen}" alt="${producto.nombre}" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-name">${producto.nombre}</h3>
+                            <p class="product-price">S/. ${producto.precio.toFixed(2)}</p>
+                            <p class="product-description">${producto.descripcion}</p>
+                            <button class="btn product-button">Ver Detalles <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            productsContainer.innerHTML = productsHTML;
+        }
+        // Cargar información de contacto
+        function loadContactInfo() {
+            const contactContainer = document.getElementById('contact-info');
+            let contactHTML = `
+                <h3>Estamos aquí para ayudarte</h3>
+                <div class="contact-details">
+                    <p><i class="fas fa-map-marker-alt"></i> ${pageData.contacto.direccion}</p>
+                    <p><i class="fas fa-phone"></i> ${pageData.contacto.telefono}</p>
+                    <p><i class="fas fa-envelope"></i> ${pageData.contacto.email}</p>
+                    <p><i class="fas fa-clock"></i> ${pageData.contacto.horario}</p>
+                </div>
+                <h3>Síguenos en redes sociales</h3>
+                <div class="social-links">
+            `;
+            pageData.redesSociales.forEach(red => {
+                contactHTML += `
+                    <a href="${red.enlace}" class="social-link" title="${red.nombre}">
+                        <i class="${red.icono}"></i>
+                    </a>
+                `;
+            });
+            contactHTML += `</div>`;
+            contactContainer.innerHTML = contactHTML;
+        }
+        // Inicializar slider
+        function initializeSlider() {
             const slides = document.querySelectorAll('.slide');
             const dots = document.querySelectorAll('.slider-dot');
             const prevArrow = document.getElementById('prev-slide');
             const nextArrow = document.getElementById('next-slide');
-            
             function showSlide(n) {
                 // Asegurarse de que el índice esté dentro de los límites
                 if (n >= slides.length) {
@@ -798,166 +845,106 @@
                 } else {
                     currentSlide = n;
                 }
-                
                 // Ocultar todas las slides y quitar clase active de los dots
                 slides.forEach(slide => slide.classList.remove('active'));
                 dots.forEach(dot => dot.classList.remove('active'));
-                
                 // Mostrar la slide actual y activar su dot correspondiente
                 slides[currentSlide].classList.add('active');
                 if (dots[currentSlide]) {
                     dots[currentSlide].classList.add('active');
                 }
             }
-            
             function nextSlide() {
                 showSlide(currentSlide + 1);
             }
-            
             function prevSlide() {
                 showSlide(currentSlide - 1);
             }
-            
             // Event listeners for slider
             if (nextArrow) nextArrow.addEventListener('click', nextSlide);
             if (prevArrow) prevArrow.addEventListener('click', prevSlide);
-            
             dots.forEach((dot) => {
                 dot.addEventListener('click', () => {
                     const slideIndex = parseInt(dot.getAttribute('data-slide'));
                     showSlide(slideIndex);
                 });
             });
-            
-            // Auto slide - reiniciar el intervalo cuando se interactúa manualmente
+            // Auto slide
             function startSlideInterval() {
                 clearInterval(slideInterval);
                 slideInterval = setInterval(nextSlide, 5000);
             }
-            
             // Pausar el auto slide cuando el mouse está sobre el slider
-            const slider = document.querySelector('.slider-container');
+            const slider = document.querySelector('.hero-slider');
             if (slider) {
                 slider.addEventListener('mouseenter', () => {
                     clearInterval(slideInterval);
                 });
-                
                 slider.addEventListener('mouseleave', startSlideInterval);
             }
-            
             // Iniciar el auto slide
             startSlideInterval();
         }
-        
-        // Cargar productos aleatorios
-        function cargarProductosDestacados() {
-            // Usar datos de ejemplo si no hay productos cargados
-            if (!productosData || productosData.length === 0) {
-                productosData = [
-                    {
-                        id: 1,
-                        nombre: "Tarjetas Personales",
-                        precio: 80,
-                        imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                        descripcion: "Tarjetas de presentación de alta calidad"
-                    },
-                    {
-                        id: 2,
-                        nombre: "Volantes",
-                        precio: 90,
-                        imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                        descripcion: "Volantes publicitarios efectivos"
-                    },
-                    {
-                        id: 3,
-                        nombre: "Roll Up",
-                        precio: 160,
-                        imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                        descripcion: "Display roll up para exhibiciones"
-                    },
-                    {
-                        id: 4,
-                        nombre: "Trípticos",
-                        precio: 285,
-                        imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                        descripcion: "Trípticos informativos y publicitarios"
-                    },
-                    {
-                        id: 5,
-                        nombre: "Banner Publicitario",
-                        precio: 200,
-                        imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                        descripcion: "Banners de gran formato para exteriores"
-                    },
-                    {
-                        id: 6,
-                        nombre: "Folletos",
-                        precio: 150,
-                        imagen: "https://images.unsplash.com/photo-1541789097-89e31683eb70?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                        descripcion: "Folletos promocionales full color"
-                    }
-                ];
+        // Inicializar navegación
+        function initializeNavigation() {
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const navMenu = document.getElementById('nav-menu');
+            if (mobileMenuBtn && navMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    mobileMenuBtn.innerHTML = navMenu.classList.contains('active') 
+                        ? '<i class="fas fa-times"></i>' 
+                        : '<i class="fas fa-bars"></i>';
+                });
             }
-            
-            // Mezclar array aleatoriamente y tomar 6 productos
-            const productosAleatorios = [...productosData]
-                .sort(() => 0.5 - Math.random())
-                .slice(0, 6);
-            
-            mostrarProductosDestacados(productosAleatorios);
-        }
-        
-        function mostrarProductosDestacados(productos) {
-            const container = document.getElementById('featured-products');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            productos.forEach(producto => {
-                const productElement = document.createElement('div');
-                productElement.className = 'product-card fade-in';
-                
-                productElement.innerHTML = `
-                    <img src="${producto.imagen}" alt="${producto.nombre}" class="product-image">
-                    <div class="product-info">
-                        <h3 class="product-name">${producto.nombre}</h3>
-                        <p class="product-price">${producto.precio === 0 ? 'Cotizar' : `S/. ${producto.precio.toFixed(2)}`}</p>
-                        <button class="product-button">
-                            ${producto.precio === 0 ? 'Solicitar cotización' : 'Ver detalles'}
-                        </button>
-                    </div>
-                `;
-                
-                container.appendChild(productElement);
-            });
-        }
-        
-        // Navegación entre secciones
-        function inicializarNavegacion() {
-            // Navegación por clicks
-            const navLinks = document.querySelectorAll('.nav-link, .logo, .indicator-dot');
-            
+            // Cerrar menú al hacer clic en un enlace
+            const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    const targetSection = this.getAttribute('data-section');
-                    scrollToSection(targetSection);
-                    setActiveSection(targetSection);
+                link.addEventListener('click', () => {
+                    if (navMenu.classList.contains('active')) {
+                        navMenu.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
                 });
             });
+            // Navegación por clicks
+            const allNavLinks = document.querySelectorAll('.nav-link, .indicator-dot');
             
+            allNavLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetSection = this.getAttribute('href') || this.getAttribute('data-section');
+                    scrollToSection(targetSection);
+                    setActiveSection(targetSection.replace('#', ''));
+                });
+            });
+        }
+        // Inicializar efectos de scroll
+        function initializeScrollEffects() {
+            // Ocultar/mostrar header al hacer scroll
+            let lastScrollTop = 0;
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > lastScrollTop && scrollTop > 200) {
+                    header.classList.add('hidden');
+                } else {
+                    header.classList.remove('hidden');
+                }
+                lastScrollTop = scrollTop;
+                // Detectar sección activa
+                detectActiveSection();
+                // Activar animaciones al hacer scroll
+                activateScrollAnimations();
+            }, false);
             // Navegación por scroll con rueda del mouse
-            let isScrolling = false;
             window.addEventListener('wheel', function(e) {
-                // Solo procesar si no hay scroll en progreso
                 if (isScrolling) return;
-                
-                // Determinar dirección del scroll
                 const delta = e.deltaY || e.detail || (-e.wheelDelta);
-                
                 // Obtener secciones
-                const sections = document.querySelectorAll('.section');
+                const sections = document.querySelectorAll('section');
                 let currentSectionIndex = 0;
-                
                 // Encontrar la sección actual
                 for (let i = 0; i < sections.length; i++) {
                     const rect = sections[i].getBoundingClientRect();
@@ -966,7 +953,6 @@
                         break;
                     }
                 }
-                
                 // Determinar la siguiente sección basándose en la dirección del scroll
                 let nextSectionIndex;
                 if (delta > 0) {
@@ -976,134 +962,75 @@
                     // Scroll hacia arriba
                     nextSectionIndex = Math.max(currentSectionIndex - 1, 0);
                 }
-                
                 // Si ya estamos en la sección correcta, no hacer nada
                 if (nextSectionIndex === currentSectionIndex) return;
-                
                 // Navegar a la siguiente sección
                 const nextSection = sections[nextSectionIndex];
-                scrollToSection(nextSection.id);
+                scrollToSection('#' + nextSection.id);
             }, { passive: true });
-            
-            // Detectar sección activa durante el scroll
-            let scrollTimeout;
-            window.addEventListener('scroll', function() {
-                // Ocultar/mostrar header
-                const header = document.getElementById('main-header');
-                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                
-                if (scrollTop > 200) {
-                    header.classList.add('hidden');
-                } else {
-                    header.classList.remove('hidden');
-                }
-                
-                // Usar un timeout para limitar la frecuencia de detección
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(function() {
-                    detectarSeccionActiva();
-                    activarAnimacionesScroll();
-                }, 100);
-            }, false);
         }
-        
+        // Función para desplazarse a una sección
         function scrollToSection(sectionId) {
             isScrolling = true;
-            const section = document.getElementById(sectionId);
+            const section = document.querySelector(sectionId);
             if (section) {
                 window.scrollTo({
                     top: section.offsetTop,
                     behavior: 'smooth'
                 });
-                
                 // Actualizar sección activa
-                setActiveSection(sectionId);
-                
+                setActiveSection(sectionId.replace('#', ''));
                 // Restablecer isScrolling después de que termine el scroll
                 setTimeout(() => {
                     isScrolling = false;
                 }, 1000);
             }
         }
-        
+        // Establecer sección activa
         function setActiveSection(sectionId) {
             // Actualizar navegación
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            
-            const activeLink = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
+            const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
             if (activeLink) {
                 activeLink.classList.add('active');
             }
-            
             // Actualizar indicadores
             document.querySelectorAll('.indicator-dot').forEach(dot => {
                 dot.classList.remove('active');
             });
-            
             const activeDot = document.querySelector(`.indicator-dot[data-section="${sectionId}"]`);
             if (activeDot) {
                 activeDot.classList.add('active');
             }
         }
-        
-        function detectarSeccionActiva() {
-            const sections = document.querySelectorAll('.section');
+        // Detectar sección activa
+        function detectActiveSection() {
+            const sections = document.querySelectorAll('section');
             let currentSection = '';
-            
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 const sectionHeight = section.offsetHeight;
-                
                 if (window.scrollY >= sectionTop - 100 && window.scrollY < sectionTop + sectionHeight - 100) {
                     currentSection = section.id;
                 }
             });
-            
             if (currentSection) {
                 setActiveSection(currentSection);
             }
         }
-        
-        // Efectos de scroll
-        function inicializarEfectosScroll() {
-            // Configurar observador de intersección para animaciones
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.2
-            };
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, observerOptions);
-            
-            // Observar elementos para animación
-            document.querySelectorAll('.section-title, .section-subtitle, .product-card, .contact-info, .map-container').forEach(el => {
-                observer.observe(el);
-            });
-        }
-        
-        function activarAnimacionesScroll() {
-            const elementos = document.querySelectorAll('.fade-in, .section-title, .section-subtitle');
+        // Activar animaciones al hacer scroll
+        function activateScrollAnimations() {
+            const elements = document.querySelectorAll('.fade-in, .contact-info, .map-container');
             const windowHeight = window.innerHeight;
-            
-            elementos.forEach(elemento => {
-                const position = elemento.getBoundingClientRect().top;
-                
+            elements.forEach(element => {
+                const position = element.getBoundingClientRect().top;
                 if (position < windowHeight - 100) {
-                    elemento.classList.add('visible');
+                    element.classList.add('visible');
                 }
             });
         }
-        
-        // Inicializar la página
-        document.addEventListener('DOMContentLoaded', cargarDatosExternos);
     </script>
 </body>
 </html>
