@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda en línea</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dark-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Estilos específicos solo para la funcionalidad de captura */
+        .contenedor-captura-temporal {
+            position: fixed !important;
+            left: -9999px !important;
+            top: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: -9999 !important;
+            opacity: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        .marca-agua-captura {
+            position: absolute !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            color: rgba(0, 0, 0, 0.5) !important;
+            font-size: 22px !important;
+            font-weight: bold !important;
+            font-family: Arial, sans-serif !important;
+            text-shadow: 0 0 5px rgba(255,255,255,0.7) !important;
+            z-index: 99999 !important;
+            pointer-events: none !important;
+            opacity: 0.8 !important;
+        }
+        
+        body.dark-theme .marca-agua-captura {
+            color: rgba(255, 255, 255, 0.6) !important;
+            text-shadow: 0 0 5px rgba(0,0,0,0.7) !important;
+        }
+        
+        /* Animación para el spinner (sin afectar otros estilos) */
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        // Función para copiar URL del producto
+        function copiarURLProducto() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    mostrarNotificacion('¡Enlace copiado!');
+                })
+                .catch(err => {
+                    console.error('Error al copiar: ', err);
+                    mostrarNotificacion('Error al copiar enlace');
+                });
+        }
+    </script>
+</head>
+<body class="dark-theme">
+    <header>
+    <div class="header-content">
+        <h1>Tienda en línea</h1>
+        
+        <!-- Buscador para PC -->
+        <div id="buscador-pc">
+            <div id="buscador">
+                <input type="text" id="buscar-producto" placeholder="Buscar productos...">
+                <button id="btn-buscar"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        
+        <!-- Iconos derecha -->
+        <div class="header-icons">
+            <!-- Icono de búsqueda para móvil -->
+            <div id="mobile-search-icon" onclick="toggleMobileSearch()">
+                <i class="fas fa-search"></i>
+            </div>
+            <!-- Carrito -->
+            <div id="carrito-contador" onclick="abrirCarritoPopup()">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="contador">0</span>
+            </div>
+        </div>
+        
+        <!-- Buscador para móvil (oculto por defecto) -->
+    <div id="mobile-search-container" class="mobile-search-hidden">
+        <div id="mobile-search">
+            <button id="mobile-search-back" onclick="toggleMobileSearch()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <input type="text" id="mobile-buscar-producto" placeholder="Buscar productos...">
+            <button id="mobile-btn-buscar">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+    </div>
+</header>
+
+    <div class="page-transition"></div>
+
+    <main role="main">
+        <section id="productos" class="section"></section>
+        <div id="paginacion">
+            <button id="anterior" class="btn-pagina">&lt;</button>
+            <span><span id="pagina-actual">1</span> de <span id="total-paginas">1</span></span>
+            <button id="siguiente" class="btn-pagina">&gt;</button>
+        </div>
+    </main>
+
+    <div id="carrito-popup" class="popup">
+        <div class="popup-content">
+            <span class="cerrar-popup" onclick="cerrarCarritoPopup()">&times;</span>
+            <h2>Tu Carrito</h2>
+            <div id="carrito-items"></div>
+            <div id="carrito-total">Total: S/. 0.00</div>
+            <button id="ver-carrito-completo">Ver Carrito Completo</button>
+        </div>
+    </div>
+
+    <div id="producto-popup" class="popup">
+        <div class="popup-content">
+            <span class="cerrar-popup" onclick="cerrarProductoPopup()">&times;</span>
+            <div class="popup-flex">
+                <div class="popup-imagen-container">
+                    <img id="popup-imagen" src="" alt="Imagen del producto">
+                </div>
+                <div class="popup-detalles">
+                    <h2 id="popup-nombre"></h2>
+                    <p id="popup-precio" class="precio"></p>
+                    <p id="popup-descripcion" class="descripcion"></p>
+                    <div class="popup-botones">
+                        <button id="popup-agregar" class="btn-primario"></button>
+                        <button id="popup-copiar-imagen" class="btn-secundario" title="Capturar pantalla">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <!-- Nuevo botón para compartir URL -->
+                        <button id="popup-compartir-url" class="btn-secundario" title="Copiar enlace" onclick="copiarURLProducto()">
+                            <i class="fas fa-link"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra fija de categorías -->
+<div id="categorias-fixed">
+    <div class="categorias-container"></div>
+</div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

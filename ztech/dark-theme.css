@@ -1,0 +1,272 @@
+/* Tema oscuro inspirado en WhatsApp */
+body {
+    background-color: #111b21;
+    color: #e9edef;
+}
+
+header {
+    background-color: #202c33;
+}
+
+#carrito-flotante {
+    background-color: #202c33;
+    border-color: #30383d;
+}
+
+#carrito-popup h2 {
+    color: #e9edef; /* Color claro para tema oscuro */
+}
+
+.carrito-header {
+    background-color: #202c33;
+}
+
+.carrito-footer {
+    background-color: #202c33;
+    border-color: #30383d;
+}
+
+#lista-carrito-flotante li {
+    background-color: #2a3942;
+}
+
+.producto {
+    background-color: #202c33;
+    border-color: #30383d;
+}
+
+.producto h3 {
+    color: #e9edef;
+}
+
+.producto .precio {
+    color: #00a884;
+}
+
+.producto .descripcion {
+    color: #8696a0;
+}
+
+button, #ver-carrito-completo {
+    background-color: #00a884;
+}
+
+button:hover, #ver-carrito-completo:hover {
+    background-color: #008f72;
+}
+
+/* Estilos actualizados para el buscador */
+#buscador {
+    background-color: #2a3942;
+    border-radius: 8px;
+    padding: 8px;
+
+}
+
+#buscar-producto {
+    background-color: transparent;
+    color: #e9edef;
+    border: none;
+    width: 100%;
+    padding: 8px;
+    font-size: 15px;
+}
+
+#buscar-producto::placeholder {
+    color: #8696a0;
+}
+
+#btn-buscar {
+    background-color: transparent;
+    color: #8696a0;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+}
+
+#btn-buscar:hover {
+    color: #00a884;
+}
+
+.popup {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.popup-content {
+    background-color: #202c33;
+    border-color: #30383d;
+}
+
+#popup-precio {
+    color: #00a884;
+}
+
+.cerrar-popup {
+    color: #8696a0; /* Color más claro para tema oscuro */
+}
+
+.cerrar-popup:hover,
+.cerrar-popup:focus {
+    color: #e9edef; /* Color al hacer hover */
+}
+
+/* Estilos específicos para carrito.html */
+.btn-volver {
+    background-color: #00a884;
+    color: #e9edef;
+}
+
+.btn-volver:hover {
+    background-color: #008f72;
+}
+
+#carrito-footer {
+    background-color: #202c33;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-realizar-pedido {
+    background-color: #00a884;
+}
+
+.btn-realizar-pedido:hover {
+    background-color: #008f72;
+}
+
+.btn-realizar-pedido.disabled {
+    background-color: #30383d;
+    color: #8696a0;
+}
+
+.carrito-encabezado {
+    background-color: #202c33;
+    border-bottom-color: #30383d;
+}
+
+#lista-carrito li {
+    border-bottom-color: #30383d;
+}
+
+.cantidad-input {
+    background-color: #2a3942;
+    border-color: #30383d;
+    color: #e9edef;
+}
+
+.btn-cantidad {
+    background-color: #00a884;
+    color: #e9edef;
+}
+
+.btn-eliminar {
+    color: #f44336;
+}
+
+.mensaje-confirmacion {
+    background-color: #00a884;
+    color: #e9edef;
+}
+
+/* En dark-theme.css */
+#carrito-items {
+    scrollbar-color: #2a3942 #202c33; /* Para Firefox */
+}
+
+#carrito-items::-webkit-scrollbar-track {
+    background: #2a3942;
+}
+
+#carrito-items::-webkit-scrollbar-thumb {
+    background: #8696a0;
+}
+
+#carrito-items::-webkit-scrollbar-thumb:hover {
+    background: #00a884;
+}
+
+/* Buscador PC - Tema oscuro */
+body.dark-theme #buscador {
+    background-color: #2a3942;
+}
+
+body.dark-theme #buscar-producto {
+    color: #e9edef;
+    background-color: transparent;
+}
+
+body.dark-theme #buscar-producto::placeholder {
+    color: #8696a0;
+}
+
+body.dark-theme #btn-buscar {
+    color: #8696a0;
+}
+
+/* Buscador móvil - Tema oscuro */
+body.dark-theme #mobile-search-container {
+    background-color: #202c33;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+body.dark-theme #mobile-buscar-producto {
+    background-color: #2a3942;
+    color: #e9edef;
+    border: 1px solid #30383d;
+}
+
+body.dark-theme #mobile-buscar-producto::placeholder {
+    color: #8696a0;
+}
+
+body.dark-theme #mobile-btn-buscar {
+    background-color: #00a884;
+}
+
+body.dark-theme #mobile-btn-buscar:hover {
+    background-color: #008f72;
+}
+
+/* Estilos para tema oscuro */
+body.dark-theme #categorias-container {
+    background-color: #202c33;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+body.dark-theme #categoria-btn {
+    background-color: #2a3942;
+    color: #e9edef;
+}
+
+body.dark-theme #categoria-btn:hover {
+    background-color: #30383d;
+}
+
+body.dark-theme #categoria-btn.active {
+    background-color: #00a884;
+    color: white;
+}
+
+/* ===== BARRA FIJA DE CATEGORÍAS - TEMA OSCURO ===== */
+body.dark-theme #categorias-fixed {
+    background: #202c33 !important;
+    border-top: 1px solid #30383d !important;
+    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-theme #categorias-fixed .categoria-btn {
+    background-color: #2a3942 !important;
+    color: #e9edef !important;
+}
+
+body.dark-theme #categorias-fixed .categoria-btn:hover {
+    background-color: #30383d !important;
+}
+
+body.dark-theme #categorias-fixed .categoria-btn.active {
+    background-color: #00a884 !important;
+    color: white !important;
+}
+
+body.dark-theme #categorias-fixed .categorias-container::-webkit-scrollbar-thumb {
+    background: #00a884 !important;
+}
