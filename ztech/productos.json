@@ -7,7 +7,16 @@
         "descripcion": "Prepárate para los auriculares True Wireless más inteligentes que hayas visto hasta ahora. Los auriculares JBL Tour Pro 3 se presentan en una funda de carga inteligente recientemente rediseñada con una práctica pantalla táctil repleta de funciones que te ofrece un control total de tu experiencia sonora sin sacar el teléfono del bolsillo. Conéctate fácilmente a cualquier dispositivo Bluetooth® y sumérgete en la música, las películas y los juegos con el sonido JBL Spatial 360 con seguimiento de la cabeza. Los JBL Tour Pro 3 también incorporan el legendario sonido JBL Pro de alta resolución. A la hora de trabajar, aíslate del mundo con la cancelación de ruido True Adaptive en tiempo real. Y si estás volando, utiliza la funda de carga inteligente, Smart Charging Case™ como transmisor de audio para conectarte sin cables al sistema de entretenimiento en vuelo (o el PC) y disfrutar de una experiencia de sonido de cine mientras estás en el aire. O bien, en tu escritorio, conecta fácilmente la funda de caga inteligente al ordenador para disfrutar de llamadas con una calidad perfecta.",
         "categoria": "Articulares"
     },
+    {
+        "id": 0,
+        "nombre": "Apple AirPods Pro 2 gen",
+        "precio": 110,
+        "imagen": "img/JBL_Tour Pro 3.png",
+        "descripcion": "Los AirPods Pro vienen con hasta 2 veces más Cancelación Activa de Ruido1, modo Ambiente adaptable y audio espacial personalizado con seguimiento dinámico de la cabeza para que disfrutes un sonido inmersivo.2 Y ahora con distintos tamaños de almohadillas (XS, S, M, L) y hasta 6 horas de reproducción de audio.",
+        "categoria": "Articulares"
+    }
 ]
+
 
 
 
