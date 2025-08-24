@@ -252,9 +252,8 @@
             font-size: 2.5rem;
             margin-bottom: 3rem;
             position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
+            display: block;
+            width: 100%;
         }
 
         .section-title::after {
@@ -420,13 +419,13 @@
             transform: scale(1.3);
         }
 
-        /* Services mejorado */
-        .services {
+        /* Categories Section */
+        .categories {
             padding: 6rem 2rem;
             background: linear-gradient(to bottom, #0d161b 0%, #111b21 100%);
         }
 
-        .services-grid {
+        .categories-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2.5rem;
@@ -434,7 +433,7 @@
             margin: 0 auto;
         }
 
-        .service-card {
+        .category-card {
             background: var(--dark-card);
             padding: 2.5rem;
             border-radius: 20px;
@@ -445,7 +444,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
-        .service-card::before {
+        .category-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -455,12 +454,12 @@
             background: linear-gradient(45deg, var(--primary), #25d366);
         }
 
-        .service-card:hover {
+        .category-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
         }
 
-        .service-icon {
+        .category-icon {
             font-size: 3.5rem;
             margin-bottom: 1.5rem;
             background: linear-gradient(45deg, var(--primary), #25d366);
@@ -469,15 +468,34 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .service-card h3 {
+        .category-card h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
             color: var(--dark-text);
         }
 
-        .service-card p {
+        .category-card p {
             color: var(--dark-secondary);
             line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-btn {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .category-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
         }
 
         /* Footer mejorado */
@@ -564,6 +582,13 @@
             color: var(--dark-secondary);
         }
 
+        /* Centrado de secciones */
+        .section-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
         /* Responsive */
         @media (max-width: 992px) {
             .hero h1 {
@@ -596,6 +621,10 @@
             .section-title {
                 font-size: 2rem;
             }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -612,7 +641,7 @@
             }
             
             .featured-products,
-            .services {
+            .categories {
                 padding: 4rem 1rem;
             }
         }
@@ -647,7 +676,7 @@
                 <ul>
                     <li><a href="#" class="active">Inicio</a></li>
                     <li><a href="tienda.html">Tienda</a></li>
-                    <li><a href="#services">Servicios</a></li>
+                    <li><a href="#categories">Categorías</a></li>
                     <li><a href="#contact">Contacto</a></li>
                 </ul>
             </nav>
@@ -673,8 +702,8 @@
                 <a href="tienda.html" class="btn btn-primary fade-in">
                     <i class="fas fa-store"></i> Ver Catálogo
                 </a>
-                <a href="#services" class="btn btn-secondary fade-in">
-                    <i class="fas fa-info-circle"></i> Nuestros Servicios
+                <a href="#categories" class="btn btn-secondary fade-in">
+                    <i class="fas fa-tags"></i> Ver Categorías
                 </a>
             </div>
         </div>
@@ -682,35 +711,25 @@
 
     <!-- Featured Products -->
     <section class="featured-products" id="featured">
-        <h2 class="section-title fade-in">Productos Destacados</h2>
-        <div class="products-slider">
-            <div class="slider-container" id="slider-container">
-                <!-- Los productos se cargarán dinámicamente con JavaScript -->
+        <div class="section-container">
+            <h2 class="section-title fade-in">Productos Destacados</h2>
+            <div class="products-slider">
+                <div class="slider-container" id="slider-container">
+                    <!-- Los productos se cargarán dinámicamente con JavaScript -->
+                </div>
             </div>
-        </div>
-        <div class="slider-controls" id="slider-controls">
-            <!-- Los dots se generarán dinámicamente -->
+            <div class="slider-controls" id="slider-controls">
+                <!-- Los dots se generarán dinámicamente -->
+            </div>
         </div>
     </section>
 
-    <!-- Services -->
-    <section class="services" id="services">
-        <h2 class="section-title fade-in">Nuestros Servicios</h2>
-        <div class="services-grid">
-            <div class="service-card fade-in">
-                <i class="fas fa-print service-icon"></i>
-                <h3>Impresión Digital</h3>
-                <p>Impresiones de alta calidad en diversos materiales, desde papel hasta vinilos y lonas. Tecnología de punta para resultados excepcionales.</p>
-            </div>
-            <div class="service-card fade-in">
-                <i class="fas fa-id-card service-icon"></i>
-                <h3>Tarjetas Personales</h3>
-                <p>Diseño profesional y fabricación de tarjetas de presentación que reflejen la identidad de tu marca y dejen una impresión duradera.</p>
-            </div>
-            <div class="service-card fade-in">
-                <i class="fas fa-ad service-icon"></i>
-                <h3>Publicidad Exterior</h3>
-                <p>Banners, pendones, vallas publicitarias y más. Materiales resistentes y diseños impactantes para maximizar tu visibilidad.</p>
+    <!-- Categories Section -->
+    <section class="categories" id="categories">
+        <div class="section-container">
+            <h2 class="section-title fade-in">Categorías Destacadas</h2>
+            <div class="categories-grid" id="categories-container">
+                <!-- Las categorías se cargarán dinámicamente con JavaScript -->
             </div>
         </div>
     </section>
@@ -756,6 +775,40 @@
         let currentSlide = 0;
         const slidesToShow = 4;
 
+        // Categorías predefinidas con iconos
+        const categoriasData = [
+            {
+                nombre: "Tarjetas y Papelería",
+                descripcion: "Tarjetas personales, volantes, trípticos y material corporativo de alta calidad.",
+                icono: "fa-id-card"
+            },
+            {
+                nombre: "Publicidad Exterior",
+                descripcion: "Banners, pendones, vallas publicitarias y displays para maximizar tu visibilidad.",
+                icono: "fa-ad"
+            },
+            {
+                nombre: "Señalización",
+                descripcion: "Señales informativas, direccionales y de seguridad para todo tipo de espacios.",
+                icono: "fa-map-signs"
+            },
+            {
+                nombre: "Material POP",
+                descripcion: "Exhibidores, stands y material promocional para punto de venta.",
+                icono: "fa-store"
+            },
+            {
+                nombre: "Impresión Digital",
+                descripcion: "Impresiones de alta calidad en diversos materiales y formatos.",
+                icono: "fa-print"
+            },
+            {
+                nombre: "Gran Formato",
+                descripcion: "Impresiones a gran escala para eventos, ferias y exposiciones.",
+                icono: "fa-expand-arrows-alt"
+            }
+        ];
+
         // Cargar productos
         async function cargarProductos() {
             try {
@@ -770,6 +823,9 @@
                 
                 // Crear controles del slider
                 crearSliderControls();
+                
+                // Mostrar categorías aleatorias
+                mostrarCategoriasAleatorias();
             } catch (error) {
                 console.error('Error al cargar productos:', error);
             }
@@ -822,6 +878,36 @@
                     card.classList.add('visible');
                 });
             }, 100);
+        }
+
+        // Mostrar 3 categorías aleatorias
+        function mostrarCategoriasAleatorias() {
+            const categoriesContainer = document.getElementById('categories-container');
+            categoriesContainer.innerHTML = '';
+            
+            // Mezclar categorías y tomar 3
+            const categoriasAleatorias = shuffleArray([...categoriasData]).slice(0, 3);
+            
+            categoriasAleatorias.forEach(categoria => {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'category-card fade-in';
+                categoryCard.innerHTML = `
+                    <i class="fas ${categoria.icono} category-icon"></i>
+                    <h3>${categoria.nombre}</h3>
+                    <p>${categoria.descripcion}</p>
+                    <a href="tienda.html" class="category-btn">
+                        <i class="fas fa-arrow-right"></i> Ver Productos
+                    </a>
+                `;
+                categoriesContainer.appendChild(categoryCard);
+            });
+            
+            // Animar categorías
+            setTimeout(() => {
+                document.querySelectorAll('.category-card.fade-in').forEach(card => {
+                    card.classList.add('visible');
+                });
+            }, 200);
         }
 
         // Crear controles del slider
