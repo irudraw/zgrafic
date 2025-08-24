@@ -113,41 +113,6 @@
             color: var(--primary);
         }
 
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .header-icon {
-            font-size: 1.3rem;
-            color: var(--dark-text);
-            transition: var(--transition);
-            cursor: pointer;
-            position: relative;
-        }
-
-        .header-icon:hover {
-            color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        #contador {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff3b30;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-
         /* Hero section mejorada */
         .hero {
             min-height: 100vh;
@@ -296,6 +261,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             transition: var(--transition);
             position: relative;
+            cursor: pointer;
         }
 
         .product-card:hover {
@@ -358,13 +324,8 @@
             overflow: hidden;
         }
 
-        .product-actions {
-            display: flex;
-            gap: 1rem;
-        }
-
         .product-btn {
-            flex: 1;
+            width: 100%;
             padding: 0.8rem;
             border: none;
             border-radius: 10px;
@@ -375,27 +336,15 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-        }
-
-        .btn-add {
-            background: linear-gradient(45deg, var(--primary), #25d366);
-            color: white;
-        }
-
-        .btn-add:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 168, 132, 0.4);
-        }
-
-        .btn-details {
             background: transparent;
-            color: var(--dark-text);
-            border: 2px solid var(--dark-border);
+            color: var(--primary);
+            border: 2px solid var(--primary);
         }
 
-        .btn-details:hover {
-            border-color: var(--primary);
-            color: var(--primary);
+        .product-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
         }
 
         .slider-controls {
@@ -565,7 +514,7 @@
             justify-content: center;
             color: var(--dark-text);
             font-size: 1.2rem;
-            transition: var(--transition);
+            transition: var(--transition;
         }
 
         .social-icon:hover {
@@ -669,41 +618,31 @@
         <div class="header-content">
             <div class="logo">
                 <i class="fas fa-paint-brush"></i>
-                ZGrafic
+                <span id="logo-text">ZGrafic</span>
             </div>
             
             <nav class="main-nav">
                 <ul>
-                    <li><a href="#" class="active">Inicio</a></li>
-                    <li><a href="tienda.html">Tienda</a></li>
-                    <li><a href="#categories">Categorías</a></li>
-                    <li><a href="#contact">Contacto</a></li>
+                    <li><a href="#" class="active" id="nav-inicio">Inicio</a></li>
+                    <li><a href="tienda.html" id="nav-tienda">Tienda</a></li>
+                    <li><a href="#categories" id="nav-categorias">Categorías</a></li>
+                    <li><a href="#contact" id="nav-contacto">Contacto</a></li>
                 </ul>
             </nav>
-            
-            <div class="header-icons">
-                <div class="header-icon" id="theme-toggle">
-                    <i class="fas fa-moon"></i>
-                </div>
-                <div class="header-icon" id="carrito-contador">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="contador">0</span>
-                </div>
-            </div>
         </div>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1 class="fade-in">Soluciones Gráficas de Alta Calidad</h1>
-            <p class="fade-in">Diseño, impresión y publicidad para hacer crecer tu negocio</p>
+            <h1 class="fade-in" id="hero-title">Soluciones Gráficas de Alta Calidad</h1>
+            <p class="fade-in" id="hero-subtitle">Diseño, impresión y publicidad para hacer crecer tu negocio</p>
             <div class="hero-buttons">
-                <a href="tienda.html" class="btn btn-primary fade-in">
-                    <i class="fas fa-store"></i> Ver Catálogo
+                <a href="tienda.html" class="btn btn-primary fade-in" id="hero-btn-primary">
+                    <i class="fas fa-store"></i> <span id="hero-btn-primary-text">Ver Catálogo</span>
                 </a>
-                <a href="#categories" class="btn btn-secondary fade-in">
-                    <i class="fas fa-tags"></i> Ver Categorías
+                <a href="#categories" class="btn btn-secondary fade-in" id="hero-btn-secondary">
+                    <i class="fas fa-tags"></i> <span id="hero-btn-secondary-text">Ver Categorías</span>
                 </a>
             </div>
         </div>
@@ -712,7 +651,7 @@
     <!-- Featured Products -->
     <section class="featured-products" id="featured">
         <div class="section-container">
-            <h2 class="section-title fade-in">Productos Destacados</h2>
+            <h2 class="section-title fade-in" id="products-title">Productos Destacados</h2>
             <div class="products-slider">
                 <div class="slider-container" id="slider-container">
                     <!-- Los productos se cargarán dinámicamente con JavaScript -->
@@ -727,7 +666,7 @@
     <!-- Categories Section -->
     <section class="categories" id="categories">
         <div class="section-container">
-            <h2 class="section-title fade-in">Categorías Destacadas</h2>
+            <h2 class="section-title fade-in" id="categories-title">Categorías Destacadas</h2>
             <div class="categories-grid" id="categories-container">
                 <!-- Las categorías se cargarán dinámicamente con JavaScript -->
             </div>
@@ -738,17 +677,17 @@
     <footer id="contact">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>ZGrafic</h3>
-                <p>Soluciones gráficas integrales para empresas y emprendedores. Calidad, rapidez y precios competitivos.</p>
+                <h3 id="footer-brand">ZGrafic</h3>
+                <p id="footer-description">Soluciones gráficas integrales para empresas y emprendedores. Calidad, rapidez y precios competitivos.</p>
             </div>
             <div class="footer-section footer-contact">
-                <h3>Contacto</h3>
-                <p><i class="fas fa-phone"></i> (01) 123-4567</p>
-                <p><i class="fas fa-envelope"></i> info@zgrafic.com</p>
-                <p><i class="fas fa-map-marker-alt"></i> Av. Principal 123, Lima, Perú</p>
+                <h3 id="footer-contact-title">Contacto</h3>
+                <p><i class="fas fa-phone"></i> <span id="footer-phone">(01) 123-4567</span></p>
+                <p><i class="fas fa-envelope"></i> <span id="footer-email">info@zgrafic.com</span></p>
+                <p><i class="fas fa-map-marker-alt"></i> <span id="footer-address">Av. Principal 123, Lima, Perú</span></p>
             </div>
             <div class="footer-section">
-                <h3>Síguenos</h3>
+                <h3 id="footer-social-title">Síguenos</h3>
                 <div class="social-icons">
                     <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
@@ -757,57 +696,89 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2023 ZGrafic. Todos los derechos reservados.</p>
+            <p id="footer-copyright">&copy; 2023 ZGrafic. Todos los derechos reservados.</p>
         </div>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script>
-        // Inicializar AOS
-        AOS.init({
-            duration: 1000,
-            once: true,
-            offset: 100
-        });
-
         // Variables globales
         let productos = [];
+        let textos = {};
         let currentSlide = 0;
         const slidesToShow = 4;
 
-        // Categorías predefinidas con iconos
-        const categoriasData = [
-            {
-                nombre: "Tarjetas y Papelería",
-                descripcion: "Tarjetas personales, volantes, trípticos y material corporativo de alta calidad.",
-                icono: "fa-id-card"
-            },
-            {
-                nombre: "Publicidad Exterior",
-                descripcion: "Banners, pendones, vallas publicitarias y displays para maximizar tu visibilidad.",
-                icono: "fa-ad"
-            },
-            {
-                nombre: "Señalización",
-                descripcion: "Señales informativas, direccionales y de seguridad para todo tipo de espacios.",
-                icono: "fa-map-signs"
-            },
-            {
-                nombre: "Material POP",
-                descripcion: "Exhibidores, stands y material promocional para punto de venta.",
-                icono: "fa-store"
-            },
-            {
-                nombre: "Impresión Digital",
-                descripcion: "Impresiones de alta calidad en diversos materiales y formatos.",
-                icono: "fa-print"
-            },
-            {
-                nombre: "Gran Formato",
-                descripcion: "Impresiones a gran escala para eventos, ferias y exposiciones.",
-                icono: "fa-expand-arrows-alt"
+        // Cargar textos desde JSON externo
+        async function cargarTextos() {
+            try {
+                const response = await fetch('textos.json');
+                textos = await response.json();
+                aplicarTextos();
+            } catch (error) {
+                console.error('Error al cargar textos:', error);
+                // Textos por defecto en caso de error
+                textos = {
+                    marca: "ZGrafic",
+                    navegacion: {
+                        inicio: "Inicio",
+                        tienda: "Tienda",
+                        categorias: "Categorías",
+                        contacto: "Contacto"
+                    },
+                    hero: {
+                        titulo: "Soluciones Gráficas de Alta Calidad",
+                        subtitulo: "Diseño, impresión y publicidad para hacer crecer tu negocio",
+                        botonPrincipal: "Ver Catálogo",
+                        botonSecundario: "Ver Categorías"
+                    },
+                    secciones: {
+                        productos: "Productos Destacados",
+                        categorias: "Categorías Destacadas"
+                    },
+                    footer: {
+                        marca: "ZGrafic",
+                        descripcion: "Soluciones gráficas integrales para empresas y emprendedores. Calidad, rapidez y precios competitivos.",
+                        contacto: "Contacto",
+                        telefono: "(01) 123-4567",
+                        email: "info@zgrafic.com",
+                        direccion: "Av. Principal 123, Lima, Perú",
+                        siguenos: "Síguenos",
+                        copyright: "© 2023 ZGrafic. Todos los derechos reservados."
+                    }
+                };
+                aplicarTextos();
             }
-        ];
+        }
+
+        // Aplicar textos a la interfaz
+        function aplicarTextos() {
+            // Header
+            document.getElementById('logo-text').textContent = textos.marca;
+            document.getElementById('nav-inicio').textContent = textos.navegacion.inicio;
+            document.getElementById('nav-tienda').textContent = textos.navegacion.tienda;
+            document.getElementById('nav-categorias').textContent = textos.navegacion.categorias;
+            document.getElementById('nav-contacto').textContent = textos.navegacion.contacto;
+
+            // Hero
+            document.getElementById('hero-title').textContent = textos.hero.titulo;
+            document.getElementById('hero-subtitle').textContent = textos.hero.subtitulo;
+            document.getElementById('hero-btn-primary-text').textContent = textos.hero.botonPrincipal;
+            document.getElementById('hero-btn-secondary-text').textContent = textos.hero.botonSecundario;
+
+            // Secciones
+            document.getElementById('products-title').textContent = textos.secciones.productos;
+            document.getElementById('categories-title').textContent = textos.secciones.categorias;
+
+            // Footer
+            document.getElementById('footer-brand').textContent = textos.footer.marca;
+            document.getElementById('footer-description').textContent = textos.footer.descripcion;
+            document.getElementById('footer-contact-title').textContent = textos.footer.contacto;
+            document.getElementById('footer-phone').textContent = textos.footer.telefono;
+            document.getElementById('footer-email').textContent = textos.footer.email;
+            document.getElementById('footer-address').textContent = textos.footer.direccion;
+            document.getElementById('footer-social-title').textContent = textos.footer.siguenos;
+            document.getElementById('footer-copyright').textContent = textos.footer.copyright;
+        }
 
         // Cargar productos
         async function cargarProductos() {
@@ -851,6 +822,9 @@
             productosMostrar.forEach(producto => {
                 const productCard = document.createElement('div');
                 productCard.className = 'product-card fade-in';
+                productCard.onclick = () => {
+                    window.location.href = `tienda.html?producto=${producto.id}`;
+                };
                 productCard.innerHTML = `
                     <div class="product-image">
                         <img src="${producto.imagen}" alt="${producto.nombre}" onerror="this.src='https://via.placeholder.com/300x200/202c33/8696a0?text=Imagen+no+disponible'">
@@ -859,14 +833,9 @@
                         <h3>${producto.nombre}</h3>
                         <span class="product-price">${producto.precio === 0 ? 'Cotizar' : `S/.${producto.precio.toFixed(2)}`}</span>
                         <p class="product-description">${producto.descripcion.split('\n')[0]}</p>
-                        <div class="product-actions">
-                            <button class="product-btn btn-add" onclick="agregarAlCarrito(${producto.id})">
-                                <i class="fas fa-cart-plus"></i> Agregar
-                            </button>
-                            <button class="product-btn btn-details" onclick="window.location.href='tienda.html?producto=${producto.id}'">
-                                <i class="fas fa-eye"></i> Ver
-                            </button>
-                        </div>
+                        <button class="product-btn">
+                            <i class="fas fa-arrow-right"></i> Ver Detalles
+                        </button>
                     </div>
                 `;
                 sliderContainer.appendChild(productCard);
@@ -884,6 +853,40 @@
         function mostrarCategoriasAleatorias() {
             const categoriesContainer = document.getElementById('categories-container');
             categoriesContainer.innerHTML = '';
+            
+            // Categorías predefinidas
+            const categoriasData = [
+                {
+                    nombre: "Tarjetas y Papelería",
+                    descripcion: "Tarjetas personales, volantes, trípticos y material corporativo de alta calidad.",
+                    icono: "fa-id-card"
+                },
+                {
+                    nombre: "Publicidad Exterior",
+                    descripcion: "Banners, pendones, vallas publicitarias y displays para maximizar tu visibilidad.",
+                    icono: "fa-ad"
+                },
+                {
+                    nombre: "Señalización",
+                    descripcion: "Señales informativas, direccionales y de seguridad para todo tipo de espacios.",
+                    icono: "fa-map-signs"
+                },
+                {
+                    nombre: "Material POP",
+                    descripcion: "Exhibidores, stands y material promocional para punto de venta.",
+                    icono: "fa-store"
+                },
+                {
+                    nombre: "Impresión Digital",
+                    descripcion: "Impresiones de alta calidad en diversos materiales y formatos.",
+                    icono: "fa-print"
+                },
+                {
+                    nombre: "Gran Formato",
+                    descripcion: "Impresiones a gran escala para eventos, ferias y exposiciones.",
+                    icono: "fa-expand-arrows-alt"
+                }
+            ];
             
             // Mezclar categorías y tomar 3
             const categoriasAleatorias = shuffleArray([...categoriasData]).slice(0, 3);
@@ -961,52 +964,20 @@
             });
         });
 
-        // Toggle tema
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            const icon = document.querySelector('#theme-toggle i');
-            if (icon.classList.contains('fa-moon')) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                // Cambiar a tema claro (podrías implementar esto)
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                // Volver a tema oscuro
-            }
-        });
-
-        // Función para agregar al carrito (simulada)
-        function agregarAlCarrito(id) {
-            const producto = productos.find(p => p.id === id);
-            const contador = document.getElementById('contador');
-            let count = parseInt(contador.textContent);
-            contador.textContent = count + 1;
-            
-            // Mostrar notificación
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: var(--primary);
-                color: white;
-                padding: 15px 25px;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
-            `;
-            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${producto.nombre} agregado al carrito`;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 3000);
-        }
-
         // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
-            cargarProductos();
+            // Inicializar AOS
+            AOS.init({
+                duration: 1000,
+                once: true,
+                offset: 100
+            });
+
+            // Cargar textos primero
+            cargarTextos().then(() => {
+                // Luego cargar productos
+                cargarProductos();
+            });
             
             // Animar elementos iniciales
             setTimeout(() => {
