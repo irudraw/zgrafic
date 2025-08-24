@@ -9,14 +9,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
   <style>
-    /* Slider */
+    /* --- SLIDER --- */
     .slider-container {
       position: relative;
       overflow: hidden;
       width: 100%;
-      max-height: 400px;
-      margin-bottom: 30px;
-      border-radius: 12px;
+      max-height: 420px;
+      margin-bottom: 40px;
+      border-radius: 15px;
     }
     .slider-wrapper {
       display: flex;
@@ -24,26 +24,13 @@
     }
     .slide {
       min-width: 100%;
-      box-sizing: border-box;
       text-align: center;
       background: #202c33;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
     }
     .slide img {
-      max-height: 250px;
-      object-fit: contain;
-      margin: 15px auto;
-    }
-    .slide h3 {
-      margin: 10px 0;
-      color: #e9edef;
-    }
-    .slide .precio {
-      color: #00a884;
-      font-weight: bold;
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
     }
     .slider-controls {
       position: absolute;
@@ -57,14 +44,60 @@
       background: rgba(0,0,0,0.5);
       border: none;
       color: #fff;
-      padding: 10px;
+      padding: 12px;
       cursor: pointer;
       border-radius: 50%;
+      font-size: 20px;
+    }
+
+    /* --- PRODUCTOS ALEATORIOS --- */
+    .productos-section {
+      margin: 40px auto;
+    }
+    .productos-section h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #e9edef;
     }
     .productos-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 20px;
+    }
+    .producto {
+      padding: 15px;
+      border-radius: 10px;
+      transition: transform 0.2s;
+    }
+    .producto:hover {
+      transform: translateY(-5px);
+    }
+    .producto img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    /* --- SECCION DE DATOS --- */
+    .datos-section {
+      margin: 50px auto;
+      padding: 30px;
+      background-color: #202c33;
+      border-radius: 15px;
+      text-align: center;
+    }
+    .datos-section h2 {
+      margin-bottom: 20px;
+      color: #00a884;
+    }
+    .datos-section p {
+      margin: 8px 0;
+      color: #e9edef;
+    }
+    .datos-section i {
+      margin-right: 8px;
+      color: #00a884;
     }
   </style>
 </head>
@@ -72,7 +105,7 @@
   <header>
     <div class="header-content">
       <h1>Tienda en línea</h1>
-      <!-- Buscador PC -->
+      <!-- Buscador -->
       <div id="buscador-pc">
         <div id="buscador">
           <input type="text" id="buscar-producto" placeholder="Buscar productos...">
@@ -80,10 +113,7 @@
         </div>
       </div>
       <div class="header-icons">
-        <div id="mobile-search-icon" onclick="toggleMobileSearch()">
-          <i class="fas fa-search"></i>
-        </div>
-        <div id="carrito-contador" onclick="abrirCarritoPopup()">
+        <div id="carrito-contador">
           <i class="fas fa-shopping-cart"></i>
           <span id="contador">0</span>
         </div>
@@ -91,62 +121,38 @@
     </div>
   </header>
 
-  <main role="main">
-    <!-- SLIDER DE PRODUCTOS NUEVOS -->
+  <main>
+    <!-- SLIDER DE IMÁGENES PERSONALIZADAS -->
     <section class="slider-container">
-      <div class="slider-wrapper" id="slider"></div>
+      <div class="slider-wrapper" id="slider">
+        <div class="slide"><img src="banner/banner1.jpg" alt="Promo 1"></div>
+        <div class="slide"><img src="banner/banner2.jpg" alt="Promo 2"></div>
+        <div class="slide"><img src="banner/banner3.jpg" alt="Promo 3"></div>
+      </div>
       <div class="slider-controls">
         <button id="prev">&#10094;</button>
         <button id="next">&#10095;</button>
       </div>
     </section>
 
-    <!-- LISTADO DE PRODUCTOS ALEATORIOS -->
-    <section id="productos" class="productos-grid"></section>
+    <!-- PRODUCTOS ALEATORIOS -->
+    <section class="productos-section">
+      <h2>Productos destacados</h2>
+      <div id="productos" class="productos-grid"></div>
+    </section>
+
+    <!-- SECCIÓN DE DATOS -->
+    <section class="datos-section">
+      <h2>Contáctanos</h2>
+      <p><i class="fas fa-map-marker-alt"></i> Dirección: Av. Siempre Viva 123 - Lima</p>
+      <p><i class="fas fa-phone"></i> WhatsApp: +51 987 654 321</p>
+      <p><i class="fas fa-envelope"></i> Email: contacto@mitienda.com</p>
+      <p><i class="fas fa-clock"></i> Horario: Lunes a Sábado - 9am a 7pm</p>
+    </section>
   </main>
 
-  <!-- Popup Carrito -->
-  <div id="carrito-popup" class="popup">
-    <div class="popup-content">
-      <span class="cerrar-popup" onclick="cerrarCarritoPopup()">&times;</span>
-      <h2>Tu Carrito</h2>
-      <div id="carrito-items"></div>
-      <div id="carrito-total">Total: S/. 0.00</div>
-      <button id="ver-carrito-completo">Ver Carrito Completo</button>
-    </div>
-  </div>
-
   <script>
-    let productos = [];
-
-    // Cargar productos JSON
-    fetch("productos.json")
-      .then(res => res.json())
-      .then(data => {
-        productos = data;
-
-        // SLIDER con los 3 primeros como "nuevos"
-        cargarSlider(productos.slice(0,3));
-
-        // Productos aleatorios
-        const aleatorios = productos.sort(() => Math.random() - 0.5);
-        cargarProductos(aleatorios);
-      });
-
-    function cargarSlider(lista) {
-      const slider = document.getElementById("slider");
-      slider.innerHTML = "";
-      lista.forEach(prod => {
-        slider.innerHTML += `
-          <div class="slide">
-            <img src="${prod.imagen}" alt="${prod.nombre}">
-            <h3>${prod.nombre}</h3>
-            <p class="precio">S/. ${prod.precio}</p>
-          </div>`;
-      });
-      iniciarSlider();
-    }
-
+    // --- SLIDER ---
     function iniciarSlider() {
       const slider = document.querySelector(".slider-wrapper");
       const slides = document.querySelectorAll(".slide");
@@ -161,7 +167,22 @@
         index = (index - 1 + slides.length) % slides.length;
         slider.style.transform = `translateX(-${index * 100}%)`;
       };
+
+      // Auto-play
+      setInterval(() => {
+        index = (index + 1) % slides.length;
+        slider.style.transform = `translateX(-${index * 100}%)`;
+      }, 5000);
     }
+    iniciarSlider();
+
+    // --- PRODUCTOS ALEATORIOS ---
+    fetch("productos.json")
+      .then(res => res.json())
+      .then(data => {
+        const aleatorios = data.sort(() => Math.random() - 0.5).slice(0, 6);
+        cargarProductos(aleatorios);
+      });
 
     function cargarProductos(lista) {
       const contenedor = document.getElementById("productos");
