@@ -1,202 +1,944 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tienda en línea</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="dark-theme.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZGrafic - Soluciones Gráficas Profesionales</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+        /* Reset y estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <style>
-    /* --- SLIDER --- */
-    .slider-container {
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-      max-height: 420px;
-      margin-bottom: 40px;
-      border-radius: 15px;
-    }
-    .slider-wrapper {
-      display: flex;
-      transition: transform 0.5s ease-in-out;
-    }
-    .slide {
-      min-width: 100%;
-      text-align: center;
-      background: #202c33;
-    }
-    .slide img {
-      width: 100%;
-      height: 420px;
-      object-fit: cover;
-    }
-    .slider-controls {
-      position: absolute;
-      top: 50%;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      transform: translateY(-50%);
-    }
-    .slider-controls button {
-      background: rgba(0,0,0,0.5);
-      border: none;
-      color: #fff;
-      padding: 12px;
-      cursor: pointer;
-      border-radius: 50%;
-      font-size: 20px;
-    }
+        :root {
+            --primary: #00a884;
+            --primary-dark: #008f72;
+            --dark-bg: #111b21;
+            --dark-card: #202c33;
+            --dark-text: #e9edef;
+            --dark-secondary: #8696a0;
+            --dark-border: #30383d;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-    /* --- PRODUCTOS ALEATORIOS --- */
-    .productos-section {
-      margin: 40px auto;
-    }
-    .productos-section h2 {
-      margin-bottom: 20px;
-      text-align: center;
-      color: #e9edef;
-    }
-    .productos-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    .producto {
-      padding: 15px;
-      border-radius: 10px;
-      transition: transform 0.2s;
-    }
-    .producto:hover {
-      transform: translateY(-5px);
-    }
-    .producto img {
-      width: 100%;
-      height: 180px;
-      object-fit: contain;
-      margin-bottom: 10px;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d161b 0%, #111b21 100%);
+            color: var(--dark-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-    /* --- SECCION DE DATOS --- */
-    .datos-section {
-      margin: 50px auto;
-      padding: 30px;
-      background-color: #202c33;
-      border-radius: 15px;
-      text-align: center;
-    }
-    .datos-section h2 {
-      margin-bottom: 20px;
-      color: #00a884;
-    }
-    .datos-section p {
-      margin: 8px 0;
-      color: #e9edef;
-    }
-    .datos-section i {
-      margin-right: 8px;
-      color: #00a884;
-    }
-  </style>
+        /* Header mejorado */
+        header {
+            background: rgba(17, 27, 33, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--dark-border);
+            transition: var(--transition);
+        }
+
+        .header-scrolled {
+            padding: 0.8rem 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), #25d366);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .main-nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .main-nav a {
+            color: var(--dark-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 0;
+            position: relative;
+            font-size: 1.1rem;
+        }
+
+        .main-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .main-nav a:hover::after,
+        .main-nav a.active::after {
+            width: 100%;
+        }
+
+        .main-nav a.active,
+        .main-nav a:hover {
+            color: var(--primary);
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-icon {
+            font-size: 1.3rem;
+            color: var(--dark-text);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .header-icon:hover {
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        #contador {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        /* Hero section mejorada */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 0 2rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 168, 132, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(37, 211, 102, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--dark-text), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            color: var(--dark-secondary);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), #25d366);
+            color: white;
+            box-shadow: 0 10px 20px rgba(0, 168, 132, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 168, 132, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--dark-text);
+            border: 2px solid var(--dark-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        /* Featured Products mejorado */
+        .featured-products {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .products-slider {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slider-container {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .slider-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .product-card {
+            min-width: 320px;
+            background: var(--dark-card);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(45deg, var(--primary), #25d366);
+        }
+
+        .product-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--dark-text);
+        }
+
+        .product-price {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: block;
+        }
+
+        .product-description {
+            color: var(--dark-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .product-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-add {
+            background: linear-gradient(45deg, var(--primary), #25d366);
+            color: white;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 168, 132, 0.4);
+        }
+
+        .btn-details {
+            background: transparent;
+            color: var(--dark-text);
+            border: 2px solid var(--dark-border);
+        }
+
+        .btn-details:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--dark-border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .slider-dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
+        }
+
+        /* Services mejorado */
+        .services {
+            padding: 6rem 2rem;
+            background: linear-gradient(to bottom, #0d161b 0%, #111b21 100%);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: var(--dark-card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(45deg, var(--primary), #25d366);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .service-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), #25d366);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-text);
+        }
+
+        .service-card p {
+            color: var(--dark-secondary);
+            line-height: 1.7;
+        }
+
+        /* Footer mejorado */
+        footer {
+            background: #0d161b;
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid var(--dark-border);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .footer-section p {
+            color: var(--dark-secondary);
+            margin-bottom: 1.2rem;
+            line-height: 1.7;
+        }
+
+        .footer-contact p {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .footer-contact i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--dark-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-text);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 3rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--dark-border);
+            color: var(--dark-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .main-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .product-card {
+                min-width: 280px;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 1rem;
+            }
+            
+            .hero {
+                padding: 0 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .featured-products,
+            .services {
+                padding: 4rem 1rem;
+            }
+        }
+
+        /* Animaciones */
+        [data-aos] {
+            transition: all 1s ease;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <h1>Tienda en línea</h1>
-      <!-- Buscador -->
-      <div id="buscador-pc">
-        <div id="buscador">
-          <input type="text" id="buscar-producto" placeholder="Buscar productos...">
-          <button id="btn-buscar"><i class="fas fa-search"></i></button>
+    <!-- Header -->
+    <header id="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-paint-brush"></i>
+                ZGrafic
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="active">Inicio</a></li>
+                    <li><a href="tienda.html">Tienda</a></li>
+                    <li><a href="#services">Servicios</a></li>
+                    <li><a href="#contact">Contacto</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-icons">
+                <div class="header-icon" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="header-icon" id="carrito-contador">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="contador">0</span>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="header-icons">
-        <div id="carrito-contador">
-          <i class="fas fa-shopping-cart"></i>
-          <span id="contador">0</span>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="fade-in">Soluciones Gráficas de Alta Calidad</h1>
+            <p class="fade-in">Diseño, impresión y publicidad para hacer crecer tu negocio</p>
+            <div class="hero-buttons">
+                <a href="tienda.html" class="btn btn-primary fade-in">
+                    <i class="fas fa-store"></i> Ver Catálogo
+                </a>
+                <a href="#services" class="btn btn-secondary fade-in">
+                    <i class="fas fa-info-circle"></i> Nuestros Servicios
+                </a>
+            </div>
         </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <!-- SLIDER DE IMÁGENES PERSONALIZADAS -->
-    <section class="slider-container">
-      <div class="slider-wrapper" id="slider">
-        <div class="slide"><img src="banner/banner1.jpg" alt="Promo 1"></div>
-        <div class="slide"><img src="banner/banner2.jpg" alt="Promo 2"></div>
-        <div class="slide"><img src="banner/banner3.jpg" alt="Promo 3"></div>
-      </div>
-      <div class="slider-controls">
-        <button id="prev">&#10094;</button>
-        <button id="next">&#10095;</button>
-      </div>
     </section>
 
-    <!-- PRODUCTOS ALEATORIOS -->
-    <section class="productos-section">
-      <h2>Productos destacados</h2>
-      <div id="productos" class="productos-grid"></div>
+    <!-- Featured Products -->
+    <section class="featured-products" id="featured">
+        <h2 class="section-title fade-in">Productos Destacados</h2>
+        <div class="products-slider">
+            <div class="slider-container" id="slider-container">
+                <!-- Los productos se cargarán dinámicamente con JavaScript -->
+            </div>
+        </div>
+        <div class="slider-controls" id="slider-controls">
+            <!-- Los dots se generarán dinámicamente -->
+        </div>
     </section>
 
-    <!-- SECCIÓN DE DATOS -->
-    <section class="datos-section">
-      <h2>Contáctanos</h2>
-      <p><i class="fas fa-map-marker-alt"></i> Dirección: Av. Siempre Viva 123 - Lima</p>
-      <p><i class="fas fa-phone"></i> WhatsApp: +51 987 654 321</p>
-      <p><i class="fas fa-envelope"></i> Email: contacto@mitienda.com</p>
-      <p><i class="fas fa-clock"></i> Horario: Lunes a Sábado - 9am a 7pm</p>
+    <!-- Services -->
+    <section class="services" id="services">
+        <h2 class="section-title fade-in">Nuestros Servicios</h2>
+        <div class="services-grid">
+            <div class="service-card fade-in">
+                <i class="fas fa-print service-icon"></i>
+                <h3>Impresión Digital</h3>
+                <p>Impresiones de alta calidad en diversos materiales, desde papel hasta vinilos y lonas. Tecnología de punta para resultados excepcionales.</p>
+            </div>
+            <div class="service-card fade-in">
+                <i class="fas fa-id-card service-icon"></i>
+                <h3>Tarjetas Personales</h3>
+                <p>Diseño profesional y fabricación de tarjetas de presentación que reflejen la identidad de tu marca y dejen una impresión duradera.</p>
+            </div>
+            <div class="service-card fade-in">
+                <i class="fas fa-ad service-icon"></i>
+                <h3>Publicidad Exterior</h3>
+                <p>Banners, pendones, vallas publicitarias y más. Materiales resistentes y diseños impactantes para maximizar tu visibilidad.</p>
+            </div>
+        </div>
     </section>
-  </main>
 
-  <script>
-    // --- SLIDER ---
-    function iniciarSlider() {
-      const slider = document.querySelector(".slider-wrapper");
-      const slides = document.querySelectorAll(".slide");
-      let index = 0;
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>ZGrafic</h3>
+                <p>Soluciones gráficas integrales para empresas y emprendedores. Calidad, rapidez y precios competitivos.</p>
+            </div>
+            <div class="footer-section footer-contact">
+                <h3>Contacto</h3>
+                <p><i class="fas fa-phone"></i> (01) 123-4567</p>
+                <p><i class="fas fa-envelope"></i> info@zgrafic.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> Av. Principal 123, Lima, Perú</p>
+            </div>
+            <div class="footer-section">
+                <h3>Síguenos</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 ZGrafic. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 
-      document.getElementById("next").onclick = () => {
-        index = (index + 1) % slides.length;
-        slider.style.transform = `translateX(-${index * 100}%)`;
-      };
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Inicializar AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
 
-      document.getElementById("prev").onclick = () => {
-        index = (index - 1 + slides.length) % slides.length;
-        slider.style.transform = `translateX(-${index * 100}%)`;
-      };
+        // Variables globales
+        let productos = [];
+        let currentSlide = 0;
+        const slidesToShow = 4;
 
-      // Auto-play
-      setInterval(() => {
-        index = (index + 1) % slides.length;
-        slider.style.transform = `translateX(-${index * 100}%)`;
-      }, 5000);
-    }
-    iniciarSlider();
+        // Cargar productos
+        async function cargarProductos() {
+            try {
+                const response = await fetch('productos.json');
+                productos = await response.json();
+                
+                // Mezclar productos aleatoriamente
+                shuffleArray(productos);
+                
+                // Mostrar productos en el slider
+                mostrarProductosSlider();
+                
+                // Crear controles del slider
+                crearSliderControls();
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
 
-    // --- PRODUCTOS ALEATORIOS ---
-    fetch("productos.json")
-      .then(res => res.json())
-      .then(data => {
-        const aleatorios = data.sort(() => Math.random() - 0.5).slice(0, 6);
-        cargarProductos(aleatorios);
-      });
+        // Función para mezclar array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
-    function cargarProductos(lista) {
-      const contenedor = document.getElementById("productos");
-      contenedor.innerHTML = "";
-      lista.forEach(prod => {
-        contenedor.innerHTML += `
-          <div class="producto">
-            <img src="${prod.imagen}" alt="${prod.nombre}">
-            <h3>${prod.nombre}</h3>
-            <p class="precio">S/. ${prod.precio}</p>
-            <p class="descripcion">${prod.descripcion}</p>
-          </div>`;
-      });
-    }
-  </script>
+        // Mostrar productos en el slider
+        function mostrarProductosSlider() {
+            const sliderContainer = document.getElementById('slider-container');
+            sliderContainer.innerHTML = '';
+            
+            // Mostrar productos (máximo 8)
+            const productosMostrar = productos.slice(0, 8);
+            
+            productosMostrar.forEach(producto => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card fade-in';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <img src="${producto.imagen}" alt="${producto.nombre}" onerror="this.src='https://via.placeholder.com/300x200/202c33/8696a0?text=Imagen+no+disponible'">
+                    </div>
+                    <div class="product-info">
+                        <h3>${producto.nombre}</h3>
+                        <span class="product-price">${producto.precio === 0 ? 'Cotizar' : `S/.${producto.precio.toFixed(2)}`}</span>
+                        <p class="product-description">${producto.descripcion.split('\n')[0]}</p>
+                        <div class="product-actions">
+                            <button class="product-btn btn-add" onclick="agregarAlCarrito(${producto.id})">
+                                <i class="fas fa-cart-plus"></i> Agregar
+                            </button>
+                            <button class="product-btn btn-details" onclick="window.location.href='tienda.html?producto=${producto.id}'">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                        </div>
+                    </div>
+                `;
+                sliderContainer.appendChild(productCard);
+            });
+            
+            // Animar productos
+            setTimeout(() => {
+                document.querySelectorAll('.product-card.fade-in').forEach(card => {
+                    card.classList.add('visible');
+                });
+            }, 100);
+        }
+
+        // Crear controles del slider
+        function crearSliderControls() {
+            const controlsContainer = document.getElementById('slider-controls');
+            controlsContainer.innerHTML = '';
+            
+            const totalSlides = Math.ceil(8 / slidesToShow);
+            
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = `slider-dot ${i === 0 ? 'active' : ''}`;
+                dot.addEventListener('click', () => goToSlide(i));
+                controlsContainer.appendChild(dot);
+            }
+        }
+
+        // Navegar a slide específico
+        function goToSlide(slideIndex) {
+            const sliderContainer = document.getElementById('slider-container');
+            const productCards = document.querySelectorAll('.product-card');
+            const cardWidth = productCards[0].offsetWidth + 32; // Ancho + gap
+            
+            currentSlide = slideIndex;
+            sliderContainer.scrollTo({
+                left: currentSlide * cardWidth * slidesToShow,
+                behavior: 'smooth'
+            });
+            
+            // Actualizar dots activos
+            document.querySelectorAll('.slider-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+            
+            // Animar elementos al hacer scroll
+            document.querySelectorAll('.fade-in').forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                if (elementTop < window.innerHeight - 100) {
+                    element.classList.add('visible');
+                }
+            });
+        });
+
+        // Toggle tema
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const icon = document.querySelector('#theme-toggle i');
+            if (icon.classList.contains('fa-moon')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                // Cambiar a tema claro (podrías implementar esto)
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                // Volver a tema oscuro
+            }
+        });
+
+        // Función para agregar al carrito (simulada)
+        function agregarAlCarrito(id) {
+            const producto = productos.find(p => p.id === id);
+            const contador = document.getElementById('contador');
+            let count = parseInt(contador.textContent);
+            contador.textContent = count + 1;
+            
+            // Mostrar notificación
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: var(--primary);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+            `;
+            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${producto.nombre} agregado al carrito`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarProductos();
+            
+            // Animar elementos iniciales
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    if (elementTop < window.innerHeight - 100) {
+                        element.classList.add('visible');
+                    }
+                });
+            }, 500);
+            
+            // Auto slide cada 5 segundos
+            setInterval(() => {
+                const totalSlides = Math.ceil(8 / slidesToShow);
+                const nextSlide = (currentSlide + 1) % totalSlides;
+                goToSlide(nextSlide);
+            }, 5000);
+        });
+    </script>
 </body>
 </html>
