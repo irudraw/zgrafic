@@ -8,7 +8,7 @@
         "categoria": "Articulares"
     },
     {
-        "id": 0,
+        "id": 1,
         "nombre": "Apple AirPods Pro 2 gen",
         "precio": 110,
         "imagen": "img/airpods-2da-gen.png",
@@ -16,6 +16,7 @@
         "categoria": "Articulares"
     }
 ]
+
 
 
 
