@@ -1,5 +1,5 @@
 {
-    "marca": "ZGrafic",
+    "marca": "ZTech",
     "navegacion": {
         "inicio": "Inicio",
         "tienda": "Tienda",
@@ -7,8 +7,8 @@
         "contacto": "Contacto"
     },
     "hero": {
-        "titulo": "Soluciones Gráficas de Alta Calidad",
-        "subtitulo": "Diseño, impresión y publicidad para hacer crecer tu negocio",
+        "titulo": "Tecnología al alcance de todos: con calidad, estilo y buen precio.",
+        "subtitulo": "ENVIOS A NIVEL NACIONAL",
         "botonPrincipal": "Ver Catálogo",
         "botonSecundario": "Ver Categorías"
     },
