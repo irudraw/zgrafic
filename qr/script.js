@@ -327,3 +327,19 @@ document.getElementById('searchInput').addEventListener('input', () => {
 });
 
 document.addEventListener('DOMContentLoaded', updateHistoryDisplay);
+
+// Leer parámetro ?url= de la barra del navegador
+const params = new URLSearchParams(window.location.search);
+const qrImageUrl = params.get("url");
+
+if (qrImageUrl) {
+    (async () => {
+        try {
+            const result = await readQRCodeFromURL(qrImageUrl);
+            alert("QR leído: " + result);
+            saveHistory(result);
+        } catch (err) {
+            alert("❌ Error al leer QR: " + err);
+        }
+    })();
+}
