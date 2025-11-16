@@ -343,3 +343,24 @@ if (qrImageUrl) {
         }
     })();
 }
+
+function readQRCodeFromURL(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // Permite imágenes externas
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            if (code) resolve(code.data);
+            else reject("No se detectó QR");
+        };
+        img.onerror = () => reject("No se pudo cargar la imagen");
+        img.src = url;
+    });
+}
+
