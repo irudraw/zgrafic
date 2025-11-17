@@ -329,14 +329,7 @@ document.getElementById('searchInput').addEventListener('input', () => {
 document.addEventListener('DOMContentLoaded', updateHistoryDisplay);
 
 // Leer parámetro ?url= de la barra del navegador
-const params = new URLSearchParams(window.location.search);
-const qrImageUrl = params.get("url");
-
-if (qrImageUrl) {
-    (async () => {
-        try {
-            const result = await readQRCodeFromURL(qrImageUrl);
-            // Leer parámetro ?url= de la URL
+// Leer parámetro ?url= de la URL
 const params = new URLSearchParams(window.location.search);
 const qrImageUrl = params.get("url");
 
@@ -361,11 +354,6 @@ if (qrImageUrl) {
     })();
 }
 
-        } catch (err) {
-            alert("❌ Error al leer QR: " + err);
-        }
-    })();
-}
 
 function readQRCodeFromURL(url) {
     return new Promise((resolve, reject) => {
