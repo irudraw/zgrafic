@@ -206,34 +206,32 @@ button, input[type="file"] {
     justify-content: center;
 }
 
-/* Color visible sobre fondo gris */
-.action-icon i {
+.action-icon svg {
     width: 22px;
     height: 22px;
-    stroke: #2c3e50; /* Azul oscuro elegante */
-    stroke-width: 2.2;
+    stroke: #2c3e50 !important; /* Color inicial oscuro */
     transition: all .2s ease;
 }
 
-/* Hover con contraste */
-.action-icon:hover i {
-    stroke: #188038; /* Verde elegante (mismo tono de tu proyecto) */
+/* Hover: Verde elegante */
+.action-icon:hover svg {
+    stroke: #188038 !important;
     transform: scale(1.15);
 }
 
-/* Icono para enlace (opcional, diferente color si es URL) */
-.open-url-btn i {
-    stroke: #0d47a1; /* Azul más fuerte */
+/* Ícono específico para enlaces */
+.open-url-btn svg {
+    stroke: #0d47a1 !important;
 }
-.open-url-btn:hover i {
-    stroke: #42a5f5; /* Cian moderno */
+.open-url-btn:hover svg {
+    stroke: #42a5f5 !important;
 }
 
-/* Icono eliminar color rojo */
-.delete-btn i {
-    stroke: #b71c1c; /* Rojo oscuro elegante */
+/* Ícono eliminar */
+.delete-btn svg {
+    stroke: #b71c1c !important;
 }
-.delete-btn:hover i {
-    stroke: #e53935;
+.delete-btn:hover svg {
+    stroke: #e53935 !important;
 }
 
