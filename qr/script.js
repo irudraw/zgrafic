@@ -361,12 +361,6 @@ if (qrImageUrl) {
     })();
 }
 
-        } catch (err) {
-            alert("❌ Error al leer QR: " + err);
-        }
-    })();
-}
-
 function readQRCodeFromURL(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
