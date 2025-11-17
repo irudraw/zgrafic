@@ -206,15 +206,34 @@ button, input[type="file"] {
     justify-content: center;
 }
 
+/* Color visible sobre fondo gris */
 .action-icon i {
-    width: 20px;
-    height: 20px;
-    stroke: #188038;
-    transition: 0.2s;
+    width: 22px;
+    height: 22px;
+    stroke: #2c3e50; /* Azul oscuro elegante */
+    stroke-width: 2.2;
+    transition: all .2s ease;
 }
 
+/* Hover con contraste */
 .action-icon:hover i {
-    stroke: #0f5727;
+    stroke: #188038; /* Verde elegante (mismo tono de tu proyecto) */
     transform: scale(1.15);
+}
+
+/* Icono para enlace (opcional, diferente color si es URL) */
+.open-url-btn i {
+    stroke: #0d47a1; /* Azul más fuerte */
+}
+.open-url-btn:hover i {
+    stroke: #42a5f5; /* Cian moderno */
+}
+
+/* Icono eliminar color rojo */
+.delete-btn i {
+    stroke: #b71c1c; /* Rojo oscuro elegante */
+}
+.delete-btn:hover i {
+    stroke: #e53935;
 }
 
