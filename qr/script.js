@@ -122,23 +122,14 @@ function updateHistoryDisplay() {
                 <div class="history-item-date">${item.date}</div>
             </div>
             <div class="history-item-actions">
-
-                <button class="view-btn" data-index="${originalIndex}" title="Ver QR" class="action-icon">
-                    <i data-lucide="eye"></i>
+                <button class="view-btn" data-index="${originalIndex}">Ver</button>
+                <button class="delete-btn" data-index="${originalIndex}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
                 </button>
-            
-                ${isValidURL(item.text) ?
-                    `<button class="open-url-btn" data-url="${item.text}" title="Abrir enlace" class="action-icon">
-                        <i data-lucide="external-link"></i>
-                    </button>` : ""
-                }
-            
-                <button class="delete-btn" data-index="${originalIndex}" title="Eliminar" class="action-icon">
-                    <i data-lucide="trash-2"></i>
-                </button>
-
             </div>
-
         `;
         historyList.appendChild(li);
         
@@ -163,8 +154,6 @@ function updateHistoryDisplay() {
             deleteHistoryItem(parseInt(this.getAttribute('data-index')));
         });
     });
-lucide.createIcons();
-
 }
 
 function makeEditable(element, index) {
