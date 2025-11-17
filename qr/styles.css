@@ -200,8 +200,8 @@ button, input[type="file"] {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px;
-    display: flex;
+    padding: 6px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
 }
@@ -209,10 +209,12 @@ button, input[type="file"] {
 .action-icon i {
     width: 20px;
     height: 20px;
-    stroke: #188038; /* Verde elegante */
+    stroke: #188038;
+    transition: 0.2s;
 }
 
 .action-icon:hover i {
-    stroke: #0f5727; /* Hover más oscuro */
+    stroke: #0f5727;
+    transform: scale(1.15);
 }
 
