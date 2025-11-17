@@ -336,27 +336,10 @@ if (qrImageUrl) {
     (async () => {
         try {
             const result = await readQRCodeFromURL(qrImageUrl);
-            // Leer parámetro ?url= de la URL
-const params = new URLSearchParams(window.location.search);
-const qrImageUrl = params.get("url");
-
-if (qrImageUrl) {
-    (async () => {
-        try {
-            const result = await readQRCodeFromURL(qrImageUrl);
-
-            // Mostrar en el visor como si fuera entrada normal
-            document.getElementById("textInput").value = result;
-            autoResizeTextarea.call(document.getElementById('textInput'));
-
-            saveHistory(result); // Guardar en historial
-
-            // Si tienes botón de generar QR, simular click automático
-            const generateBtn = document.querySelector(".generate-btn");
-            if (generateBtn) generateBtn.click();
-
+            alert("QR leído: " + result);
+            saveHistory(result);
         } catch (err) {
-            console.log("❌ Error: ", err);
+            alert("❌ Error al leer QR: " + err);
         }
     })();
 }
@@ -380,4 +363,3 @@ function readQRCodeFromURL(url) {
         img.src = url;
     });
 }
-
