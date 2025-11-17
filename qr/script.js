@@ -34,7 +34,7 @@ function readQRCode(file) {
 }
 
 function generateStylizedQR(text, size = 256) {
-    const qr = qrcode(0, 'M');
+    const qr = qrcode(0, 'H');
     qr.addData(text);
     qr.make();
     
@@ -66,7 +66,7 @@ function generateStylizedQR(text, size = 256) {
                 if (!((row < 7 && col < 7) || 
                       (row < 7 && col >= modules - 7) || 
                       (row >= modules - 7 && col < 7))) {
-                    svg += `<circle cx="${x + cellSize/2}" cy="${y + cellSize/2}" r="${cellSize/2}" fill="black" />`;
+                    svg += `<circle cx="${x + cellSize/2}" cy="${y + cellSize/2}" r="${cellSize*0.35}" fill="black" />`;
                 }
             }
         }
