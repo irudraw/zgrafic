@@ -329,43 +329,10 @@ document.getElementById('searchInput').addEventListener('input', () => {
 document.addEventListener('DOMContentLoaded', updateHistoryDisplay);
 
 // Leer parámetro ?url= de la barra del navegador
-// Leer parámetro ?url= de la URL
-// Leer parámetro ?url= de la URL
-const params = new URLSearchParams(window.location.search);
-const qrImageUrl = params.get("url");
-
-if (qrImageUrl) {
-    (async () => {
-        try {
-            const result = await readQRCodeFromURL(qrImageUrl);
-
-            // Mostrar el texto leído
-            const input = document.getElementById("textInput");
-            input.value = result;
-            autoResizeTextarea.call(input);
-
-            saveHistory(result);
-
-            // Generar el QR visual directamente
-            if (typeof createQRCode === "function") {
-                createQRCode(); 
-            } else {
-                const generateBtn = document.querySelector(".generate-btn");
-                if (generateBtn) generateBtn.click();
-            }
-
-        } catch (err) {
-            console.log("❌ Error al leer QR:", err);
-        }
-    })();
-}
-
-
-
 function readQRCodeFromURL(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.crossOrigin = "anonymous"; // Permite imágenes externas
+        img.crossOrigin = "anonymous";
         img.onload = function () {
             const canvas = document.createElement("canvas");
             canvas.width = img.width;
@@ -380,4 +347,26 @@ function readQRCodeFromURL(url) {
         img.onerror = () => reject("No se pudo cargar la imagen");
         img.src = url;
     });
+}
+
+// Detectar ?url= en la barra
+const params = new URLSearchParams(window.location.search);
+const qrImageUrl = params.get("url");
+
+if (qrImageUrl) {
+    (async () => {
+        try {
+            const result = await readQRCodeFromURL(qrImageUrl);
+
+            // Mostrar el resultado como si arrastraras una imagen
+            const textInput = document.getElementById('textInput');
+            textInput.value = result;
+            autoResizeTextarea.call(textInput);
+
+            displayQR(result); // 👈 ESTA ES LA CLAVE
+
+        } catch (err) {
+            console.error("Error al leer QR:", err);
+        }
+    })();
 }
