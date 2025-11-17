@@ -163,8 +163,8 @@ function updateHistoryDisplay() {
             deleteHistoryItem(parseInt(this.getAttribute('data-index')));
         });
     });
+lucide.createIcons();
 
-    lucide.createIcons();
 }
 
 function makeEditable(element, index) {
