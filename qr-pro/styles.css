@@ -1,0 +1,75 @@
+:root{
+  --bg: #f0f0f0;
+  --card: #ffffff;
+  --muted: #666;
+  --accent: #188038;
+  --icon: #2c3e50;
+  --danger: #b71c1c;
+  --link: #0d47a1;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0b0f14;
+    --card: #0f1720;
+    --muted: #9aa4b2;
+    --accent: #39d98a;
+    --icon: #e6eef7;
+    --danger: #ff8080;
+    --link: #6ec1ff;
+  }
+}
+
+*{box-sizing: border-box;font-family: Inter, Arial, sans-serif}
+
+body{margin:0;background:var(--bg);color:var(--icon);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+
+.app{width:100%;max-width:1100px;background:var(--card);border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.08);overflow:hidden}
+
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid rgba(0,0,0,0.04)}
+.app-header h1{margin:0;font-size:18px}
+.header-actions .action-icon{background:none;border:none;cursor:pointer;padding:6px;border-radius:6px}
+
+.app-main{display:flex;gap:18px;padding:18px}
+.left-panel{flex:1;display:flex;flex-direction:column;gap:12px}
+.right-panel{width:340px}
+
+.drop-zone{border:2px dashed rgba(0,0,0,0.08);border-radius:12px;padding:28px;text-align:center;background:linear-gradient(180deg, rgba(255,255,255,0.6), transparent);cursor:pointer}
+@media (prefers-color-scheme: dark){ .drop-zone{border-color:rgba(255,255,255,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)} }
+
+.drop-zone.dragover{background:rgba(24,128,56,0.05);border-color:var(--accent)}
+
+textarea#textInput{width:100%;min-height:70px;padding:12px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);resize:none;background:transparent;color:var(--icon)}
+.controls{display:flex;gap:8px}
+.controls .primary{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+
+.qr-output{display:flex;align-items:center;justify-content:center;padding:12px;border-radius:8px;border:1px dashed rgba(0,0,0,0.04);min-height:160px}
+
+#historyList{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+#historyList li{display:flex;gap:12px;align-items:center;padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(0,0,0,0.01), transparent)}
+.history-item-qr{width:56px;height:56px;border-radius:6px;flex:0 0 56px;display:flex;align-items:center;justify-content:center;background:#fff;padding:6px}
+.history-item-content{flex:1;display:flex;flex-direction:column;gap:4px}
+.history-item-title{font-weight:600;font-size:13px;color:var(--icon);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-item-text{font-size:12px;color:var(--muted);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.history-item-actions{display:flex;gap:6px;align-items:center}
+.action-icon{background:none;border:none;cursor:pointer;padding:6px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
+/* apply styles to SVG injected by lucide */
+.action-icon svg{width:20px;height:20px;stroke:var(--icon);stroke-width:1.6;transition:all .18s ease}
+
+.action-icon:hover svg{transform:scale(1.12);stroke:var(--accent)}
+
+/* specific buttons */
+.open-url-btn svg{stroke:var(--link)}
+.open-url-btn:hover svg{stroke:var(--link);opacity:0.95}
+.delete-btn svg{stroke:var(--danger)}
+.delete-btn:hover svg{stroke:var(--danger);opacity:0.9}
+
+#historyHeader{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
+#historyHeader input{padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);width:180px}
+
+#pagination{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:12px}
+#pagination button{padding:6px 10px;border-radius:8px;border:none;background:rgba(0,0,0,0.05);cursor:pointer}
+
+.toast{position:fixed;right:20px;bottom:20px;background:rgba(0,0,0,0.7);color:#fff;padding:10px 14px;border-radius:8px;opacity:0;transform:translateY(8px);transition:all .25s ease;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
