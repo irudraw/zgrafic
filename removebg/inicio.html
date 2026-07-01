@@ -59,6 +59,7 @@
       max-height: 300px;
       border-radius: 0.75rem;
       object-fit: contain;
+      display: none; /* Ocultas por defecto hasta que carguen */
     }
     .buttons {
       display: flex;
@@ -121,18 +122,14 @@
     <div class="status" id="statusMessage"></div>
   </div>
 
-  <!-- Cargar la librería (versión fija) -->
   <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.2/dist/browser/background-removal.iife.js"></script>
-
   <script>
-    // Todo el código se ejecuta solo cuando la librería está disponible
     (function() {
-      // Esperar hasta que imglyRemoveBackground exista (con un pequeño margen de seguridad)
+      // Esperar a que la librería esté disponible
       function whenReady(callback) {
         if (typeof imglyRemoveBackground !== 'undefined') {
           callback();
         } else {
-          // Si no se cargó aún, esperamos un poco (raro que pase con script síncrono)
           setTimeout(() => whenReady(callback), 50);
         }
       }
@@ -144,8 +141,6 @@
         const removeBtn = document.getElementById('removeBtn');
         const downloadBtn = document.getElementById('downloadBtn');
         const statusEl = document.getElementById('statusMessage');
-        const originalBox = document.getElementById('originalBox');
-        const resultBox = document.getElementById('resultBox');
 
         let originalImageElement = null;
         let resultBlob = null;
@@ -164,30 +159,49 @@
           removeBtn.disabled = true;
         }
 
+        // Evento al seleccionar archivo
         fileInput.addEventListener('change', (e) => {
+          console.log('Archivo seleccionado:', e.target.files[0]);
           const file = e.target.files[0];
           if (!file) {
             reset();
             originalImg.src = '';
             originalImg.style.display = 'none';
+            setStatus('Selecciona una imagen para empezar');
             return;
           }
 
           const reader = new FileReader();
           reader.onload = function(ev) {
+            console.log('Imagen leída, asignando src...');
             originalImg.src = ev.target.result;
             originalImg.style.display = 'block';
-            originalImageElement = new Image();
-            originalImageElement.src = ev.target.result;
-            originalImageElement.onload = () => {
-              reset();
-              removeBtn.disabled = false;   // habilitamos después de resetear
+            
+            // Usamos directamente el onload de la imagen para habilitar el botón
+            originalImg.onload = function() {
+              console.log('Imagen original cargada correctamente.');
+              // Guardamos referencia de la imagen original para quitar fondo
+              originalImageElement = originalImg;
+              reset(); // limpia resultado y deshabilita botones
+              removeBtn.disabled = false;
               setStatus('Listo para quitar el fondo');
             };
+            
+            originalImg.onerror = function() {
+              console.error('Error al cargar la imagen original.');
+              setStatus('❌ No se pudo cargar la imagen. Prueba con otra.');
+            };
           };
+          
+          reader.onerror = function() {
+            console.error('Error al leer el archivo.');
+            setStatus('❌ Error al leer el archivo.');
+          };
+
           reader.readAsDataURL(file);
         });
 
+        // Botón quitar fondo
         removeBtn.addEventListener('click', async () => {
           if (!originalImageElement) return;
           removeBtn.disabled = true;
@@ -210,6 +224,7 @@
           }
         });
 
+        // Botón descargar
         downloadBtn.addEventListener('click', () => {
           if (!resultBlob) return;
           const url = URL.createObjectURL(resultBlob);
@@ -226,6 +241,7 @@
         // Estado inicial
         reset();
         setStatus('Selecciona una imagen para empezar');
+        console.log('Aplicación lista.');
       });
     })();
   </script>
