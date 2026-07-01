@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quitar fondo de imagen (IA, sin SIMD)</title>
+  <title>Quitar fondo de imagen con IA (WebGL)</title>
   <style>
-    /* ... el mismo CSS que antes ... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, sans-serif;
@@ -99,7 +98,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🧹 Quitar fondo con IA</h1>
+    <h1>🧠 Quitar fondo con IA (sin SIMD)</h1>
     <div class="input-area">
       <label for="fileInput" class="custom-file-label">📁 Seleccionar imagen</label>
       <input type="file" id="fileInput" accept="image/*" />
@@ -123,105 +122,189 @@
     <div class="status" id="statusMessage"></div>
   </div>
 
-  <!-- Módulo ES desde esm.sh (v1.7.0) -->
-  <script type="module">
-    import { removeBackground } from 'https://esm.sh/@imgly/background-removal@1.7.0';
+  <!-- Cargar ONNX Runtime Web desde CDN (sin SIMD) -->
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.1/dist/ort.webgl.min.js"></script>
+  <!-- También necesitamos un helper para manipular imágenes -->
+  <script src="https://cdn.jsdelivr.net/npm/jimp@0.22.12/browser/lib/jimp.min.js"></script>
 
-    const fileInput = document.getElementById('fileInput');
-    const originalImg = document.getElementById('originalImg');
-    const resultImg = document.getElementById('resultImg');
-    const removeBtn = document.getElementById('removeBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const statusEl = document.getElementById('statusMessage');
+  <script>
+    (async function() {
+      const fileInput = document.getElementById('fileInput');
+      const originalImg = document.getElementById('originalImg');
+      const resultImg = document.getElementById('resultImg');
+      const removeBtn = document.getElementById('removeBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const statusEl = document.getElementById('statusMessage');
 
-    let originalImageElement = null;
-    let resultBlob = null;
+      let originalImageElement = null;
+      let resultBlob = null;
+      let ortSession = null;
 
-    function setStatus(text, isLoading = false) {
-      statusEl.innerHTML = isLoading
-        ? `<span class="loader"></span> ${text}`
-        : text;
-    }
-
-    function reset() {
-      resultBlob = null;
-      resultImg.src = '';
-      resultImg.style.display = 'none';
-      downloadBtn.disabled = true;
-      removeBtn.disabled = true;
-    }
-
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) {
-        reset();
-        originalImg.src = '';
-        originalImg.style.display = 'none';
-        setStatus('Selecciona una imagen para empezar');
-        return;
+      // Cargar el modelo U²-Net (ONNX) desde un repositorio público
+      async function loadModel() {
+        setStatus('Cargando modelo de IA... (esto puede tardar unos segundos)', true);
+        try {
+          // Usamos el modelo U²-Net convertido a ONNX disponible en HuggingFace
+          const modelUrl = 'https://huggingface.co/Xenova/u2net/resolve/main/model.onnx';
+          ortSession = await ort.InferenceSession.create(modelUrl, {
+            executionProviders: ['webgl'], // Forzamos WebGL para evitar SIMD
+          });
+          setStatus('Modelo cargado. Selecciona una imagen.');
+        } catch (err) {
+          console.error(err);
+          setStatus('❌ Error al cargar el modelo. Recarga la página.');
+        }
       }
 
-      const reader = new FileReader();
-      reader.onload = function(ev) {
-        originalImg.src = ev.target.result;
-        originalImg.style.display = 'block';
-        originalImg.onload = function() {
-          originalImageElement = originalImg;
+      function setStatus(text, isLoading = false) {
+        statusEl.innerHTML = isLoading
+          ? `<span class="loader"></span> ${text}`
+          : text;
+      }
+
+      function reset() {
+        resultBlob = null;
+        resultImg.src = '';
+        resultImg.style.display = 'none';
+        downloadBtn.disabled = true;
+        removeBtn.disabled = true;
+      }
+
+      // Cuando se selecciona una imagen
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) {
           reset();
+          originalImg.src = '';
+          originalImg.style.display = 'none';
+          setStatus('Selecciona una imagen para empezar');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          originalImg.src = ev.target.result;
+          originalImg.style.display = 'block';
+          originalImg.onload = function() {
+            originalImageElement = originalImg;
+            reset();
+            removeBtn.disabled = false;
+            setStatus('Listo para quitar el fondo');
+          };
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Procesar imagen con el modelo
+      removeBtn.addEventListener('click', async () => {
+        if (!originalImageElement || !ortSession) return;
+        removeBtn.disabled = true;
+        setStatus('Procesando imagen...', true);
+        downloadBtn.disabled = true;
+
+        try {
+          // 1. Convertir la imagen a un tensor de entrada (320x320, normalizado)
+          const inputTensor = await imageToTensor(originalImageElement);
+          
+          // 2. Ejecutar inferencia
+          const feeds = { 'input': inputTensor };
+          const results = await ortSession.run(feeds);
+          const output = results['output']; // tensor (1,1,320,320)
+
+          // 3. Convertir la máscara en imagen final con fondo transparente
+          const blob = await applyMask(originalImageElement, output);
+          resultBlob = blob;
+          const url = URL.createObjectURL(blob);
+          resultImg.src = url;
+          resultImg.style.display = 'block';
+          downloadBtn.disabled = false;
+          setStatus('¡Fondo eliminado con éxito!');
+        } catch (err) {
+          console.error(err);
+          setStatus('❌ Error al procesar la imagen. Intenta con otra.');
+        } finally {
           removeBtn.disabled = false;
-          setStatus('Listo para quitar el fondo');
-        };
-        originalImg.onerror = function() {
-          setStatus('❌ No se pudo cargar la imagen. Prueba con otra.');
-        };
-      };
-      reader.onerror = function() {
-        setStatus('❌ Error al leer el archivo.');
-      };
-      reader.readAsDataURL(file);
-    });
+        }
+      });
 
-    removeBtn.addEventListener('click', async () => {
-      if (!originalImageElement) return;
-      removeBtn.disabled = true;
-      setStatus('Procesando...', true);
-      downloadBtn.disabled = true;
+      // Descargar resultado
+      downloadBtn.addEventListener('click', () => {
+        if (!resultBlob) return;
+        const url = URL.createObjectURL(resultBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sin_fondo.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setStatus('Descarga iniciada ✅');
+      });
 
-      try {
-        // 👉 Forzamos backend 'webgl' para evitar el error de SIMD
-        const blob = await removeBackground(originalImageElement, {
-          backend: 'webgl'
-        });
-        resultBlob = blob;
-        const url = URL.createObjectURL(blob);
-        resultImg.src = url;
-        resultImg.style.display = 'block';
-        downloadBtn.disabled = false;
-        setStatus('¡Fondo eliminado con éxito!');
-      } catch (err) {
-        console.error(err);
-        // Si también falla WebGL, podríamos intentar con 'cpu' (muy lento)
-        setStatus('❌ Error al procesar. Intenta con otra imagen o recarga la página.');
-      } finally {
-        removeBtn.disabled = false;
+      // Funciones auxiliares
+      async function imageToTensor(img) {
+        // Redimensionar a 320x320 y normalizar (modelo U²-Net)
+        const canvas = document.createElement('canvas');
+        canvas.width = 320;
+        canvas.height = 320;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 320, 320);
+        const imageData = ctx.getImageData(0, 0, 320, 320);
+        const { data } = imageData;
+        
+        // Convertir a Float32Array (normalizado: 0..1, formato NCHW)
+        const float32Data = new Float32Array(1 * 3 * 320 * 320);
+        for (let i = 0; i < data.length; i += 4) {
+          const pixelIndex = i / 4;
+          float32Data[pixelIndex] = data[i] / 255;           // R
+          float32Data[320*320 + pixelIndex] = data[i+1] / 255; // G
+          float32Data[2*320*320 + pixelIndex] = data[i+2] / 255; // B
+        }
+        return new ort.Tensor('float32', float32Data, [1, 3, 320, 320]);
       }
-    });
 
-    downloadBtn.addEventListener('click', () => {
-      if (!resultBlob) return;
-      const url = URL.createObjectURL(resultBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sin_fondo.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setStatus('Descarga iniciada ✅');
-    });
+      async function applyMask(originalImg, maskTensor) {
+        // maskTensor: [1, 1, 320, 320] valores 0..1
+        const maskData = maskTensor.data; // Float32Array
+        const width = 320, height = 320;
 
-    reset();
-    setStatus('Selecciona una imagen para empezar');
+        // Dibujar la imagen original en un canvas de 320x320
+        const srcCanvas = document.createElement('canvas');
+        srcCanvas.width = width;
+        srcCanvas.height = height;
+        const srcCtx = srcCanvas.getContext('2d');
+        srcCtx.drawImage(originalImg, 0, 0, width, height);
+        const srcImageData = srcCtx.getImageData(0, 0, width, height);
+        const srcData = srcImageData.data;
+
+        // Crear canvas de salida
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width = width;
+        outCanvas.height = height;
+        const outCtx = outCanvas.getContext('2d');
+        const outImageData = outCtx.createImageData(width, height);
+        const outData = outImageData.data;
+
+        for (let i = 0; i < maskData.length; i++) {
+          const alpha = Math.round(maskData[i] * 255); // 0..255
+          outData[i*4] = srcData[i*4];       // R
+          outData[i*4+1] = srcData[i*4+1];   // G
+          outData[i*4+2] = srcData[i*4+2];   // B
+          outData[i*4+3] = alpha;            // A (máscara)
+        }
+        outCtx.putImageData(outImageData, 0, 0);
+
+        // Convertir canvas a blob PNG
+        return new Promise(resolve => {
+          outCanvas.toBlob(blob => resolve(blob), 'image/png');
+        });
+      }
+
+      // Arrancar
+      reset();
+      setStatus('Cargando modelo...');
+      await loadModel();
+    })();
   </script>
 </body>
 </html>
