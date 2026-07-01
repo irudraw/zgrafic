@@ -298,7 +298,16 @@
   </div>
 
 <script type="module">
-  import { removeBackground } from "https://esm.sh/@imgly/background-removal@1.5.5";
+  import { AutoModel, AutoProcessor, RawImage, env } from "https://esm.sh/@huggingface/transformers@3.0.2";
+
+  // No usar modelos locales, y forzar 1 hilo de WASM explícitamente:
+  // en sitios sin headers COOP/COEP (como GitHub Pages) el multithreading
+  // no está disponible, y dejarlo en su valor por defecto puede colgar
+  // la inicialización del modelo indefinidamente en algunas librerías de IA.
+  env.allowLocalModels = false;
+  env.backends.onnx.wasm.numThreads = 1;
+
+  const MODEL_ID = 'briaai/RMBG-1.4';
 
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
@@ -315,6 +324,33 @@
   const resetBtn = document.getElementById('resetBtn');
 
   let resultURL = null;
+  let modelPromise = null;
+
+  // Carga el modelo una sola vez y la reutiliza en cada imagen.
+  function getModel() {
+    if (!modelPromise) {
+      modelPromise = Promise.all([
+        AutoModel.from_pretrained(MODEL_ID, {
+          config: { model_type: 'custom' },
+          progress_callback: onProgress
+        }),
+        AutoProcessor.from_pretrained(MODEL_ID, {
+          progress_callback: onProgress
+        })
+      ]);
+    }
+    return modelPromise;
+  }
+
+  function onProgress(data) {
+    if (data.status === 'progress' && data.total) {
+      const pct = Math.round((data.loaded / data.total) * 100);
+      barFill.style.width = Math.min(90, pct) + '%';
+      statusText.textContent = 'Descargando modelo de IA…';
+    } else if (data.status === 'ready' || data.status === 'done') {
+      statusText.textContent = 'Recortando imagen…';
+    }
+  }
 
   dropzone.addEventListener('click', () => fileInput.click());
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
@@ -356,38 +392,26 @@
     beforeImg.src = originalURL;
     afterImg.src = originalURL;
 
-    // wait for the image to know its natural size, so the before-layer clip works
     await new Promise(res => { beforeImg.onload = res; });
     syncBeforeWidth();
 
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('timeout')), 60000)
+    );
+
     try {
-      // Sin esto, la librería a veces no resuelve bien dónde viven sus
-      // archivos de modelo (WASM/ONNX) al cargarse vía esm.sh, y se queda
-      // colgada esperando en vez de fallar. Apuntamos directo al CDN oficial.
-      const config = {
-        publicPath: 'https://staticimgly.com/@imgly/background-removal-data/1.5.5/dist/',
-        progress: (key, current, total) => {
-          const pct = total ? Math.round((current / total) * 100) : 0;
-          barFill.style.width = Math.min(95, pct) + '%';
-          statusText.textContent = key.includes('fetch')
-            ? 'Descargando modelo de IA…'
-            : 'Recortando imagen…';
-        }
-      };
+      const canvas = await Promise.race([cutOut(file), timeout]);
 
-      // Si por lo que sea nunca resuelve, avisamos en vez de dejarlo colgado.
-      const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('timeout')), 45000)
-      );
+      canvas.toBlob(blob => {
+        if (resultURL) URL.revokeObjectURL(resultURL);
+        resultURL = URL.createObjectURL(blob);
+        afterImg.src = resultURL;
+        barFill.style.width = '100%';
+        statusText.textContent = 'Listo';
+        statusLine.classList.add('done');
+        downloadBtn.disabled = false;
+      }, 'image/png');
 
-      const blob = await Promise.race([removeBackground(file, config), timeout]);
-
-      resultURL = URL.createObjectURL(blob);
-      afterImg.src = resultURL;
-      barFill.style.width = '100%';
-      statusText.textContent = 'Listo';
-      statusLine.classList.add('done');
-      downloadBtn.disabled = false;
     } catch (err) {
       statusText.textContent = err.message === 'timeout'
         ? 'Está tardando demasiado. Prueba con una imagen más liviana o recarga la página.'
@@ -395,6 +419,31 @@
       barFill.style.width = '0%';
       console.error(err);
     }
+  }
+
+  async function cutOut(file){
+    const [model, processor] = await getModel();
+
+    const img = await RawImage.fromBlob(file);
+    const { pixel_values } = await processor(img);
+    const { output } = await model({ input: pixel_values });
+
+    const mask = await RawImage.fromTensor(output[0].mul(255).to('uint8'))
+      .resize(img.width, img.height);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img.toCanvas(), 0, 0);
+
+    const pixelData = ctx.getImageData(0, 0, img.width, img.height);
+    for (let i = 0; i < mask.data.length; ++i) {
+      pixelData.data[4 * i + 3] = mask.data[i];
+    }
+    ctx.putImageData(pixelData, 0, 0);
+
+    return canvas;
   }
 
   function syncBeforeWidth(){
