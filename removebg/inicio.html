@@ -262,7 +262,7 @@
     </header>
 
     <h1>Quita el fondo<br/><span class="accent">sin subir nada a un servidor.</span></h1>
-    <p class="lede">Sube una foto y un modelo de IA la recorta directamente en tu navegador, con WebAssembly. No hay backend, no hay cuenta, no hay límite de imágenes.</p>
+    <p class="lede">Sube una foto y un modelo de IA la recorta directamente en tu navegador. Gratis, sin límite de imágenes, sin cuenta.</p>
 
     <div id="dropzone">
       <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" />
@@ -292,7 +292,7 @@
     </div>
 
     <footer>
-      <span>Procesado localmente con <a href="https://github.com/imgly/background-removal-js" target="_blank" rel="noopener">@imgly/background-removal</a></span>
+      <span>Procesado localmente con <a href="https://huggingface.co/briaai/RMBG-1.4" target="_blank" rel="noopener">RMBG-1.4</a> vía Transformers.js</span>
       <span class="mono">v1.0</span>
     </footer>
   </div>
@@ -300,10 +300,6 @@
 <script type="module">
   import { AutoModel, AutoProcessor, RawImage, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2";
 
-  // No usar modelos locales, y forzar 1 hilo de WASM explícitamente:
-  // en sitios sin headers COOP/COEP (como GitHub Pages) el multithreading
-  // no está disponible, y dejarlo en su valor por defecto puede colgar
-  // la inicialización del modelo indefinidamente en algunas librerías de IA.
   env.allowLocalModels = false;
   env.backends.onnx.wasm.numThreads = 1;
 
@@ -331,7 +327,6 @@
   let resultURL = null;
   let modelPromise = null;
 
-  // Carga el modelo una sola vez y la reutiliza en cada imagen.
   function getModel() {
     if (!modelPromise) {
       modelPromise = Promise.all([
@@ -390,7 +385,7 @@
 
     if (!hasSimd) {
       stage.classList.add('show');
-      statusText.textContent = 'Este dispositivo no soporta una función necesaria (WebAssembly SIMD). Probá desde otro celular o computadora más reciente.';
+      statusText.textContent = 'Este dispositivo no soporta una función necesaria del navegador (WebAssembly SIMD). Probá desde otro celular o computadora.';
       barFill.style.width = '0%';
       return;
     }
@@ -465,7 +460,6 @@
   }
   window.addEventListener('resize', syncBeforeWidth);
 
-  // Slider drag logic
   let dragging = false;
   function setSplit(clientX){
     const rect = compare.getBoundingClientRect();
