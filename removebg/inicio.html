@@ -331,7 +331,8 @@
     if (!modelPromise) {
       modelPromise = Promise.all([
         AutoModel.from_pretrained(MODEL_ID, {
-          config: { model_type: 'custom' },
+          device: 'wasm',
+          dtype: 'fp32',
           progress_callback: onProgress
         }),
         AutoProcessor.from_pretrained(MODEL_ID, {
