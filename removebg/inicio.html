@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quitar fondo de imagen</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    .container {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: #1a1a1a;
+    }
+    .input-area {
+      margin-bottom: 1.5rem;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .custom-file-label {
+      display: inline-block;
+      background: #4f46e5;
+      color: white;
+      padding: 0.8rem 1.8rem;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .custom-file-label:hover {
+      background: #4338ca;
+    }
+    .preview-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+    .preview-item {
+      flex: 1 1 250px;
+      border: 2px dashed #ddd;
+      border-radius: 1rem;
+      padding: 1rem;
+      background: #fafafa;
+    }
+    .preview-item p {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .preview-item img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 0.75rem;
+      object-fit: contain;
+    }
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 0.7rem 1.8rem;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #e5e7eb;
+      color: #1f2937;
+    }
+    button.primary {
+      background: #10b981;
+      color: white;
+    }
+    button.primary:hover {
+      background: #059669;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #4b5563;
+      min-height: 1.5em;
+    }
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #d1d5db;
+      border-top-color: #4f46e5;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧹 Quitar fondo de imagen</h1>
+    <div class="input-area">
+      <label for="fileInput" class="custom-file-label">📁 Seleccionar imagen</label>
+      <input type="file" id="fileInput" accept="image/*" />
+    </div>
+
+    <div class="preview-box">
+      <div class="preview-item" id="originalBox">
+        <p>Original</p>
+        <img id="originalImg" alt="Vista previa original" />
+      </div>
+      <div class="preview-item" id="resultBox">
+        <p>Sin fondo</p>
+        <img id="resultImg" alt="Resultado" />
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button id="removeBtn" class="primary" disabled>✨ Quitar fondo</button>
+      <button id="downloadBtn" disabled>⬇️ Descargar</button>
+    </div>
+    <div class="status" id="statusMessage"></div>
+  </div>
+
+  <!-- Cargar la librería desde CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@latest/dist/browser/background-removal.iife.js"></script>
+
+  <script>
+    (function() {
+      const fileInput = document.getElementById('fileInput');
+      const originalImg = document.getElementById('originalImg');
+      const resultImg = document.getElementById('resultImg');
+      const removeBtn = document.getElementById('removeBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const statusEl = document.getElementById('statusMessage');
+      const originalBox = document.getElementById('originalBox');
+      const resultBox = document.getElementById('resultBox');
+
+      let originalImageElement = null;
+      let resultBlob = null;
+
+      // Mostrar mensaje de estado
+      function setStatus(text, isLoading = false) {
+        statusEl.innerHTML = isLoading
+          ? `<span class="loader"></span> ${text}`
+          : text;
+      }
+
+      // Limpiar estado
+      function reset() {
+        resultBlob = null;
+        resultImg.src = '';
+        resultBox.querySelector('img').style.display = 'none';
+        downloadBtn.disabled = true;
+        removeBtn.disabled = true;
+      }
+
+      // Mostrar imagen original
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+          reset();
+          originalImg.src = '';
+          originalBox.querySelector('img').style.display = 'none';
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          originalImg.src = ev.target.result;
+          originalImg.style.display = 'block';
+          originalImageElement = new Image();
+          originalImageElement.src = ev.target.result;
+          originalImageElement.onload = () => {
+            removeBtn.disabled = false;
+            reset();
+            setStatus('Listo para quitar el fondo');
+          };
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Quitar fondo
+      removeBtn.addEventListener('click', async () => {
+        if (!originalImageElement) return;
+
+        removeBtn.disabled = true;
+        setStatus('Procesando imagen...', true);
+        resultImg.style.display = 'none';
+        downloadBtn.disabled = true;
+
+        try {
+          // La librería está disponible globalmente como imglyRemoveBackground
+          const blob = await imglyRemoveBackground(originalImageElement);
+          resultBlob = blob;
+
+          const url = URL.createObjectURL(blob);
+          resultImg.src = url;
+          resultImg.style.display = 'block';
+
+          downloadBtn.disabled = false;
+          setStatus('¡Fondo eliminado con éxito!');
+        } catch (err) {
+          console.error(err);
+          setStatus('❌ Error al procesar la imagen. Intenta con otra.');
+        } finally {
+          removeBtn.disabled = false;
+        }
+      });
+
+      // Descargar resultado
+      downloadBtn.addEventListener('click', () => {
+        if (!resultBlob) return;
+
+        const url = URL.createObjectURL(resultBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sin_fondo.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        setStatus('Descarga iniciada ✅');
+      });
+
+      // Estado inicial
+      reset();
+      setStatus('Selecciona una imagen para empezar');
+    })();
+  </script>
+</body>
+</html>
