@@ -122,109 +122,102 @@
     <div class="status" id="statusMessage"></div>
   </div>
 
-  <!-- 🔽 CAMBIA ESTA LÍNEA POR LA URL DEL CDN (si prefieres) o usa el archivo local -->
-  <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0"></script>
+  <!-- Módulo ES desde esm.sh (confiable) -->
+  <script type="module">
+    import { removeBackground } from 'https://esm.sh/@imgly/background-removal@1.7.0';
 
-  <script>
-    // El código espera la función global imglyRemoveBackground (versión IIFE/UMD)
-    (function iniciar() {
-      if (typeof imglyRemoveBackground === 'undefined') {
-        setTimeout(iniciar, 50);
+    // Elementos del DOM
+    const fileInput = document.getElementById('fileInput');
+    const originalImg = document.getElementById('originalImg');
+    const resultImg = document.getElementById('resultImg');
+    const removeBtn = document.getElementById('removeBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusEl = document.getElementById('statusMessage');
+
+    let originalImageElement = null;
+    let resultBlob = null;
+
+    function setStatus(text, isLoading = false) {
+      statusEl.innerHTML = isLoading
+        ? `<span class="loader"></span> ${text}`
+        : text;
+    }
+
+    function reset() {
+      resultBlob = null;
+      resultImg.src = '';
+      resultImg.style.display = 'none';
+      downloadBtn.disabled = true;
+      removeBtn.disabled = true;
+    }
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) {
+        reset();
+        originalImg.src = '';
+        originalImg.style.display = 'none';
+        setStatus('Selecciona una imagen para empezar');
         return;
       }
 
-      const fileInput = document.getElementById('fileInput');
-      const originalImg = document.getElementById('originalImg');
-      const resultImg = document.getElementById('resultImg');
-      const removeBtn = document.getElementById('removeBtn');
-      const downloadBtn = document.getElementById('downloadBtn');
-      const statusEl = document.getElementById('statusMessage');
-
-      let originalImageElement = null;
-      let resultBlob = null;
-
-      function setStatus(text, isLoading = false) {
-        statusEl.innerHTML = isLoading
-          ? `<span class="loader"></span> ${text}`
-          : text;
-      }
-
-      function reset() {
-        resultBlob = null;
-        resultImg.src = '';
-        resultImg.style.display = 'none';
-        downloadBtn.disabled = true;
-        removeBtn.disabled = true;
-      }
-
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        originalImg.src = ev.target.result;
+        originalImg.style.display = 'block';
+        originalImg.onload = function() {
+          originalImageElement = originalImg;
           reset();
-          originalImg.src = '';
-          originalImg.style.display = 'none';
-          setStatus('Selecciona una imagen para empezar');
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          originalImg.src = ev.target.result;
-          originalImg.style.display = 'block';
-          originalImg.onload = function() {
-            originalImageElement = originalImg;
-            reset();
-            removeBtn.disabled = false;
-            setStatus('Listo para quitar el fondo');
-          };
-          originalImg.onerror = function() {
-            setStatus('❌ No se pudo cargar la imagen. Prueba con otra.');
-          };
-        };
-        reader.onerror = function() {
-          setStatus('❌ Error al leer el archivo.');
-        };
-        reader.readAsDataURL(file);
-      });
-
-      removeBtn.addEventListener('click', async () => {
-        if (!originalImageElement) return;
-        removeBtn.disabled = true;
-        setStatus('Procesando...', true);
-        downloadBtn.disabled = true;
-
-        try {
-          const blob = await imglyRemoveBackground(originalImageElement);
-          resultBlob = blob;
-          const url = URL.createObjectURL(blob);
-          resultImg.src = url;
-          resultImg.style.display = 'block';
-          downloadBtn.disabled = false;
-          setStatus('¡Fondo eliminado con éxito!');
-        } catch (err) {
-          console.error(err);
-          setStatus('❌ Error al procesar. Intenta con otra imagen.');
-        } finally {
           removeBtn.disabled = false;
-        }
-      });
+          setStatus('Listo para quitar el fondo');
+        };
+        originalImg.onerror = function() {
+          setStatus('❌ No se pudo cargar la imagen. Prueba con otra.');
+        };
+      };
+      reader.onerror = function() {
+        setStatus('❌ Error al leer el archivo.');
+      };
+      reader.readAsDataURL(file);
+    });
 
-      downloadBtn.addEventListener('click', () => {
-        if (!resultBlob) return;
-        const url = URL.createObjectURL(resultBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'sin_fondo.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        setStatus('Descarga iniciada ✅');
-      });
+    removeBtn.addEventListener('click', async () => {
+      if (!originalImageElement) return;
+      removeBtn.disabled = true;
+      setStatus('Procesando...', true);
+      downloadBtn.disabled = true;
 
-      reset();
-      setStatus('Selecciona una imagen para empezar');
-    })();
+      try {
+        const blob = await removeBackground(originalImageElement);
+        resultBlob = blob;
+        const url = URL.createObjectURL(blob);
+        resultImg.src = url;
+        resultImg.style.display = 'block';
+        downloadBtn.disabled = false;
+        setStatus('¡Fondo eliminado con éxito!');
+      } catch (err) {
+        console.error(err);
+        setStatus('❌ Error al procesar. Intenta con otra imagen.');
+      } finally {
+        removeBtn.disabled = false;
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!resultBlob) return;
+      const url = URL.createObjectURL(resultBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sin_fondo.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setStatus('Descarga iniciada ✅');
+    });
+
+    reset();
+    setStatus('Selecciona una imagen para empezar');
   </script>
 </body>
 </html>
