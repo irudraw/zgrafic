@@ -361,11 +361,11 @@
     syncBeforeWidth();
 
     try {
-      const blob = await removeBackground(file, {
-        // GitHub Pages no manda headers COOP/COEP, así que forzamos 1 hilo
-        // para evitar el intento fallido de multithreading y su warning.
-        proxyToWorker: true,
-        device: 'cpu',
+      // Sin esto, la librería a veces no resuelve bien dónde viven sus
+      // archivos de modelo (WASM/ONNX) al cargarse vía esm.sh, y se queda
+      // colgada esperando en vez de fallar. Apuntamos directo al CDN oficial.
+      const config = {
+        publicPath: 'https://staticimgly.com/@imgly/background-removal-data/1.5.5/dist/',
         progress: (key, current, total) => {
           const pct = total ? Math.round((current / total) * 100) : 0;
           barFill.style.width = Math.min(95, pct) + '%';
@@ -373,7 +373,14 @@
             ? 'Descargando modelo de IA…'
             : 'Recortando imagen…';
         }
-      });
+      };
+
+      // Si por lo que sea nunca resuelve, avisamos en vez de dejarlo colgado.
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), 45000)
+      );
+
+      const blob = await Promise.race([removeBackground(file, config), timeout]);
 
       resultURL = URL.createObjectURL(blob);
       afterImg.src = resultURL;
@@ -382,7 +389,10 @@
       statusLine.classList.add('done');
       downloadBtn.disabled = false;
     } catch (err) {
-      statusText.textContent = 'No se pudo procesar la imagen. Intenta con otra.';
+      statusText.textContent = err.message === 'timeout'
+        ? 'Está tardando demasiado. Prueba con una imagen más liviana o recarga la página.'
+        : 'No se pudo procesar la imagen. Intenta con otra.';
+      barFill.style.width = '0%';
       console.error(err);
     }
   }
