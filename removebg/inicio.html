@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quitar fondo de imagen</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, sans-serif;
       background: #f5f5f5;
@@ -29,17 +25,9 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.1);
       text-align: center;
     }
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-      color: #1a1a1a;
-    }
-    .input-area {
-      margin-bottom: 1.5rem;
-    }
-    input[type="file"] {
-      display: none;
-    }
+    h1 { font-size: 1.8rem; margin-bottom: 1.5rem; color: #1a1a1a; }
+    .input-area { margin-bottom: 1.5rem; }
+    input[type="file"] { display: none; }
     .custom-file-label {
       display: inline-block;
       background: #4f46e5;
@@ -50,9 +38,7 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    .custom-file-label:hover {
-      background: #4338ca;
-    }
+    .custom-file-label:hover { background: #4338ca; }
     .preview-box {
       display: flex;
       flex-wrap: wrap;
@@ -67,12 +53,7 @@
       padding: 1rem;
       background: #fafafa;
     }
-    .preview-item p {
-      font-size: 0.9rem;
-      color: #555;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
+    .preview-item p { font-size: 0.9rem; color: #555; margin-bottom: 0.5rem; font-weight: 500; }
     .preview-item img {
       max-width: 100%;
       max-height: 300px;
@@ -96,23 +77,10 @@
       background: #e5e7eb;
       color: #1f2937;
     }
-    button.primary {
-      background: #10b981;
-      color: white;
-    }
-    button.primary:hover {
-      background: #059669;
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .status {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #4b5563;
-      min-height: 1.5em;
-    }
+    button.primary { background: #10b981; color: white; }
+    button.primary:hover { background: #059669; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status { margin-top: 1rem; font-size: 0.9rem; color: #4b5563; min-height: 1.5em; }
     .loader {
       display: inline-block;
       width: 20px;
@@ -124,9 +92,7 @@
       vertical-align: middle;
       margin-right: 0.5rem;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -155,9 +121,7 @@
     <div class="status" id="statusMessage"></div>
   </div>
 
-  <!-- Cargar la librería desde CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@latest/dist/browser/background-removal.iife.js"></script>
-
   <script>
     (function() {
       const fileInput = document.getElementById('fileInput');
@@ -172,23 +136,21 @@
       let originalImageElement = null;
       let resultBlob = null;
 
-      // Mostrar mensaje de estado
       function setStatus(text, isLoading = false) {
         statusEl.innerHTML = isLoading
           ? `<span class="loader"></span> ${text}`
           : text;
       }
 
-      // Limpiar estado
       function reset() {
         resultBlob = null;
         resultImg.src = '';
         resultBox.querySelector('img').style.display = 'none';
         downloadBtn.disabled = true;
-        removeBtn.disabled = true;
+        removeBtn.disabled = true;   // ← se deshabilita aquí, pero luego lo volvemos a habilitar
       }
 
-      // Mostrar imagen original
+      // Selección de archivo
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) {
@@ -205,8 +167,9 @@
           originalImageElement = new Image();
           originalImageElement.src = ev.target.result;
           originalImageElement.onload = () => {
-            removeBtn.disabled = false;
-            reset();
+            // ⚠️ CORRECCIÓN: primero limpiamos (reset) y después habilitamos el botón
+            reset();                       // deshabilita removeBtn...
+            removeBtn.disabled = false;    // ...pero lo volvemos a habilitar inmediatamente
             setStatus('Listo para quitar el fondo');
           };
         };
@@ -216,21 +179,17 @@
       // Quitar fondo
       removeBtn.addEventListener('click', async () => {
         if (!originalImageElement) return;
-
         removeBtn.disabled = true;
         setStatus('Procesando imagen...', true);
         resultImg.style.display = 'none';
         downloadBtn.disabled = true;
 
         try {
-          // La librería está disponible globalmente como imglyRemoveBackground
           const blob = await imglyRemoveBackground(originalImageElement);
           resultBlob = blob;
-
           const url = URL.createObjectURL(blob);
           resultImg.src = url;
           resultImg.style.display = 'block';
-
           downloadBtn.disabled = false;
           setStatus('¡Fondo eliminado con éxito!');
         } catch (err) {
@@ -241,10 +200,9 @@
         }
       });
 
-      // Descargar resultado
+      // Descargar
       downloadBtn.addEventListener('click', () => {
         if (!resultBlob) return;
-
         const url = URL.createObjectURL(resultBlob);
         const a = document.createElement('a');
         a.href = url;
@@ -253,7 +211,6 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-
         setStatus('Descarga iniciada ✅');
       });
 
