@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quitar fondo con Transformers.js</title>
+  <title>Quitar fondo con MODNet</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -122,8 +122,8 @@
     <div class="status" id="statusMessage"></div>
   </div>
 
+  <!-- Cargar Transformers.js desde CDN -->
   <script type="module">
-    // Importar pipeline desde la CDN
     import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.0.1/dist/transformers.min.js';
 
     const fileInput = document.getElementById('fileInput');
@@ -151,13 +151,12 @@
       removeBtn.disabled = true;
     }
 
-    // Cargar el pipeline de eliminación de fondo (usa MODNet por defecto)
+    // Cargar el modelo MODNet (ligero, especializado en quitar fondos)
     async function loadModel() {
       setStatus('Descargando modelo (≈176 MB)...', true);
       try {
         segmenter = await pipeline('background-removal', 'Xenova/modnet', {
-          // Forzar WebGL para evitar problemas de SIMD
-          device: 'webgl',
+          device: 'webgl',  // WebGL -> no necesita SIMD
         });
         setStatus('Modelo listo. Selecciona una imagen.');
       } catch (err) {
@@ -197,10 +196,8 @@
       downloadBtn.disabled = true;
 
       try {
-        // El pipeline devuelve un canvas directamente con el fondo quitado
+        // El pipeline devuelve un canvas con la imagen sin fondo
         const outputCanvas = await segmenter(originalImageElement);
-        
-        // Convertir canvas a Blob (PNG)
         const blob = await new Promise(resolve => outputCanvas.toBlob(resolve, 'image/png'));
         resultBlob = blob;
         resultImg.src = URL.createObjectURL(blob);
@@ -228,7 +225,6 @@
       setStatus('Descarga iniciada ✅');
     });
 
-    // Inicio
     reset();
     await loadModel();
   </script>
