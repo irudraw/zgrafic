@@ -122,11 +122,12 @@
     <div class="status" id="statusMessage"></div>
   </div>
 
-  <!-- ✅ CDN FUNCIONAL (unpkg, versión 1.4.0, ruta exacta) -->
-  <script src="https://unpkg.com/@imgly/background-removal@1.4.0/dist/browser/background-removal.iife.js"></script>
+  <!-- Script principal como módulo -->
+  <script type="module">
+    // Importamos la función directamente desde el CDN
+    import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/dist/background-removal.esm.js';
 
-  <script>
-    // La función global imglyRemoveBackground estará disponible inmediatamente
+    // Elementos del DOM
     const fileInput = document.getElementById('fileInput');
     const originalImg = document.getElementById('originalImg');
     const resultImg = document.getElementById('resultImg');
@@ -188,7 +189,8 @@
       downloadBtn.disabled = true;
 
       try {
-        const blob = await imglyRemoveBackground(originalImageElement);
+        // Usamos la función importada (antes era imglyRemoveBackground)
+        const blob = await removeBackground(originalImageElement);
         resultBlob = blob;
         const url = URL.createObjectURL(blob);
         resultImg.src = url;
