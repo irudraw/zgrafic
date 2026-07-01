@@ -258,11 +258,11 @@
   <div class="wrap">
     <header>
       <div class="logo"><span class="logo-mark"></span>cutout</div>
-      <span class="tag">100% en tu navegador</span>
+      <span class="tag">Servidor propio · gratis</span>
     </header>
 
-    <h1>Quita el fondo<br/><span class="accent">sin subir nada a un servidor.</span></h1>
-    <p class="lede">Sube una foto y un modelo de IA recorta a la persona directamente en tu navegador, usando la GPU. No hay backend, no hay cuenta, no hay límite de imágenes.</p>
+    <h1>Quita el fondo<br/><span class="accent">funciona en cualquier dispositivo.</span></h1>
+    <p class="lede">Sube una foto y un servidor gratuito la recorta con IA. No depende de tu celular ni tu PC — anda igual en cualquier dispositivo.</p>
 
     <div id="dropzone">
       <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" />
@@ -292,14 +292,17 @@
     </div>
 
     <footer>
-      <span>Procesado localmente con <a href="https://github.com/tensorflow/tfjs-models/tree/master/body-segmentation" target="_blank" rel="noopener">TensorFlow.js + MediaPipe Selfie Segmentation</a></span>
+      <span>Procesado con <a href="https://github.com/danielgatis/rembg" target="_blank" rel="noopener">rembg</a>, alojado en Hugging Face Spaces</span>
       <span class="mono">v1.0</span>
     </footer>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-segmentation@1.0.2/dist/body-segmentation.min.js"></script>
 <script type="module">
+  // 👉 Después de desplegar tu Space en Hugging Face, reemplazá esta URL
+  // por la tuya. Tiene la forma:
+  // https://TU-USUARIO-NOMBRE-DEL-SPACE.hf.space/remove-bg
+  const SERVER_URL = 'https://zgrafic-remove-bg-api.hf.space/remove-bg';
+
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
   const stage = document.getElementById('stage');
@@ -315,28 +318,6 @@
   const resetBtn = document.getElementById('resetBtn');
 
   let resultURL = null;
-  let segmenterPromise = null;
-
-  // Carga el segmentador una sola vez y lo reutiliza en cada imagen.
-  // Usamos WebGL (GPU) en vez de WASM, así funciona incluso en PCs
-  // viejas que no soportan WebAssembly SIMD.
-  function getSegmenter() {
-    if (!segmenterPromise) {
-      segmenterPromise = (async () => {
-        try {
-          await tf.setBackend('webgl');
-        } catch {
-          await tf.setBackend('cpu'); // último recurso, más lento pero universal
-        }
-        await tf.ready();
-        return bodySegmentation.createSegmenter(
-          bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation,
-          { runtime: 'tfjs', modelType: 'general' }
-        );
-      })();
-    }
-    return segmenterPromise;
-  }
 
   dropzone.addEventListener('click', () => fileInput.click());
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
@@ -370,8 +351,8 @@
 
     stage.classList.add('show');
     statusLine.classList.remove('done');
-    statusText.textContent = 'Cargando modelo de IA…';
-    barFill.style.width = '15%';
+    statusText.textContent = 'Subiendo imagen…';
+    barFill.style.width = '20%';
     downloadBtn.disabled = true;
 
     const originalURL = URL.createObjectURL(file);
@@ -381,60 +362,44 @@
     await new Promise(res => { beforeImg.onload = res; });
     syncBeforeWidth();
 
+    // El servidor gratuito puede tardar en "despertar" si nadie lo usó
+    // en un rato, así que damos bastante margen antes de avisar timeout.
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), 60000)
+      setTimeout(() => reject(new Error('timeout')), 90000)
     );
 
     try {
       barFill.style.width = '45%';
-      statusText.textContent = 'Recortando imagen…';
-      const canvas = await Promise.race([cutOut(file), timeout]);
+      statusText.textContent = 'Recortando imagen… (puede tardar si el servidor estaba dormido)';
 
-      canvas.toBlob(blob => {
-        if (resultURL) URL.revokeObjectURL(resultURL);
-        resultURL = URL.createObjectURL(blob);
-        afterImg.src = resultURL;
-        barFill.style.width = '100%';
-        statusText.textContent = 'Listo';
-        statusLine.classList.add('done');
-        downloadBtn.disabled = false;
-      }, 'image/png');
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await Promise.race([
+        fetch(SERVER_URL, { method: 'POST', body: formData }),
+        timeout
+      ]);
+
+      if (!res.ok) {
+        throw new Error('Error del servidor (' + res.status + ').');
+      }
+
+      const blob = await res.blob();
+      if (resultURL) URL.revokeObjectURL(resultURL);
+      resultURL = URL.createObjectURL(blob);
+      afterImg.src = resultURL;
+      barFill.style.width = '100%';
+      statusText.textContent = 'Listo';
+      statusLine.classList.add('done');
+      downloadBtn.disabled = false;
 
     } catch (err) {
       statusText.textContent = err.message === 'timeout'
-        ? 'Está tardando demasiado. Prueba con una imagen más liviana o recarga la página.'
-        : 'No se pudo procesar la imagen. Intenta con otra.';
+        ? 'El servidor está tardando demasiado. Probá de nuevo en un momento.'
+        : 'No se pudo conectar con el servidor. Revisá que la URL esté bien configurada.';
       barFill.style.width = '0%';
       console.error(err);
     }
-  }
-
-  async function cutOut(file){
-    const segmenter = await getSegmenter();
-    const imgBitmap = await createImageBitmap(file);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = imgBitmap.width;
-    canvas.height = imgBitmap.height;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(imgBitmap, 0, 0);
-
-    const people = await segmenter.segmentPeople(canvas);
-    const mask = await bodySegmentation.toBinaryMask(
-      people,
-      { r: 255, g: 255, b: 255, a: 255 }, // persona -> opaco
-      { r: 0, g: 0, b: 0, a: 0 },         // fondo -> transparente
-      false,
-      0.6
-    );
-
-    const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < pixelData.data.length; i += 4) {
-      pixelData.data[i + 3] = mask.data[i + 3]; // copiar canal alfa de la máscara
-    }
-    ctx.putImageData(pixelData, 0, 0);
-
-    return canvas;
   }
 
   function syncBeforeWidth(){
@@ -443,7 +408,6 @@
   }
   window.addEventListener('resize', syncBeforeWidth);
 
-  // Slider drag logic
   let dragging = false;
   function setSplit(clientX){
     const rect = compare.getBoundingClientRect();
