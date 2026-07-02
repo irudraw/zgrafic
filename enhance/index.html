@@ -84,6 +84,16 @@
     line-height:1.55;
   }
 
+  #typeBox{ margin-top:20px; }
+  #typeBox label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    color: var(--muted);
+    display:block;
+    margin-bottom:10px;
+  }
+  #typeOptions .scale-opt{ padding:12px 20px; }
+
   #scaleBox{ margin-top:20px; }
   #scaleBox label{
     font-family:'JetBrains Mono', monospace;
@@ -300,6 +310,14 @@
       <div class="drop-sub">o <span class="accent">haz clic para elegir un archivo</span> — JPG, PNG o WEBP</div>
     </div>
 
+    <div id="typeBox">
+      <label>¿Qué estás subiendo?</label>
+      <div class="scale-options" id="typeOptions">
+        <button type="button" class="scale-opt active" data-type="foto">Foto de persona<span>restaura rostro + cuerpo</span></button>
+        <button type="button" class="scale-opt" data-type="imagen">Imagen o diseño<span>sin rostros, solo nitidez</span></button>
+      </div>
+    </div>
+
     <div id="scaleBox">
       <label>Nivel de mejora</label>
       <div class="scale-options" id="scaleOptions">
@@ -324,7 +342,8 @@
       </div>
 
       <div class="actions">
-        <button class="primary" id="downloadBtn" disabled>Descargar PNG</button>
+        <button class="primary" id="enhanceBtn" disabled>Mejorar</button>
+        <button class="ghost" id="downloadBtn" disabled>Descargar PNG</button>
         <button class="ghost" id="resetBtn">Probar otra imagen</button>
       </div>
     </div>
@@ -343,6 +362,7 @@
 
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
+  const typeOptions = document.getElementById('typeOptions');
   const scaleOptions = document.getElementById('scaleOptions');
   const stage = document.getElementById('stage');
   const statusLine = document.getElementById('statusLine');
@@ -353,11 +373,22 @@
   const afterImg = document.getElementById('afterImg');
   const beforeLayer = document.getElementById('beforeLayer');
   const handle = document.getElementById('handle');
+  const enhanceBtn = document.getElementById('enhanceBtn');
   const downloadBtn = document.getElementById('downloadBtn');
   const resetBtn = document.getElementById('resetBtn');
 
   let resultURL = null;
   let selectedScale = 2;
+  let selectedType = 'foto';
+  let currentFile = null;
+
+  typeOptions.addEventListener('click', e => {
+    const btn = e.target.closest('.scale-opt');
+    if (!btn) return;
+    typeOptions.querySelectorAll('.scale-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedType = btn.dataset.type;
+  });
 
   scaleOptions.addEventListener('click', e => {
     const btn = e.target.closest('.scale-opt');
@@ -373,15 +404,17 @@
   dropzone.addEventListener('drop', e => {
     e.preventDefault();
     dropzone.classList.remove('drag');
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
   });
   fileInput.addEventListener('change', e => {
-    if (e.target.files[0]) handleFile(e.target.files[0]);
+    if (e.target.files[0]) selectFile(e.target.files[0]);
   });
 
   resetBtn.addEventListener('click', () => {
     stage.classList.remove('show');
     fileInput.value = '';
+    currentFile = null;
+    enhanceBtn.disabled = true;
     downloadBtn.disabled = true;
     if (resultURL) URL.revokeObjectURL(resultURL);
   });
@@ -394,14 +427,21 @@
     a.click();
   });
 
-  async function handleFile(file){
+  enhanceBtn.addEventListener('click', () => {
+    if (currentFile) processImage(currentFile);
+  });
+
+  async function selectFile(file){
     if (!file.type.startsWith('image/')) return;
+    currentFile = file;
 
     stage.classList.add('show');
     statusLine.classList.remove('done');
-    statusText.textContent = 'Subiendo imagen…';
-    barFill.style.width = '15%';
+    statusText.textContent = 'Listo — elegí el tipo y la escala, después presioná "Mejorar"';
+    barFill.style.width = '0%';
     downloadBtn.disabled = true;
+    enhanceBtn.disabled = false;
+    enhanceBtn.textContent = 'Mejorar';
 
     const originalURL = URL.createObjectURL(file);
     beforeImg.src = originalURL;
@@ -409,6 +449,15 @@
 
     await new Promise(res => { beforeImg.onload = res; });
     syncBeforeWidth();
+  }
+
+  async function processImage(file){
+    enhanceBtn.disabled = true;
+    enhanceBtn.textContent = 'Mejorando…';
+    downloadBtn.disabled = true;
+    statusLine.classList.remove('done');
+    statusText.textContent = 'Subiendo imagen…';
+    barFill.style.width = '15%';
 
     // Puede tardar varios minutos en el CPU gratuito, y bastante más
     // cuanto más alta sea la escala elegida (cada x2 extra es una
@@ -420,11 +469,13 @@
 
     try {
       barFill.style.width = '35%';
-      statusText.textContent = 'Mejorando rostro y cuerpo (x' + selectedScale + ')… puede tardar varios minutos, no cierres esta pestaña';
+      const label = selectedType === 'foto' ? 'rostro y cuerpo' : 'la imagen';
+      statusText.textContent = 'Mejorando ' + label + ' (x' + selectedScale + ')… puede tardar varios minutos, no cierres esta pestaña';
 
       const formData = new FormData();
       formData.append('file', file);
       formData.append('scale', String(selectedScale));
+      formData.append('type', selectedType);
 
       const res = await Promise.race([
         fetch(SERVER_URL, { method: 'POST', body: formData }),
@@ -443,12 +494,16 @@
       statusText.textContent = 'Listo';
       statusLine.classList.add('done');
       downloadBtn.disabled = false;
+      enhanceBtn.textContent = 'Mejorar de nuevo';
+      enhanceBtn.disabled = false;
 
     } catch (err) {
       statusText.textContent = err.message === 'timeout'
         ? 'El servidor está tardando demasiado. Probá de nuevo en un momento.'
         : 'No se pudo conectar con el servidor. Revisá que la URL esté bien configurada.';
       barFill.style.width = '0%';
+      enhanceBtn.textContent = 'Mejorar';
+      enhanceBtn.disabled = false;
       console.error(err);
     }
   }
