@@ -84,6 +84,44 @@
     line-height:1.55;
   }
 
+  #scaleBox{ margin-top:20px; }
+  #scaleBox label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    color: var(--muted);
+    display:block;
+    margin-bottom:10px;
+  }
+  .scale-options{
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .scale-opt{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.95rem;
+    padding:10px 18px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    transition: all .15s ease;
+  }
+  .scale-opt span{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:400;
+    font-size:0.65rem;
+    color: var(--muted);
+  }
+  .scale-opt:hover{ border-color: var(--chroma); }
+  .scale-opt.active{
+    background: var(--chroma);
+    color:#1a0e17;
+    border-color: var(--chroma);
+  }
+  .scale-opt.active span{ color:#1a0e17; opacity:0.7; }
+
   /* Dropzone */
   #dropzone{
     position:relative;
@@ -262,6 +300,15 @@
       <div class="drop-sub">o <span class="accent">haz clic para elegir un archivo</span> — JPG, PNG o WEBP</div>
     </div>
 
+    <div id="scaleBox">
+      <label>Nivel de mejora</label>
+      <div class="scale-options" id="scaleOptions">
+        <button type="button" class="scale-opt active" data-scale="2">x2<span>rápido</span></button>
+        <button type="button" class="scale-opt" data-scale="4">x4<span>medio</span></button>
+        <button type="button" class="scale-opt" data-scale="6">x6<span>lento</span></button>
+      </div>
+    </div>
+
     <div id="stage">
       <div class="status mono" id="statusLine"><span class="dot"></span><span id="statusText">Subiendo imagen…</span></div>
       <div class="bar"><div class="bar-fill" id="barFill"></div></div>
@@ -296,6 +343,7 @@
 
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
+  const scaleOptions = document.getElementById('scaleOptions');
   const stage = document.getElementById('stage');
   const statusLine = document.getElementById('statusLine');
   const statusText = document.getElementById('statusText');
@@ -309,6 +357,15 @@
   const resetBtn = document.getElementById('resetBtn');
 
   let resultURL = null;
+  let selectedScale = 2;
+
+  scaleOptions.addEventListener('click', e => {
+    const btn = e.target.closest('.scale-opt');
+    if (!btn) return;
+    scaleOptions.querySelectorAll('.scale-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedScale = Number(btn.dataset.scale);
+  });
 
   dropzone.addEventListener('click', () => fileInput.click());
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
@@ -353,18 +410,21 @@
     await new Promise(res => { beforeImg.onload = res; });
     syncBeforeWidth();
 
-    // Puede tardar varios minutos en el CPU gratuito, sobre todo si el
-    // servidor estaba dormido. Le damos bastante margen.
+    // Puede tardar varios minutos en el CPU gratuito, y bastante más
+    // cuanto más alta sea la escala elegida (cada x2 extra es una
+    // pasada real de IA, no un simple agrandado).
+    const timeoutMs = { 2: 360000, 4: 600000, 6: 900000 }[selectedScale] || 360000;
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), 360000)
+      setTimeout(() => reject(new Error('timeout')), timeoutMs)
     );
 
     try {
       barFill.style.width = '35%';
-      statusText.textContent = 'Mejorando rostro y cuerpo… puede tardar varios minutos, no cierres esta pestaña';
+      statusText.textContent = 'Mejorando rostro y cuerpo (x' + selectedScale + ')… puede tardar varios minutos, no cierres esta pestaña';
 
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('scale', String(selectedScale));
 
       const res = await Promise.race([
         fetch(SERVER_URL, { method: 'POST', body: formData }),
