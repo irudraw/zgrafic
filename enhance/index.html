@@ -353,15 +353,15 @@
     await new Promise(res => { beforeImg.onload = res; });
     syncBeforeWidth();
 
-    // GFPGAN + Real-ESRGAN en CPU tardan más que la app de fondos,
-    // y el servidor puede tener que "despertar" si estaba dormido.
+    // Puede tardar varios minutos en el CPU gratuito, sobre todo si el
+    // servidor estaba dormido. Le damos bastante margen.
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), 150000)
+      setTimeout(() => reject(new Error('timeout')), 360000)
     );
 
     try {
       barFill.style.width = '35%';
-      statusText.textContent = 'Mejorando rostro y cuerpo… (puede tardar 30-90s)';
+      statusText.textContent = 'Mejorando rostro y cuerpo… puede tardar varios minutos, no cierres esta pestaña';
 
       const formData = new FormData();
       formData.append('file', file);
