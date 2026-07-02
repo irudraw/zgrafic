@@ -435,6 +435,11 @@
     if (!file.type.startsWith('image/')) return;
     currentFile = file;
 
+    // Ping de "despertar" al servidor en paralelo, sin esperar la respuesta,
+    // así empieza a cargar los modelos mientras elegís tipo y escala.
+    const baseUrl = SERVER_URL.replace(/\/enhance\/?$/, '');
+    fetch(baseUrl).catch(() => {});
+
     stage.classList.add('show');
     statusLine.classList.remove('done');
     statusText.textContent = 'Listo — elegí el tipo y la escala, después presioná "Mejorar"';
@@ -462,7 +467,7 @@
     // Puede tardar varios minutos en el CPU gratuito, y bastante más
     // cuanto más alta sea la escala elegida (cada x2 extra es una
     // pasada real de IA, no un simple agrandado).
-    const timeoutMs = { 2: 360000, 3: 400000, 4: 600000 }[selectedScale] || 360000;
+    const timeoutMs = { 2: 600000, 3: 700000, 4: 900000 }[selectedScale] || 600000;
     const timeout = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('timeout')), timeoutMs)
     );
