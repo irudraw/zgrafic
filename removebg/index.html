@@ -391,7 +391,7 @@
     // El servidor gratuito puede tardar en "despertar" si nadie lo usó
     // en un rato, así que damos bastante margen antes de avisar timeout.
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), 180000)
+      setTimeout(() => reject(new Error('timeout')), 300000)
     );
 
     try {
