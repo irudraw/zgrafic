@@ -271,13 +271,13 @@
       <div class="drop-sub">o <span class="accent">haz clic para elegir un archivo</span> — JPG, PNG o WEBP</div>
     </div>
 
-    <label style="display:flex; align-items:center; gap:8px; margin-top:14px; font-size:0.85rem; color:var(--muted); cursor:pointer;">
-      <input type="checkbox" id="mattingToggle" checked style="accent-color:var(--chroma);" />
-      Refinar bordes finos (cabello) — desactivalo si la foto tiene varias personas juntas
-    </label>
-
     <div id="stage">
-      <div class="status mono" id="statusLine"><span class="dot"></span><span id="statusText">Cargando modelo de IA…</span></div>
+      <label style="display:flex; align-items:center; gap:8px; margin:18px 0 4px; font-size:0.85rem; color:var(--muted); cursor:pointer;">
+        <input type="checkbox" id="mattingToggle" checked style="accent-color:var(--chroma);" />
+        Refinar bordes finos (cabello) — desactivalo si la foto tiene varias personas juntas
+      </label>
+
+      <div class="status mono" id="statusLine"><span class="dot"></span><span id="statusText">Listo — presioná "Eliminar fondo" cuando quieras</span></div>
       <div class="bar"><div class="bar-fill" id="barFill"></div></div>
 
       <div class="compare" id="compare">
@@ -291,7 +291,8 @@
       </div>
 
       <div class="actions">
-        <button class="primary" id="downloadBtn" disabled>Descargar PNG</button>
+        <button class="primary" id="removeBgBtn" disabled>Eliminar fondo</button>
+        <button class="ghost" id="downloadBtn" disabled>Descargar PNG</button>
         <button class="ghost" id="resetBtn">Probar otra imagen</button>
       </div>
     </div>
@@ -319,10 +320,12 @@
   const afterImg = document.getElementById('afterImg');
   const beforeLayer = document.getElementById('beforeLayer');
   const handle = document.getElementById('handle');
+  const removeBgBtn = document.getElementById('removeBgBtn');
   const downloadBtn = document.getElementById('downloadBtn');
   const resetBtn = document.getElementById('resetBtn');
 
   let resultURL = null;
+  let currentFile = null;
 
   dropzone.addEventListener('click', () => fileInput.click());
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
@@ -330,15 +333,17 @@
   dropzone.addEventListener('drop', e => {
     e.preventDefault();
     dropzone.classList.remove('drag');
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
   });
   fileInput.addEventListener('change', e => {
-    if (e.target.files[0]) handleFile(e.target.files[0]);
+    if (e.target.files[0]) selectFile(e.target.files[0]);
   });
 
   resetBtn.addEventListener('click', () => {
     stage.classList.remove('show');
     fileInput.value = '';
+    currentFile = null;
+    removeBgBtn.disabled = true;
     downloadBtn.disabled = true;
     if (resultURL) URL.revokeObjectURL(resultURL);
   });
@@ -351,14 +356,21 @@
     a.click();
   });
 
-  async function handleFile(file){
+  removeBgBtn.addEventListener('click', () => {
+    if (currentFile) processImage(currentFile);
+  });
+
+  async function selectFile(file){
     if (!file.type.startsWith('image/')) return;
+    currentFile = file;
 
     stage.classList.add('show');
     statusLine.classList.remove('done');
-    statusText.textContent = 'Subiendo imagen…';
-    barFill.style.width = '20%';
+    statusText.textContent = 'Listo — presioná "Eliminar fondo" cuando quieras';
+    barFill.style.width = '0%';
     downloadBtn.disabled = true;
+    removeBgBtn.disabled = false;
+    removeBgBtn.textContent = 'Eliminar fondo';
 
     const originalURL = URL.createObjectURL(file);
     beforeImg.src = originalURL;
@@ -366,11 +378,20 @@
 
     await new Promise(res => { beforeImg.onload = res; });
     syncBeforeWidth();
+  }
+
+  async function processImage(file){
+    removeBgBtn.disabled = true;
+    removeBgBtn.textContent = 'Procesando…';
+    downloadBtn.disabled = true;
+    statusLine.classList.remove('done');
+    statusText.textContent = 'Subiendo imagen…';
+    barFill.style.width = '20%';
 
     // El servidor gratuito puede tardar en "despertar" si nadie lo usó
     // en un rato, así que damos bastante margen antes de avisar timeout.
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), 90000)
+      setTimeout(() => reject(new Error('timeout')), 180000)
     );
 
     try {
@@ -398,12 +419,16 @@
       statusText.textContent = 'Listo';
       statusLine.classList.add('done');
       downloadBtn.disabled = false;
+      removeBgBtn.textContent = 'Eliminar fondo de nuevo';
+      removeBgBtn.disabled = false;
 
     } catch (err) {
       statusText.textContent = err.message === 'timeout'
         ? 'El servidor está tardando demasiado. Probá de nuevo en un momento.'
         : 'No se pudo conectar con el servidor. Revisá que la URL esté bien configurada.';
       barFill.style.width = '0%';
+      removeBgBtn.textContent = 'Eliminar fondo';
+      removeBgBtn.disabled = false;
       console.error(err);
     }
   }
