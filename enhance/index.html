@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cutout — quita el fondo de tus fotos</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✂️</text></svg>">
+<title>Enhance — mejora la calidad de tus fotos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #111311;
-    --surface: #1a1d1a;
-    --surface-2: #22261f;
+    --bg: #121113;
+    --surface: #1d1a1e;
+    --surface-2: #26212a;
     --ink: #eae7de;
-    --muted: #8b9088;
-    --chroma: #39ff88;
-    --chroma-dim: #1f8a51;
-    --line: #2c302b;
+    --muted: #948b95;
+    --chroma: #ff7ae0;
+    --chroma-dim: #a5449a;
+    --line: #302b30;
     --radius: 14px;
   }
   *{box-sizing:border-box;}
@@ -28,8 +28,8 @@
     font-family:'Inter', sans-serif;
     min-height:100vh;
     background-image:
-      radial-gradient(circle at 15% 0%, rgba(57,255,136,0.06), transparent 45%),
-      radial-gradient(circle at 85% 100%, rgba(57,255,136,0.04), transparent 40%);
+      radial-gradient(circle at 15% 0%, rgba(255,122,224,0.07), transparent 45%),
+      radial-gradient(circle at 85% 100%, rgba(255,122,224,0.05), transparent 40%);
   }
   .mono{font-family:'JetBrains Mono', monospace;}
   .wrap{
@@ -84,6 +84,54 @@
     line-height:1.55;
   }
 
+  #typeBox{ margin-top:20px; }
+  #typeBox label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    color: var(--muted);
+    display:block;
+    margin-bottom:10px;
+  }
+  #typeOptions .scale-opt{ padding:12px 20px; }
+
+  #scaleBox{ margin-top:20px; }
+  #scaleBox label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    color: var(--muted);
+    display:block;
+    margin-bottom:10px;
+  }
+  .scale-options{
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .scale-opt{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.95rem;
+    padding:10px 18px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    transition: all .15s ease;
+  }
+  .scale-opt span{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:400;
+    font-size:0.65rem;
+    color: var(--muted);
+  }
+  .scale-opt:hover{ border-color: var(--chroma); }
+  .scale-opt.active{
+    background: var(--chroma);
+    color:#1a0e17;
+    border-color: var(--chroma);
+  }
+  .scale-opt.active span{ color:#1a0e17; opacity:0.7; }
+
   /* Dropzone */
   #dropzone{
     position:relative;
@@ -104,13 +152,9 @@
     width:52px; height:52px;
     margin: 0 auto 18px;
     border-radius:10px;
-    background:
-      linear-gradient(45deg, #2a2d28 25%, transparent 25%) -0px -0px/16px 16px,
-      linear-gradient(-45deg, #2a2d28 25%, transparent 25%) -0px 8px/16px 16px,
-      linear-gradient(45deg, transparent 75%, #2a2d28 75%) -0px -0px/16px 16px,
-      linear-gradient(-45deg, transparent 75%, #2a2d28 75%) -8px -8px/16px 16px;
-    background-color:#1f221e;
+    background: linear-gradient(135deg, #ff7ae0, #a5449a);
     display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem;
   }
   .drop-title{
     font-family:'Space Grotesk', sans-serif;
@@ -129,12 +173,7 @@
     border-radius: var(--radius);
     overflow:hidden;
     border:1px solid var(--line);
-    background:
-      linear-gradient(45deg, #1c1e1b 25%, transparent 25%) 0 0/22px 22px,
-      linear-gradient(-45deg, #1c1e1b 25%, transparent 25%) 0 11px/22px 22px,
-      linear-gradient(45deg, transparent 75%, #1c1e1b 75%) 0 0/22px 22px,
-      linear-gradient(-45deg, transparent 75%, #1c1e1b 75%) -11px -11px/22px 22px;
-    background-color:#141613;
+    background-color:#1a171b;
     max-height: 560px;
     cursor: zoom-in;
   }
@@ -174,7 +213,7 @@
     transform: translate(-50%,-50%);
     width:34px; height:34px;
     background: var(--chroma);
-    color:#0d0f0d;
+    color:#1a0e17;
     border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     font-size:0.9rem;
@@ -187,7 +226,7 @@
     letter-spacing:0.05em;
     padding:4px 9px;
     border-radius:99px;
-    background: rgba(10,12,10,0.65);
+    background: rgba(10,8,10,0.65);
     color: var(--muted);
     border:1px solid var(--line);
     z-index:3;
@@ -241,10 +280,10 @@
   }
   button.primary{
     background: var(--chroma);
-    color:#0d0f0d;
+    color:#1a0e17;
     border-color: var(--chroma);
   }
-  button.primary:hover{ background:#4dffa0; }
+  button.primary:hover{ background:#ff96e7; }
   button.ghost:hover{ border-color: var(--muted); }
   button:disabled{ opacity:0.4; cursor:not-allowed; }
 
@@ -268,27 +307,39 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="logo"><span class="logo-mark"></span>cutout</div>
+      <div class="logo"><span class="logo-mark"></span>enhance</div>
       <span class="tag">Servidor propio · gratis</span>
     </header>
 
-    <h1>Quita el fondo<br/><span class="accent">funciona en cualquier dispositivo.</span></h1>
-    <p class="lede">Sube una foto y un servidor gratuito la recorta con IA. No depende de tu celular ni tu PC — anda igual en cualquier dispositivo.</p>
+    <h1>Mejora tus fotos<br/><span class="accent">rostros y cuerpo, más nítidos.</span></h1>
+    <p class="lede">Sube una foto y un servidor gratuito restaura rostros y mejora la definición general de la imagen con IA. Sin límite, sin cuenta.</p>
 
     <div id="dropzone">
       <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" />
-      <div class="drop-icon">✂️</div>
+      <div class="drop-icon">✨</div>
       <div class="drop-title">Suelta una imagen aquí</div>
       <div class="drop-sub">o <span class="accent">haz clic para elegir un archivo</span> — JPG, PNG o WEBP</div>
     </div>
 
-    <div id="stage">
-      <label style="display:flex; align-items:center; gap:8px; margin:18px 0 4px; font-size:0.85rem; color:var(--muted); cursor:pointer;">
-        <input type="checkbox" id="mattingToggle" checked style="accent-color:var(--chroma);" />
-        Refinar bordes finos (cabello) — desactivalo si la foto tiene varias personas juntas
-      </label>
+    <div id="typeBox">
+      <label>¿Qué estás subiendo?</label>
+      <div class="scale-options" id="typeOptions">
+        <button type="button" class="scale-opt active" data-type="foto">Foto de persona<span>restaura rostro + cuerpo</span></button>
+        <button type="button" class="scale-opt" data-type="imagen">Imagen o diseño<span>sin rostros, solo nitidez</span></button>
+      </div>
+    </div>
 
-      <div class="status mono" id="statusLine"><span class="dot"></span><span id="statusText">Listo — presioná "Eliminar fondo" cuando quieras</span></div>
+    <div id="scaleBox">
+      <label>Nivel de mejora</label>
+      <div class="scale-options" id="scaleOptions">
+        <button type="button" class="scale-opt active" data-scale="2">x2<span>rápido</span></button>
+        <button type="button" class="scale-opt" data-scale="3">x3<span>rápido</span></button>
+        <button type="button" class="scale-opt" data-scale="4">x4<span>medio</span></button>
+      </div>
+    </div>
+
+    <div id="stage">
+      <div class="status mono" id="statusLine"><span class="dot"></span><span id="statusText">Subiendo imagen…</span></div>
       <div class="bar"><div class="bar-fill" id="barFill"></div></div>
 
       <div class="compare" id="compare">
@@ -296,7 +347,7 @@
         <span class="badge right">DESPUÉS</span>
         <span class="badge zoom-hint" id="zoomHint">🔍 rueda del mouse para zoom</span>
         <div class="zoom-wrap" id="zoomWrap">
-          <img id="afterImg" src="" alt="Imagen sin fondo" />
+          <img id="afterImg" src="" alt="Imagen mejorada" />
           <div class="before-layer" id="beforeLayer">
             <img id="beforeImg" src="" alt="Imagen original" />
           </div>
@@ -305,14 +356,14 @@
       </div>
 
       <div class="actions">
-        <button class="primary" id="removeBgBtn" disabled>Eliminar fondo</button>
+        <button class="primary" id="enhanceBtn" disabled>Mejorar</button>
         <button class="ghost" id="downloadBtn" disabled>Descargar PNG</button>
         <button class="ghost" id="resetBtn">Probar otra imagen</button>
       </div>
     </div>
 
     <footer>
-      <span>Procesado con <a href="https://github.com/danielgatis/rembg" target="_blank" rel="noopener">rembg</a>, alojado en Hugging Face Spaces</span>
+      <span>Procesado con <a href="https://github.com/TencentARC/GFPGAN" target="_blank" rel="noopener">GFPGAN</a> + <a href="https://github.com/xinntao/Real-ESRGAN" target="_blank" rel="noopener">Real-ESRGAN</a>, alojado en Hugging Face Spaces</span>
       <span class="mono">v1.0</span>
     </footer>
   </div>
@@ -320,11 +371,13 @@
 <script type="module">
   // 👉 Después de desplegar tu Space en Hugging Face, reemplazá esta URL
   // por la tuya. Tiene la forma:
-  // https://TU-USUARIO-NOMBRE-DEL-SPACE.hf.space/remove-bg
-  const SERVER_URL = 'https://zgrafic-remove-bg-api.hf.space/remove-bg';
+  // https://TU-USUARIO-NOMBRE-DEL-SPACE.hf.space/enhance
+  const SERVER_URL = 'https://zgrafic-enhance-photo-api.hf.space/enhance';
 
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
+  const typeOptions = document.getElementById('typeOptions');
+  const scaleOptions = document.getElementById('scaleOptions');
   const stage = document.getElementById('stage');
   const statusLine = document.getElementById('statusLine');
   const statusText = document.getElementById('statusText');
@@ -335,12 +388,30 @@
   const afterImg = document.getElementById('afterImg');
   const beforeLayer = document.getElementById('beforeLayer');
   const handle = document.getElementById('handle');
-  const removeBgBtn = document.getElementById('removeBgBtn');
+  const enhanceBtn = document.getElementById('enhanceBtn');
   const downloadBtn = document.getElementById('downloadBtn');
   const resetBtn = document.getElementById('resetBtn');
 
   let resultURL = null;
+  let selectedScale = 2;
+  let selectedType = 'foto';
   let currentFile = null;
+
+  typeOptions.addEventListener('click', e => {
+    const btn = e.target.closest('.scale-opt');
+    if (!btn) return;
+    typeOptions.querySelectorAll('.scale-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedType = btn.dataset.type;
+  });
+
+  scaleOptions.addEventListener('click', e => {
+    const btn = e.target.closest('.scale-opt');
+    if (!btn) return;
+    scaleOptions.querySelectorAll('.scale-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedScale = Number(btn.dataset.scale);
+  });
 
   dropzone.addEventListener('click', () => fileInput.click());
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
@@ -358,7 +429,7 @@
     stage.classList.remove('show');
     fileInput.value = '';
     currentFile = null;
-    removeBgBtn.disabled = true;
+    enhanceBtn.disabled = true;
     downloadBtn.disabled = true;
     if (resultURL) URL.revokeObjectURL(resultURL);
   });
@@ -367,11 +438,11 @@
     if (!resultURL) return;
     const a = document.createElement('a');
     a.href = resultURL;
-    a.download = 'sin-fondo.png';
+    a.download = 'foto-mejorada.png';
     a.click();
   });
 
-  removeBgBtn.addEventListener('click', () => {
+  enhanceBtn.addEventListener('click', () => {
     if (currentFile) processImage(currentFile);
   });
 
@@ -379,13 +450,18 @@
     if (!file.type.startsWith('image/')) return;
     currentFile = file;
 
+    // Ping de "despertar" al servidor en paralelo, sin esperar la respuesta,
+    // así empieza a cargar los modelos mientras elegís tipo y escala.
+    const baseUrl = SERVER_URL.replace(/\/enhance\/?$/, '');
+    fetch(baseUrl).catch(() => {});
+
     stage.classList.add('show');
     statusLine.classList.remove('done');
-    statusText.textContent = 'Listo — presioná "Eliminar fondo" cuando quieras';
+    statusText.textContent = 'Listo — elegí el tipo y la escala, después presioná "Mejorar"';
     barFill.style.width = '0%';
     downloadBtn.disabled = true;
-    removeBgBtn.disabled = false;
-    removeBgBtn.textContent = 'Eliminar fondo';
+    enhanceBtn.disabled = false;
+    enhanceBtn.textContent = 'Mejorar';
 
     const originalURL = URL.createObjectURL(file);
     beforeImg.src = originalURL;
@@ -397,26 +473,30 @@
   }
 
   async function processImage(file){
-    removeBgBtn.disabled = true;
-    removeBgBtn.textContent = 'Procesando…';
+    enhanceBtn.disabled = true;
+    enhanceBtn.textContent = 'Mejorando…';
     downloadBtn.disabled = true;
     statusLine.classList.remove('done');
     statusText.textContent = 'Subiendo imagen…';
-    barFill.style.width = '20%';
+    barFill.style.width = '15%';
 
-    // El servidor gratuito puede tardar en "despertar" si nadie lo usó
-    // en un rato, así que damos bastante margen antes de avisar timeout.
+    // Puede tardar varios minutos en el CPU gratuito, y bastante más
+    // cuanto más alta sea la escala elegida (cada x2 extra es una
+    // pasada real de IA, no un simple agrandado).
+    const timeoutMs = { 2: 600000, 3: 700000, 4: 900000 }[selectedScale] || 600000;
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), 420000)
+      setTimeout(() => reject(new Error('timeout')), timeoutMs)
     );
 
     try {
-      barFill.style.width = '45%';
-      statusText.textContent = 'Recortando imagen… (puede tardar si el servidor estaba dormido)';
+      barFill.style.width = '35%';
+      const label = selectedType === 'foto' ? 'rostro y cuerpo' : 'la imagen';
+      statusText.textContent = 'Mejorando ' + label + ' (x' + selectedScale + ')… puede tardar varios minutos, no cierres esta pestaña';
 
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('matting', document.getElementById('mattingToggle').checked ? 'true' : 'false');
+      formData.append('scale', String(selectedScale));
+      formData.append('type', selectedType);
 
       const res = await Promise.race([
         fetch(SERVER_URL, { method: 'POST', body: formData }),
@@ -435,16 +515,16 @@
       statusText.textContent = 'Listo';
       statusLine.classList.add('done');
       downloadBtn.disabled = false;
-      removeBgBtn.textContent = 'Eliminar fondo de nuevo';
-      removeBgBtn.disabled = false;
+      enhanceBtn.textContent = 'Mejorar de nuevo';
+      enhanceBtn.disabled = false;
 
     } catch (err) {
       statusText.textContent = err.message === 'timeout'
         ? 'El servidor está tardando demasiado. Probá de nuevo en un momento.'
         : 'No se pudo conectar con el servidor. Revisá que la URL esté bien configurada.';
       barFill.style.width = '0%';
-      removeBgBtn.textContent = 'Eliminar fondo';
-      removeBgBtn.disabled = false;
+      enhanceBtn.textContent = 'Mejorar';
+      enhanceBtn.disabled = false;
       console.error(err);
     }
   }
