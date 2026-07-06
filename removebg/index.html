@@ -364,6 +364,11 @@
     if (!file.type.startsWith('image/')) return;
     currentFile = file;
 
+    // Ping de "despertar" al servidor en paralelo, sin esperar la respuesta,
+    // así empieza a cargar el modelo mientras elegís las opciones.
+    const baseUrl = SERVER_URL.replace(/\/remove-bg\/?$/, '');
+    fetch(baseUrl).catch(() => {});
+
     stage.classList.add('show');
     statusLine.classList.remove('done');
     statusText.textContent = 'Listo — presioná "Eliminar fondo" cuando quieras';
