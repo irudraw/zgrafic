@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eliminar Fondo Local</title>
 
-    <!-- MediaPipe Selfie Segmentation versión estable 0.8.1 -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.8.1/selfie_segmentation.js"
+    <!-- Cargar MediaPipe Selfie Segmentation desde UNPKG (versión 0.8.1) -->
+    <script src="https://unpkg.com/@mediapipe/selfie_segmentation@0.8.1/selfie_segmentation.js"
             crossorigin="anonymous">
     </script>
 
@@ -203,24 +203,24 @@
 
         // ----- Configurar MediaPipe Selfie Segmentation -----
         function setupSegmenter() {
-            // Verificar que SelfieSegmentation esté definido
+            // Verificar que la librería se cargó
             if (typeof SelfieSegmentation === 'undefined') {
-                statusDiv.textContent = '❌ Error: La librería MediaPipe no se cargó. Revisa la conexión.';
-                console.error('SelfieSegmentation no está definido. Verifica que el script se haya cargado correctamente.');
+                statusDiv.textContent = '❌ Error: No se pudo cargar la librería. Revisa la conexión.';
                 return;
             }
 
-            // Configurar locateFile para que use la misma versión
+            // Configurar locateFile para que use la misma versión desde UNPKG
             SelfieSegmentation.prototype.locateFile = function(file) {
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.8.1/${file}`;
+                return `https://unpkg.com/@mediapipe/selfie_segmentation@0.8.1/${file}`;
             };
 
             segmenter = new SelfieSegmentation({
                 modelSelection: 1, // 1 = Selfie (personas), 0 = General
             });
 
-            // Evento cuando el modelo termina de cargar o al recibir resultados
+            // Evento cuando el modelo termina de cargar
             segmenter.onResults((results) => {
+                // results.segmentationMask es un ImageData
                 if (results.segmentationMask) {
                     applyMask(results.segmentationMask);
                     statusDiv.textContent = '✅ Fondo eliminado correctamente';
@@ -242,7 +242,6 @@
             }).catch((err) => {
                 console.error(err);
                 statusDiv.textContent = '❌ Error al cargar el modelo. Revisa la consola.';
-                processBtn.disabled = true;
             });
         }
 
@@ -378,18 +377,19 @@
         downloadBtn.addEventListener('click', downloadResult);
 
         // ----- Inicializar el segmentador al cargar la página -----
-        // Esperar a que el DOM esté listo y el script de MediaPipe cargado
-        if (document.readyState === 'complete') {
+        // Esperar a que el script de MediaPipe esté cargado
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setupSegmenter();
         } else {
-            window.addEventListener('load', setupSegmenter);
+            document.addEventListener('DOMContentLoaded', setupSegmenter);
         }
 
-        // También manejar el caso de que el script de MediaPipe falle
-        // y SelfieSegmentation no esté definido después de unos segundos
+        // También si el script se carga de forma asíncrona, podemos intentar de nuevo después
+        // (pero con la etiqueta script normal debería estar listo al ejecutarse este script)
+        // En caso de que no, ponemos un timeout para reintentar
         setTimeout(() => {
             if (typeof SelfieSegmentation === 'undefined') {
-                statusDiv.textContent = '❌ Error: No se pudo cargar la librería MediaPipe. Verifica tu conexión a internet.';
+                statusDiv.textContent = '❌ La librería no se cargó. Intenta recargar la página.';
             }
         }, 5000);
 
