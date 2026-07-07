@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Studio Pro – Fondo + Super‑Resolución IA</title>
 
-  <!-- Import Map para Transformers.js -->
+  <!-- Import Map para Transformers.js y upscaler.js -->
   <script type="importmap">
   {
     "imports": {
-      "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0/dist/transformers.js"
+      "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0/dist/transformers.js",
+      "@upscalerjs/esrgan": "https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan@1.0.0/dist/upscaler.js"
     }
   }
   </script>
 
   <style>
-    /* Estilos iguales que antes, omitidos por brevedad */
     * { box-sizing: border-box; }
     body { font-family: system-ui, sans-serif; background: #f1f5f9; margin: 0; padding: 20px; }
     .container { background: white; border-radius: 24px; padding: 30px; max-width: 1200px; margin: auto; }
@@ -59,7 +59,7 @@
       <div style="font-weight: 600; color: #0f172a;">⚙️ Modelos IA</div>
       <div style="font-size:0.9rem; color:#334155;">
         <span class="badge">🧹 BEN2-ONNX</span> (fondo)<br>
-        <span class="badge">⬆️ 4x-RealSR</span> (super‑resolución 4x)
+        <span class="badge">⬆️ ESRGAN</span> (super‑resolución 4x)
       </div>
       <div style="font-size:0.8rem; color:#64748b;">⏳ Primera carga: ~50 MB, se cachea.</div>
     </div>
@@ -90,6 +90,8 @@
   //  IMPORTS
   // =====================================================================
   import { pipeline, RawImage } from '@huggingface/transformers';
+  // Importar upscaler.js (ESRGAN para super-resolución)
+  import Upscaler from '@upscalerjs/esrgan';
 
   // =====================================================================
   //  DOM REFS
@@ -151,12 +153,16 @@
       setStatus('📦 Cargando BEN2-ONNX (fondo)…', true, 5);
       bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
       isBgReady = true;
-      setStatus('✅ BEN2 listo. Cargando 4x-RealSR (super‑resolución)…', true, 40);
+      setStatus('✅ BEN2 listo. Cargando ESRGAN (super‑resolución)…', true, 40);
 
-      // Modelo 4x-RealSR (público, más estable que Swin2SR)
-      upscaler = await pipeline('image-to-image', 'onnx-community/4x-RealSR', {
-        dtype: 'fp32'
+      // Cargar ESRGAN con upscaler.js
+      upscaler = new Upscaler({
+        model: 'esrgan',
+        scale: 4
       });
+      // Esperar a que el modelo esté listo (carga asíncrona)
+      await upscaler.load();
+
       isUpscalerReady = true;
 
       setStatus('✅ Todos los modelos listos. Sube una imagen.', false, 100);
@@ -164,16 +170,11 @@
     } catch (err) {
       console.error('Error cargando modelos:', err);
       setStatus('❌ Error cargando modelos: ' + err.message, false);
-      // Si falla 4x-RealSR, intentar con otro modelo conocido
-      if (!isUpscalerReady) {
-        try {
-          setStatus('🔄 Intentando con modelo alternativo (ESRGAN)…', true, 60);
-          upscaler = await pipeline('image-to-image', 'Xenova/4x_ESRGAN', { dtype: 'fp32' });
-          isUpscalerReady = true;
-          setStatus('✅ Modelos listos (ESRGAN). Sube una imagen.', false, 100);
-          if (loadedImage) enableButtons(true);
-        } catch (e2) {
-          setStatus('⚠️ Solo BEN2 disponible. La mejora con IA no funcionará.', false);
+      // Si falla ESRGAN, al menos BEN2 debería funcionar
+      if (isBgReady) {
+        setStatus('✅ BEN2 listo. ESRGAN falló, pero puedes eliminar fondo.', false);
+        if (loadedImage) {
+          removeBgBtn.disabled = false;
         }
       }
     }
@@ -221,25 +222,6 @@
   }
 
   // =====================================================================
-  //  FUNCIÓN AUXILIAR: Redimensionar a múltiplo de 4
-  // =====================================================================
-  function resizeToMultipleOf4(canvas) {
-    const w = canvas.width;
-    const h = canvas.height;
-    const newW = Math.floor(w / 4) * 4 || 4; // mínimo 4 para evitar cero
-    const newH = Math.floor(h / 4) * 4 || 4;
-    if (newW === w && newH === h) return canvas;
-    const newCanvas = document.createElement('canvas');
-    newCanvas.width = newW;
-    newCanvas.height = newH;
-    const ctx = newCanvas.getContext('2d');
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(canvas, 0, 0, newW, newH);
-    return newCanvas;
-  }
-
-  // =====================================================================
   //  ELIMINAR FONDO (BEN2)
   // =====================================================================
   async function removeBackground() {
@@ -281,7 +263,7 @@
   }
 
   // =====================================================================
-  //  MEJORAR CON IA (Super‑resolución 4x)
+  //  MEJORAR CON IA (Super‑resolución 4x con ESRGAN)
   // =====================================================================
   async function upscaleWithAI() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
@@ -315,38 +297,28 @@
         ctx.drawImage(loadedImage, 0, 0);
       }
 
-      // 2. Redimensionar a múltiplo de 4 (requisito de muchos modelos)
-      const resizedCanvas = resizeToMultipleOf4(sourceCanvas);
+      // 2. Convertir a ImageData para upscaler.js
+      const imageData = sourceCanvas.getContext('2d').getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
 
-      // 3. Convertir a RawImage
-      const rawImage = await RawImage.fromCanvas(resizedCanvas);
+      // 3. Ejecutar ESRGAN (devuelve ImageData escalado)
+      const output = await upscaler.upscale(imageData, {
+        patchSize: 64, // Tamaño del parche para optimizar rendimiento
+        progress: (p) => setStatus(`⬆️ Progreso: ${Math.round(p * 100)}%`, true, 30 + p * 50)
+      });
 
-      // 4. Ejecutar el modelo
-      const output = await upscaler(rawImage);
-
-      // 5. Extraer ImageData
-      let imageData;
-      if (output.toImageData) {
-        imageData = output.toImageData();
-      } else if (output.data) {
-        imageData = new ImageData(output.data, output.width, output.height);
-      } else {
-        throw new Error('Formato de salida no reconocido');
-      }
-
-      // 6. Crear canvas de salida
+      // 4. Crear canvas de salida
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = imageData.width;
-      outCanvas.height = imageData.height;
+      outCanvas.width = output.width;
+      outCanvas.height = output.height;
       const outCtx = outCanvas.getContext('2d');
-      outCtx.putImageData(imageData, 0, 0);
+      outCtx.putImageData(output, 0, 0);
 
-      // 7. Guardar blob
+      // 5. Guardar blob
       const blob = await new Promise(resolve => outCanvas.toBlob(resolve, 'image/png'));
       currentResultBlob = blob;
       currentStep = (currentStep === 'background_removed') ? 'both' : 'upscaled';
 
-      // 8. Mostrar en canvas
+      // 6. Mostrar en canvas
       const resultUrl = URL.createObjectURL(blob);
       const resultImg = new Image();
       resultImg.onload = () => {
@@ -363,7 +335,7 @@
       resultImg.src = resultUrl;
     } catch (err) {
       console.error(err);
-      setStatus('❌ Error en IA: ' + err.message + '. Intenta con una imagen más pequeña o diferente.', false);
+      setStatus('❌ Error en IA: ' + err.message + '. Intenta con una imagen más pequeña.', false);
       processing = false;
       enableButtons(true);
     }
@@ -406,26 +378,18 @@
       canvas.height = imgNoBg.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(imgNoBg, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-      // Redimensionar a múltiplo de 4
-      const resizedCanvas = resizeToMultipleOf4(canvas);
-      const rawImage = await RawImage.fromCanvas(resizedCanvas);
-      const output = await upscaler(rawImage);
-
-      let imageData;
-      if (output.toImageData) {
-        imageData = output.toImageData();
-      } else if (output.data) {
-        imageData = new ImageData(output.data, output.width, output.height);
-      } else {
-        throw new Error('Formato de salida no reconocido');
-      }
+      const output = await upscaler.upscale(imageData, {
+        patchSize: 64,
+        progress: (p) => setStatus(`⬆️ Progreso: ${Math.round(p * 100)}%`, true, 50 + p * 40)
+      });
 
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = imageData.width;
-      outCanvas.height = imageData.height;
+      outCanvas.width = output.width;
+      outCanvas.height = output.height;
       const outCtx = outCanvas.getContext('2d');
-      outCtx.putImageData(imageData, 0, 0);
+      outCtx.putImageData(output, 0, 0);
 
       const finalBlob = await new Promise(resolve => outCanvas.toBlob(resolve, 'image/png'));
       currentResultBlob = finalBlob;
