@@ -213,7 +213,7 @@
       <div style="font-weight: 600; color: #0f172a;">⚙️ Modelos IA</div>
       <div style="font-size:0.9rem; color:#334155;">
         <span class="badge">🧹 BEN2-ONNX</span> (fondo)<br>
-        <span class="badge">⬆️ 4x-ESRGAN</span> (super‑resolución 4x)
+        <span class="badge">⬆️ ESRGAN</span> (super‑resolución 4x)
       </div>
       <div style="font-size:0.8rem; color:#64748b;">
         ⚡ La primera carga descarga ~50 MB de modelo. Se cachea.
@@ -281,7 +281,7 @@
   let isUpscalerReady = false;
 
   let currentResultBlob = null;
-  let currentStep = 'idle'; // idle | background_removed | upscaled | both
+  let currentStep = 'idle';
   let processing = false;
 
   // =====================================================================
@@ -304,33 +304,44 @@
   }
 
   // =====================================================================
-  //  CARGAR MODELOS
+  //  CARGAR MODELOS (usando modelos públicos y estables)
   // =====================================================================
   async function loadModels() {
     try {
       setStatus('📦 Cargando BEN2-ONNX (fondo)…', true, 5);
       bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
       isBgReady = true;
-      setStatus('✅ BEN2 listo. Cargando 4x-ESRGAN (super‑resolución)…', true, 40);
+      setStatus('✅ BEN2 listo. Cargando Real-ESRGAN (super‑resolución)…', true, 40);
 
-      // Modelo: 4x_ESRGAN (estable y probado)
-      upscaler = await pipeline('image-to-image', 'Xenova/4x_ESRGAN');
+      // MODELO PÚBLICO: Real-ESRGAN-x4 (debería funcionar sin autenticación)
+      // Si falla, probamos con "Xenova/Real-ESRGAN-x4" (otro espejo)
+      // También podemos usar "Xenova/4x_APISR_GRL_GAN_generator" que antes dio error pero lo dejamos como fallback
+      const modelName = 'Xenova/Real-ESRGAN-x4';
+      upscaler = await pipeline('image-to-image', modelName);
       isUpscalerReady = true;
 
       setStatus('✅ Todos los modelos listos. Sube una imagen.', false, 100);
       if (loadedImage) enableButtons(true);
     } catch (err) {
-      console.error(err);
-      setStatus('❌ Error cargando modelos: ' + err.message, false);
-      // Intentar al menos BEN2
-      if (!isBgReady) {
+      console.error('Error cargando modelos:', err);
+      // Si falla ESRGAN, intentamos con otro modelo público
+      if (!isUpscalerReady) {
         try {
-          bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
-          isBgReady = true;
-          setStatus('✅ BEN2 listo. APISR falló, pero puedes eliminar fondo.', false);
+          setStatus('⚠️ Falló Real-ESRGAN. Intentando con "4x_APISR_GRL_GAN_generator"…', true, 50);
+          upscaler = await pipeline('image-to-image', 'Xenova/4x_APISR_GRL_GAN_generator');
+          isUpscalerReady = true;
+          setStatus('✅ APISR cargado. BEN2 listo. Sube una imagen.', false, 100);
           if (loadedImage) enableButtons(true);
-        } catch (e) {
-          setStatus('❌ Error crítico: no se pudo cargar ningún modelo.', false);
+        } catch (err2) {
+          console.error('Error con APISR:', err2);
+          // Si también falla, dejamos solo fondo
+          setStatus('⚠️ No se pudo cargar el modelo de super‑resolución. Solo fondo disponible.', false);
+          isUpscalerReady = false;
+          if (loadedImage) {
+            removeBgBtn.disabled = false;
+            upscaleBtn.disabled = true;
+            bothBtn.disabled = true;
+          }
         }
       }
     }
