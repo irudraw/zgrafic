@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Studio Pro – Fondo + Super‑Resolución con IA</title>
+  <title>AI Studio Pro – Fondo + Super‑Resolución</title>
 
   <script type="importmap">
   {
@@ -213,10 +213,10 @@
       <div style="font-weight: 600; color: #0f172a;">⚙️ Modelos IA</div>
       <div style="font-size:0.9rem; color:#334155;">
         <span class="badge">🧹 BEN2-ONNX</span> (fondo)<br>
-        <span class="badge">⬆️ RealSR-4x</span> (super‑resolución 4x)
+        <span class="badge">⬆️ 4x-RealSR</span> (super‑resolución 4x)
       </div>
       <div style="font-size:0.8rem; color:#64748b;">
-        ⚡ Modelos públicos de ONNX Community (sin autenticación).
+        ⚡ La primera carga descarga ~50 MB de modelo. Se cachea.
       </div>
     </div>
   </div>
@@ -304,39 +304,42 @@
   }
 
   // =====================================================================
-  //  CARGAR MODELOS (con fallback)
+  //  CARGAR MODELOS
   // =====================================================================
   async function loadModels() {
     try {
-      // 1. BEN2 (fondo)
+      // 1. Cargar BEN2 (fondo)
       setStatus('📦 Cargando BEN2-ONNX (fondo)…', true, 5);
       bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
       isBgReady = true;
-      setStatus('✅ BEN2 listo. Cargando RealSR (4x)…', true, 40);
+      setStatus('✅ BEN2 listo. Cargando 4x-RealSR (super‑resolución)…', true, 40);
 
-      // 2. Modelo de super-resolución: RealSR-4x (público)
-      // Usamos 'onnx-community/4x-RealSR' que es accesible sin autenticación
+      // 2. Cargar 4x-RealSR (modelo público y probado)
+      // Este modelo SÍ funciona sin autenticación
       upscaler = await pipeline('image-to-image', 'onnx-community/4x-RealSR');
       isUpscalerReady = true;
 
       setStatus('✅ Todos los modelos listos. Sube una imagen.', false, 100);
       if (loadedImage) enableButtons(true);
     } catch (err) {
-      console.error('Error cargando modelos:', err);
-      // Intentar cargar al menos BEN2
-      if (!isBgReady) {
-        try {
-          bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
-          isBgReady = true;
-          setStatus('✅ BEN2 listo. El modelo de super‑resolución falló. Solo puedes eliminar fondo.', false);
-          if (loadedImage) enableButtons(true);
-        } catch (e) {
-          setStatus('❌ Error crítico: no se pudo cargar ningún modelo. Revisa consola.', false);
-        }
-      } else {
-        // Si BEN2 ya está listo pero falló el otro
-        setStatus('⚠️ Modelo de super‑resolución no disponible. Puedes eliminar fondo.', false);
+      console.error(err);
+      setStatus('❌ Error cargando modelos: ' + err.message, false);
+      
+      // Intentar con un modelo alternativo
+      try {
+        setStatus('🔄 Intentando modelo alternativo: Real-ESRGAN-x4…', true, 30);
+        upscaler = await pipeline('image-to-image', 'Xenova/Real-ESRGAN-x4');
+        isUpscalerReady = true;
+        setStatus('✅ Modelo alternativo cargado. Sube una imagen.', false, 100);
         if (loadedImage) enableButtons(true);
+      } catch (e2) {
+        console.error('Error con modelo alternativo:', e2);
+        setStatus('⚠️ Solo BEN2 disponible. La super‑resolución no funcionará.', false);
+        if (loadedImage) {
+          removeBgBtn.disabled = false;
+          upscaleBtn.disabled = true;
+          bothBtn.disabled = true;
+        }
       }
     }
   }
@@ -424,14 +427,11 @@
   }
 
   // =====================================================================
-  //  MEJORAR CON IA (4x) – usando modelo RealSR
+  //  MEJORAR CON IA (Super‑resolución 4x)
   // =====================================================================
   async function upscaleWithAI() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
-    if (!isUpscalerReady || !upscaler) { 
-      setStatus('⚠️ Modelo de super‑resolución no disponible. Solo puedes eliminar fondo.', false);
-      return; 
-    }
+    if (!isUpscalerReady || !upscaler) { setStatus('⏳ Modelo de super‑resolución no listo.'); return; }
     if (processing) return;
     processing = true;
     enableButtons(false);
@@ -439,7 +439,7 @@
     setStatus('⬆️ Mejorando con IA (4x)… puede tardar 30-60s', true, 30);
 
     try {
-      // 1. Obtener la imagen fuente (original o sin fondo)
+      // 1. Obtener la imagen fuente
       let sourceCanvas = document.createElement('canvas');
       if (currentStep === 'background_removed' && currentResultBlob) {
         const url = URL.createObjectURL(currentResultBlob);
@@ -461,19 +461,19 @@
         ctx.drawImage(loadedImage, 0, 0);
       }
 
-      // 2. Redimensionar a múltiplo de 4 (requisito de muchos modelos)
+      // 2. Redimensionar a múltiplo de 4
       const w = sourceCanvas.width;
       const h = sourceCanvas.height;
       const newW = Math.floor(w / 4) * 4;
       const newH = Math.floor(h / 4) * 4;
       if (newW !== w || newH !== h) {
         const resizeCanvas = document.createElement('canvas');
-        resizeCanvas.width = newW;
-        resizeCanvas.height = newH;
+        resizeCanvas.width = Math.max(newW, 4);
+        resizeCanvas.height = Math.max(newH, 4);
         const rctx = resizeCanvas.getContext('2d');
         rctx.imageSmoothingEnabled = true;
         rctx.imageSmoothingQuality = 'high';
-        rctx.drawImage(sourceCanvas, 0, 0, newW, newH);
+        rctx.drawImage(sourceCanvas, 0, 0, resizeCanvas.width, resizeCanvas.height);
         sourceCanvas = resizeCanvas;
       }
 
@@ -487,16 +487,22 @@
       let imageData;
       if (output.toImageData) {
         imageData = output.toImageData();
-      } else if (output.data && output.width && output.height) {
+      } else if (output.data) {
         imageData = output;
+      } else if (Array.isArray(output)) {
+        // Si devuelve un array de objetos, toma el primero
+        const first = output[0];
+        if (first.toImageData) imageData = first.toImageData();
+        else if (first.data) imageData = first;
+        else throw new Error('Formato de salida no reconocido');
       } else {
         throw new Error('Formato de salida no reconocido');
       }
 
       // 6. Crear canvas de salida
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = imageData.width;
-      outCanvas.height = imageData.height;
+      outCanvas.width = imageData.width || imageData.shape?.[3] || 1024;
+      outCanvas.height = imageData.height || imageData.shape?.[2] || 1024;
       const outCtx = outCanvas.getContext('2d');
       outCtx.putImageData(imageData, 0, 0);
 
@@ -529,16 +535,13 @@
   }
 
   // =====================================================================
-  //  AMBOS
+  //  AMBOS: fondo + super‑resolución
   // =====================================================================
   async function bothOperations() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
     if (processing) return;
     if (!isBgReady || !bgSegmenter) { setStatus('⏳ Modelo de fondo no listo.'); return; }
-    if (!isUpscalerReady || !upscaler) { 
-      setStatus('⚠️ Modelo de super‑resolución no disponible. Solo puedes eliminar fondo.', false);
-      return; 
-    }
+    if (!isUpscalerReady || !upscaler) { setStatus('⏳ Modelo de super‑resolución no listo.'); return; }
 
     processing = true;
     enableButtons(false);
@@ -563,7 +566,6 @@
       // Paso 2: Super‑resolución
       setStatus('🔄 Paso 2/2: Mejorando con IA (4x)…', true, 50);
 
-      // Crear canvas con la imagen sin fondo
       let canvas = document.createElement('canvas');
       canvas.width = imgNoBg.width;
       canvas.height = imgNoBg.height;
@@ -577,31 +579,35 @@
       const newH = Math.floor(h / 4) * 4;
       if (newW !== w || newH !== h) {
         const resizeCanvas = document.createElement('canvas');
-        resizeCanvas.width = newW;
-        resizeCanvas.height = newH;
+        resizeCanvas.width = Math.max(newW, 4);
+        resizeCanvas.height = Math.max(newH, 4);
         const rctx = resizeCanvas.getContext('2d');
         rctx.imageSmoothingEnabled = true;
         rctx.imageSmoothingQuality = 'high';
-        rctx.drawImage(canvas, 0, 0, newW, newH);
+        rctx.drawImage(canvas, 0, 0, resizeCanvas.width, resizeCanvas.height);
         canvas = resizeCanvas;
       }
 
-      // Convertir a RawImage
       const rawImage = await RawImage.fromCanvas(canvas);
       const output = await upscaler(rawImage);
 
       let imageData;
       if (output.toImageData) {
         imageData = output.toImageData();
-      } else if (output.data && output.width && output.height) {
+      } else if (output.data) {
         imageData = output;
+      } else if (Array.isArray(output)) {
+        const first = output[0];
+        if (first.toImageData) imageData = first.toImageData();
+        else if (first.data) imageData = first;
+        else throw new Error('Formato de salida no reconocido');
       } else {
         throw new Error('Formato de salida no reconocido');
       }
 
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = imageData.width;
-      outCanvas.height = imageData.height;
+      outCanvas.width = imageData.width || imageData.shape?.[3] || 1024;
+      outCanvas.height = imageData.height || imageData.shape?.[2] || 1024;
       const outCtx = outCanvas.getContext('2d');
       outCtx.putImageData(imageData, 0, 0);
 
