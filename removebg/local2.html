@@ -213,10 +213,10 @@
       <div style="font-weight: 600; color: #0f172a;">⚙️ Modelos IA</div>
       <div style="font-size:0.9rem; color:#334155;">
         <span class="badge">🧹 BEN2-ONNX</span> (fondo)<br>
-        <span class="badge">⬆️ ESRGAN</span> (super‑resolución 4x)
+        <span class="badge">⬆️ RealSR-4x</span> (super‑resolución 4x)
       </div>
       <div style="font-size:0.8rem; color:#64748b;">
-        ⚡ La primera carga descarga ~50 MB de modelo. Se cachea.
+        ⚡ Modelos públicos de ONNX Community (sin autenticación).
       </div>
     </div>
   </div>
@@ -304,45 +304,39 @@
   }
 
   // =====================================================================
-  //  CARGAR MODELOS (usando modelos públicos y estables)
+  //  CARGAR MODELOS (con fallback)
   // =====================================================================
   async function loadModels() {
     try {
+      // 1. BEN2 (fondo)
       setStatus('📦 Cargando BEN2-ONNX (fondo)…', true, 5);
       bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
       isBgReady = true;
-      setStatus('✅ BEN2 listo. Cargando Real-ESRGAN (super‑resolución)…', true, 40);
+      setStatus('✅ BEN2 listo. Cargando RealSR (4x)…', true, 40);
 
-      // MODELO PÚBLICO: Real-ESRGAN-x4 (debería funcionar sin autenticación)
-      // Si falla, probamos con "Xenova/Real-ESRGAN-x4" (otro espejo)
-      // También podemos usar "Xenova/4x_APISR_GRL_GAN_generator" que antes dio error pero lo dejamos como fallback
-      const modelName = 'Xenova/Real-ESRGAN-x4';
-      upscaler = await pipeline('image-to-image', modelName);
+      // 2. Modelo de super-resolución: RealSR-4x (público)
+      // Usamos 'onnx-community/4x-RealSR' que es accesible sin autenticación
+      upscaler = await pipeline('image-to-image', 'onnx-community/4x-RealSR');
       isUpscalerReady = true;
 
       setStatus('✅ Todos los modelos listos. Sube una imagen.', false, 100);
       if (loadedImage) enableButtons(true);
     } catch (err) {
       console.error('Error cargando modelos:', err);
-      // Si falla ESRGAN, intentamos con otro modelo público
-      if (!isUpscalerReady) {
+      // Intentar cargar al menos BEN2
+      if (!isBgReady) {
         try {
-          setStatus('⚠️ Falló Real-ESRGAN. Intentando con "4x_APISR_GRL_GAN_generator"…', true, 50);
-          upscaler = await pipeline('image-to-image', 'Xenova/4x_APISR_GRL_GAN_generator');
-          isUpscalerReady = true;
-          setStatus('✅ APISR cargado. BEN2 listo. Sube una imagen.', false, 100);
+          bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
+          isBgReady = true;
+          setStatus('✅ BEN2 listo. El modelo de super‑resolución falló. Solo puedes eliminar fondo.', false);
           if (loadedImage) enableButtons(true);
-        } catch (err2) {
-          console.error('Error con APISR:', err2);
-          // Si también falla, dejamos solo fondo
-          setStatus('⚠️ No se pudo cargar el modelo de super‑resolución. Solo fondo disponible.', false);
-          isUpscalerReady = false;
-          if (loadedImage) {
-            removeBgBtn.disabled = false;
-            upscaleBtn.disabled = true;
-            bothBtn.disabled = true;
-          }
+        } catch (e) {
+          setStatus('❌ Error crítico: no se pudo cargar ningún modelo. Revisa consola.', false);
         }
+      } else {
+        // Si BEN2 ya está listo pero falló el otro
+        setStatus('⚠️ Modelo de super‑resolución no disponible. Puedes eliminar fondo.', false);
+        if (loadedImage) enableButtons(true);
       }
     }
   }
@@ -430,11 +424,14 @@
   }
 
   // =====================================================================
-  //  MEJORAR CON IA (Super‑resolución 4x) – con redimension a múltiplo de 4
+  //  MEJORAR CON IA (4x) – usando modelo RealSR
   // =====================================================================
   async function upscaleWithAI() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
-    if (!isUpscalerReady || !upscaler) { setStatus('⏳ Modelo de super‑resolución no listo.'); return; }
+    if (!isUpscalerReady || !upscaler) { 
+      setStatus('⚠️ Modelo de super‑resolución no disponible. Solo puedes eliminar fondo.', false);
+      return; 
+    }
     if (processing) return;
     processing = true;
     enableButtons(false);
@@ -464,7 +461,7 @@
         ctx.drawImage(loadedImage, 0, 0);
       }
 
-      // 2. Redimensionar a múltiplo de 4 (necesario para ESRGAN)
+      // 2. Redimensionar a múltiplo de 4 (requisito de muchos modelos)
       const w = sourceCanvas.width;
       const h = sourceCanvas.height;
       const newW = Math.floor(w / 4) * 4;
@@ -490,7 +487,7 @@
       let imageData;
       if (output.toImageData) {
         imageData = output.toImageData();
-      } else if (output.data) {
+      } else if (output.data && output.width && output.height) {
         imageData = output;
       } else {
         throw new Error('Formato de salida no reconocido');
@@ -525,20 +522,23 @@
       resultImg.src = resultUrl;
     } catch (err) {
       console.error(err);
-      setStatus('❌ Error en IA: ' + err.message + '. Verifica que la imagen sea válida y no demasiado grande.', false);
+      setStatus('❌ Error en IA: ' + err.message, false);
       processing = false;
       enableButtons(true);
     }
   }
 
   // =====================================================================
-  //  AMBOS: fondo + super‑resolución IA
+  //  AMBOS
   // =====================================================================
   async function bothOperations() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
     if (processing) return;
     if (!isBgReady || !bgSegmenter) { setStatus('⏳ Modelo de fondo no listo.'); return; }
-    if (!isUpscalerReady || !upscaler) { setStatus('⏳ Modelo de super‑resolución no listo.'); return; }
+    if (!isUpscalerReady || !upscaler) { 
+      setStatus('⚠️ Modelo de super‑resolución no disponible. Solo puedes eliminar fondo.', false);
+      return; 
+    }
 
     processing = true;
     enableButtons(false);
@@ -593,7 +593,7 @@
       let imageData;
       if (output.toImageData) {
         imageData = output.toImageData();
-      } else if (output.data) {
+      } else if (output.data && output.width && output.height) {
         imageData = output;
       } else {
         throw new Error('Formato de salida no reconocido');
