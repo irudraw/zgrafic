@@ -1,441 +1,446 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Studio Pro – Mejora de Imagen con UpscalerJS</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Studio Pro – Mejora de Imagen con UpscalerJS</title>
 
-    <!-- Cargar TensorFlow.js y UpscalerJS desde CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/upscaler@latest/dist/browser/umd/upscaler.min.js"></script>
+  <!-- 1. Cargar TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  
+  <!-- 2. Cargar el modelo por defecto de UpscalerJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@upscalerjs/default-model@latest/dist/umd/index.min.js"></script>
+  
+  <!-- 3. Cargar UpscalerJS -->
+  <script src="https://cdn.jsdelivr.net/npm/upscaler@latest/dist/browser/umd/upscaler.min.js"></script>
 
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: #f1f5f9;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-        .container {
-            background: white;
-            border-radius: 24px;
-            padding: 30px;
-            max-width: 1200px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-        }
-        h1 {
-            margin-top: 0;
-            color: #0f172a;
-            font-weight: 800;
-            font-size: 2.2rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        h1 small { font-size: 0.9rem; font-weight: 400; color: #64748b; }
-        .badge {
-            display: inline-block;
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin: 0 4px;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin: 20px 0;
-        }
-        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-        .drop-zone {
-            border: 2px dashed #cbd5e1;
-            border-radius: 16px;
-            padding: 40px 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: #f8fafc;
-            text-align: center;
-        }
-        .drop-zone:hover, .drop-zone.dragover {
-            background: #eff6ff;
-            border-color: #3b82f6;
-        }
-        .drop-zone p { margin: 0; color: #334155; }
-        .drop-zone small { color: #94a3b8; }
-        .drop-zone input { display: none; }
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            margin: 15px 0;
-        }
-        .controls button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .controls button:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
-        .controls button:hover:not(:disabled) { background: #2563eb; }
-        .controls .btn-purple { background: #8b5cf6; }
-        .controls .btn-purple:hover:not(:disabled) { background: #7c3aed; }
-        .controls .btn-rose { background: #f43f5e; }
-        .controls .btn-rose:hover:not(:disabled) { background: #e11d48; }
-        .status {
-            margin: 15px 0;
-            padding: 12px 20px;
-            background: #f8fafc;
-            border-radius: 12px;
-            font-weight: 500;
-            min-height: 3em;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .status .loader {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 4px solid #e2e8f0;
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .canvas-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-        .canvas-box {
-            flex: 1 1 280px;
-            background: repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            position: relative;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .canvas-box .label {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(15,23,42,0.8);
-            color: white;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            z-index: 10;
-            backdrop-filter: blur(4px);
-        }
-        .canvas-box canvas {
-            max-width: 100%;
-            max-height: 550px;
-            display: block;
-        }
-        .info {
-            margin-top: 20px;
-            font-size: 0.85rem;
-            color: #64748b;
-            text-align: center;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            text-align: center;
-        }
-    </style>
+  <style>
+    /* ===== Estilos (igual que antes) ===== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .container {
+      background: white;
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 1200px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 2.2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 small { font-size: 0.9rem; font-weight: 400; color: #64748b; }
+    .badge {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin: 0 4px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 20px 0;
+    }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 40px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #f8fafc;
+      text-align: center;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      background: #eff6ff;
+      border-color: #3b82f6;
+    }
+    .drop-zone p { margin: 0; color: #334155; }
+    .drop-zone small { color: #94a3b8; }
+    .drop-zone input { display: none; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 15px 0;
+    }
+    .controls button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .controls button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .controls button:hover:not(:disabled) { background: #2563eb; }
+    .controls .btn-purple { background: #8b5cf6; }
+    .controls .btn-purple:hover:not(:disabled) { background: #7c3aed; }
+    .controls .btn-rose { background: #f43f5e; }
+    .controls .btn-rose:hover:not(:disabled) { background: #e11d48; }
+    .status {
+      margin: 15px 0;
+      padding: 12px 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+      font-weight: 500;
+      min-height: 3em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .status .loader {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .canvas-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    .canvas-box {
+      flex: 1 1 280px;
+      background: repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      position: relative;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .canvas-box .label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(15,23,42,0.8);
+      color: white;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+    .canvas-box canvas {
+      max-width: 100%;
+      max-height: 550px;
+      display: block;
+    }
+    .info {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #64748b;
+      text-align: center;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-    <h1>🪄 AI Studio Pro
-        <small>Super‑Resolución con UpscalerJS</small>
-    </h1>
+  <h1>🪄 AI Studio Pro <small>Super‑Resolución con UpscalerJS</small></h1>
 
-    <div class="grid-2">
-        <div class="drop-zone" id="dropZone">
-            <p>📤 Arrastra o haz clic para subir imagen</p>
-            <small>JPG, PNG, WebP (máx. 10 MB)</small>
-            <input type="file" id="fileInput" accept="image/*" />
-        </div>
-        <div style="display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 10px; background: #f8fafc; border-radius: 12px;">
-            <div style="font-weight: 600; color: #0f172a;">⚙️ Modelo IA</div>
-            <div style="font-size:0.9rem; color:#334155;">
-                <span class="badge">⬆️ ESRGAN</span> (super‑resolución)
-            </div>
-            <div style="font-size:0.8rem; color:#64748b;">
-                ⚡ Los modelos se cargan desde CDN público.
-            </div>
-        </div>
+  <div class="grid-2">
+    <div class="drop-zone" id="dropZone">
+      <p>📤 Arrastra o haz clic para subir imagen</p>
+      <small>JPG, PNG, WebP (máx. 10 MB)</small>
+      <input type="file" id="fileInput" accept="image/*" />
     </div>
+    <div style="display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 10px; background: #f8fafc; border-radius: 12px;">
+      <div style="font-weight: 600; color: #0f172a;">⚙️ Modelo IA</div>
+      <div style="font-size:0.9rem; color:#334155;">
+        <span class="badge">⬆️ ESRGAN</span> (super‑resolución 2x)
+      </div>
+      <div style="font-size:0.8rem; color:#64748b;">
+        ⚡ Los modelos se cargan desde CDN público.
+      </div>
+    </div>
+  </div>
 
-    <div class="controls">
-        <button id="upscaleBtn" class="btn-purple" disabled>⬆️ Mejorar con IA (4x)</button>
-        <button id="downloadBtn" class="btn-rose" disabled>⬇️ Descargar</button>
-        <button id="resetBtn">🔄 Reiniciar</button>
-    </div>
+  <div class="controls">
+    <button id="upscaleBtn" class="btn-purple" disabled>⬆️ Mejorar con IA</button>
+    <button id="downloadBtn" class="btn-rose" disabled>⬇️ Descargar</button>
+    <button id="resetBtn">🔄 Reiniciar</button>
+  </div>
 
-    <div class="status" id="status">
-        <span class="loader"></span> Cargando modelo…
-    </div>
+  <div class="status" id="status">
+    <span class="loader"></span> Cargando modelo…
+  </div>
 
-    <div class="canvas-wrapper">
-        <div class="canvas-box"><span class="label">📷 Original</span><canvas id="originalCanvas"></canvas></div>
-        <div class="canvas-box"><span class="label">🎯 Resultado</span><canvas id="resultCanvas"></canvas></div>
-    </div>
+  <div class="canvas-wrapper">
+    <div class="canvas-box"><span class="label">📷 Original</span><canvas id="originalCanvas"></canvas></div>
+    <div class="canvas-box"><span class="label">🎯 Resultado</span><canvas id="resultCanvas"></canvas></div>
+  </div>
 
-    <div class="info">
-        ⚡ Todo el procesamiento es <strong>local</strong>. Tus imágenes nunca se suben a ningún servidor.
-    </div>
-    <div class="footer">Hecho para GitHub Pages · Código abierto · Sin subida de datos</div>
+  <div class="info">
+    ⚡ Todo el procesamiento es <strong>local</strong>. Tus imágenes nunca se suben a ningún servidor.
+  </div>
+  <div class="footer">Hecho para GitHub Pages · Código abierto · Sin subida de datos</div>
 </div>
 
 <script>
-    // =====================================================================
-    //  DOM REFS
-    // =====================================================================
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const upscaleBtn = document.getElementById('upscaleBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const statusDiv = document.getElementById('status');
-    const originalCanvas = document.getElementById('originalCanvas');
-    const resultCanvas = document.getElementById('resultCanvas');
-    const ctxOrig = originalCanvas.getContext('2d');
-    const ctxRes = resultCanvas.getContext('2d');
+  // =====================================================================
+  //  DOM REFS
+  // =====================================================================
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const upscaleBtn = document.getElementById('upscaleBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const statusDiv = document.getElementById('status');
+  const originalCanvas = document.getElementById('originalCanvas');
+  const resultCanvas = document.getElementById('resultCanvas');
+  const ctxOrig = originalCanvas.getContext('2d');
+  const ctxRes = resultCanvas.getContext('2d');
 
-    // =====================================================================
-    //  STATE
-    // =====================================================================
-    let loadedImage = null;           // HTMLImageElement
-    let imageUrl = null;
-    let upscaler = null;
-    let isModelReady = false;
-    let currentResultBlob = null;
-    let processing = false;
+  // =====================================================================
+  //  STATE
+  // =====================================================================
+  let loadedImage = null;           // HTMLImageElement
+  let imageUrl = null;
+  let upscaler = null;
+  let isModelReady = false;
+  let currentResultBlob = null;
+  let processing = false;
 
-    // =====================================================================
-    //  UI HELPERS
-    // =====================================================================
-    function setStatus(msg, isLoading = false) {
-        if (isLoading) {
-            statusDiv.innerHTML = `<span class="loader"></span> ${msg}`;
-        } else {
-            statusDiv.textContent = msg;
-        }
+  // =====================================================================
+  //  UI HELPERS
+  // =====================================================================
+  function setStatus(msg, isLoading = false) {
+    if (isLoading) {
+      statusDiv.innerHTML = `<span class="loader"></span> ${msg}`;
+    } else {
+      statusDiv.textContent = msg;
+    }
+  }
+
+  function enableButtons(enabled) {
+    upscaleBtn.disabled = !enabled || !loadedImage || !isModelReady || processing;
+    downloadBtn.disabled = !enabled || !currentResultBlob || processing;
+  }
+
+  // =====================================================================
+  //  CARGAR MODELO
+  // =====================================================================
+  async function loadModel() {
+    try {
+      setStatus('📦 Cargando modelo de super‑resolución…', true);
+      
+      // Verificar que la variable global del modelo existe
+      if (typeof DefaultUpscalerJSModel === 'undefined') {
+        throw new Error('El modelo DefaultUpscalerJSModel no se cargó correctamente. Verifica que el script del modelo se haya cargado.');
+      }
+
+      // Crear la instancia de Upscaler pasando el modelo explícitamente
+      upscaler = new Upscaler({ 
+        model: DefaultUpscalerJSModel 
+      });
+      
+      isModelReady = true;
+      setStatus('✅ Modelo listo. Sube una imagen.');
+      if (loadedImage) enableButtons(true);
+    } catch (err) {
+      console.error('Error cargando modelo:', err);
+      setStatus('❌ Error cargando modelo: ' + err.message);
+    }
+  }
+
+  // Iniciar carga del modelo al cargar la página
+  loadModel();
+
+  // =====================================================================
+  //  CARGAR IMAGEN
+  // =====================================================================
+  function loadImageFromFile(file) {
+    if (!file || !file.type.startsWith('image/')) {
+      alert('Selecciona una imagen (JPG, PNG, WebP).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('La imagen es demasiado grande (máx. 10 MB).');
+      return;
     }
 
-    function enableButtons(enabled) {
-        upscaleBtn.disabled = !enabled || !loadedImage || !isModelReady || processing;
-        downloadBtn.disabled = !enabled || !currentResultBlob || processing;
-    }
-
-    // =====================================================================
-    //  CARGAR MODELO
-    // =====================================================================
-    async function loadModel() {
-        try {
-            setStatus('📦 Cargando modelo de super‑resolución…', true);
-            // Inicializar UpscalerJS con el modelo por defecto (4x)
-            // El modelo se cargará automáticamente desde la CDN pública de UpscalerJS[reference:2]
-            upscaler = new Upscaler({
-                model: 'default-model',
-            });
-            isModelReady = true;
-            setStatus('✅ Modelo listo. Sube una imagen.');
-            if (loadedImage) enableButtons(true);
-        } catch (err) {
-            console.error('Error cargando modelo:', err);
-            setStatus('❌ Error cargando modelo: ' + err.message);
-        }
-    }
-
-    // Iniciar carga del modelo al cargar la página
-    loadModel();
-
-    // =====================================================================
-    //  CARGAR IMAGEN
-    // =====================================================================
-    function loadImageFromFile(file) {
-        if (!file || !file.type.startsWith('image/')) {
-            alert('Selecciona una imagen (JPG, PNG, WebP).');
-            return;
-        }
-        if (file.size > 10 * 1024 * 1024) {
-            alert('La imagen es demasiado grande (máx. 10 MB).');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                loadedImage = img;
-                if (imageUrl) URL.revokeObjectURL(imageUrl);
-                imageUrl = URL.createObjectURL(file);
-
-                originalCanvas.width = img.width;
-                originalCanvas.height = img.height;
-                ctxOrig.drawImage(img, 0, 0);
-
-                resultCanvas.width = img.width;
-                resultCanvas.height = img.height;
-                ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-                currentResultBlob = null;
-                downloadBtn.disabled = true;
-                setStatus('📷 Imagen cargada. Haz clic en "Mejorar con IA".');
-                enableButtons(true);
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    // =====================================================================
-    //  MEJORAR CON IA (UpscalerJS)
-    // =====================================================================
-    async function upscaleWithAI() {
-        if (!loadedImage) {
-            setStatus('⚠️ Primero carga una imagen.');
-            return;
-        }
-        if (!isModelReady || !upscaler) {
-            setStatus('⏳ Modelo no está listo aún.');
-            return;
-        }
-        if (processing) return;
-
-        processing = true;
-        enableButtons(false);
-        setStatus('⬆️ Mejorando con IA (4x)… puede tardar 30-60s', true);
-
-        try {
-            // UpscalerJS puede aceptar una URL, un elemento <img> o un canvas[reference:3]
-            // Usamos la URL de la imagen cargada
-            const upscaledImageSrc = await upscaler.upscale(imageUrl, {
-                // Opcional: podemos especificar el modelo y la escala
-                // Por defecto usa el modelo default-model que escala 4x
-            });
-
-            // El resultado es un string base64 de la imagen mejorada[reference:4]
-            // Crear un nuevo elemento Image para mostrarlo en el canvas
-            const resultImg = new Image();
-            resultImg.onload = () => {
-                resultCanvas.width = resultImg.width;
-                resultCanvas.height = resultImg.height;
-                ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-                ctxRes.drawImage(resultImg, 0, 0);
-
-                // Convertir a blob para descarga
-                resultCanvas.toBlob((blob) => {
-                    currentResultBlob = blob;
-                    downloadBtn.disabled = false;
-                    setStatus(`✅ Super‑resolución aplicada (${resultImg.width}x${resultImg.height})`);
-                    processing = false;
-                    enableButtons(true);
-                }, 'image/png');
-            };
-            resultImg.src = upscaledImageSrc;
-        } catch (err) {
-            console.error(err);
-            setStatus('❌ Error al mejorar: ' + err.message);
-            processing = false;
-            enableButtons(true);
-        }
-    }
-
-    // =====================================================================
-    //  DESCARGAR
-    // =====================================================================
-    function downloadResult() {
-        if (!currentResultBlob) {
-            alert('No hay resultado para descargar.');
-            return;
-        }
-        const link = document.createElement('a');
-        link.download = 'imagen_mejorada.png';
-        link.href = URL.createObjectURL(currentResultBlob);
-        link.click();
-        URL.revokeObjectURL(link.href);
-    }
-
-    // =====================================================================
-    //  REINICIAR
-    // =====================================================================
-    function resetApp() {
-        loadedImage = null;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        loadedImage = img;
         if (imageUrl) URL.revokeObjectURL(imageUrl);
-        imageUrl = null;
-        currentResultBlob = null;
-        processing = false;
-        ctxOrig.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+        imageUrl = URL.createObjectURL(file);
+
+        originalCanvas.width = img.width;
+        originalCanvas.height = img.height;
+        ctxOrig.drawImage(img, 0, 0);
+
+        resultCanvas.width = img.width;
+        resultCanvas.height = img.height;
         ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-        originalCanvas.width = 0;
-        originalCanvas.height = 0;
-        resultCanvas.width = 0;
-        resultCanvas.height = 0;
+        currentResultBlob = null;
         downloadBtn.disabled = true;
-        enableButtons(false);
-        setStatus('🔄 Reiniciado. Sube una imagen.');
-        fileInput.value = '';
+        setStatus('📷 Imagen cargada. Haz clic en "Mejorar con IA".');
+        enableButtons(true);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // =====================================================================
+  //  MEJORAR CON IA (UpscalerJS)
+  // =====================================================================
+  async function upscaleWithAI() {
+    if (!loadedImage) {
+      setStatus('⚠️ Primero carga una imagen.');
+      return;
     }
+    if (!isModelReady || !upscaler) {
+      setStatus('⏳ Modelo no está listo aún.');
+      return;
+    }
+    if (processing) return;
 
-    // =====================================================================
-    //  EVENTOS
-    // =====================================================================
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        if (e.dataTransfer.files.length) loadImageFromFile(e.dataTransfer.files[0]);
-    });
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) loadImageFromFile(e.target.files[0]);
-        fileInput.value = '';
-    });
-
-    upscaleBtn.addEventListener('click', upscaleWithAI);
-    downloadBtn.addEventListener('click', downloadResult);
-    resetBtn.addEventListener('click', resetApp);
-
-    // =====================================================================
-    //  INICIO
-    // =====================================================================
-    setStatus('⏳ Cargando modelo…', true);
+    processing = true;
     enableButtons(false);
+    setStatus('⬆️ Mejorando con IA… puede tardar unos segundos', true);
+
+    try {
+      // UpscalerJS acepta URL, <img> o canvas
+      const upscaledImageSrc = await upscaler.upscale(imageUrl);
+
+      // El resultado es un string base64 de la imagen mejorada
+      const resultImg = new Image();
+      resultImg.onload = () => {
+        resultCanvas.width = resultImg.width;
+        resultCanvas.height = resultImg.height;
+        ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+        ctxRes.drawImage(resultImg, 0, 0);
+
+        // Convertir a blob para descarga
+        resultCanvas.toBlob((blob) => {
+          currentResultBlob = blob;
+          downloadBtn.disabled = false;
+          setStatus(`✅ Super‑resolución aplicada (${resultImg.width}x${resultImg.height})`);
+          processing = false;
+          enableButtons(true);
+        }, 'image/png');
+      };
+      resultImg.src = upscaledImageSrc;
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Error al mejorar: ' + err.message);
+      processing = false;
+      enableButtons(true);
+    }
+  }
+
+  // =====================================================================
+  //  DESCARGAR
+  // =====================================================================
+  function downloadResult() {
+    if (!currentResultBlob) {
+      alert('No hay resultado para descargar.');
+      return;
+    }
+    const link = document.createElement('a');
+    link.download = 'imagen_mejorada.png';
+    link.href = URL.createObjectURL(currentResultBlob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  // =====================================================================
+  //  REINICIAR
+  // =====================================================================
+  function resetApp() {
+    loadedImage = null;
+    if (imageUrl) URL.revokeObjectURL(imageUrl);
+    imageUrl = null;
+    currentResultBlob = null;
+    processing = false;
+    ctxOrig.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+    ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+    originalCanvas.width = 0;
+    originalCanvas.height = 0;
+    resultCanvas.width = 0;
+    resultCanvas.height = 0;
+    downloadBtn.disabled = true;
+    enableButtons(false);
+    setStatus('🔄 Reiniciado. Sube una imagen.');
+    fileInput.value = '';
+  }
+
+  // =====================================================================
+  //  EVENTOS
+  // =====================================================================
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) loadImageFromFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length) loadImageFromFile(e.target.files[0]);
+    fileInput.value = '';
+  });
+
+  upscaleBtn.addEventListener('click', upscaleWithAI);
+  downloadBtn.addEventListener('click', downloadResult);
+  resetBtn.addEventListener('click', resetApp);
+
+  // =====================================================================
+  //  INICIO
+  // =====================================================================
+  setStatus('⏳ Cargando modelo…', true);
+  enableButtons(false);
 </script>
 </body>
 </html>
