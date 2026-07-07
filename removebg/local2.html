@@ -3,19 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Studio Pro – Mejora de Imagen con UpscalerJS</title>
+  <title>AI Studio Pro – Mejora de Imagen con IA</title>
 
-  <!-- 1. Cargar TensorFlow.js -->
+  <!-- Cargar TensorFlow.js, modelo por defecto y UpscalerJS -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-  
-  <!-- 2. Cargar el modelo por defecto de UpscalerJS -->
   <script src="https://cdn.jsdelivr.net/npm/@upscalerjs/default-model@latest/dist/umd/index.min.js"></script>
-  
-  <!-- 3. Cargar UpscalerJS -->
   <script src="https://cdn.jsdelivr.net/npm/upscaler@latest/dist/browser/umd/upscaler.min.js"></script>
 
   <style>
-    /* ===== Estilos (igual que antes) ===== */
     * { box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -35,156 +30,86 @@
       width: 100%;
       box-shadow: 0 20px 60px rgba(0,0,0,0.08);
     }
-    h1 {
-      margin-top: 0;
-      color: #0f172a;
-      font-weight: 800;
-      font-size: 2.2rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    h1 { margin-top: 0; color: #0f172a; font-size: 2.2rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     h1 small { font-size: 0.9rem; font-weight: 400; color: #64748b; }
     .badge {
-      display: inline-block;
-      background: #dbeafe;
-      color: #1e40af;
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin: 0 4px;
+      background: #dbeafe; color: #1e40af; padding: 4px 14px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600; margin: 0 4px;
     }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin: 20px 0;
-    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 20px 0; }
     @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
     .drop-zone {
-      border: 2px dashed #cbd5e1;
-      border-radius: 16px;
-      padding: 40px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: #f8fafc;
-      text-align: center;
+      border: 2px dashed #cbd5e1; border-radius: 16px; padding: 40px 20px;
+      cursor: pointer; transition: all 0.2s; background: #f8fafc; text-align: center;
     }
-    .drop-zone:hover, .drop-zone.dragover {
-      background: #eff6ff;
-      border-color: #3b82f6;
-    }
+    .drop-zone:hover, .drop-zone.dragover { background: #eff6ff; border-color: #3b82f6; }
     .drop-zone p { margin: 0; color: #334155; }
     .drop-zone small { color: #94a3b8; }
     .drop-zone input { display: none; }
     .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin: 15px 0;
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 15px 0;
     }
     .controls button {
-      background: #3b82f6;
-      color: white;
-      border: none;
-      padding: 10px 22px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: background 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      background: #3b82f6; color: white; border: none; padding: 10px 22px;
+      border-radius: 40px; font-weight: 600; font-size: 0.95rem; cursor: pointer;
+      transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px;
     }
-    .controls button:disabled {
-      background: #94a3b8;
-      cursor: not-allowed;
-    }
+    .controls button:disabled { background: #94a3b8; cursor: not-allowed; }
     .controls button:hover:not(:disabled) { background: #2563eb; }
     .controls .btn-purple { background: #8b5cf6; }
     .controls .btn-purple:hover:not(:disabled) { background: #7c3aed; }
     .controls .btn-rose { background: #f43f5e; }
     .controls .btn-rose:hover:not(:disabled) { background: #e11d48; }
     .status {
-      margin: 15px 0;
-      padding: 12px 20px;
-      background: #f8fafc;
-      border-radius: 12px;
-      font-weight: 500;
-      min-height: 3em;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      margin: 15px 0; padding: 12px 20px; background: #f8fafc; border-radius: 12px;
+      font-weight: 500; min-height: 3em; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     }
     .status .loader {
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      border: 4px solid #e2e8f0;
-      border-top-color: #3b82f6;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      display: inline-block; width: 24px; height: 24px;
+      border: 4px solid #e2e8f0; border-top-color: #3b82f6;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .progress-bar {
+      width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin: 5px 0;
+    }
+    .progress-bar .fill {
+      height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      width: 0%; border-radius: 10px; transition: width 0.3s;
+    }
     .canvas-wrapper {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 15px;
+      display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 15px;
     }
     .canvas-box {
       flex: 1 1 280px;
       background: repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      overflow: hidden;
-      position: relative;
-      min-height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden;
+      position: relative; min-height: 200px;
+      display: flex; align-items: center; justify-content: center;
     }
     .canvas-box .label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(15,23,42,0.8);
-      color: white;
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      z-index: 10;
-      backdrop-filter: blur(4px);
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(15,23,42,0.8); color: white;
+      padding: 4px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+      z-index: 10; backdrop-filter: blur(4px);
     }
-    .canvas-box canvas {
-      max-width: 100%;
-      max-height: 550px;
-      display: block;
+    .canvas-box canvas { max-width: 100%; max-height: 550px; display: block; }
+    .info { margin-top: 20px; font-size: 0.85rem; color: #64748b; text-align: center; }
+    .footer { margin-top: 20px; font-size: 0.75rem; color: #94a3b8; text-align: center; }
+    .settings-group {
+      display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
+      background: #f8fafc; padding: 12px 20px; border-radius: 12px; margin: 10px 0;
     }
-    .info {
-      margin-top: 20px;
-      font-size: 0.85rem;
-      color: #64748b;
-      text-align: center;
+    .settings-group label {
+      display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: #1e293b;
     }
-    .footer {
-      margin-top: 20px;
-      font-size: 0.75rem;
-      color: #94a3b8;
-      text-align: center;
-    }
+    .settings-group input[type="range"] { width: 120px; }
+    .settings-group .value { min-width: 40px; font-weight: 600; color: #3b82f6; }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>🪄 AI Studio Pro <small>Super‑Resolución con UpscalerJS</small></h1>
+  <h1>🪄 AI Studio Pro <small>Mejora de Imagen con IA</small></h1>
 
   <div class="grid-2">
     <div class="drop-zone" id="dropZone">
@@ -193,18 +118,24 @@
       <input type="file" id="fileInput" accept="image/*" />
     </div>
     <div style="display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 10px; background: #f8fafc; border-radius: 12px;">
-      <div style="font-weight: 600; color: #0f172a;">⚙️ Modelo IA</div>
-      <div style="font-size:0.9rem; color:#334155;">
-        <span class="badge">⬆️ ESRGAN</span> (super‑resolución 2x)
+      <div style="font-weight: 600; color: #0f172a;">⚙️ Ajustes</div>
+      <div class="settings-group">
+        <label>Tamaño máximo de entrada:
+          <select id="maxSizeSelect">
+            <option value="1024">1024 px</option>
+            <option value="1500" selected>1500 px</option>
+            <option value="2048">2048 px</option>
+          </select>
+        </label>
       </div>
       <div style="font-size:0.8rem; color:#64748b;">
-        ⚡ Los modelos se cargan desde CDN público.
+        ⚡ La imagen se redimensionará a este tamaño antes de aplicar la IA para evitar errores de GPU.
       </div>
     </div>
   </div>
 
   <div class="controls">
-    <button id="upscaleBtn" class="btn-purple" disabled>⬆️ Mejorar con IA</button>
+    <button id="upscaleBtn" class="btn-purple" disabled>⬆️ Mejorar con IA (2x)</button>
     <button id="downloadBtn" class="btn-rose" disabled>⬇️ Descargar</button>
     <button id="resetBtn">🔄 Reiniciar</button>
   </div>
@@ -212,10 +143,11 @@
   <div class="status" id="status">
     <span class="loader"></span> Cargando modelo…
   </div>
+  <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
 
   <div class="canvas-wrapper">
     <div class="canvas-box"><span class="label">📷 Original</span><canvas id="originalCanvas"></canvas></div>
-    <div class="canvas-box"><span class="label">🎯 Resultado</span><canvas id="resultCanvas"></canvas></div>
+    <div class="canvas-box"><span class="label">🎯 Mejorada</span><canvas id="resultCanvas"></canvas></div>
   </div>
 
   <div class="info">
@@ -234,16 +166,18 @@
   const downloadBtn = document.getElementById('downloadBtn');
   const resetBtn = document.getElementById('resetBtn');
   const statusDiv = document.getElementById('status');
+  const progressFill = document.getElementById('progressFill');
   const originalCanvas = document.getElementById('originalCanvas');
   const resultCanvas = document.getElementById('resultCanvas');
   const ctxOrig = originalCanvas.getContext('2d');
   const ctxRes = resultCanvas.getContext('2d');
+  const maxSizeSelect = document.getElementById('maxSizeSelect');
 
   // =====================================================================
   //  STATE
   // =====================================================================
-  let loadedImage = null;           // HTMLImageElement
-  let imageUrl = null;
+  let loadedImage = null;           // Imagen original (HTMLImageElement)
+  let imageUrl = null;              // URL de la imagen original
   let upscaler = null;
   let isModelReady = false;
   let currentResultBlob = null;
@@ -252,11 +186,14 @@
   // =====================================================================
   //  UI HELPERS
   // =====================================================================
-  function setStatus(msg, isLoading = false) {
+  function setStatus(msg, isLoading = false, progress = null) {
     if (isLoading) {
       statusDiv.innerHTML = `<span class="loader"></span> ${msg}`;
     } else {
       statusDiv.textContent = msg;
+    }
+    if (progress !== null) {
+      progressFill.style.width = `${Math.min(100, progress)}%`;
     }
   }
 
@@ -270,29 +207,44 @@
   // =====================================================================
   async function loadModel() {
     try {
-      setStatus('📦 Cargando modelo de super‑resolución…', true);
-      
-      // Verificar que la variable global del modelo existe
+      setStatus('📦 Cargando modelo de super‑resolución (ESRGAN 2x)…', true, 10);
       if (typeof DefaultUpscalerJSModel === 'undefined') {
-        throw new Error('El modelo DefaultUpscalerJSModel no se cargó correctamente. Verifica que el script del modelo se haya cargado.');
+        throw new Error('El modelo DefaultUpscalerJSModel no se cargó correctamente.');
       }
-
-      // Crear la instancia de Upscaler pasando el modelo explícitamente
-      upscaler = new Upscaler({ 
-        model: DefaultUpscalerJSModel 
-      });
-      
+      upscaler = new Upscaler({ model: DefaultUpscalerJSModel });
       isModelReady = true;
-      setStatus('✅ Modelo listo. Sube una imagen.');
+      setStatus('✅ Modelo listo. Sube una imagen.', false, 100);
       if (loadedImage) enableButtons(true);
     } catch (err) {
       console.error('Error cargando modelo:', err);
       setStatus('❌ Error cargando modelo: ' + err.message);
     }
   }
-
-  // Iniciar carga del modelo al cargar la página
   loadModel();
+
+  // =====================================================================
+  //  FUNCIÓN: Redimensionar imagen a un tamaño máximo (lado más largo)
+  // =====================================================================
+  function resizeImageToMaxSize(image, maxSize) {
+    const w = image.width;
+    const h = image.height;
+    let newW, newH;
+    if (w > h) {
+      newW = Math.min(w, maxSize);
+      newH = Math.round((newW / w) * h);
+    } else {
+      newH = Math.min(h, maxSize);
+      newW = Math.round((newH / h) * w);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = newW;
+    canvas.height = newH;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(image, 0, 0, newW, newH);
+    return canvas;
+  }
 
   // =====================================================================
   //  CARGAR IMAGEN
@@ -306,7 +258,6 @@
       alert('La imagen es demasiado grande (máx. 10 MB).');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -333,28 +284,29 @@
   }
 
   // =====================================================================
-  //  MEJORAR CON IA (UpscalerJS)
+  //  MEJORAR CON IA (con redimensionamiento previo)
   // =====================================================================
   async function upscaleWithAI() {
-    if (!loadedImage) {
-      setStatus('⚠️ Primero carga una imagen.');
-      return;
-    }
-    if (!isModelReady || !upscaler) {
-      setStatus('⏳ Modelo no está listo aún.');
-      return;
-    }
+    if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
+    if (!isModelReady || !upscaler) { setStatus('⏳ Modelo no está listo aún.'); return; }
     if (processing) return;
 
     processing = true;
     enableButtons(false);
-    setStatus('⬆️ Mejorando con IA… puede tardar unos segundos', true);
+    setStatus('🔄 Preparando imagen…', true, 20);
 
     try {
-      // UpscalerJS acepta URL, <img> o canvas
-      const upscaledImageSrc = await upscaler.upscale(imageUrl);
+      // 1. Redimensionar la imagen a un tamaño máximo (configurable)
+      const maxSize = parseInt(maxSizeSelect.value);
+      const resizedCanvas = resizeImageToMaxSize(loadedImage, maxSize);
+      const resizedDataUrl = resizedCanvas.toDataURL('image/png');
 
-      // El resultado es un string base64 de la imagen mejorada
+      setStatus('⬆️ Mejorando con IA (2x)… puede tardar unos segundos', true, 50);
+
+      // 2. Aplicar el modelo de IA sobre la imagen redimensionada
+      const upscaledImageSrc = await upscaler.upscale(resizedDataUrl);
+
+      // 3. Mostrar el resultado
       const resultImg = new Image();
       resultImg.onload = () => {
         resultCanvas.width = resultImg.width;
@@ -362,11 +314,11 @@
         ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
         ctxRes.drawImage(resultImg, 0, 0);
 
-        // Convertir a blob para descarga
+        // Guardar blob para descarga
         resultCanvas.toBlob((blob) => {
           currentResultBlob = blob;
           downloadBtn.disabled = false;
-          setStatus(`✅ Super‑resolución aplicada (${resultImg.width}x${resultImg.height})`);
+          setStatus(`✅ Mejora aplicada (${resultImg.width}x${resultImg.height})`, false, 100);
           processing = false;
           enableButtons(true);
         }, 'image/png');
@@ -384,10 +336,7 @@
   //  DESCARGAR
   // =====================================================================
   function downloadResult() {
-    if (!currentResultBlob) {
-      alert('No hay resultado para descargar.');
-      return;
-    }
+    if (!currentResultBlob) { alert('No hay resultado para descargar.'); return; }
     const link = document.createElement('a');
     link.download = 'imagen_mejorada.png';
     link.href = URL.createObjectURL(currentResultBlob);
