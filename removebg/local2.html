@@ -250,7 +250,7 @@
   // =====================================================================
   //  IMPORTS
   // =====================================================================
-  import { pipeline } from '@huggingface/transformers';
+  import { pipeline, RawImage } from '@huggingface/transformers';
 
   // =====================================================================
   //  DOM REFS
@@ -317,7 +317,6 @@
       setStatus('✅ BEN2 listo. Cargando APISR (super‑resolución)…', true, 40);
 
       // 2. Cargar APISR (super‑resolución 4x)
-      // Usamos el modelo "Xenova/4x_APISR_GRL_GAN_generator-onnx"
       upscaler = await pipeline('image-to-image', 'Xenova/4x_APISR_GRL_GAN_generator-onnx');
       isUpscalerReady = true;
 
@@ -328,7 +327,6 @@
       setStatus('❌ Error cargando modelos: ' + err.message, false);
       // Intentar cargar al menos uno
       if (!isBgReady) {
-        // Reintentar BEN2
         try {
           bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
           isBgReady = true;
@@ -425,7 +423,7 @@
   }
 
   // =====================================================================
-  //  MEJORAR CON IA (Super‑resolución 4x)
+  //  MEJORAR CON IA (Super‑resolución 4x) – CORREGIDO
   // =====================================================================
   async function upscaleWithAI() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
@@ -437,16 +435,10 @@
     setStatus('⬆️ Mejorando con IA (4x)… puede tardar 30-60s', true, 30);
 
     try {
-      // Usar la imagen original o la que ya tenga fondo eliminado
-      let sourceImage = loadedImage;
+      // 1. Obtener la imagen fuente (original o sin fondo)
       let sourceCanvas = document.createElement('canvas');
-      sourceCanvas.width = sourceImage.width;
-      sourceCanvas.height = sourceImage.height;
-      const ctx = sourceCanvas.getContext('2d');
-      ctx.drawImage(sourceImage, 0, 0);
-
-      // Si ya tenemos fondo eliminado, usamos ese
       if (currentStep === 'background_removed' && currentResultBlob) {
+        // Cargar la imagen sin fondo desde el blob
         const url = URL.createObjectURL(currentResultBlob);
         const img = await new Promise((resolve, reject) => {
           const i = new Image();
@@ -456,44 +448,51 @@
         });
         sourceCanvas.width = img.width;
         sourceCanvas.height = img.height;
-        const ctx2 = sourceCanvas.getContext('2d');
-        ctx2.drawImage(img, 0, 0);
+        const ctx = sourceCanvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
         URL.revokeObjectURL(url);
+      } else {
+        // Usar la imagen original
+        sourceCanvas.width = loadedImage.width;
+        sourceCanvas.height = loadedImage.height;
+        const ctx = sourceCanvas.getContext('2d');
+        ctx.drawImage(loadedImage, 0, 0);
       }
 
-      // Obtener ImageData para el pipeline
-      const imageData = sourceCanvas.getContext('2d').getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+      // 2. Convertir a RawImage (entrada correcta para el pipeline)
+      const rawImage = await RawImage.fromCanvas(sourceCanvas);
 
-      // Ejecutar el modelo (devuelve otro ImageData)
-      const output = await upscaler(imageData);
+      // 3. Ejecutar el modelo (devuelve un RawImage o array de RawImage)
+      const output = await upscaler(rawImage);
 
-      // Crear canvas con el resultado
+      // 4. Obtener ImageData y mostrarlo
+      const imageData = output.toImageData ? output.toImageData() : output.data;
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = output.width;
-      outCanvas.height = output.height;
+      outCanvas.width = output.width || imageData.width;
+      outCanvas.height = output.height || imageData.height;
       const outCtx = outCanvas.getContext('2d');
-      outCtx.putImageData(new ImageData(output.data, output.width, output.height), 0, 0);
+      outCtx.putImageData(imageData, 0, 0);
 
-      // Convertir a blob
+      // 5. Convertir a blob y guardar
       const blob = await new Promise(resolve => outCanvas.toBlob(resolve, 'image/png'));
       currentResultBlob = blob;
       currentStep = (currentStep === 'background_removed') ? 'both' : 'upscaled';
 
-      // Mostrar en canvas
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => {
-        resultCanvas.width = img.width;
-        resultCanvas.height = img.height;
+      // 6. Mostrar en el canvas de resultado
+      const resultUrl = URL.createObjectURL(blob);
+      const resultImg = new Image();
+      resultImg.onload = () => {
+        resultCanvas.width = resultImg.width;
+        resultCanvas.height = resultImg.height;
         ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-        ctxRes.drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
-        setStatus(`✅ Super‑resolución 4x aplicada (${img.width}x${img.height})`, false, 100);
+        ctxRes.drawImage(resultImg, 0, 0);
+        URL.revokeObjectURL(resultUrl);
+        setStatus(`✅ Super‑resolución 4x aplicada (${resultImg.width}x${resultImg.height})`, false, 100);
         downloadBtn.disabled = false;
         processing = false;
         enableButtons(true);
       };
-      img.src = url;
+      resultImg.src = resultUrl;
     } catch (err) {
       console.error(err);
       setStatus('❌ Error en IA: ' + err.message, false);
@@ -533,20 +532,25 @@
 
       // Paso 2: Super‑resolución sobre la imagen sin fondo
       setStatus('🔄 Paso 2/2: Mejorando con IA (4x)…', true, 50);
-      // Pasar la imagen sin fondo al modelo
+
+      // Crear canvas con la imagen sin fondo
       const canvas = document.createElement('canvas');
       canvas.width = imgNoBg.width;
       canvas.height = imgNoBg.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(imgNoBg, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-      const output = await upscaler(imageData);
+      // Convertir a RawImage y ejecutar modelo
+      const rawImage = await RawImage.fromCanvas(canvas);
+      const output = await upscaler(rawImage);
+
+      // Obtener ImageData
+      const imageData = output.toImageData ? output.toImageData() : output.data;
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = output.width;
-      outCanvas.height = output.height;
+      outCanvas.width = output.width || imageData.width;
+      outCanvas.height = output.height || imageData.height;
       const outCtx = outCanvas.getContext('2d');
-      outCtx.putImageData(new ImageData(output.data, output.width, output.height), 0, 0);
+      outCtx.putImageData(imageData, 0, 0);
 
       const finalBlob = await new Promise(resolve => outCanvas.toBlob(resolve, 'image/png'));
       currentResultBlob = finalBlob;
