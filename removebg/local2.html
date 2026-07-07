@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Studio Pro – Fondo + Super‑Resolución con IA</title>
 
-  <!-- Import Map para Transformers.js (v3.4.0) -->
   <script type="importmap">
   {
     "imports": {
@@ -214,7 +213,7 @@
       <div style="font-weight: 600; color: #0f172a;">⚙️ Modelos IA</div>
       <div style="font-size:0.9rem; color:#334155;">
         <span class="badge">🧹 BEN2-ONNX</span> (fondo)<br>
-        <span class="badge">⬆️ APISR-GAN</span> (super‑resolución 4x)
+        <span class="badge">⬆️ 4x-ESRGAN</span> (super‑resolución 4x)
       </div>
       <div style="font-size:0.8rem; color:#64748b;">
         ⚡ La primera carga descarga ~50 MB de modelo. Se cachea.
@@ -272,18 +271,17 @@
   // =====================================================================
   //  STATE
   // =====================================================================
-  let loadedImage = null;           // HTMLImageElement
+  let loadedImage = null;
   let imageFile = null;
   let imageUrl = null;
 
-  // Modelos
-  let bgSegmenter = null;           // BEN2 pipeline
-  let upscaler = null;             // APISR pipeline
+  let bgSegmenter = null;
+  let upscaler = null;
   let isBgReady = false;
   let isUpscalerReady = false;
 
   let currentResultBlob = null;
-  let currentStep = 'idle';         // idle | background_removed | upscaled | both
+  let currentStep = 'idle'; // idle | background_removed | upscaled | both
   let processing = false;
 
   // =====================================================================
@@ -310,14 +308,13 @@
   // =====================================================================
   async function loadModels() {
     try {
-      // 1. Cargar BEN2 (fondo)
       setStatus('📦 Cargando BEN2-ONNX (fondo)…', true, 5);
       bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
       isBgReady = true;
-      setStatus('✅ BEN2 listo. Cargando APISR (super‑resolución)…', true, 40);
+      setStatus('✅ BEN2 listo. Cargando 4x-ESRGAN (super‑resolución)…', true, 40);
 
-      // 2. Cargar APISR (super‑resolución 4x)
-      upscaler = await pipeline('image-to-image', 'Xenova/4x_APISR_GRL_GAN_generator-onnx');
+      // Modelo: 4x_ESRGAN (estable y probado)
+      upscaler = await pipeline('image-to-image', 'Xenova/4x_ESRGAN');
       isUpscalerReady = true;
 
       setStatus('✅ Todos los modelos listos. Sube una imagen.', false, 100);
@@ -325,7 +322,7 @@
     } catch (err) {
       console.error(err);
       setStatus('❌ Error cargando modelos: ' + err.message, false);
-      // Intentar cargar al menos uno
+      // Intentar al menos BEN2
       if (!isBgReady) {
         try {
           bgSegmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
@@ -339,7 +336,6 @@
     }
   }
 
-  // Iniciar carga
   loadModels();
 
   // =====================================================================
@@ -423,7 +419,7 @@
   }
 
   // =====================================================================
-  //  MEJORAR CON IA (Super‑resolución 4x) – CORREGIDO
+  //  MEJORAR CON IA (Super‑resolución 4x) – con redimension a múltiplo de 4
   // =====================================================================
   async function upscaleWithAI() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
@@ -438,7 +434,6 @@
       // 1. Obtener la imagen fuente (original o sin fondo)
       let sourceCanvas = document.createElement('canvas');
       if (currentStep === 'background_removed' && currentResultBlob) {
-        // Cargar la imagen sin fondo desde el blob
         const url = URL.createObjectURL(currentResultBlob);
         const img = await new Promise((resolve, reject) => {
           const i = new Image();
@@ -452,33 +447,57 @@
         ctx.drawImage(img, 0, 0);
         URL.revokeObjectURL(url);
       } else {
-        // Usar la imagen original
         sourceCanvas.width = loadedImage.width;
         sourceCanvas.height = loadedImage.height;
         const ctx = sourceCanvas.getContext('2d');
         ctx.drawImage(loadedImage, 0, 0);
       }
 
-      // 2. Convertir a RawImage (entrada correcta para el pipeline)
+      // 2. Redimensionar a múltiplo de 4 (necesario para ESRGAN)
+      const w = sourceCanvas.width;
+      const h = sourceCanvas.height;
+      const newW = Math.floor(w / 4) * 4;
+      const newH = Math.floor(h / 4) * 4;
+      if (newW !== w || newH !== h) {
+        const resizeCanvas = document.createElement('canvas');
+        resizeCanvas.width = newW;
+        resizeCanvas.height = newH;
+        const rctx = resizeCanvas.getContext('2d');
+        rctx.imageSmoothingEnabled = true;
+        rctx.imageSmoothingQuality = 'high';
+        rctx.drawImage(sourceCanvas, 0, 0, newW, newH);
+        sourceCanvas = resizeCanvas;
+      }
+
+      // 3. Convertir a RawImage
       const rawImage = await RawImage.fromCanvas(sourceCanvas);
 
-      // 3. Ejecutar el modelo (devuelve un RawImage o array de RawImage)
+      // 4. Ejecutar el modelo
       const output = await upscaler(rawImage);
 
-      // 4. Obtener ImageData y mostrarlo
-      const imageData = output.toImageData ? output.toImageData() : output.data;
+      // 5. Extraer ImageData
+      let imageData;
+      if (output.toImageData) {
+        imageData = output.toImageData();
+      } else if (output.data) {
+        imageData = output;
+      } else {
+        throw new Error('Formato de salida no reconocido');
+      }
+
+      // 6. Crear canvas de salida
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = output.width || imageData.width;
-      outCanvas.height = output.height || imageData.height;
+      outCanvas.width = imageData.width;
+      outCanvas.height = imageData.height;
       const outCtx = outCanvas.getContext('2d');
       outCtx.putImageData(imageData, 0, 0);
 
-      // 5. Convertir a blob y guardar
+      // 7. Guardar blob
       const blob = await new Promise(resolve => outCanvas.toBlob(resolve, 'image/png'));
       currentResultBlob = blob;
       currentStep = (currentStep === 'background_removed') ? 'both' : 'upscaled';
 
-      // 6. Mostrar en el canvas de resultado
+      // 8. Mostrar en canvas
       const resultUrl = URL.createObjectURL(blob);
       const resultImg = new Image();
       resultImg.onload = () => {
@@ -495,7 +514,7 @@
       resultImg.src = resultUrl;
     } catch (err) {
       console.error(err);
-      setStatus('❌ Error en IA: ' + err.message, false);
+      setStatus('❌ Error en IA: ' + err.message + '. Verifica que la imagen sea válida y no demasiado grande.', false);
       processing = false;
       enableButtons(true);
     }
@@ -530,25 +549,48 @@
       });
       URL.revokeObjectURL(url1);
 
-      // Paso 2: Super‑resolución sobre la imagen sin fondo
+      // Paso 2: Super‑resolución
       setStatus('🔄 Paso 2/2: Mejorando con IA (4x)…', true, 50);
 
       // Crear canvas con la imagen sin fondo
-      const canvas = document.createElement('canvas');
+      let canvas = document.createElement('canvas');
       canvas.width = imgNoBg.width;
       canvas.height = imgNoBg.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(imgNoBg, 0, 0);
 
-      // Convertir a RawImage y ejecutar modelo
+      // Redimensionar a múltiplo de 4
+      const w = canvas.width;
+      const h = canvas.height;
+      const newW = Math.floor(w / 4) * 4;
+      const newH = Math.floor(h / 4) * 4;
+      if (newW !== w || newH !== h) {
+        const resizeCanvas = document.createElement('canvas');
+        resizeCanvas.width = newW;
+        resizeCanvas.height = newH;
+        const rctx = resizeCanvas.getContext('2d');
+        rctx.imageSmoothingEnabled = true;
+        rctx.imageSmoothingQuality = 'high';
+        rctx.drawImage(canvas, 0, 0, newW, newH);
+        canvas = resizeCanvas;
+      }
+
+      // Convertir a RawImage
       const rawImage = await RawImage.fromCanvas(canvas);
       const output = await upscaler(rawImage);
 
-      // Obtener ImageData
-      const imageData = output.toImageData ? output.toImageData() : output.data;
+      let imageData;
+      if (output.toImageData) {
+        imageData = output.toImageData();
+      } else if (output.data) {
+        imageData = output;
+      } else {
+        throw new Error('Formato de salida no reconocido');
+      }
+
       const outCanvas = document.createElement('canvas');
-      outCanvas.width = output.width || imageData.width;
-      outCanvas.height = output.height || imageData.height;
+      outCanvas.width = imageData.width;
+      outCanvas.height = imageData.height;
       const outCtx = outCanvas.getContext('2d');
       outCtx.putImageData(imageData, 0, 0);
 
