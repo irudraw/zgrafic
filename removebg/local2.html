@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eliminar Fondo – BEN2 (Transformers.js)</title>
 
-  <!-- Import Map para Transformers.js (v3.4.0 o superior) -->
+  <!-- Import Map con la versión más reciente de Transformers.js -->
   <script type="importmap">
   {
     "imports": {
-      "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0/dist/transformers.js"
+      "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@latest/dist/transformers.js"
     }
   }
   </script>
@@ -168,227 +168,224 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🧹 Eliminar Fondo</h1>
-    <p class="sub">Modelo <strong>BEN2‑ONNX</strong> · 100% local · sin subir imágenes</p>
+<div class="container">
+  <h1>🧹 Eliminar Fondo</h1>
+  <p class="sub">Modelo <strong>BEN2‑ONNX</strong> · 100% local · sin subir imágenes</p>
 
-    <!-- Zona de arrastre -->
-    <div class="drop-zone" id="dropZone">
-      <p>📤 Arrastra una imagen o haz clic para seleccionar</p>
-      <small>JPG, PNG, WebP</small>
-      <input type="file" id="fileInput" accept="image/*" />
-    </div>
-
-    <!-- Botones -->
-    <div class="controls">
-      <button id="processBtn" disabled>🚀 Eliminar fondo</button>
-      <button id="downloadBtn" class="download" disabled>⬇️ Descargar PNG</button>
-    </div>
-
-    <!-- Estado -->
-    <div id="status" class="status">⏳ Cargando modelo…</div>
-
-    <!-- Canvas -->
-    <div class="canvas-wrapper">
-      <div class="canvas-box">
-        <canvas id="originalCanvas"></canvas>
-      </div>
-      <div class="canvas-box">
-        <canvas id="resultCanvas"></canvas>
-      </div>
-    </div>
-
-    <div class="info">
-      ⚡ Usa <a href="https://huggingface.co/onnx-community/BEN2-ONNX" target="_blank">BEN2‑ONNX</a> vía <a href="https://huggingface.co/docs/transformers.js" target="_blank">Transformers.js</a>
-    </div>
-    <div class="footer">Hecho para GitHub Pages · Código abierto</div>
+  <div class="drop-zone" id="dropZone">
+    <p>📤 Arrastra una imagen o haz clic para seleccionar</p>
+    <small>JPG, PNG, WebP</small>
+    <input type="file" id="fileInput" accept="image/*" />
   </div>
 
-  <!-- ====== CÓDIGO PRINCIPAL (módulo ES) ====== -->
-  <script type="module">
-    // ----- Importar Transformers.js -----
-    import { pipeline } from '@huggingface/transformers';
+  <div class="controls">
+    <button id="processBtn" disabled>🚀 Eliminar fondo</button>
+    <button id="downloadBtn" class="download" disabled>⬇️ Descargar PNG</button>
+  </div>
 
-    // ----- Referencias DOM -----
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const processBtn = document.getElementById('processBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const statusDiv = document.getElementById('status');
-    const originalCanvas = document.getElementById('originalCanvas');
-    const resultCanvas = document.getElementById('resultCanvas');
-    const ctxOrig = originalCanvas.getContext('2d');
-    const ctxRes = resultCanvas.getContext('2d');
+  <div id="status" class="status">⏳ Cargando modelo…</div>
 
-    // ----- Estado -----
-    let loadedImage = null;      // HTMLImageElement
-    let imageUrl = null;        // URL para el pipeline
-    let segmenter = null;       // pipeline cargado
-    let isModelReady = false;
-    let currentResult = null;   // Imagen resultante (para descargar)
+  <div class="canvas-wrapper">
+    <div class="canvas-box">
+      <canvas id="originalCanvas"></canvas>
+    </div>
+    <div class="canvas-box">
+      <canvas id="resultCanvas"></canvas>
+    </div>
+  </div>
 
-    // ----- Función para actualizar estado -----
-    function setStatus(msg, isLoading = false) {
-      if (isLoading) {
-        statusDiv.innerHTML = `<span class="loader"></span> ${msg}`;
-      } else {
-        statusDiv.textContent = msg;
-      }
+  <div class="info">
+    ⚡ Usa <a href="https://huggingface.co/onnx-community/BEN2-ONNX" target="_blank">BEN2‑ONNX</a> vía <a href="https://huggingface.co/docs/transformers.js" target="_blank">Transformers.js</a>
+  </div>
+  <div class="footer">Hecho para GitHub Pages · Código abierto</div>
+</div>
+
+<script type="module">
+  // ----- Importar Transformers.js -----
+  import { pipeline } from '@huggingface/transformers';
+
+  // ----- Referencias DOM -----
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const processBtn = document.getElementById('processBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const statusDiv = document.getElementById('status');
+  const originalCanvas = document.getElementById('originalCanvas');
+  const resultCanvas = document.getElementById('resultCanvas');
+  const ctxOrig = originalCanvas.getContext('2d');
+  const ctxRes = resultCanvas.getContext('2d');
+
+  // ----- Estado -----
+  let loadedImage = null;          // HTMLImageElement
+  let imageUrl = null;            // URL para el pipeline
+  let segmenter = null;           // pipeline cargado
+  let isModelReady = false;
+  let currentResultBlob = null;   // Blob de la imagen resultante (para descarga)
+
+  // ----- Función para actualizar estado -----
+  function setStatus(msg, isLoading = false) {
+    if (isLoading) {
+      statusDiv.innerHTML = `<span class="loader"></span> ${msg}`;
+    } else {
+      statusDiv.textContent = msg;
+    }
+  }
+
+  // ----- Cargar el modelo (solo una vez) -----
+  async function loadModel() {
+    try {
+      setStatus('📦 Descargando modelo BEN2-ONNX… (puede tardar 1-2 min la primera vez)', true);
+      segmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
+      isModelReady = true;
+      setStatus('✅ Modelo listo. Sube una imagen.');
+      if (loadedImage) processBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Error al cargar el modelo. Revisa consola.');
+    }
+  }
+
+  loadModel();
+
+  // ----- Cargar imagen desde archivo -----
+  function loadImageFromFile(file) {
+    if (!file || !file.type.startsWith('image/')) {
+      alert('Por favor, selecciona una imagen (JPG, PNG, WebP).');
+      return;
     }
 
-    // ----- Cargar el modelo (solo una vez) -----
-    async function loadModel() {
-      try {
-        setStatus('📦 Descargando modelo BEN2-ONNX… (puede tardar 1-2 min la primera vez)', true);
-        segmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
-        isModelReady = true;
-        setStatus('✅ Modelo listo. Sube una imagen.');
-        if (loadedImage) processBtn.disabled = false;
-      } catch (err) {
-        console.error(err);
-        setStatus('❌ Error al cargar el modelo. Revisa consola.');
-      }
-    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        loadedImage = img;
+        // Liberar URL anterior si existía
+        if (imageUrl) URL.revokeObjectURL(imageUrl);
+        imageUrl = URL.createObjectURL(file);
 
-    // Llamar a la carga del modelo al iniciar
-    loadModel();
+        // Mostrar en canvas original
+        originalCanvas.width = img.width;
+        originalCanvas.height = img.height;
+        ctxOrig.drawImage(img, 0, 0);
 
-    // ----- Cargar imagen desde archivo -----
-    function loadImageFromFile(file) {
-      if (!file || !file.type.startsWith('image/')) {
-        alert('Por favor, selecciona una imagen (JPG, PNG, WebP).');
-        return;
-      }
+        // Limpiar resultado
+        resultCanvas.width = img.width;
+        resultCanvas.height = img.height;
+        ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+        currentResultBlob = null;
+        downloadBtn.disabled = true;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          loadedImage = img;
-          // Liberar URL anterior si existía
-          if (imageUrl) URL.revokeObjectURL(imageUrl);
-          imageUrl = URL.createObjectURL(file);  // para el pipeline
-
-          // Mostrar en canvas original
-          originalCanvas.width = img.width;
-          originalCanvas.height = img.height;
-          ctxOrig.drawImage(img, 0, 0);
-
-          // Limpiar resultado
-          resultCanvas.width = img.width;
-          resultCanvas.height = img.height;
-          ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-          currentResult = null;
-          downloadBtn.disabled = true;
-
-          setStatus('📷 Imagen cargada. Haz clic en "Eliminar fondo".');
-          if (isModelReady) processBtn.disabled = false;
-          else processBtn.disabled = true;
-        };
-        img.src = e.target.result;
+        setStatus('📷 Imagen cargada. Haz clic en "Eliminar fondo".');
+        if (isModelReady) processBtn.disabled = false;
+        else processBtn.disabled = true;
       };
-      reader.readAsDataURL(file);
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ----- Procesar imagen (eliminar fondo) -----
+  async function processImage() {
+    if (!loadedImage || !imageUrl) {
+      setStatus('⚠️ Primero carga una imagen.');
+      return;
+    }
+    if (!isModelReady || !segmenter) {
+      setStatus('⏳ Modelo no está listo aún. Espera…');
+      return;
     }
 
-    // ----- Procesar imagen (eliminar fondo) -----
-    async function processImage() {
-      if (!loadedImage || !imageUrl) {
-        setStatus('⚠️ Primero carga una imagen.');
-        return;
-      }
-      if (!isModelReady || !segmenter) {
-        setStatus('⏳ Modelo no está listo aún. Espera…');
-        return;
-      }
+    processBtn.disabled = true;
+    downloadBtn.disabled = true;
+    setStatus('🔄 Procesando… (puede tomar unos segundos)', true);
 
-      // Deshabilitar botones durante el procesamiento
-      processBtn.disabled = true;
-      downloadBtn.disabled = true;
-      setStatus('🔄 Procesando… (puede tomar unos segundos)', true);
+    try {
+      // Ejecutar el pipeline
+      const results = await segmenter([imageUrl]);
+      const resultImg = results[0];
 
-      try {
-        // El pipeline espera un array de entradas (una imagen)
-        const results = await segmenter([imageUrl]);
-        // results[0] es un objeto "Image" (similar a un canvas)
-        const resultImg = results[0];
+      // Obtener el blob de la imagen resultante (con transparencia)
+      const blob = await resultImg.toBlob();
+      currentResultBlob = blob;
 
-        // Guardar referencia para descarga
-        currentResult = resultImg;
+      // Crear una URL para mostrar en el canvas
+      const url = URL.createObjectURL(blob);
 
-        // Dibujar en el canvas de resultado (fondo transparente)
-        const w = loadedImage.width;
-        const h = loadedImage.height;
-        resultCanvas.width = w;
-        resultCanvas.height = h;
-        // El método toCanvas() dibuja la imagen con transparencia
-        resultImg.toCanvas(resultCanvas);
-
+      // Cargar la imagen en un elemento Image para dibujarla
+      const img = new Image();
+      img.onload = () => {
+        // Ajustar canvas de resultado al tamaño de la imagen (debe ser igual a la original)
+        resultCanvas.width = img.width;
+        resultCanvas.height = img.height;
+        ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+        ctxRes.drawImage(img, 0, 0);
         setStatus('✅ Fondo eliminado correctamente');
         downloadBtn.disabled = false;
         processBtn.disabled = false;
-
-      } catch (err) {
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = (err) => {
         console.error(err);
-        setStatus('❌ Error al procesar. Revisa consola.');
+        setStatus('❌ Error al mostrar la imagen resultante.');
         processBtn.disabled = false;
-        downloadBtn.disabled = true;
-      }
+      };
+      img.src = url;
+
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Error al procesar. Revisa consola.');
+      processBtn.disabled = false;
+      downloadBtn.disabled = true;
     }
+  }
 
-    // ----- Descargar resultado -----
-    function downloadResult() {
-      if (!currentResult) {
-        alert('No hay resultado para descargar.');
-        return;
-      }
-      // Convertir a Blob y descargar
-      currentResult.toBlob((blob) => {
-        const link = document.createElement('a');
-        link.download = 'sin_fondo.png';
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        URL.revokeObjectURL(link.href);
-      });
+  // ----- Descargar resultado (usa el blob guardado) -----
+  function downloadResult() {
+    if (!currentResultBlob) {
+      alert('No hay resultado para descargar.');
+      return;
     }
+    const link = document.createElement('a');
+    link.download = 'sin_fondo.png';
+    link.href = URL.createObjectURL(currentResultBlob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
 
-    // ----- EVENTOS UI -----
+  // ----- EVENTOS UI -----
 
-    // Clic en la zona de arrastre
-    dropZone.addEventListener('click', (e) => {
-      if (e.target.tagName !== 'INPUT') fileInput.click();
-    });
+  // Clic en la zona de arrastre
+  dropZone.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'INPUT') fileInput.click();
+  });
 
-    // Arrastrar y soltar
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
-    dropZone.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-    });
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      const files = e.dataTransfer.files;
-      if (files.length > 0) loadImageFromFile(files[0]);
-    });
+  // Arrastrar y soltar
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+  dropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+  });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) loadImageFromFile(files[0]);
+  });
 
-    // Input file (cuando se selecciona manualmente)
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) {
-        loadImageFromFile(e.target.files[0]);
-      }
-      fileInput.value = ''; // para poder repetir el mismo archivo
-    });
+  // Input file
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      loadImageFromFile(e.target.files[0]);
+    }
+    fileInput.value = '';
+  });
 
-    // Botones
-    processBtn.addEventListener('click', processImage);
-    downloadBtn.addEventListener('click', downloadResult);
-
-    // ----- Inicialización: si el modelo ya está cargado, habilitar botón -----
-    // (ya se maneja en loadModel y loadImageFromFile)
-
-  </script>
+  // Botones
+  processBtn.addEventListener('click', processImage);
+  downloadBtn.addEventListener('click', downloadResult);
+</script>
 </body>
 </html>
