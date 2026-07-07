@@ -1,363 +1,383 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eliminar Fondo (Local) - MediaPipe Tasks</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eliminar Fondo Local</title>
 
-  <!-- Import Map para cargar MediaPipe Tasks Vision -->
-  <script type="importmap">
-  {
-    "imports": {
-      "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm/mediapipe-tasks-vision.js"
-    }
-  }
-  </script>
+    <!-- MediaPipe Selfie Segmentation (versión estable 0.8.10) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.8.10/selfie_segmentation.js"
+            crossorigin="anonymous">
+    </script>
 
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .container {
-      background: white;
-      border-radius: 16px;
-      padding: 30px;
-      max-width: 950px;
-      width: 100%;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-      text-align: center;
-    }
-    h1 { margin-top: 0; color: #1a1a2e; }
-    .upload-area {
-      border: 2px dashed #bbb;
-      border-radius: 12px;
-      padding: 30px;
-      margin: 20px 0;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .upload-area:hover {
-      background: #f8f9fc;
-      border-color: #1a73e8;
-    }
-    .upload-area input { display: none; }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    .controls button {
-      background: #1a73e8;
-      color: white;
-      border: none;
-      padding: 12px 28px;
-      border-radius: 30px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .controls button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
-    .controls button:hover:not(:disabled) {
-      background: #1558b0;
-    }
-    .controls .download-btn {
-      background: #34a853;
-    }
-    .controls .download-btn:hover:not(:disabled) {
-      background: #2d8e47;
-    }
-    .status {
-      margin: 12px 0;
-      font-weight: 500;
-      color: #1a1a2e;
-      min-height: 1.5em;
-    }
-    .canvas-wrapper {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .canvas-box {
-      flex: 1 1 280px;
-      background: repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #ddd;
-      min-height: 250px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .canvas-box canvas {
-      display: block;
-      max-width: 100%;
-      max-height: 500px;
-      width: auto;
-      height: auto;
-    }
-    .info {
-      margin-top: 15px;
-      color: #555;
-      font-size: 14px;
-    }
-    .footer {
-      margin-top: 25px;
-      font-size: 13px;
-      color: #888;
-    }
-    .loader {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #1a73e8;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  </style>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 950px;
+            width: 100%;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+        h1 {
+            margin-top: 0;
+            color: #1a1a2e;
+        }
+        .upload-area {
+            border: 2px dashed #bbb;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            background: #fafafa;
+        }
+        .upload-area:hover {
+            background: #f0f4ff;
+            border-color: #1a73e8;
+        }
+        .upload-area.dragover {
+            background: #e8f0fe;
+            border-color: #1a73e8;
+        }
+        .upload-area input {
+            display: none;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .controls button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .controls button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+        .controls button:hover:not(:disabled) {
+            background: #1558b0;
+        }
+        .controls .download-btn {
+            background: #34a853;
+        }
+        .controls .download-btn:hover:not(:disabled) {
+            background: #2d8e47;
+        }
+        .status {
+            margin: 12px 0;
+            font-weight: 500;
+            color: #1a1a2e;
+            min-height: 1.8em;
+        }
+        .canvas-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .canvas-box {
+            flex: 1 1 280px;
+            background: repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .canvas-box canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 500px;
+            width: auto;
+            height: auto;
+        }
+        .info {
+            margin-top: 15px;
+            color: #555;
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #888;
+        }
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>🖼️ Eliminar Fondo (Local)</h1>
-  <p>Sube una foto con una <strong>persona</strong> y la IA eliminará el fondo sin enviar datos a internet.</p>
+    <h1>🖼️ Eliminar Fondo (Local)</h1>
+    <p>Sube una foto con una <strong>persona</strong> y la IA eliminará el fondo sin enviar datos a internet.</p>
 
-  <div class="upload-area" id="uploadArea">
-    <p>📤 Haz clic o arrastra una imagen aquí</p>
-    <input type="file" id="fileInput" accept="image/*" />
-  </div>
-
-  <div class="controls">
-    <button id="processBtn" disabled>🚀 Eliminar fondo</button>
-    <button id="downloadBtn" class="download-btn" disabled>⬇️ Descargar PNG</button>
-  </div>
-
-  <div id="status" class="status">⏳ Cargando modelo...</div>
-
-  <div class="canvas-wrapper">
-    <div class="canvas-box">
-      <canvas id="originalCanvas"></canvas>
+    <div class="upload-area" id="uploadArea">
+        <p>📤 Haz clic o arrastra una imagen aquí</p>
+        <input type="file" id="fileInput" accept="image/*" />
     </div>
-    <div class="canvas-box">
-      <canvas id="resultCanvas"></canvas>
-    </div>
-  </div>
 
-  <div class="info">
-    ⚡ Procesamiento completamente local usando <strong>MediaPipe Tasks Vision</strong>.
-    <br /> Modelo: <em>Selfie Segmentation</em> (optimizado para personas).
-  </div>
-  <div class="footer">
-    Hecho para GitHub Pages · Código 100% local
-  </div>
+    <div class="controls">
+        <button id="processBtn" disabled>🚀 Eliminar fondo</button>
+        <button id="downloadBtn" class="download-btn" disabled>⬇️ Descargar PNG</button>
+    </div>
+
+    <div id="status" class="status">⏳ Cargando modelo...</div>
+
+    <div class="canvas-wrapper">
+        <div class="canvas-box">
+            <canvas id="originalCanvas"></canvas>
+        </div>
+        <div class="canvas-box">
+            <canvas id="resultCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="info">
+        ⚡ Procesamiento completamente local usando <strong>MediaPipe Selfie Segmentation</strong>.
+        <br /> Modelo: <em>selfie_segmentation (versión 0.8.10)</em>
+    </div>
+    <div class="footer">
+        Hecho para GitHub Pages · Código 100% local · Sin subida de datos
+    </div>
 </div>
 
-<script type="module">
-  // ----- Importar MediaPipe Tasks Vision -----
-  import { ImageSegmenter, FilesetResolver } from "@mediapipe/tasks-vision";
+<script>
+    (function() {
+        // ----- Elementos DOM -----
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const processBtn = document.getElementById('processBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusDiv = document.getElementById('status');
+        const originalCanvas = document.getElementById('originalCanvas');
+        const resultCanvas = document.getElementById('resultCanvas');
+        const ctxOrig = originalCanvas.getContext('2d');
+        const ctxRes = resultCanvas.getContext('2d');
 
-  // ----- Elementos DOM -----
-  const fileInput = document.getElementById('fileInput');
-  const uploadArea = document.getElementById('uploadArea');
-  const processBtn = document.getElementById('processBtn');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const statusDiv = document.getElementById('status');
-  const originalCanvas = document.getElementById('originalCanvas');
-  const resultCanvas = document.getElementById('resultCanvas');
-  const ctxOrig = originalCanvas.getContext('2d');
-  const ctxRes = resultCanvas.getContext('2d');
+        let loadedImage = null;          // Imagen cargada (HTMLImageElement)
+        let segmenter = null;            // Instancia de SelfieSegmentation
+        let isModelReady = false;
 
-  let loadedImage = null;          // Imagen cargada (HTMLImageElement)
-  let imageSegmenter = null;       // Instancia del segmentador
-  let isModelReady = false;
+        // ----- Configurar MediaPipe Selfie Segmentation -----
+        function setupSegmenter() {
+            // Configurar locateFile para usar la misma versión
+            SelfieSegmentation.prototype.locateFile = function(file) {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.8.10/${file}`;
+            };
 
-  // ----- Inicializar el segmentador -----
-  async function initializeSegmenter() {
-    try {
-      statusDiv.innerHTML = '⏳ Descargando modelo... (puede tomar unos segundos)';
-      // Crear el resolver de archivos (descarga el WASM y el modelo)
-      const vision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
-      );
-      // Crear el segmentador con opciones
-      imageSegmenter = await ImageSegmenter.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/1/selfie_segmenter.task',
-          delegate: 'GPU'  // Usar GPU si está disponible
-        },
-        outputCategoryMask: false,    // No necesitamos la máscara de categorías
-        outputConfidenceMasks: true,  // Queremos la máscara de confianza (para alpha)
-      });
-      isModelReady = true;
-      statusDiv.textContent = '✅ Modelo listo. Sube una imagen.';
-      if (loadedImage) {
-        processBtn.disabled = false;
-      }
-    } catch (err) {
-      console.error(err);
-      statusDiv.textContent = '❌ Error al cargar el modelo. Revisa la consola.';
-    }
-  }
+            segmenter = new SelfieSegmentation({
+                modelSelection: 1, // 1 = Selfie (personas), 0 = General
+            });
 
-  // Llamar a la inicialización
-  initializeSegmenter();
+            // Evento cuando el modelo termina de cargar
+            segmenter.onResults((results) => {
+                // results.segmentationMask es un ImageData
+                if (results.segmentationMask) {
+                    applyMask(results.segmentationMask);
+                    statusDiv.textContent = '✅ Fondo eliminado correctamente';
+                    downloadBtn.disabled = false;
+                    processBtn.disabled = false;
+                } else {
+                    statusDiv.textContent = '⚠️ No se detectó ningún sujeto. Prueba otra imagen.';
+                    processBtn.disabled = false;
+                }
+            });
 
-  // ----- Función para cargar imagen desde archivo -----
-  function loadImageFromFile(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        loadedImage = img;
-        // Mostrar en canvas original
-        originalCanvas.width = img.width;
-        originalCanvas.height = img.height;
-        ctxOrig.drawImage(img, 0, 0);
-        // Limpiar resultado
-        resultCanvas.width = img.width;
-        resultCanvas.height = img.height;
-        ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-        statusDiv.textContent = 'Imagen cargada. Haz clic en "Eliminar fondo".';
-        processBtn.disabled = !isModelReady;
-        downloadBtn.disabled = true;
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
+            // Inicializar el modelo
+            segmenter.initialize().then(() => {
+                isModelReady = true;
+                statusDiv.textContent = '✅ Modelo listo. Sube una imagen.';
+                if (loadedImage) {
+                    processBtn.disabled = false;
+                }
+            }).catch((err) => {
+                console.error(err);
+                statusDiv.textContent = '❌ Error al cargar el modelo. Revisa la consola.';
+            });
+        }
 
-  // ----- Procesar la imagen (eliminar fondo) -----
-  async function processImage() {
-    if (!loadedImage || !imageSegmenter || !isModelReady) {
-      statusDiv.textContent = 'Espera a que el modelo esté listo.';
-      return;
-    }
+        // ----- Aplicar máscara al canvas de resultado -----
+        function applyMask(maskData) {
+            if (!loadedImage) return;
+            const w = loadedImage.width;
+            const h = loadedImage.height;
 
-    // Mostrar estado de carga
-    statusDiv.innerHTML = '<span class="loader"></span> Procesando...';
-    processBtn.disabled = true;
-    downloadBtn.disabled = true;
+            // Dibujar la imagen original en un canvas temporal
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = w;
+            tempCanvas.height = h;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(loadedImage, 0, 0);
+            const imageData = tempCtx.getImageData(0, 0, w, h);
+            const data = imageData.data;
+            const mask = maskData.data; // Uint8ClampedArray
 
-    try {
-      // Crear un objeto ImageData a partir del canvas original
-      const w = loadedImage.width;
-      const h = loadedImage.height;
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = w;
-      tempCanvas.height = h;
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.drawImage(loadedImage, 0, 0);
-      const imageData = tempCtx.getImageData(0, 0, w, h);
+            // Recorrer píxeles y usar el canal rojo de la máscara como alpha
+            for (let i = 0; i < data.length; i += 4) {
+                const alpha = mask[i]; // canal R (0-255)
+                data[i + 3] = alpha;   // asignar alpha
+            }
 
-      // Crear un objeto ImageBitmap para enviar al segmentador
-      const bitmap = await createImageBitmap(imageData);
+            // Dibujar en el canvas de resultado
+            ctxRes.clearRect(0, 0, w, h);
+            ctxRes.putImageData(imageData, 0, 0);
+        }
 
-      // Segmentar
-      const result = await imageSegmenter.segment(bitmap);
-      const confidenceMask = result.confidenceMasks?.[0]; // Tomamos la primera máscara (persona)
+        // ----- Procesar la imagen -----
+        function processImage() {
+            if (!loadedImage) {
+                statusDiv.textContent = 'Primero carga una imagen.';
+                return;
+            }
+            if (!isModelReady) {
+                statusDiv.textContent = 'El modelo aún no está listo. Espera...';
+                return;
+            }
 
-      if (!confidenceMask) {
-        statusDiv.textContent = '⚠️ No se detectó ninguna persona. Prueba otra imagen.';
-        processBtn.disabled = false;
-        return;
-      }
+            statusDiv.innerHTML = '<span class="loader"></span> Procesando...';
+            processBtn.disabled = true;
+            downloadBtn.disabled = true;
 
-      // Obtener los datos de la máscara (Float32Array)
-      const maskData = confidenceMask.getAsFloat32Array(); // valores 0..1
+            try {
+                segmenter.send({ image: loadedImage });
+            } catch (err) {
+                console.error(err);
+                statusDiv.textContent = '❌ Error al enviar la imagen. Intenta de nuevo.';
+                processBtn.disabled = false;
+            }
+        }
 
-      // Aplicar la máscara al canvas de resultado (usando alpha)
-      const outputData = new ImageData(new Uint8ClampedArray(imageData.data), w, h);
-      const pixels = outputData.data;
+        // ----- Descargar resultado -----
+        function downloadResult() {
+            if (!resultCanvas) return;
+            const link = document.createElement('a');
+            link.download = 'sin_fondo.png';
+            link.href = resultCanvas.toDataURL('image/png');
+            link.click();
+        }
 
-      // La máscara tiene tamaño w*h, pero en Float32Array
-      for (let i = 0; i < pixels.length; i += 4) {
-        // El índice en la máscara es i/4
-        const idx = i / 4;
-        const alpha = Math.round(maskData[idx] * 255);
-        pixels[i + 3] = alpha; // asignar alpha
-      }
+        // ----- Cargar imagen desde archivo -----
+        function loadImageFromFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('Por favor, selecciona un archivo de imagen.');
+                return;
+            }
 
-      // Dibujar en el canvas de resultado
-      ctxRes.clearRect(0, 0, w, h);
-      ctxRes.putImageData(outputData, 0, 0);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    loadedImage = img;
+                    // Mostrar en canvas original
+                    originalCanvas.width = img.width;
+                    originalCanvas.height = img.height;
+                    ctxOrig.drawImage(img, 0, 0);
+                    // Limpiar resultado
+                    resultCanvas.width = img.width;
+                    resultCanvas.height = img.height;
+                    ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+                    statusDiv.textContent = 'Imagen cargada. Haz clic en "Eliminar fondo".';
+                    processBtn.disabled = !isModelReady;
+                    downloadBtn.disabled = true;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
 
-      statusDiv.textContent = '✅ Fondo eliminado correctamente';
-      downloadBtn.disabled = false;
-      processBtn.disabled = false;
+        // ----- Eventos UI -----
 
-      // Liberar el bitmap
-      bitmap.close();
-      result.close(); // liberar memoria
+        // Clic en el área -> abrir selector de archivos
+        uploadArea.addEventListener('click', (e) => {
+            // Evitar que el clic en el input se propague y abra dos veces
+            if (e.target.tagName !== 'INPUT') {
+                fileInput.click();
+            }
+        });
 
-    } catch (err) {
-      console.error(err);
-      statusDiv.textContent = '❌ Error durante el procesamiento. Revisa la consola.';
-      processBtn.disabled = false;
-    }
-  }
+        // Arrastrar y soltar
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
 
-  // ----- Descargar resultado -----
-  function downloadResult() {
-    if (!resultCanvas) return;
-    const link = document.createElement('a');
-    link.download = 'sin_fondo.png';
-    link.href = resultCanvas.toDataURL('image/png');
-    link.click();
-  }
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
 
-  // ----- Eventos UI -----
-  uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                loadImageFromFile(files[0]);
+            }
+        });
 
-  uploadArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadArea.style.borderColor = '#1a73e8';
-  });
-  uploadArea.addEventListener('dragleave', () => {
-    uploadArea.style.borderColor = '#bbb';
-  });
-  uploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadArea.style.borderColor = '#bbb';
-    const files = e.dataTransfer.files;
-    if (files.length > 0 && files[0].type.startsWith('image/')) {
-      loadImageFromFile(files[0]);
-    } else {
-      alert('Por favor, sube un archivo de imagen.');
-    }
-  });
+        // Input file
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                loadImageFromFile(e.target.files[0]);
+            }
+            // Resetear para que se pueda seleccionar el mismo archivo de nuevo
+            fileInput.value = '';
+        });
 
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-      loadImageFromFile(e.target.files[0]);
-    }
-  });
+        // Botones
+        processBtn.addEventListener('click', processImage);
+        downloadBtn.addEventListener('click', downloadResult);
 
-  processBtn.addEventListener('click', processImage);
-  downloadBtn.addEventListener('click', downloadResult);
+        // ----- Inicializar el segmentador al cargar la página -----
+        setupSegmenter();
 
-  // Si el modelo ya está listo y hay imagen, habilitar botón
-  // (ya se maneja en initializeSegmenter y loadImageFromFile)
+        // Si el modelo ya está listo y hay imagen, habilitar botón
+        // (se maneja en setupSegmenter y loadImageFromFile)
+
+    })();
 </script>
 </body>
 </html>
