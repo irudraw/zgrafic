@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Studio Pro - Fondo + Mejora de Calidad</title>
+  <title>AI Studio Pro - Fondo + Super-Resolución Real</title>
 
-  <!-- Import Map para Transformers.js -->
+  <!-- Import Map para Transformers.js y ONNX Runtime -->
   <script type="importmap">
   {
     "imports": {
-      "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0/dist/transformers.js"
+      "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0/dist/transformers.js",
+      "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.0/dist/esm/ort.js"
     }
   }
   </script>
@@ -44,11 +45,7 @@
       gap: 12px;
       flex-wrap: wrap;
     }
-    h1 small {
-      font-size: 0.9rem;
-      font-weight: 400;
-      color: #64748b;
-    }
+    h1 small { font-size: 0.9rem; font-weight: 400; color: #64748b; }
     .badge {
       display: inline-block;
       background: #dbeafe;
@@ -65,9 +62,7 @@
       gap: 24px;
       margin: 20px 0;
     }
-    @media (max-width: 768px) {
-      .grid-2 { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
     .drop-zone {
       border: 2px dashed #cbd5e1;
       border-radius: 16px;
@@ -116,20 +111,8 @@
     .controls .btn-purple:hover:not(:disabled) { background: #7c3aed; }
     .controls .btn-rose { background: #f43f5e; }
     .controls .btn-rose:hover:not(:disabled) { background: #e11d48; }
-    .controls select, .controls input[type="range"] {
-      padding: 8px 16px;
-      border-radius: 30px;
-      border: 1px solid #e2e8f0;
-      background: white;
-      font-size: 0.9rem;
-    }
-    .controls label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.9rem;
-      color: #334155;
-    }
+    .controls .btn-orange { background: #f59e0b; }
+    .controls .btn-orange:hover:not(:disabled) { background: #d97706; }
     .status {
       margin: 15px 0;
       padding: 12px 20px;
@@ -226,28 +209,12 @@
       border-radius: 12px;
       margin: 10px 0;
     }
-    .settings-group label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.9rem;
-      color: #1e293b;
-    }
-    .settings-group input[type="range"] {
-      width: 120px;
-    }
-    .settings-group .value {
-      min-width: 35px;
-      font-weight: 600;
-      color: #3b82f6;
-    }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>
-    🪄 AI Studio Pro
-    <small>Eliminar Fondo + Mejora de Calidad</small>
+  <h1>🪄 AI Studio Pro
+    <small>Fondo + Super‑Resolución Real</small>
   </h1>
 
   <div class="grid-2">
@@ -257,31 +224,22 @@
       <input type="file" id="fileInput" accept="image/*" />
     </div>
     <div style="display: flex; flex-direction: column; justify-content: center; gap: 8px;">
-      <div style="font-weight: 600; color: #0f172a;">⚙️ Ajustes</div>
+      <div style="font-weight: 600; color: #0f172a;">⚙️ Modelo de Super‑Resolución</div>
       <div class="settings-group">
         <label>Escala:
           <select id="scaleSelect">
-            <option value="2">2x</option>
-            <option value="4" selected>4x</option>
-            <option value="8">8x</option>
+            <option value="4">4x (Real-ESRGAN)</option>
           </select>
         </label>
-        <label>Enfoque:
-          <input type="range" id="sharpnessRange" min="0" max="200" value="80" />
-          <span class="value" id="sharpnessValue">80%</span>
-        </label>
-        <label>Contraste:
-          <input type="range" id="contrastRange" min="50" max="200" value="115" />
-          <span class="value" id="contrastValue">115%</span>
-        </label>
+        <span style="font-size:0.8rem; color:#64748b;">(descarga ~50 MB la primera vez)</span>
       </div>
     </div>
   </div>
 
   <div class="controls">
     <button id="removeBgBtn" disabled>🧹 Eliminar Fondo</button>
-    <button id="upscaleBtn" class="btn-purple" disabled>⬆️ Mejorar Calidad</button>
-    <button id="bothBtn" class="btn-success" disabled>✨ Hacer Ambos</button>
+    <button id="upscaleBtn" class="btn-purple" disabled>⬆️ Super‑Resolución 4x</button>
+    <button id="bothBtn" class="btn-success" disabled>✨ Ambos (Fondo + 4x)</button>
     <button id="downloadBtn" class="btn-rose" disabled>⬇️ Descargar</button>
     <button id="resetBtn">🔄 Reiniciar</button>
   </div>
@@ -297,7 +255,7 @@
   </div>
 
   <div class="info">
-    ⚡ Modelos: <strong>BEN2-ONNX</strong> (fondo) · <strong>Mejora avanzada</strong> (Lanczos + Unsharp Mask)
+    ⚡ Modelos: <strong>BEN2-ONNX</strong> (fondo) · <strong>Real-ESRGAN-x4</strong> (super‑resolución IA)
   </div>
   <div class="footer">100% local · GitHub Pages · Sin subida de datos</div>
 </div>
@@ -307,6 +265,7 @@
   //  IMPORTS
   // =====================================================================
   import { pipeline } from '@huggingface/transformers';
+  import * as ort from 'onnxruntime-web';
 
   // =====================================================================
   //  DOM REFS
@@ -324,11 +283,6 @@
   const resultCanvas = document.getElementById('resultCanvas');
   const ctxOrig = originalCanvas.getContext('2d');
   const ctxRes = resultCanvas.getContext('2d');
-  const scaleSelect = document.getElementById('scaleSelect');
-  const sharpnessRange = document.getElementById('sharpnessRange');
-  const contrastRange = document.getElementById('contrastRange');
-  const sharpnessValue = document.getElementById('sharpnessValue');
-  const contrastValue = document.getElementById('contrastValue');
 
   // =====================================================================
   //  STATE
@@ -336,10 +290,16 @@
   let loadedImage = null;           // HTMLImageElement
   let imageFile = null;
   let imageUrl = null;
-  let segmenter = null;
-  let isModelReady = false;
+  let segmenter = null;             // BEN2 pipeline
+  let isBgModelReady = false;
+
+  // Estado para Real-ESRGAN
+  let esrganSession = null;
+  let isEsrganReady = false;
+  let esrganLoading = false;
+
   let currentResultBlob = null;
-  let currentStep = 'idle';
+  let currentStep = 'idle';         // idle | background_removed | upscaled | both
   let processing = false;
 
   // =====================================================================
@@ -360,34 +320,63 @@
     progressFill.style.width = `${Math.min(100, value)}%`;
   }
 
+  function enableButtons(enabled) {
+    const btns = [removeBgBtn, upscaleBtn, bothBtn];
+    btns.forEach(b => b.disabled = !enabled || !loadedImage || !isBgModelReady || processing);
+  }
+
   // =====================================================================
-  //  LOAD MODEL (BEN2)
+  //  CARGAR MODELO BEN2 (fondo)
   // =====================================================================
-  async function loadModel() {
+  async function loadBgModel() {
     try {
-      setStatus('📦 Descargando modelo BEN2-ONNX… (1-2 min primera vez)', true, 5);
+      setStatus('📦 Descargando BEN2-ONNX… (1-2 min primera vez)', true, 5);
       segmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
-      isModelReady = true;
-      setStatus('✅ Modelo listo. Sube una imagen.', false, 100);
-      if (loadedImage) enableButtons(true);
+      isBgModelReady = true;
+      setStatus('✅ BEN2 listo. Cargando Real-ESRGAN…', false, 50);
+      // Tras BEN2, cargamos ESRGAN
+      await loadEsrganModel();
     } catch (err) {
       console.error(err);
-      setStatus('❌ Error al cargar el modelo: ' + err.message, false);
+      setStatus('❌ Error al cargar BEN2: ' + err.message, false);
     }
   }
 
-  loadModel();
-
   // =====================================================================
-  //  BUTTONS STATE
+  //  CARGAR REAL-ESRGAN (super-resolución)
   // =====================================================================
-  function enableButtons(enabled) {
-    const btns = [removeBgBtn, upscaleBtn, bothBtn];
-    btns.forEach(b => b.disabled = !enabled || !loadedImage || !isModelReady || processing);
+  async function loadEsrganModel() {
+    if (esrganLoading || isEsrganReady) return;
+    esrganLoading = true;
+    try {
+      setStatus('📦 Descargando Real-ESRGAN-x4 (50 MB)… puede tardar 2-3 min', true, 55);
+      // Configurar ONNX Runtime para usar WebGL o WebGPU
+      ort.env.wasm.numThreads = 4;
+      // Cargar el modelo desde Hugging Face
+      const modelUrl = 'https://huggingface.co/onnx-community/Real-ESRGAN-x4/resolve/main/model.onnx';
+      const session = await ort.InferenceSession.create(modelUrl, {
+        executionProviders: ['webgl', 'wasm'],
+        graphOptimizationLevel: 'all',
+      });
+      esrganSession = session;
+      isEsrganReady = true;
+      esrganLoading = false;
+      setStatus('✅ Todos los modelos listos. Sube una imagen.', false, 100);
+      if (loadedImage) enableButtons(true);
+    } catch (err) {
+      console.error('Error cargando ESRGAN:', err);
+      setStatus('⚠️ Real-ESRGAN no cargado. Usa solo eliminación de fondo.', false);
+      esrganLoading = false;
+      // Aun así, habilitamos el botón de fondo
+      if (loadedImage) enableButtons(true);
+    }
   }
 
+  // Iniciar carga de modelos
+  loadBgModel();
+
   // =====================================================================
-  //  LOAD IMAGE
+  //  CARGAR IMAGEN
   // =====================================================================
   function loadImageFromFile(file) {
     if (!file || !file.type.startsWith('image/')) {
@@ -426,78 +415,79 @@
   }
 
   // =====================================================================
-  //  IMAGE PROCESSING: UPSCALE + ENHANCE
+  //  PROCESAR CON REAL-ESRGAN
   // =====================================================================
-  function processImageWithEnhancement(image, scale, sharpness, contrast) {
-    const w = image.width;
-    const h = image.height;
-    const newW = Math.round(w * scale);
-    const newH = Math.round(h * scale);
+  async function runEsrgan(imageElement) {
+    if (!isEsrganReady || !esrganSession) {
+      throw new Error('Real-ESRGAN no está listo');
+    }
 
-    // Crear canvas temporal para el escalado
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = newW;
-    tempCanvas.height = newH;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.imageSmoothingEnabled = true;
-    tempCtx.imageSmoothingQuality = 'high'; // Lanczos en navegadores modernos
-
-    // Dibujar imagen escalada
-    tempCtx.drawImage(image, 0, 0, newW, newH);
-
-    // Obtener datos de píxeles
-    const imageData = tempCtx.getImageData(0, 0, newW, newH);
+    // 1. Obtener datos de la imagen
+    const w = imageElement.width;
+    const h = imageElement.height;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(imageElement, 0, 0);
+    const imageData = ctx.getImageData(0, 0, w, h);
     const data = imageData.data;
 
-    // Aplicar contraste
-    const contrastFactor = contrast / 100;
-    const brightnessOffset = 0; // Podríamos añadir brillo
+    // 2. Convertir a tensor (RGB float32, rango 0-1)
+    // Real-ESRGAN espera entrada [1, 3, H, W] normalizada
+    const inputTensor = new Float32Array(3 * h * w);
+    let idx = 0;
     for (let i = 0; i < data.length; i += 4) {
-      data[i] = Math.min(255, Math.max(0, (data[i] - 128) * contrastFactor + 128 + brightnessOffset));
-      data[i+1] = Math.min(255, Math.max(0, (data[i+1] - 128) * contrastFactor + 128 + brightnessOffset));
-      data[i+2] = Math.min(255, Math.max(0, (data[i+2] - 128) * contrastFactor + 128 + brightnessOffset));
+      inputTensor[idx] = data[i] / 255.0;       // R
+      inputTensor[idx + w*h] = data[i+1] / 255.0; // G
+      inputTensor[idx + 2*w*h] = data[i+2] / 255.0; // B
+      idx++;
     }
-    tempCtx.putImageData(imageData, 0, 0);
 
-    // Aplicar máscara de enfoque (Unsharp Mask) si sharpness > 0
-    if (sharpness > 0) {
-      const sharpFactor = sharpness / 100;
-      // Crear una copia suavizada para el enmascaramiento
-      const blurCanvas = document.createElement('canvas');
-      blurCanvas.width = newW;
-      blurCanvas.height = newH;
-      const blurCtx = blurCanvas.getContext('2d');
-      blurCtx.filter = 'blur(2px)';
-      blurCtx.drawImage(tempCanvas, 0, 0);
-      const blurData = blurCtx.getImageData(0, 0, newW, newH);
-      const blurPixels = blurData.data;
+    const input = new ort.Tensor('float32', inputTensor, [1, 3, h, w]);
 
-      const sharpData = tempCtx.getImageData(0, 0, newW, newH);
-      const sharpPixels = sharpData.data;
+    // 3. Ejecutar inferencia
+    const feeds = { input: input };
+    const results = await esrganSession.run(feeds);
+    const output = results.output.data; // Float32Array
 
-      for (let i = 0; i < sharpPixels.length; i += 4) {
-        const r = sharpPixels[i];
-        const g = sharpPixels[i+1];
-        const b = sharpPixels[i+2];
-        const br = blurPixels[i];
-        const bg = blurPixels[i+1];
-        const bb = blurPixels[i+2];
-        sharpPixels[i] = Math.min(255, Math.max(0, r + (r - br) * sharpFactor));
-        sharpPixels[i+1] = Math.min(255, Math.max(0, g + (g - bg) * sharpFactor));
-        sharpPixels[i+2] = Math.min(255, Math.max(0, b + (b - bb) * sharpFactor));
+    // 4. Convertir salida a imagen (asumiendo [1,3,H*4,W*4])
+    const outH = h * 4;
+    const outW = w * 4;
+    const outputData = new Uint8ClampedArray(outW * outH * 4);
+
+    for (let y = 0; y < outH; y++) {
+      for (let x = 0; x < outW; x++) {
+        const idxOut = (y * outW + x) * 4;
+        const idxR = y * outW + x;
+        const idxG = y * outW + x + outH * outW;
+        const idxB = y * outW + x + 2 * outH * outW;
+        // clamp y escalar a 0-255
+        const r = Math.min(255, Math.max(0, Math.round(output[idxR] * 255)));
+        const g = Math.min(255, Math.max(0, Math.round(output[idxG] * 255)));
+        const b = Math.min(255, Math.max(0, Math.round(output[idxB] * 255)));
+        outputData[idxOut] = r;
+        outputData[idxOut+1] = g;
+        outputData[idxOut+2] = b;
+        outputData[idxOut+3] = 255; // alpha
       }
-      tempCtx.putImageData(sharpData, 0, 0);
     }
 
-    return tempCanvas;
+    const outputCanvas = document.createElement('canvas');
+    outputCanvas.width = outW;
+    outputCanvas.height = outH;
+    const outCtx = outputCanvas.getContext('2d');
+    const imageDataOut = new ImageData(outputData, outW, outH);
+    outCtx.putImageData(imageDataOut, 0, 0);
+    return outputCanvas;
   }
 
   // =====================================================================
-  //  REMOVE BACKGROUND (BEN2)
+  //  ELIMINAR FONDO (BEN2)
   // =====================================================================
   async function removeBackground() {
     if (!loadedImage || !imageUrl) { setStatus('⚠️ Primero carga una imagen.'); return; }
-    if (!isModelReady || !segmenter) { setStatus('⏳ Modelo no listo.'); return; }
+    if (!isBgModelReady || !segmenter) { setStatus('⏳ Modelo de fondo no listo.'); return; }
     if (processing) return;
     processing = true;
     enableButtons(false);
@@ -534,24 +524,23 @@
   }
 
   // =====================================================================
-  //  UPSCALE & ENHANCE
+  //  SUPER-RESOLUCIÓN (Real-ESRGAN)
   // =====================================================================
-  async function upscaleAndEnhance() {
+  async function upscaleImage() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
     if (processing) return;
+    if (!isEsrganReady) {
+      setStatus('⏳ Real-ESRGAN aún no cargado. Espera…', true);
+      return;
+    }
     processing = true;
     enableButtons(false);
     downloadBtn.disabled = true;
-    setStatus('⬆️ Mejorando calidad…', true, 20);
+    setStatus('⬆️ Aplicando super‑resolución 4x… (puede tardar 30-60s)', true, 30);
 
     try {
-      const scale = parseFloat(scaleSelect.value);
-      const sharpness = parseInt(sharpnessRange.value);
-      const contrast = parseInt(contrastRange.value);
-
-      // Usar la imagen original o la que tenga fondo eliminado?
+      // Usar la imagen original o la que ya tenga fondo eliminado
       let sourceImage = loadedImage;
-      // Si ya tenemos un resultado con fondo eliminado, usarlo como base
       if (currentStep === 'background_removed' && currentResultBlob) {
         const url = URL.createObjectURL(currentResultBlob);
         const img = await new Promise((resolve, reject) => {
@@ -564,12 +553,11 @@
         URL.revokeObjectURL(url);
       }
 
-      const enhancedCanvas = processImageWithEnhancement(sourceImage, scale, sharpness, contrast);
-      const blob = await new Promise(resolve => enhancedCanvas.toBlob(resolve, 'image/png'));
+      const upscaledCanvas = await runEsrgan(sourceImage);
+      const blob = await new Promise(resolve => upscaledCanvas.toBlob(resolve, 'image/png'));
       currentResultBlob = blob;
       currentStep = 'upscaled';
 
-      // Mostrar en canvas
       const url = URL.createObjectURL(blob);
       const img = new Image();
       img.onload = () => {
@@ -578,7 +566,7 @@
         ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
         ctxRes.drawImage(img, 0, 0);
         URL.revokeObjectURL(url);
-        setStatus(`✅ Calidad mejorada (${scale}x) + enfoque ${sharpness}%`, false, 100);
+        setStatus(`✅ Super‑resolución 4x aplicada (${img.width}x${img.height})`, false, 100);
         downloadBtn.disabled = false;
         processing = false;
         enableButtons(true);
@@ -586,18 +574,21 @@
       img.src = url;
     } catch (err) {
       console.error(err);
-      setStatus('❌ Error: ' + err.message, false);
+      setStatus('❌ Error en super‑resolución: ' + err.message, false);
       processing = false;
       enableButtons(true);
     }
   }
 
   // =====================================================================
-  //  BOTH: Fondo + Mejora
+  //  AMBOS: fondo + super-resolución
   // =====================================================================
   async function bothOperations() {
     if (!loadedImage) { setStatus('⚠️ Primero carga una imagen.'); return; }
     if (processing) return;
+    if (!isBgModelReady || !segmenter) { setStatus('⏳ Modelo de fondo no listo.'); return; }
+    if (!isEsrganReady) { setStatus('⏳ Real-ESRGAN no listo. Espera…', true); return; }
+
     processing = true;
     enableButtons(false);
     downloadBtn.disabled = true;
@@ -605,12 +596,10 @@
     try {
       // Paso 1: Eliminar fondo
       setStatus('🔄 Paso 1/2: Eliminando fondo…', true, 15);
-      if (!isModelReady || !segmenter) throw new Error('Modelo no listo');
       const bgResults = await segmenter([imageUrl]);
       const bgImg = bgResults[0];
       const bgBlob = await bgImg.toBlob();
 
-      // Cargar la imagen sin fondo
       const url1 = URL.createObjectURL(bgBlob);
       const imgNoBg = await new Promise((resolve, reject) => {
         const i = new Image();
@@ -620,14 +609,10 @@
       });
       URL.revokeObjectURL(url1);
 
-      // Paso 2: Mejorar calidad
-      setStatus('🔄 Paso 2/2: Mejorando calidad…', true, 50);
-      const scale = parseFloat(scaleSelect.value);
-      const sharpness = parseInt(sharpnessRange.value);
-      const contrast = parseInt(contrastRange.value);
-
-      const enhancedCanvas = processImageWithEnhancement(imgNoBg, scale, sharpness, contrast);
-      const finalBlob = await new Promise(resolve => enhancedCanvas.toBlob(resolve, 'image/png'));
+      // Paso 2: Super-resolución sobre la imagen sin fondo
+      setStatus('🔄 Paso 2/2: Aplicando super‑resolución 4x…', true, 50);
+      const upscaledCanvas = await runEsrgan(imgNoBg);
+      const finalBlob = await new Promise(resolve => upscaledCanvas.toBlob(resolve, 'image/png'));
       currentResultBlob = finalBlob;
       currentStep = 'both';
 
@@ -639,13 +624,12 @@
         ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
         ctxRes.drawImage(finalImg, 0, 0);
         URL.revokeObjectURL(finalUrl);
-        setStatus(`✅ Fondo eliminado + calidad mejorada (${scale}x)`, false, 100);
+        setStatus(`✅ Fondo eliminado + super‑resolución 4x (${finalImg.width}x${finalImg.height})`, false, 100);
         downloadBtn.disabled = false;
         processing = false;
         enableButtons(true);
       };
       finalImg.src = finalUrl;
-
     } catch (err) {
       console.error(err);
       setStatus('❌ Error: ' + err.message, false);
@@ -689,7 +673,7 @@
   }
 
   // =====================================================================
-  //  EVENTS
+  //  EVENTOS
   // =====================================================================
   dropZone.addEventListener('click', () => fileInput.click());
   dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
@@ -705,19 +689,15 @@
   });
 
   removeBgBtn.addEventListener('click', removeBackground);
-  upscaleBtn.addEventListener('click', upscaleAndEnhance);
+  upscaleBtn.addEventListener('click', upscaleImage);
   bothBtn.addEventListener('click', bothOperations);
   downloadBtn.addEventListener('click', downloadResult);
   resetBtn.addEventListener('click', resetApp);
 
-  // Sliders
-  sharpnessRange.addEventListener('input', () => sharpnessValue.textContent = sharpnessRange.value + '%');
-  contrastRange.addEventListener('input', () => contrastValue.textContent = contrastRange.value + '%');
-
   // =====================================================================
-  //  INIT
+  //  INICIO
   // =====================================================================
-  setStatus('⏳ Cargando modelos…', true);
+  setStatus('⏳ Cargando modelos… (BEN2 + Real-ESRGAN)', true);
   enableButtons(false);
 </script>
 </body>
