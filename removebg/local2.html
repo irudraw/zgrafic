@@ -1,399 +1,394 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Eliminar Fondo Local</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eliminar Fondo – BEN2 (Transformers.js)</title>
 
-    <!-- Cargar MediaPipe Selfie Segmentation desde UNPKG (versión 0.8.1) -->
-    <script src="https://unpkg.com/@mediapipe/selfie_segmentation@0.8.1/selfie_segmentation.js"
-            crossorigin="anonymous">
-    </script>
+  <!-- Import Map para Transformers.js (v3.4.0 o superior) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@huggingface/transformers": "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0/dist/transformers.js"
+    }
+  }
+  </script>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 950px;
-            width: 100%;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            text-align: center;
-        }
-        h1 {
-            margin-top: 0;
-            color: #1a1a2e;
-        }
-        .upload-area {
-            border: 2px dashed #bbb;
-            border-radius: 12px;
-            padding: 30px;
-            margin: 20px 0;
-            cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
-            background: #fafafa;
-        }
-        .upload-area:hover {
-            background: #f0f4ff;
-            border-color: #1a73e8;
-        }
-        .upload-area.dragover {
-            background: #e8f0fe;
-            border-color: #1a73e8;
-        }
-        .upload-area input {
-            display: none;
-        }
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        .controls button {
-            background: #1a73e8;
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .controls button:disabled {
-            background: #aaa;
-            cursor: not-allowed;
-        }
-        .controls button:hover:not(:disabled) {
-            background: #1558b0;
-        }
-        .controls .download-btn {
-            background: #34a853;
-        }
-        .controls .download-btn:hover:not(:disabled) {
-            background: #2d8e47;
-        }
-        .status {
-            margin: 12px 0;
-            font-weight: 500;
-            color: #1a1a2e;
-            min-height: 1.8em;
-        }
-        .canvas-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .canvas-box {
-            flex: 1 1 280px;
-            background: repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            min-height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .canvas-box canvas {
-            display: block;
-            max-width: 100%;
-            max-height: 500px;
-            width: auto;
-            height: auto;
-        }
-        .info {
-            margin-top: 15px;
-            color: #555;
-            font-size: 14px;
-        }
-        .footer {
-            margin-top: 25px;
-            font-size: 13px;
-            color: #888;
-        }
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #1a73e8;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 1000px;
+      width: 100%;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      margin-top: 0;
+      color: #1e293b;
+      font-weight: 700;
+      font-size: 2rem;
+    }
+    .sub {
+      color: #64748b;
+      margin-bottom: 25px;
+    }
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 40px 20px;
+      margin: 20px 0;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      background: #f8fafc;
+    }
+    .drop-zone:hover {
+      background: #f1f5f9;
+      border-color: #3b82f6;
+    }
+    .drop-zone.dragover {
+      background: #dbeafe;
+      border-color: #2563eb;
+    }
+    .drop-zone p {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #334155;
+    }
+    .drop-zone small {
+      color: #94a3b8;
+    }
+    .drop-zone input {
+      display: none;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .controls button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .controls button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .controls button:hover:not(:disabled) {
+      background: #2563eb;
+    }
+    .controls .download {
+      background: #22c55e;
+    }
+    .controls .download:hover:not(:disabled) {
+      background: #16a34a;
+    }
+    .status {
+      margin: 15px 0;
+      font-weight: 500;
+      color: #1e293b;
+      min-height: 2em;
+    }
+    .status .loader {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .canvas-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .canvas-box {
+      flex: 1 1 280px;
+      background: repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .canvas-box canvas {
+      max-width: 100%;
+      max-height: 500px;
+      display: block;
+    }
+    .info {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+    .info a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    .info a:hover {
+      text-decoration: underline;
+    }
+    .footer {
+      margin-top: 25px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>🧹 Eliminar Fondo</h1>
+    <p class="sub">Modelo <strong>BEN2‑ONNX</strong> · 100% local · sin subir imágenes</p>
 
-<div class="container">
-    <h1>🖼️ Eliminar Fondo (Local)</h1>
-    <p>Sube una foto con una <strong>persona</strong> y la IA eliminará el fondo sin enviar datos a internet.</p>
-
-    <div class="upload-area" id="uploadArea">
-        <p>📤 Haz clic o arrastra una imagen aquí</p>
-        <input type="file" id="fileInput" accept="image/*" />
+    <!-- Zona de arrastre -->
+    <div class="drop-zone" id="dropZone">
+      <p>📤 Arrastra una imagen o haz clic para seleccionar</p>
+      <small>JPG, PNG, WebP</small>
+      <input type="file" id="fileInput" accept="image/*" />
     </div>
 
+    <!-- Botones -->
     <div class="controls">
-        <button id="processBtn" disabled>🚀 Eliminar fondo</button>
-        <button id="downloadBtn" class="download-btn" disabled>⬇️ Descargar PNG</button>
+      <button id="processBtn" disabled>🚀 Eliminar fondo</button>
+      <button id="downloadBtn" class="download" disabled>⬇️ Descargar PNG</button>
     </div>
 
-    <div id="status" class="status">⏳ Cargando modelo...</div>
+    <!-- Estado -->
+    <div id="status" class="status">⏳ Cargando modelo…</div>
 
+    <!-- Canvas -->
     <div class="canvas-wrapper">
-        <div class="canvas-box">
-            <canvas id="originalCanvas"></canvas>
-        </div>
-        <div class="canvas-box">
-            <canvas id="resultCanvas"></canvas>
-        </div>
+      <div class="canvas-box">
+        <canvas id="originalCanvas"></canvas>
+      </div>
+      <div class="canvas-box">
+        <canvas id="resultCanvas"></canvas>
+      </div>
     </div>
 
     <div class="info">
-        ⚡ Procesamiento completamente local usando <strong>MediaPipe Selfie Segmentation</strong>.
-        <br /> Modelo: <em>selfie_segmentation (versión 0.8.1)</em>
+      ⚡ Usa <a href="https://huggingface.co/onnx-community/BEN2-ONNX" target="_blank">BEN2‑ONNX</a> vía <a href="https://huggingface.co/docs/transformers.js" target="_blank">Transformers.js</a>
     </div>
-    <div class="footer">
-        Hecho para GitHub Pages · Código 100% local · Sin subida de datos
-    </div>
-</div>
+    <div class="footer">Hecho para GitHub Pages · Código abierto</div>
+  </div>
 
-<script>
-    (function() {
-        // ----- Elementos DOM -----
-        const fileInput = document.getElementById('fileInput');
-        const uploadArea = document.getElementById('uploadArea');
-        const processBtn = document.getElementById('processBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const statusDiv = document.getElementById('status');
-        const originalCanvas = document.getElementById('originalCanvas');
-        const resultCanvas = document.getElementById('resultCanvas');
-        const ctxOrig = originalCanvas.getContext('2d');
-        const ctxRes = resultCanvas.getContext('2d');
+  <!-- ====== CÓDIGO PRINCIPAL (módulo ES) ====== -->
+  <script type="module">
+    // ----- Importar Transformers.js -----
+    import { pipeline } from '@huggingface/transformers';
 
-        let loadedImage = null;          // Imagen cargada (HTMLImageElement)
-        let segmenter = null;            // Instancia de SelfieSegmentation
-        let isModelReady = false;
+    // ----- Referencias DOM -----
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const processBtn = document.getElementById('processBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusDiv = document.getElementById('status');
+    const originalCanvas = document.getElementById('originalCanvas');
+    const resultCanvas = document.getElementById('resultCanvas');
+    const ctxOrig = originalCanvas.getContext('2d');
+    const ctxRes = resultCanvas.getContext('2d');
 
-        // ----- Configurar MediaPipe Selfie Segmentation -----
-        function setupSegmenter() {
-            // Verificar que la librería se cargó
-            if (typeof SelfieSegmentation === 'undefined') {
-                statusDiv.textContent = '❌ Error: No se pudo cargar la librería. Revisa la conexión.';
-                return;
-            }
+    // ----- Estado -----
+    let loadedImage = null;      // HTMLImageElement
+    let imageUrl = null;        // URL para el pipeline
+    let segmenter = null;       // pipeline cargado
+    let isModelReady = false;
+    let currentResult = null;   // Imagen resultante (para descargar)
 
-            // Configurar locateFile para que use la misma versión desde UNPKG
-            SelfieSegmentation.prototype.locateFile = function(file) {
-                return `https://unpkg.com/@mediapipe/selfie_segmentation@0.8.1/${file}`;
-            };
+    // ----- Función para actualizar estado -----
+    function setStatus(msg, isLoading = false) {
+      if (isLoading) {
+        statusDiv.innerHTML = `<span class="loader"></span> ${msg}`;
+      } else {
+        statusDiv.textContent = msg;
+      }
+    }
 
-            segmenter = new SelfieSegmentation({
-                modelSelection: 1, // 1 = Selfie (personas), 0 = General
-            });
+    // ----- Cargar el modelo (solo una vez) -----
+    async function loadModel() {
+      try {
+        setStatus('📦 Descargando modelo BEN2-ONNX… (puede tardar 1-2 min la primera vez)', true);
+        segmenter = await pipeline('background-removal', 'onnx-community/BEN2-ONNX');
+        isModelReady = true;
+        setStatus('✅ Modelo listo. Sube una imagen.');
+        if (loadedImage) processBtn.disabled = false;
+      } catch (err) {
+        console.error(err);
+        setStatus('❌ Error al cargar el modelo. Revisa consola.');
+      }
+    }
 
-            // Evento cuando el modelo termina de cargar
-            segmenter.onResults((results) => {
-                // results.segmentationMask es un ImageData
-                if (results.segmentationMask) {
-                    applyMask(results.segmentationMask);
-                    statusDiv.textContent = '✅ Fondo eliminado correctamente';
-                    downloadBtn.disabled = false;
-                    processBtn.disabled = false;
-                } else {
-                    statusDiv.textContent = '⚠️ No se detectó ningún sujeto. Prueba otra imagen.';
-                    processBtn.disabled = false;
-                }
-            });
+    // Llamar a la carga del modelo al iniciar
+    loadModel();
 
-            // Inicializar el modelo
-            segmenter.initialize().then(() => {
-                isModelReady = true;
-                statusDiv.textContent = '✅ Modelo listo. Sube una imagen.';
-                if (loadedImage) {
-                    processBtn.disabled = false;
-                }
-            }).catch((err) => {
-                console.error(err);
-                statusDiv.textContent = '❌ Error al cargar el modelo. Revisa la consola.';
-            });
-        }
+    // ----- Cargar imagen desde archivo -----
+    function loadImageFromFile(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        alert('Por favor, selecciona una imagen (JPG, PNG, WebP).');
+        return;
+      }
 
-        // ----- Aplicar máscara al canvas de resultado -----
-        function applyMask(maskData) {
-            if (!loadedImage) return;
-            const w = loadedImage.width;
-            const h = loadedImage.height;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          loadedImage = img;
+          // Liberar URL anterior si existía
+          if (imageUrl) URL.revokeObjectURL(imageUrl);
+          imageUrl = URL.createObjectURL(file);  // para el pipeline
 
-            // Dibujar la imagen original en un canvas temporal
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = w;
-            tempCanvas.height = h;
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCtx.drawImage(loadedImage, 0, 0);
-            const imageData = tempCtx.getImageData(0, 0, w, h);
-            const data = imageData.data;
-            const mask = maskData.data; // Uint8ClampedArray
+          // Mostrar en canvas original
+          originalCanvas.width = img.width;
+          originalCanvas.height = img.height;
+          ctxOrig.drawImage(img, 0, 0);
 
-            // Recorrer píxeles y usar el canal rojo de la máscara como alpha
-            for (let i = 0; i < data.length; i += 4) {
-                const alpha = mask[i]; // canal R (0-255)
-                data[i + 3] = alpha;   // asignar alpha
-            }
+          // Limpiar resultado
+          resultCanvas.width = img.width;
+          resultCanvas.height = img.height;
+          ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+          currentResult = null;
+          downloadBtn.disabled = true;
 
-            // Dibujar en el canvas de resultado
-            ctxRes.clearRect(0, 0, w, h);
-            ctxRes.putImageData(imageData, 0, 0);
-        }
+          setStatus('📷 Imagen cargada. Haz clic en "Eliminar fondo".');
+          if (isModelReady) processBtn.disabled = false;
+          else processBtn.disabled = true;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
 
-        // ----- Procesar la imagen -----
-        function processImage() {
-            if (!loadedImage) {
-                statusDiv.textContent = 'Primero carga una imagen.';
-                return;
-            }
-            if (!isModelReady) {
-                statusDiv.textContent = 'El modelo aún no está listo. Espera...';
-                return;
-            }
+    // ----- Procesar imagen (eliminar fondo) -----
+    async function processImage() {
+      if (!loadedImage || !imageUrl) {
+        setStatus('⚠️ Primero carga una imagen.');
+        return;
+      }
+      if (!isModelReady || !segmenter) {
+        setStatus('⏳ Modelo no está listo aún. Espera…');
+        return;
+      }
 
-            statusDiv.innerHTML = '<span class="loader"></span> Procesando...';
-            processBtn.disabled = true;
-            downloadBtn.disabled = true;
+      // Deshabilitar botones durante el procesamiento
+      processBtn.disabled = true;
+      downloadBtn.disabled = true;
+      setStatus('🔄 Procesando… (puede tomar unos segundos)', true);
 
-            try {
-                segmenter.send({ image: loadedImage });
-            } catch (err) {
-                console.error(err);
-                statusDiv.textContent = '❌ Error al enviar la imagen. Intenta de nuevo.';
-                processBtn.disabled = false;
-            }
-        }
+      try {
+        // El pipeline espera un array de entradas (una imagen)
+        const results = await segmenter([imageUrl]);
+        // results[0] es un objeto "Image" (similar a un canvas)
+        const resultImg = results[0];
 
-        // ----- Descargar resultado -----
-        function downloadResult() {
-            if (!resultCanvas) return;
-            const link = document.createElement('a');
-            link.download = 'sin_fondo.png';
-            link.href = resultCanvas.toDataURL('image/png');
-            link.click();
-        }
+        // Guardar referencia para descarga
+        currentResult = resultImg;
 
-        // ----- Cargar imagen desde archivo -----
-        function loadImageFromFile(file) {
-            if (!file || !file.type.startsWith('image/')) {
-                alert('Por favor, selecciona un archivo de imagen.');
-                return;
-            }
+        // Dibujar en el canvas de resultado (fondo transparente)
+        const w = loadedImage.width;
+        const h = loadedImage.height;
+        resultCanvas.width = w;
+        resultCanvas.height = h;
+        // El método toCanvas() dibuja la imagen con transparencia
+        resultImg.toCanvas(resultCanvas);
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    loadedImage = img;
-                    // Mostrar en canvas original
-                    originalCanvas.width = img.width;
-                    originalCanvas.height = img.height;
-                    ctxOrig.drawImage(img, 0, 0);
-                    // Limpiar resultado
-                    resultCanvas.width = img.width;
-                    resultCanvas.height = img.height;
-                    ctxRes.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-                    statusDiv.textContent = 'Imagen cargada. Haz clic en "Eliminar fondo".';
-                    processBtn.disabled = !isModelReady;
-                    downloadBtn.disabled = true;
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
+        setStatus('✅ Fondo eliminado correctamente');
+        downloadBtn.disabled = false;
+        processBtn.disabled = false;
 
-        // ----- Eventos UI -----
+      } catch (err) {
+        console.error(err);
+        setStatus('❌ Error al procesar. Revisa consola.');
+        processBtn.disabled = false;
+        downloadBtn.disabled = true;
+      }
+    }
 
-        // Clic en el área -> abrir selector de archivos
-        uploadArea.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'INPUT') {
-                fileInput.click();
-            }
-        });
+    // ----- Descargar resultado -----
+    function downloadResult() {
+      if (!currentResult) {
+        alert('No hay resultado para descargar.');
+        return;
+      }
+      // Convertir a Blob y descargar
+      currentResult.toBlob((blob) => {
+        const link = document.createElement('a');
+        link.download = 'sin_fondo.png';
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+      });
+    }
 
-        // Arrastrar y soltar
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
+    // ----- EVENTOS UI -----
 
-        uploadArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-        });
+    // Clic en la zona de arrastre
+    dropZone.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'INPUT') fileInput.click();
+    });
 
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                loadImageFromFile(files[0]);
-            }
-        });
+    // Arrastrar y soltar
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) loadImageFromFile(files[0]);
+    });
 
-        // Input file
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                loadImageFromFile(e.target.files[0]);
-            }
-            // Resetear para que se pueda seleccionar el mismo archivo de nuevo
-            fileInput.value = '';
-        });
+    // Input file (cuando se selecciona manualmente)
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        loadImageFromFile(e.target.files[0]);
+      }
+      fileInput.value = ''; // para poder repetir el mismo archivo
+    });
 
-        // Botones
-        processBtn.addEventListener('click', processImage);
-        downloadBtn.addEventListener('click', downloadResult);
+    // Botones
+    processBtn.addEventListener('click', processImage);
+    downloadBtn.addEventListener('click', downloadResult);
 
-        // ----- Inicializar el segmentador al cargar la página -----
-        // Esperar a que el script de MediaPipe esté cargado
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            setupSegmenter();
-        } else {
-            document.addEventListener('DOMContentLoaded', setupSegmenter);
-        }
+    // ----- Inicialización: si el modelo ya está cargado, habilitar botón -----
+    // (ya se maneja en loadModel y loadImageFromFile)
 
-        // También si el script se carga de forma asíncrona, podemos intentar de nuevo después
-        // (pero con la etiqueta script normal debería estar listo al ejecutarse este script)
-        // En caso de que no, ponemos un timeout para reintentar
-        setTimeout(() => {
-            if (typeof SelfieSegmentation === 'undefined') {
-                statusDiv.textContent = '❌ La librería no se cargó. Intenta recargar la página.';
-            }
-        }, 5000);
-
-    })();
-</script>
+  </script>
 </body>
 </html>
