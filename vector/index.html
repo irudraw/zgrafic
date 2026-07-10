@@ -460,9 +460,14 @@
       fd.append('remove_bg', state.removeBg ? 'true' : 'false');
 
       const res = await fetch(SERVER_URL + '/vectorize', { method:'POST', body: fd });
-      if(!res.ok) throw new Error('Servidor respondió '+res.status);
-      const svgText = await res.text();
-      if(!svgText.trim().startsWith('<svg')) throw new Error('Respuesta inválida del servidor');
+      const raw = await res.text();
+      if(!res.ok){
+        let detail = raw;
+        try{ detail = JSON.parse(raw).error || raw; }catch(e){}
+        throw new Error('Servidor respondió '+res.status+': '+detail);
+      }
+      if(!raw.trim().startsWith('<svg')) throw new Error('Respuesta inesperada del servidor: '+raw.slice(0,200));
+      const svgText = raw;
 
       latestSVG = svgText;
       afterLayer.innerHTML = svgText;
@@ -479,7 +484,7 @@
       downloadSvgBtn.disabled = false; downloadPngBtn.disabled = false; copyBtn.disabled = false;
     }catch(err){
       console.error(err);
-      statusText.textContent = 'No se pudo conectar con el servidor de IA. Revisá SERVER_URL o probá de nuevo en unos segundos.';
+      statusText.textContent = 'Error: ' + (err.message || 'no se pudo conectar con el servidor de IA') + '. Probá de nuevo en unos segundos.';
     }finally{
       proBtn.disabled = false;
       proBtn.textContent = prevLabel;
