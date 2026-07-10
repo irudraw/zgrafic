@@ -200,15 +200,8 @@
             <input type="range" id="noiseSlider" min="0" max="30" step="1" value="8" />
           </div>
           <div class="toggle-row">
-            <span class="t-label">Quitar fondo (transparencia)</span>
+            <span class="t-label">Quitar fondo (transparencia, con IA)</span>
             <label class="switch"><input type="checkbox" id="bgToggle" /><span class="slider-pill"></span></label>
-          </div>
-          <div class="box" style="margin-top:0;">
-            <label>Resolución de proceso</label>
-            <div class="opt-row" id="resOptions">
-              <button type="button" class="opt-btn active" data-res="700">Rápida<span>ideal para previsualizar</span></button>
-              <button type="button" class="opt-btn" data-res="1300">Alta calidad<span>más nodos, más lenta</span></button>
-            </div>
           </div>
         </div>
       </div>
@@ -236,10 +229,10 @@
 
       <div class="pro-card">
         <div class="pro-card-text">
-          <b>Modo IA PRO ✨</b>
-          <span>Recorta el fondo con un modelo de segmentación real y genera un trazado más limpio. Corre en un servidor propio (Hugging Face) — puede tardar unos segundos.</span>
+          <b>Motor de IA ✨</b>
+          <span>Cada vectorización se procesa en un servidor propio: recorta el fondo con un modelo de segmentación real y genera el trazado. Puede tardar unos segundos (más si el servidor estaba dormido).</span>
         </div>
-        <button class="primary" id="proBtn">Vectorizar con IA</button>
+        <button class="primary" id="proBtn">Vectorizar de nuevo</button>
       </div>
 
       <div class="actions">
@@ -256,7 +249,6 @@
     </footer>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.js"></script>
 <script type="module">
   // Reemplazá esta URL por la de tu Space de Hugging Face una vez desplegado.
   const SERVER_URL = 'https://conector-pndu.onrender.com';
@@ -265,7 +257,6 @@
   const fileInput = document.getElementById('fileInput');
   const presetOptions = document.getElementById('presetOptions');
   const curveOptions = document.getElementById('curveOptions');
-  const resOptions = document.getElementById('resOptions');
   const advancedToggle = document.getElementById('advancedToggle');
   const advancedPanel = document.getElementById('advancedPanel');
   const colorsRow = document.getElementById('colorsRow');
@@ -300,8 +291,7 @@
     detail: 6,
     curve: 'sharp',
     noise: 8,
-    removeBg: false,
-    res: 700
+    removeBg: false
   };
   let sourceImg = null;      // HTMLImageElement of the uploaded file
   let currentFile = null;
@@ -341,13 +331,6 @@
     scheduleTrace();
   });
 
-  resOptions.addEventListener('click', e=>{
-    const btn = e.target.closest('.opt-btn'); if(!btn) return;
-    state.res = Number(btn.dataset.res);
-    setActive(resOptions,'res',String(state.res));
-    scheduleTrace();
-  });
-
   colorsSlider.addEventListener('input', ()=>{ state.colors = Number(colorsSlider.value); colorsVal.textContent = state.colors; scheduleTrace(); });
   detailSlider.addEventListener('input', ()=>{ state.detail = Number(detailSlider.value); detailVal.textContent = state.detail; scheduleTrace(); });
   noiseSlider.addEventListener('input', ()=>{ state.noise = Number(noiseSlider.value); noiseVal.textContent = state.noise; scheduleTrace(); });
@@ -378,11 +361,6 @@
     if(!file.type.startsWith('image/')) return;
     currentFile = file;
 
-    if(typeof ImageTracer === 'undefined'){
-      alert('No se pudo cargar el motor de vectorización (revisá tu conexión a internet) y volvé a intentar.');
-      return;
-    }
-
     stage.classList.add('show');
     statusLine.classList.remove('done');
     statusText.textContent = 'Cargando imagen…';
@@ -392,8 +370,17 @@
     const img = new Image();
     await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=url; });
     sourceImg = img;
+
+    // Preview local liviano (solo para mostrar el "antes" mientras la IA procesa el "después").
+    const {canvas, w, h} = getWorkingCanvas(800);
+    workW = w; workH = h;
+    beforeImg.src = canvas.toDataURL('image/png');
+    compare.style.setProperty('--stage-w', w+'px');
+    compare.querySelector('.stage-box').style.aspectRatio = w+' / '+h;
+    syncBeforeWidth();
+
     resetZoom();
-    runTrace();
+    runPro();
   }
 
   function getWorkingCanvas(maxDim){
@@ -407,133 +394,11 @@
     return {canvas:c, ctx, w, h};
   }
 
-  function toGrayscale(d){
-    for(let i=0;i<d.length;i+=4){
-      const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
-      d[i]=d[i+1]=d[i+2]=g;
-    }
-  }
-
-  function toSilhouette(d){
-    let sum=0, n=0;
-    for(let i=0;i<d.length;i+=16){ sum += 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; n++; }
-    const threshold = n ? sum/n : 128;
-    for(let i=0;i<d.length;i+=4){
-      const g = 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-      if(g < threshold){ d[i]=0; d[i+1]=0; d[i+2]=0; d[i+3]=255; }
-      else { d[i]=255; d[i+1]=255; d[i+2]=255; d[i+3]=0; }
-    }
-  }
-
-  function removeBackground(imgData, w, h, threshold){
-    const data = imgData.data;
-    const visited = new Uint8Array(w*h);
-    const stack = [];
-    const idx = (x,y)=>y*w+x;
-    const corners = [[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
-    let rr=0,gg=0,bb=0;
-    corners.forEach(([x,y])=>{ const p=idx(x,y)*4; rr+=data[p]/4; gg+=data[p+1]/4; bb+=data[p+2]/4; });
-
-    function tryPush(x,y){
-      if(x<0||y<0||x>=w||y>=h) return;
-      const i = idx(x,y);
-      if(visited[i]) return;
-      const p = i*4;
-      const dr=data[p]-rr, dg=data[p+1]-gg, db=data[p+2]-bb;
-      if(dr*dr+dg*dg+db*db <= threshold*threshold){
-        visited[i]=1; stack.push(x,y);
-      }
-    }
-    const seeds = [[0,0],[w-1,0],[0,h-1],[w-1,h-1],[Math.floor(w/2),0],[Math.floor(w/2),h-1],[0,Math.floor(h/2)],[w-1,Math.floor(h/2)]];
-    seeds.forEach(([x,y])=>tryPush(x,y));
-    while(stack.length){
-      const y = stack.pop(), x = stack.pop();
-      data[idx(x,y)*4+3] = 0;
-      tryPush(x+1,y); tryPush(x-1,y); tryPush(x,y+1); tryPush(x,y-1);
-    }
-  }
-
-  function mapRange(v, inMin, inMax, outMin, outMax){
-    const t = (v - inMin) / (inMax - inMin);
-    return outMin + t * (outMax - outMin);
-  }
-
-  function buildOptions(){
-    const ltres = mapRange(state.detail, 1, 10, 2.6, 0.15);
-    const qtres = mapRange(state.detail, 1, 10, 2.6, 0.15);
-    const opts = {
-      ltres, qtres,
-      pathomit: state.noise,
-      rightangleenhance: state.curve === 'sharp',
-      linefilter: state.curve === 'sharp',
-      roundcoords: 1,
-      scale: 1,
-      strokewidth: 0,
-      viewbox: true,
-      colorquantcycles: 3
-    };
-    if(state.preset === 'outline'){
-      opts.numberofcolors = 2;
-      opts.colorsampling = 0;
-      opts.mincolorratio = 0;
-    } else {
-      opts.numberofcolors = state.colors;
-      opts.colorsampling = 2;
-      opts.mincolorratio = 0.015;
-    }
-    return opts;
-  }
-
   let traceTimer = null;
   function scheduleTrace(){
     if(!sourceImg) return;
     clearTimeout(traceTimer);
-    traceTimer = setTimeout(runTrace, 260);
-  }
-
-  function runTrace(){
-    if(!sourceImg) return;
-    statusLine.classList.remove('done');
-    statusText.textContent = 'Vectorizando…';
-    downloadSvgBtn.disabled = true; downloadPngBtn.disabled = true; copyBtn.disabled = true;
-
-    setTimeout(()=>{
-      try{
-        const {canvas, ctx, w, h} = getWorkingCanvas(state.res);
-        workW = w; workH = h;
-        const imgData = ctx.getImageData(0,0,w,h);
-
-        if(state.preset === 'sketch') toGrayscale(imgData.data);
-        if(state.preset === 'outline') toSilhouette(imgData.data);
-        if(state.removeBg && state.preset !== 'outline') removeBackground(imgData, w, h, 34);
-
-        const opts = buildOptions();
-        const svgstring = ImageTracer.imagedataToSVG(imgData, opts);
-        latestSVG = svgstring;
-
-        afterLayer.innerHTML = svgstring;
-        rightBadge.textContent = 'VECTOR';
-        beforeImg.src = canvas.toDataURL('image/png');
-        compare.style.setProperty('--stage-w', w+'px');
-
-        const compareRect = compare.getBoundingClientRect();
-        compare.querySelector('.stage-box').style.aspectRatio = w+' / '+h;
-        syncBeforeWidth();
-
-        const colorsUsed = new Set((svgstring.match(/fill="[^"]+"/g)||[])).size;
-        const pathCount = (svgstring.match(/<path /g)||[]).length;
-        const svgKB = (new Blob([svgstring]).size/1024).toFixed(1);
-        const origKB = currentFile ? (currentFile.size/1024).toFixed(1) : '—';
-        statsLine.innerHTML = `<span><b>${pathCount}</b> trazados</span><span><b>${colorsUsed}</b> colores</span><span>SVG <b>${svgKB} KB</b> · original <b>${origKB} KB</b></span>`;
-
-        statusText.textContent = 'Listo';
-        statusLine.classList.add('done');
-        downloadSvgBtn.disabled = false; downloadPngBtn.disabled = false; copyBtn.disabled = false;
-      }catch(err){
-        console.error(err);
-        statusText.textContent = 'No se pudo vectorizar esta imagen. Probá con otros ajustes.';
-      }
-    }, 20);
+    traceTimer = setTimeout(runPro, 260);
   }
 
   downloadSvgBtn.addEventListener('click', ()=>{
@@ -601,7 +466,7 @@
 
       latestSVG = svgText;
       afterLayer.innerHTML = svgText;
-      rightBadge.textContent = 'VECTOR · IA PRO';
+      rightBadge.textContent = 'VECTOR (IA)';
 
       const colorsUsed = new Set((svgText.match(/fill="[^"]+"/g)||[])).size;
       const pathCount = (svgText.match(/<path /g)||[]).length;
@@ -609,7 +474,7 @@
       const origKB = currentFile ? (currentFile.size/1024).toFixed(1) : '—';
       statsLine.innerHTML = `<span><b>${pathCount}</b> trazados</span><span><b>${colorsUsed}</b> colores</span><span>SVG <b>${svgKB} KB</b> · original <b>${origKB} KB</b> · IA (rembg + vtracer)</span>`;
 
-      statusText.textContent = 'Listo — resultado IA PRO';
+      statusText.textContent = 'Listo';
       statusLine.classList.add('done');
       downloadSvgBtn.disabled = false; downloadPngBtn.disabled = false; copyBtn.disabled = false;
     }catch(err){
