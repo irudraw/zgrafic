@@ -152,7 +152,7 @@
     </header>
 
     <h1>Convierte fotos en<br/><span class="accent">vectores nítidos.</span></h1>
-    <p class="lede">Subí una imagen y obtené un <b>SVG editable</b> — curvas, colores y contornos calculados al instante. Sin subir nada a un servidor, sin esperas, sin límites.</p>
+    <p class="lede">Subí una imagen. La IA la analiza, decide sola cómo vectorizarla y te devuelve un <b>SVG editable</b> — sin ajustes que tocar.</p>
 
     <div id="dropzone">
       <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" />
@@ -161,50 +161,6 @@
       </div>
       <div class="drop-title">Soltá una imagen aquí</div>
       <div class="drop-sub">o <span class="accent">hacé clic para elegir un archivo</span> — JPG, PNG o WEBP</div>
-    </div>
-
-    <div class="box" id="presetBox">
-      <label>Estilo de vectorización</label>
-      <div class="opt-row" id="presetOptions">
-        <button type="button" class="opt-btn active" data-preset="illustration">Ilustración<span>pocos colores, bordes limpios</span></button>
-        <button type="button" class="opt-btn" data-preset="photo">Foto realista<span>muchos colores, curvas suaves</span></button>
-        <button type="button" class="opt-btn" data-preset="sketch">Boceto<span>escala de grises posterizada</span></button>
-        <button type="button" class="opt-btn" data-preset="outline">Solo contorno<span>silueta, fondo transparente</span></button>
-      </div>
-    </div>
-
-    <div class="box">
-      <button class="advanced-toggle" id="advancedToggle" type="button">
-        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 1 L8 5 L2 9" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
-        Ajustes finos
-      </button>
-      <div id="advancedPanel">
-        <div class="inner">
-          <div class="slider-row" id="colorsRow">
-            <div class="head"><span>Colores</span><b id="colorsVal">8</b></div>
-            <input type="range" id="colorsSlider" min="2" max="64" step="1" value="8" />
-          </div>
-          <div class="slider-row">
-            <div class="head"><span>Nivel de detalle</span><b id="detailVal">6</b></div>
-            <input type="range" id="detailSlider" min="1" max="10" step="1" value="6" />
-          </div>
-          <div class="box" style="margin-top:0;">
-            <label>Estilo de curva</label>
-            <div class="opt-row" id="curveOptions">
-              <button type="button" class="opt-btn active" data-curve="sharp">Anguloso<span>ángulos rectos marcados</span></button>
-              <button type="button" class="opt-btn" data-curve="curvy">Curvo<span>líneas fluidas tipo Bézier</span></button>
-            </div>
-          </div>
-          <div class="slider-row">
-            <div class="head"><span>Reducir ruido / manchas</span><b id="noiseVal">8</b></div>
-            <input type="range" id="noiseSlider" min="0" max="30" step="1" value="8" />
-          </div>
-          <div class="toggle-row">
-            <span class="t-label">Quitar fondo (transparencia, con IA)</span>
-            <label class="switch"><input type="checkbox" id="bgToggle" /><span class="slider-pill"></span></label>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div id="stage">
@@ -230,9 +186,9 @@
       <div class="pro-card">
         <div class="pro-card-text">
           <b>Motor de IA ✨</b>
-          <span>Cada vectorización se procesa en un servidor propio: recorta el fondo con un modelo de segmentación real y genera el trazado. Puede tardar unos segundos (más si el servidor estaba dormido).</span>
+          <span>La IA analiza tu imagen y elige sola los mejores ajustes (colores, nivel de detalle, si conviene recortar el fondo) — no hay controles que tocar. Puede tardar unos segundos, más si el servidor estaba dormido.</span>
         </div>
-        <button class="primary" id="proBtn">Vectorizar de nuevo</button>
+        <button class="primary" id="proBtn">Reintentar</button>
       </div>
 
       <div class="actions">
@@ -255,18 +211,6 @@
 
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
-  const presetOptions = document.getElementById('presetOptions');
-  const curveOptions = document.getElementById('curveOptions');
-  const advancedToggle = document.getElementById('advancedToggle');
-  const advancedPanel = document.getElementById('advancedPanel');
-  const colorsRow = document.getElementById('colorsRow');
-  const colorsSlider = document.getElementById('colorsSlider');
-  const colorsVal = document.getElementById('colorsVal');
-  const detailSlider = document.getElementById('detailSlider');
-  const detailVal = document.getElementById('detailVal');
-  const noiseSlider = document.getElementById('noiseSlider');
-  const noiseVal = document.getElementById('noiseVal');
-  const bgToggle = document.getElementById('bgToggle');
 
   const stage = document.getElementById('stage');
   const statusLine = document.getElementById('statusLine');
@@ -285,61 +229,10 @@
   const proBtn = document.getElementById('proBtn');
   const rightBadge = document.querySelector('.badge.right');
 
-  let state = {
-    preset: 'illustration',
-    colors: 8,
-    detail: 6,
-    curve: 'sharp',
-    noise: 8,
-    removeBg: false
-  };
   let sourceImg = null;      // HTMLImageElement of the uploaded file
   let currentFile = null;
   let latestSVG = null;
   let workW = 0, workH = 0;
-
-  const PRESET_DEFAULTS = {
-    illustration: { colors: 8,  detail: 6, curve: 'sharp', noise: 8 },
-    photo:        { colors: 32, detail: 7, curve: 'curvy', noise: 4 },
-    sketch:       { colors: 5,  detail: 5, curve: 'curvy', noise: 6 },
-    outline:      { colors: 2,  detail: 6, curve: 'sharp', noise: 10 }
-  };
-
-  function setActive(container, selector, value){
-    container.querySelectorAll('.opt-btn').forEach(b=>b.classList.toggle('active', b.dataset[selector]===value));
-  }
-
-  presetOptions.addEventListener('click', e=>{
-    const btn = e.target.closest('.opt-btn'); if(!btn) return;
-    state.preset = btn.dataset.preset;
-    setActive(presetOptions,'preset',state.preset);
-    const d = PRESET_DEFAULTS[state.preset];
-    state.colors = d.colors; state.detail = d.detail; state.curve = d.curve; state.noise = d.noise;
-    colorsSlider.value = d.colors; colorsVal.textContent = d.colors;
-    detailSlider.value = d.detail; detailVal.textContent = d.detail;
-    noiseSlider.value = d.noise; noiseVal.textContent = d.noise;
-    setActive(curveOptions,'curve',d.curve);
-    colorsRow.style.opacity = state.preset==='outline' ? 0.35 : 1;
-    colorsSlider.disabled = state.preset==='outline';
-    scheduleTrace();
-  });
-
-  curveOptions.addEventListener('click', e=>{
-    const btn = e.target.closest('.opt-btn'); if(!btn) return;
-    state.curve = btn.dataset.curve;
-    setActive(curveOptions,'curve',state.curve);
-    scheduleTrace();
-  });
-
-  colorsSlider.addEventListener('input', ()=>{ state.colors = Number(colorsSlider.value); colorsVal.textContent = state.colors; scheduleTrace(); });
-  detailSlider.addEventListener('input', ()=>{ state.detail = Number(detailSlider.value); detailVal.textContent = state.detail; scheduleTrace(); });
-  noiseSlider.addEventListener('input', ()=>{ state.noise = Number(noiseSlider.value); noiseVal.textContent = state.noise; scheduleTrace(); });
-  bgToggle.addEventListener('change', ()=>{ state.removeBg = bgToggle.checked; scheduleTrace(); });
-
-  advancedToggle.addEventListener('click', ()=>{
-    advancedToggle.classList.toggle('open');
-    advancedPanel.classList.toggle('open');
-  });
 
   dropzone.addEventListener('click', ()=>fileInput.click());
   dropzone.addEventListener('dragover', e=>{e.preventDefault(); dropzone.classList.add('drag');});
@@ -452,12 +345,6 @@
     try{
       const fd = new FormData();
       fd.append('file', currentFile);
-      fd.append('mode', state.preset);
-      fd.append('colors', state.colors);
-      fd.append('detail', state.detail);
-      fd.append('noise', state.noise);
-      fd.append('curve', state.curve);
-      fd.append('remove_bg', state.removeBg ? 'true' : 'false');
 
       const res = await fetch(SERVER_URL + '/vectorize', { method:'POST', body: fd });
       const raw = await res.text();
