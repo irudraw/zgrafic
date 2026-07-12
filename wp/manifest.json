@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Cuaderno de Fiados - Conector WhatsApp",
+  "version": "1.0.0",
+  "description": "Agrega un botón en WhatsApp Web que abre la ficha de deuda del cliente que tenés abierto en el chat.",
+  "permissions": [],
+  "host_permissions": ["https://web.whatsapp.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

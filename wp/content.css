@@ -1,0 +1,19 @@
+#fiado-boton-flotante {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #2A2318;
+  color: #F5EFE0;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+#fiado-boton-flotante:hover { background: #443a29; }
+#fiado-boton-flotante:active { transform: scale(0.96); }

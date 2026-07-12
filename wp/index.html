@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuaderno de Fiados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="paper-texture"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">✒︎</span>
+    <div>
+      <h1>Cuaderno de Fiados</h1>
+      <p class="brand-sub">Quién debe, cuánto debe, desde cuándo</p>
+    </div>
+  </div>
+  <div class="total-box">
+    <span class="total-label">Total por cobrar</span>
+    <span class="total-amount" id="totalPorCobrar">S/ 0.00</span>
+  </div>
+</header>
+
+<main>
+  <section class="toolbar">
+    <div class="search-wrap">
+      <input type="text" id="buscador" placeholder="Buscar por nombre o teléfono…" autocomplete="off">
+    </div>
+    <button class="btn-primary" id="btnNuevoCliente">+ Nuevo cliente</button>
+  </section>
+
+  <section class="ledger" id="listaClientes">
+    <!-- filas de clientes se insertan aquí -->
+  </section>
+
+  <p class="empty-state" id="emptyState" hidden>
+    Todavía no anotaste a nadie. Tocá <strong>“+ Nuevo cliente”</strong> para empezar tu cuaderno.
+  </p>
+</main>
+
+<!-- MODAL: nuevo cliente -->
+<div class="modal-backdrop" id="modalNuevo" hidden>
+  <div class="modal">
+    <button class="modal-close" data-close>×</button>
+    <h2>Nuevo cliente</h2>
+    <form id="formNuevo">
+      <label>Nombre
+        <input type="text" id="nuevoNombre" required placeholder="Ej. Juan Pérez">
+      </label>
+      <label>Teléfono
+        <input type="tel" id="nuevoTelefono" required placeholder="Ej. 987654321">
+      </label>
+      <label>Deuda inicial (opcional)
+        <input type="number" id="nuevoMonto" min="0" step="0.01" placeholder="0.00">
+      </label>
+      <label>Imagen de referencia (opcional)
+        <input type="file" id="nuevoImagen" accept="image/*">
+      </label>
+      <img class="preview" id="previewNuevo" hidden>
+      <button type="submit" class="btn-primary btn-block">Guardar cliente</button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: detalle cliente -->
+<div class="modal-backdrop" id="modalDetalle" hidden>
+  <div class="modal modal-detalle">
+    <button class="modal-close" data-close>×</button>
+
+    <div class="detalle-head">
+      <div class="detalle-foto-wrap">
+        <img class="detalle-foto" id="detFoto" hidden>
+        <label class="cambiar-foto">
+          <input type="file" id="detImagenInput" accept="image/*" hidden>
+          cambiar imagen
+        </label>
+      </div>
+      <div class="detalle-info">
+        <h2 id="detNombre"></h2>
+        <p class="detalle-tel" id="detTelefono"></p>
+        <div class="saldo-row">
+          <span class="stamp" id="detStamp">AL DÍA</span>
+          <span class="saldo-monto" id="detSaldo">S/ 0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="acciones-rapidas">
+      <button class="btn-deuda" id="btnAgregarDeuda">+ Registrar deuda</button>
+      <button class="btn-abono" id="btnAgregarAbono">+ Registrar abono</button>
+      <button class="btn-eliminar" id="btnEliminarCliente">Eliminar cliente</button>
+    </div>
+
+    <div class="mini-form" id="miniForm" hidden>
+      <span class="mini-form-title" id="miniFormTitulo"></span>
+      <input type="number" id="miniFormMonto" min="0.01" step="0.01" placeholder="Monto">
+      <input type="text" id="miniFormNota" placeholder="Nota (opcional)">
+      <div class="mini-form-btns">
+        <button id="miniFormGuardar" class="btn-primary">Guardar</button>
+        <button id="miniFormCancelar" class="btn-secundario">Cancelar</button>
+      </div>
+    </div>
+
+    <h3 class="historial-titulo">Historial</h3>
+    <div class="historial" id="detHistorial"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
