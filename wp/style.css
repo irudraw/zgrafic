@@ -424,6 +424,17 @@ form input:focus{ outline: 2px solid var(--gold); outline-offset: 1px; }
   padding: 1px 5px;
   font-family: var(--font-mono);
 }
+.btn-link{
+  display:block;
+  width:100%;
+  background:none;
+  border:none;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  font-size: 12.5px;
+  margin-top: 12px;
+  cursor: pointer;
+}
 
 .banner-soporte{
   background: var(--gold);
