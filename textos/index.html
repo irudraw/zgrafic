@@ -131,7 +131,7 @@
         <img id="bgImage" src="" alt="Fondo reconstruido" />
       </div>
 
-      <p class="hint">💡 Hacé clic en cualquier texto para editarlo. Los cuadros marcan dónde se detectó cada texto — si algo salió mal reconocido, corregilo antes de exportar.</p>
+      <p class="hint">💡 Hacé clic en cualquier texto para editarlo. Los cuadros marcan dónde se detectó cada texto — si algo salió mal reconocido, corregilo antes de exportar. La tipografía que ves en pantalla es la detectada automáticamente (de un set de 48 fuentes); el PDF por ahora usa una fuente similar estándar, no la exacta.</p>
 
       <div class="actions">
         <button class="primary" id="exportBtn" disabled>Exportar PDF (texto real)</button>
@@ -244,9 +244,18 @@
     }
   }
 
-  function renderTextBoxes(texts){
-    const scale = () => editorWrap.getBoundingClientRect().width / naturalWidth;
+  const loadedFonts = new Set();
 
+  function loadGoogleFont(fontName){
+    if (!fontName || loadedFonts.has(fontName)) return;
+    loadedFonts.add(fontName);
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(fontName).replace(/%20/g, '+') + ':wght@400;700&display=swap';
+    document.head.appendChild(link);
+  }
+
+  function renderTextBoxes(texts){
     texts.forEach(data => {
       const el = document.createElement('div');
       el.className = 'text-box';
@@ -254,6 +263,10 @@
       el.spellcheck = false;
       el.textContent = data.text;
       el.style.color = data.color;
+      if (data.font) {
+        loadGoogleFont(data.font);
+        el.style.fontFamily = `'${data.font}', sans-serif`;
+      }
       editorWrap.appendChild(el);
       textElements.push({ el, data });
     });
