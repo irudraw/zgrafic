@@ -5,7 +5,7 @@
    respaldo en localStorage para navegadores sin esa función.
    ========================================================= */
 
-const FS_API_SOPORTADA = "showSaveFilePicker" in window;
+const FS_API_SOPORTADA = typeof window.showSaveFilePicker === "function";
 
 let fileHandle = null;          // handle del archivo local (solo si FS_API_SOPORTADA)
 let datosApp = { clientes: {} }; // { clientes: { "<telefono>": {...} } }
@@ -17,6 +17,16 @@ const bannerSoporte = document.getElementById("bannerSoporte");
 const btnCambiarArchivo = document.getElementById("btnCambiarArchivo");
 
 let handlePendienteReconexion = null;
+
+/* Evita que una operación colgada (p.ej. IndexedDB bloqueado por el
+   navegador) trabe la app para siempre: si no responde en el tiempo
+   dado, seguimos adelante igual. */
+function conTiempoLimite(promesa, ms = 2500) {
+  return Promise.race([
+    promesa,
+    new Promise((resolve) => setTimeout(() => resolve(undefined), ms))
+  ]);
+}
 
 /* ---------- IndexedDB: solo para recordar el handle del archivo ---------- */
 
@@ -79,37 +89,49 @@ async function guardarDatosPersistente() {
 
 async function iniciar() {
   if (!FS_API_SOPORTADA) {
-    cargarDesdeLocalStorage();
-    bannerSoporte.hidden = false;
-    mostrarApp();
+    activarModoRespaldoLocal();
     return;
   }
 
-  const handleGuardado = await recuperarHandleRecordado().catch(() => null);
-  if (handleGuardado) {
-    const permiso = await handleGuardado.queryPermission({ mode: "readwrite" });
-    if (permiso === "granted") {
-      fileHandle = handleGuardado;
-      await cargarDesdeArchivo();
-      mostrarApp();
+  try {
+    const handleGuardado = await conTiempoLimite(recuperarHandleRecordado().catch(() => null));
+    if (handleGuardado) {
+      const permiso = await handleGuardado.queryPermission({ mode: "readwrite" });
+      if (permiso === "granted") {
+        fileHandle = handleGuardado;
+        await cargarDesdeArchivo();
+        mostrarApp();
+        return;
+      }
+      // Existe un archivo recordado pero el navegador necesita que confirmes
+      // el permiso con un clic (medida de seguridad del navegador).
+      handlePendienteReconexion = handleGuardado;
+      document.getElementById("gateTexto").textContent =
+        "Encontramos tu archivo de datos, solo falta confirmar el permiso para volver a usarlo.";
+      document.getElementById("btnElegirArchivo").textContent = "Reconectar archivo de datos";
       return;
     }
-    // Existe un archivo recordado pero el navegador necesita que confirmes
-    // el permiso con un clic (medida de seguridad del navegador).
-    handlePendienteReconexion = handleGuardado;
-    document.getElementById("gateTexto").textContent =
-      "Encontramos tu archivo de datos, solo falta confirmar el permiso para volver a usarlo.";
-    document.getElementById("btnElegirArchivo").textContent = "Reconectar archivo de datos";
+  } catch (err) {
+    console.warn("No se pudo reconectar el archivo guardado, usando respaldo en el navegador:", err);
+    activarModoRespaldoLocal();
     return;
   }
 
   // primera vez: pantallaArchivo ya está visible con su texto por defecto
 }
 
+function activarModoRespaldoLocal() {
+  fileHandle = null;
+  handlePendienteReconexion = null;
+  cargarDesdeLocalStorage();
+  bannerSoporte.hidden = false;
+  mostrarApp();
+}
+
 function mostrarApp() {
   pantallaArchivo.hidden = true;
   appContenido.hidden = false;
-  btnCambiarArchivo.hidden = !FS_API_SOPORTADA;
+  btnCambiarArchivo.hidden = !fileHandle;
   renderLista();
   manejarParametrosURL();
 }
@@ -128,13 +150,30 @@ document.getElementById("btnElegirArchivo").addEventListener("click", async () =
         suggestedName: "deudas.json",
         types: [{ description: "Archivo JSON", accept: { "application/json": [".json"] } }]
       });
-      await guardarHandleRecordado(fileHandle);
+      // "Recordar" el archivo es solo para comodidad (evita elegirlo de
+      // nuevo la próxima vez). Si esto falla o se cuelga, no debe frenar
+      // el uso de la app — seguimos igual, solo que la próxima vez habrá
+      // que elegir el archivo otra vez.
+      try {
+        await conTiempoLimite(guardarHandleRecordado(fileHandle));
+      } catch (err) {
+        console.warn("No se pudo recordar el archivo para la próxima vez:", err);
+      }
     }
     await cargarDesdeArchivo();
     mostrarApp();
   } catch (err) {
-    if (err.name !== "AbortError") alert("No se pudo abrir el archivo: " + err.message);
+    if (err && err.name === "AbortError") return; // el usuario cerró el diálogo, no hacemos nada
+    // Cualquier otra falla (navegador sin soporte real, página dentro de un
+    // iframe/vista previa que bloquea la función, etc.): seguimos funcionando
+    // igual, guardando en el navegador en vez de en un archivo.
+    console.warn("No se pudo usar el archivo local, usando respaldo en el navegador:", err);
+    activarModoRespaldoLocal();
   }
+});
+
+document.getElementById("btnUsarSoloNavegador").addEventListener("click", () => {
+  activarModoRespaldoLocal();
 });
 
 btnCambiarArchivo.addEventListener("click", async () => {
@@ -144,7 +183,11 @@ btnCambiarArchivo.addEventListener("click", async () => {
       types: [{ description: "Archivo JSON", accept: { "application/json": [".json"] } }]
     });
     fileHandle = nuevoHandle;
-    await guardarHandleRecordado(fileHandle);
+    try {
+      await conTiempoLimite(guardarHandleRecordado(fileHandle));
+    } catch (err) {
+      console.warn("No se pudo recordar el archivo para la próxima vez:", err);
+    }
     await cargarDesdeArchivo();
     await renderLista(document.getElementById("buscador").value);
   } catch (err) {
