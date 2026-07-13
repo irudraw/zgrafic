@@ -386,6 +386,69 @@ form input:focus{ outline: 2px solid var(--gold); outline-offset: 1px; }
 .mov-monto.deuda{ color: var(--debt-red); }
 .mov-monto.abono{ color: var(--paid-green); }
 
+/* ---------- PANTALLA DE SELECCIÓN DE ARCHIVO ---------- */
+.gate-screen{
+  position: fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--paper);
+  z-index: 20;
+  padding: 20px;
+}
+.gate-card{
+  background: var(--paper-card);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 32px 28px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+}
+.gate-card .brand-mark{ font-size: 40px; }
+.gate-card h1{
+  font-family: var(--font-display);
+  font-size: 24px;
+  margin: 8px 0 10px;
+}
+.gate-card .brand-sub{
+  font-style: normal;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.gate-card code{
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: var(--font-mono);
+}
+
+.banner-soporte{
+  background: var(--gold);
+  color: #2A2318;
+  font-size: 13px;
+  text-align: center;
+  padding: 8px 16px;
+  position: relative;
+  z-index: 5;
+}
+
+.topbar-acciones{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.btn-file-label{
+  display:inline-flex;
+  align-items:center;
+  cursor:pointer;
+}
+
+/* ---------- LOGIN (heredado, ya no se usa pero se mantiene por compatibilidad de nombres de clase) ---------- */
+.topbar .btn-secundario{ align-self: center; }
+
 @media (max-width: 480px){
   .topbar{ flex-direction: column; align-items:flex-start; }
   .total-box{ align-items:flex-start; align-self: stretch; }

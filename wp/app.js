@@ -1,65 +1,208 @@
 /* =========================================================
    Cuaderno de Fiados — lógica principal
-   Guarda todo en IndexedDB (local, en tu navegador).
+   Guarda todo en un archivo JSON local en tu computadora
+   (usando la File System Access API de Chrome/Edge), con
+   respaldo en localStorage para navegadores sin esa función.
    ========================================================= */
 
-const DB_NAME = "cuadernoFiadosDB";
-const DB_VERSION = 1;
-const STORE = "clientes";
+const FS_API_SOPORTADA = "showSaveFilePicker" in window;
 
-let db = null;
-let clienteActivo = null; // teléfono del cliente abierto en el modal detalle
+let fileHandle = null;          // handle del archivo local (solo si FS_API_SOPORTADA)
+let datosApp = { clientes: {} }; // { clientes: { "<telefono>": {...} } }
+let clienteActivo = null;
 
-/* ---------- IndexedDB helpers ---------- */
+const pantallaArchivo = document.getElementById("pantallaArchivo");
+const appContenido = document.getElementById("appContenido");
+const bannerSoporte = document.getElementById("bannerSoporte");
+const btnCambiarArchivo = document.getElementById("btnCambiarArchivo");
 
-function abrirDB() {
+let handlePendienteReconexion = null;
+
+/* ---------- IndexedDB: solo para recordar el handle del archivo ---------- */
+
+const HANDLE_DB = "cuadernoFiadosHandleDB";
+
+function abrirHandleDB() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = () => {
-      const _db = req.result;
-      if (!_db.objectStoreNames.contains(STORE)) {
-        _db.createObjectStore(STORE, { keyPath: "telefono" });
-      }
-    };
+    const req = indexedDB.open(HANDLE_DB, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("handles");
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
 }
 
-function getAllClientes() {
+async function guardarHandleRecordado(handle) {
+  const hdb = await abrirHandleDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readonly");
-    const req = tx.objectStore(STORE).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = () => reject(req.error);
+    const tx = hdb.transaction("handles", "readwrite");
+    tx.objectStore("handles").put(handle, "archivoDeudas");
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
   });
 }
 
-function getCliente(telefono) {
+async function recuperarHandleRecordado() {
+  const hdb = await abrirHandleDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readonly");
-    const req = tx.objectStore(STORE).get(telefono);
+    const tx = hdb.transaction("handles", "readonly");
+    const req = tx.objectStore("handles").get("archivoDeudas");
     req.onsuccess = () => resolve(req.result || null);
     req.onerror = () => reject(req.error);
   });
 }
 
-function guardarCliente(cliente) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put(cliente);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+/* ---------- carga / guardado de datos ---------- */
+
+async function cargarDesdeArchivo() {
+  const file = await fileHandle.getFile();
+  const texto = await file.text();
+  datosApp = texto.trim() ? JSON.parse(texto) : { clientes: {} };
+  if (!datosApp.clientes) datosApp.clientes = {};
 }
 
-function eliminarClienteDB(telefono) {
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).delete(telefono);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+function cargarDesdeLocalStorage() {
+  const raw = localStorage.getItem("cuadernoFiadosDatos");
+  datosApp = raw ? JSON.parse(raw) : { clientes: {} };
+}
+
+async function guardarDatosPersistente() {
+  if (fileHandle) {
+    const writable = await fileHandle.createWritable();
+    await writable.write(JSON.stringify(datosApp, null, 2));
+    await writable.close();
+  } else {
+    localStorage.setItem("cuadernoFiadosDatos", JSON.stringify(datosApp));
+  }
+}
+
+/* ---------- arranque: elegir/reconectar archivo o usar respaldo local ---------- */
+
+async function iniciar() {
+  if (!FS_API_SOPORTADA) {
+    cargarDesdeLocalStorage();
+    bannerSoporte.hidden = false;
+    mostrarApp();
+    return;
+  }
+
+  const handleGuardado = await recuperarHandleRecordado().catch(() => null);
+  if (handleGuardado) {
+    const permiso = await handleGuardado.queryPermission({ mode: "readwrite" });
+    if (permiso === "granted") {
+      fileHandle = handleGuardado;
+      await cargarDesdeArchivo();
+      mostrarApp();
+      return;
+    }
+    // Existe un archivo recordado pero el navegador necesita que confirmes
+    // el permiso con un clic (medida de seguridad del navegador).
+    handlePendienteReconexion = handleGuardado;
+    document.getElementById("gateTexto").textContent =
+      "Encontramos tu archivo de datos, solo falta confirmar el permiso para volver a usarlo.";
+    document.getElementById("btnElegirArchivo").textContent = "Reconectar archivo de datos";
+    return;
+  }
+
+  // primera vez: pantallaArchivo ya está visible con su texto por defecto
+}
+
+function mostrarApp() {
+  pantallaArchivo.hidden = true;
+  appContenido.hidden = false;
+  btnCambiarArchivo.hidden = !FS_API_SOPORTADA;
+  renderLista();
+  manejarParametrosURL();
+}
+
+document.getElementById("btnElegirArchivo").addEventListener("click", async () => {
+  try {
+    if (handlePendienteReconexion) {
+      const permiso = await handlePendienteReconexion.requestPermission({ mode: "readwrite" });
+      if (permiso !== "granted") {
+        alert("No se concedió permiso para usar el archivo.");
+        return;
+      }
+      fileHandle = handlePendienteReconexion;
+    } else {
+      fileHandle = await window.showSaveFilePicker({
+        suggestedName: "deudas.json",
+        types: [{ description: "Archivo JSON", accept: { "application/json": [".json"] } }]
+      });
+      await guardarHandleRecordado(fileHandle);
+    }
+    await cargarDesdeArchivo();
+    mostrarApp();
+  } catch (err) {
+    if (err.name !== "AbortError") alert("No se pudo abrir el archivo: " + err.message);
+  }
+});
+
+btnCambiarArchivo.addEventListener("click", async () => {
+  try {
+    const nuevoHandle = await window.showSaveFilePicker({
+      suggestedName: "deudas.json",
+      types: [{ description: "Archivo JSON", accept: { "application/json": [".json"] } }]
+    });
+    fileHandle = nuevoHandle;
+    await guardarHandleRecordado(fileHandle);
+    await cargarDesdeArchivo();
+    await renderLista(document.getElementById("buscador").value);
+  } catch (err) {
+    if (err.name !== "AbortError") alert("No se pudo cambiar de archivo: " + err.message);
+  }
+});
+
+/* ---------- exportar / importar copia manual (funciona siempre) ---------- */
+
+document.getElementById("btnExportar").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(datosApp, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "deudas-respaldo-" + new Date().toISOString().slice(0, 10) + ".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("btnImportarInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!confirm("Esto reemplaza todos los datos actuales por los del archivo importado. ¿Continuar?")) {
+    e.target.value = "";
+    return;
+  }
+  try {
+    const texto = await file.text();
+    const nuevo = JSON.parse(texto);
+    datosApp = nuevo && nuevo.clientes ? nuevo : { clientes: {} };
+    await guardarDatosPersistente();
+    await renderLista(document.getElementById("buscador").value);
+  } catch (err) {
+    alert("El archivo no es un JSON válido de este cuaderno.");
+  }
+  e.target.value = "";
+});
+
+/* ---------- capa de datos (en memoria + persistencia) ---------- */
+
+function getAllClientes() {
+  return Promise.resolve(Object.values(datosApp.clientes));
+}
+
+function getCliente(telefono) {
+  return Promise.resolve(datosApp.clientes[telefono] || null);
+}
+
+async function guardarCliente(cliente) {
+  datosApp.clientes[cliente.telefono] = cliente;
+  await guardarDatosPersistente();
+}
+
+async function eliminarClienteDB(telefono) {
+  delete datosApp.clientes[telefono];
+  await guardarDatosPersistente();
 }
 
 /* ---------- utilidades ---------- */
@@ -85,7 +228,8 @@ function formatoFecha(iso) {
 }
 
 // Comprime una imagen a un dataURL liviano antes de guardarla
-function comprimirImagen(file, maxAncho = 500, calidad = 0.75) {
+// (el archivo JSON crece rápido con imágenes sin comprimir)
+function comprimirImagen(file, maxAncho = 500, calidad = 0.7) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -358,8 +502,9 @@ document.getElementById("buscador").addEventListener("input", (e) => {
 /* ---------- integración con la extensión de WhatsApp Web ----------
    La extensión abre esta página así:
    index.html?phone=51987654321&nombre=Juan%20Perez
-   Si el cliente ya existe, abrimos su ficha directamente.
-   Si no existe, abrimos el formulario de "nuevo cliente" ya prellenado.
+   La comparamos contra los datos del archivo local: si el cliente
+   ya existe, abrimos su ficha (mostrando si debe o está al día). Si
+   no existe, abrimos el formulario de "nuevo cliente" prellenado.
 ------------------------------------------------------------------- */
 
 async function manejarParametrosURL() {
@@ -378,8 +523,4 @@ async function manejarParametrosURL() {
 
 /* ---------- arranque ---------- */
 
-(async function init() {
-  db = await abrirDB();
-  await renderLista();
-  await manejarParametrosURL();
-})();
+iniciar();
