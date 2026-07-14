@@ -1,201 +1,39 @@
 /* =========================================================
    Cuaderno de Fiados — lógica principal
-   Guarda todo en un archivo JSON local en tu computadora
-   (usando la File System Access API de Chrome/Edge), con
-   respaldo en localStorage para navegadores sin esa función.
+   Guarda todo en el navegador (localStorage). Sin diálogos,
+   sin permisos, sin dependencias externas: funciona apenas
+   abrís la página. Para tener un archivo .json real, usá los
+   botones "Exportar copia" / "Importar copia" de arriba.
    ========================================================= */
 
-const FS_API_SOPORTADA = typeof window.showSaveFilePicker === "function";
-
-let fileHandle = null;          // handle del archivo local (solo si FS_API_SOPORTADA)
 let datosApp = { clientes: {} }; // { clientes: { "<telefono>": {...} } }
 let clienteActivo = null;
 
-const pantallaArchivo = document.getElementById("pantallaArchivo");
-const appContenido = document.getElementById("appContenido");
-const bannerSoporte = document.getElementById("bannerSoporte");
-const btnCambiarArchivo = document.getElementById("btnCambiarArchivo");
+const CLAVE_STORAGE = "cuadernoFiadosDatos";
 
-let handlePendienteReconexion = null;
+/* ---------- carga / guardado ---------- */
 
-/* Evita que una operación colgada (p.ej. IndexedDB bloqueado por el
-   navegador) trabe la app para siempre: si no responde en el tiempo
-   dado, seguimos adelante igual. */
-function conTiempoLimite(promesa, ms = 2500) {
-  return Promise.race([
-    promesa,
-    new Promise((resolve) => setTimeout(() => resolve(undefined), ms))
-  ]);
-}
-
-/* ---------- IndexedDB: solo para recordar el handle del archivo ---------- */
-
-const HANDLE_DB = "cuadernoFiadosHandleDB";
-
-function abrirHandleDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(HANDLE_DB, 1);
-    req.onupgradeneeded = () => req.result.createObjectStore("handles");
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-async function guardarHandleRecordado(handle) {
-  const hdb = await abrirHandleDB();
-  return new Promise((resolve, reject) => {
-    const tx = hdb.transaction("handles", "readwrite");
-    tx.objectStore("handles").put(handle, "archivoDeudas");
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-
-async function recuperarHandleRecordado() {
-  const hdb = await abrirHandleDB();
-  return new Promise((resolve, reject) => {
-    const tx = hdb.transaction("handles", "readonly");
-    const req = tx.objectStore("handles").get("archivoDeudas");
-    req.onsuccess = () => resolve(req.result || null);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-/* ---------- carga / guardado de datos ---------- */
-
-async function cargarDesdeArchivo() {
-  const file = await fileHandle.getFile();
-  const texto = await file.text();
-  datosApp = texto.trim() ? JSON.parse(texto) : { clientes: {} };
-  if (!datosApp.clientes) datosApp.clientes = {};
-}
-
-function cargarDesdeLocalStorage() {
-  const raw = localStorage.getItem("cuadernoFiadosDatos");
-  datosApp = raw ? JSON.parse(raw) : { clientes: {} };
-}
-
-async function guardarDatosPersistente() {
-  if (fileHandle) {
-    const writable = await fileHandle.createWritable();
-    await writable.write(JSON.stringify(datosApp, null, 2));
-    await writable.close();
-  } else {
-    localStorage.setItem("cuadernoFiadosDatos", JSON.stringify(datosApp));
-  }
-}
-
-/* ---------- arranque: elegir/reconectar archivo o usar respaldo local ---------- */
-
-async function iniciar() {
-  if (!FS_API_SOPORTADA) {
-    activarModoRespaldoLocal();
-    return;
-  }
-
+function cargarDatos() {
   try {
-    const handleGuardado = await conTiempoLimite(recuperarHandleRecordado().catch(() => null));
-    if (handleGuardado) {
-      const permiso = await handleGuardado.queryPermission({ mode: "readwrite" });
-      if (permiso === "granted") {
-        fileHandle = handleGuardado;
-        await cargarDesdeArchivo();
-        mostrarApp();
-        return;
-      }
-      // Existe un archivo recordado pero el navegador necesita que confirmes
-      // el permiso con un clic (medida de seguridad del navegador).
-      handlePendienteReconexion = handleGuardado;
-      document.getElementById("gateTexto").textContent =
-        "Encontramos tu archivo de datos, solo falta confirmar el permiso para volver a usarlo.";
-      document.getElementById("btnElegirArchivo").textContent = "Reconectar archivo de datos";
-      return;
-    }
+    const raw = localStorage.getItem(CLAVE_STORAGE);
+    datosApp = raw ? JSON.parse(raw) : { clientes: {} };
+    if (!datosApp.clientes) datosApp.clientes = {};
   } catch (err) {
-    console.warn("No se pudo reconectar el archivo guardado, usando respaldo en el navegador:", err);
-    activarModoRespaldoLocal();
-    return;
+    console.warn("No se pudieron leer los datos guardados, empezando de cero:", err);
+    datosApp = { clientes: {} };
   }
-
-  // primera vez: pantallaArchivo ya está visible con su texto por defecto
 }
 
-function activarModoRespaldoLocal() {
-  fileHandle = null;
-  handlePendienteReconexion = null;
-  cargarDesdeLocalStorage();
-  bannerSoporte.hidden = false;
-  mostrarApp();
-}
-
-function mostrarApp() {
-  pantallaArchivo.hidden = true;
-  appContenido.hidden = false;
-  btnCambiarArchivo.hidden = !fileHandle;
-  renderLista();
-  manejarParametrosURL();
-}
-
-document.getElementById("btnElegirArchivo").addEventListener("click", async () => {
+function guardarDatos() {
   try {
-    if (handlePendienteReconexion) {
-      const permiso = await handlePendienteReconexion.requestPermission({ mode: "readwrite" });
-      if (permiso !== "granted") {
-        alert("No se concedió permiso para usar el archivo.");
-        return;
-      }
-      fileHandle = handlePendienteReconexion;
-    } else {
-      fileHandle = await window.showSaveFilePicker({
-        suggestedName: "deudas.json",
-        types: [{ description: "Archivo JSON", accept: { "application/json": [".json"] } }]
-      });
-      // "Recordar" el archivo es solo para comodidad (evita elegirlo de
-      // nuevo la próxima vez). Si esto falla o se cuelga, no debe frenar
-      // el uso de la app — seguimos igual, solo que la próxima vez habrá
-      // que elegir el archivo otra vez.
-      try {
-        await conTiempoLimite(guardarHandleRecordado(fileHandle));
-      } catch (err) {
-        console.warn("No se pudo recordar el archivo para la próxima vez:", err);
-      }
-    }
-    await cargarDesdeArchivo();
-    mostrarApp();
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(datosApp));
   } catch (err) {
-    if (err && err.name === "AbortError") return; // el usuario cerró el diálogo, no hacemos nada
-    // Cualquier otra falla (navegador sin soporte real, página dentro de un
-    // iframe/vista previa que bloquea la función, etc.): seguimos funcionando
-    // igual, guardando en el navegador en vez de en un archivo.
-    console.warn("No se pudo usar el archivo local, usando respaldo en el navegador:", err);
-    activarModoRespaldoLocal();
+    console.error("No se pudo guardar en el navegador:", err);
+    alert("No se pudo guardar el cambio. Si el navegador está en modo privado/incógnito, los datos no se conservan al cerrar la pestaña.");
   }
-});
+}
 
-document.getElementById("btnUsarSoloNavegador").addEventListener("click", () => {
-  activarModoRespaldoLocal();
-});
-
-btnCambiarArchivo.addEventListener("click", async () => {
-  try {
-    const nuevoHandle = await window.showSaveFilePicker({
-      suggestedName: "deudas.json",
-      types: [{ description: "Archivo JSON", accept: { "application/json": [".json"] } }]
-    });
-    fileHandle = nuevoHandle;
-    try {
-      await conTiempoLimite(guardarHandleRecordado(fileHandle));
-    } catch (err) {
-      console.warn("No se pudo recordar el archivo para la próxima vez:", err);
-    }
-    await cargarDesdeArchivo();
-    await renderLista(document.getElementById("buscador").value);
-  } catch (err) {
-    if (err.name !== "AbortError") alert("No se pudo cambiar de archivo: " + err.message);
-  }
-});
-
-/* ---------- exportar / importar copia manual (funciona siempre) ---------- */
+/* ---------- exportar / importar copia (.json) ---------- */
 
 document.getElementById("btnExportar").addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(datosApp, null, 2)], { type: "application/json" });
@@ -220,7 +58,7 @@ document.getElementById("btnImportarInput").addEventListener("change", async (e)
     const texto = await file.text();
     const nuevo = JSON.parse(texto);
     datosApp = nuevo && nuevo.clientes ? nuevo : { clientes: {} };
-    await guardarDatosPersistente();
+    guardarDatos();
     await renderLista(document.getElementById("buscador").value);
   } catch (err) {
     alert("El archivo no es un JSON válido de este cuaderno.");
@@ -228,7 +66,7 @@ document.getElementById("btnImportarInput").addEventListener("change", async (e)
   e.target.value = "";
 });
 
-/* ---------- capa de datos (en memoria + persistencia) ---------- */
+/* ---------- capa de datos (en memoria + localStorage) ---------- */
 
 function getAllClientes() {
   return Promise.resolve(Object.values(datosApp.clientes));
@@ -240,12 +78,12 @@ function getCliente(telefono) {
 
 async function guardarCliente(cliente) {
   datosApp.clientes[cliente.telefono] = cliente;
-  await guardarDatosPersistente();
+  guardarDatos();
 }
 
 async function eliminarClienteDB(telefono) {
   delete datosApp.clientes[telefono];
-  await guardarDatosPersistente();
+  guardarDatos();
 }
 
 /* ---------- utilidades ---------- */
@@ -271,7 +109,6 @@ function formatoFecha(iso) {
 }
 
 // Comprime una imagen a un dataURL liviano antes de guardarla
-// (el archivo JSON crece rápido con imágenes sin comprimir)
 function comprimirImagen(file, maxAncho = 500, calidad = 0.7) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -545,9 +382,9 @@ document.getElementById("buscador").addEventListener("input", (e) => {
 /* ---------- integración con la extensión de WhatsApp Web ----------
    La extensión abre esta página así:
    index.html?phone=51987654321&nombre=Juan%20Perez
-   La comparamos contra los datos del archivo local: si el cliente
-   ya existe, abrimos su ficha (mostrando si debe o está al día). Si
-   no existe, abrimos el formulario de "nuevo cliente" prellenado.
+   Si el cliente ya existe, abrimos su ficha directamente (mostrando
+   si debe o está al día). Si no existe, abrimos el formulario de
+   "nuevo cliente" ya prellenado.
 ------------------------------------------------------------------- */
 
 async function manejarParametrosURL() {
@@ -566,4 +403,6 @@ async function manejarParametrosURL() {
 
 /* ---------- arranque ---------- */
 
-iniciar();
+cargarDatos();
+renderLista();
+manejarParametrosURL();

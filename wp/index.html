@@ -12,31 +12,6 @@
 
 <div class="paper-texture"></div>
 
-<!-- BANNER para navegadores sin soporte de archivos locales (Firefox/Safari) -->
-<div class="banner-soporte" id="bannerSoporte" hidden>
-  Tu navegador no permite vincular un archivo local directamente. Se está
-  usando el almacenamiento del navegador como respaldo — te recomendamos
-  exportar una copia (botón "Exportar" arriba) de vez en cuando, o usar
-  Chrome/Edge para la experiencia completa.
-</div>
-
-<!-- PANTALLA DE SELECCIÓN DE ARCHIVO -->
-<div class="gate-screen" id="pantallaArchivo">
-  <div class="gate-card">
-    <span class="brand-mark">✒︎</span>
-    <h1>Cuaderno de Fiados</h1>
-    <p class="brand-sub" id="gateTexto">
-      Elegí dónde guardar tu cuaderno. Se crea un archivo
-      <code>deudas.json</code> en tu computadora — todo queda ahí, nada
-      se sube a internet.
-    </p>
-    <button class="btn-primary btn-block" id="btnElegirArchivo">Elegir o crear archivo de datos</button>
-    <button class="btn-link" id="btnUsarSoloNavegador">Prefiero guardar solo en este navegador</button>
-  </div>
-</div>
-
-<div id="appContenido" hidden>
-
 <header class="topbar">
   <div class="brand">
     <span class="brand-mark">✒︎</span>
@@ -50,8 +25,7 @@
     <span class="total-amount" id="totalPorCobrar">S/ 0.00</span>
   </div>
   <div class="topbar-acciones">
-    <button class="btn-secundario" id="btnCambiarArchivo" hidden>Cambiar archivo</button>
-    <button class="btn-secundario" id="btnExportar">Exportar copia</button>
+    <button class="btn-secundario" id="btnExportar">Exportar copia (.json)</button>
     <label class="btn-secundario btn-file-label">
       Importar copia
       <input type="file" id="btnImportarInput" accept="application/json" hidden>
@@ -143,8 +117,6 @@
     <div class="historial" id="detHistorial"></div>
   </div>
 </div>
-
-</div><!-- /appContenido -->
 
 <script src="app.js"></script>
 </body>
