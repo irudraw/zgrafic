@@ -219,9 +219,15 @@ main{ padding: 24px clamp(16px, 4vw, 48px) 60px; max-width: 900px; margin: 0 aut
 .modal-backdrop{
   position: fixed; inset:0;
   background: rgba(42,35,24,0.45);
-  display:flex; align-items:center; justify-content:center;
   padding: 20px;
   z-index: 10;
+}
+/* Importante: el display:flex solo se aplica cuando NO tiene el
+   atributo [hidden]. Si se pone display en el selector base sin
+   esta condición, gana por sobre el [hidden] del navegador y el
+   modal queda visible aunque JS le haya puesto hidden=true. */
+.modal-backdrop:not([hidden]){
+  display:flex; align-items:center; justify-content:center;
 }
 .modal{
   background: var(--paper-card);
@@ -292,8 +298,8 @@ form input:focus{ outline: 2px solid var(--gold); outline-offset: 1px; }
   object-fit: cover;
   border-radius: 12px;
   border: 1.5px solid var(--line);
-  display:block;
 }
+.detalle-foto:not([hidden]){ display:block; }
 .cambiar-foto{
   display:block;
   margin-top: 6px;
