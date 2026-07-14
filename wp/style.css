@@ -308,6 +308,14 @@ form input:focus{ outline: 2px solid var(--gold); outline-offset: 1px; }
   text-decoration: underline;
   cursor:pointer;
 }
+.hint-paste{
+  display:block;
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-weight: 400;
+  font-style: italic;
+  margin-top: 4px;
+}
 
 .detalle-info h2{
   font-family: var(--font-display);

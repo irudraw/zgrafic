@@ -310,6 +310,33 @@ document.querySelector(".cambiar-foto").addEventListener("click", () => {
   document.getElementById("detImagenInput").click();
 });
 
+/* ---------- pegar imagen copiada (Ctrl+V) ----------
+   Pensado para usarse junto con el botón "+" de la extensión:
+   copiás una foto en WhatsApp Web y la pegás acá directamente,
+   sin tener que guardarla y subirla a mano.
+------------------------------------------------------------- */
+
+document.addEventListener("paste", async (e) => {
+  const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith("image/"));
+  if (!item) return;
+  const blob = item.getAsFile();
+  if (!blob) return;
+
+  if (!modalNuevo.hidden) {
+    e.preventDefault();
+    imagenNuevoDataURL = await comprimirImagen(blob);
+    previewNuevo.src = imagenNuevoDataURL;
+    previewNuevo.hidden = false;
+  } else if (!modalDetalle.hidden && clienteActivo) {
+    e.preventDefault();
+    const c = await getCliente(clienteActivo);
+    c.imagen = await comprimirImagen(blob);
+    await guardarCliente(c);
+    pintarDetalle(c);
+    await renderLista(document.getElementById("buscador").value);
+  }
+});
+
 document.getElementById("btnEliminarCliente").addEventListener("click", async () => {
   if (!clienteActivo) return;
   if (!confirm("¿Eliminar este cliente y todo su historial? Esta acción no se puede deshacer.")) return;
