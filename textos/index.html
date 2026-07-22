@@ -71,22 +71,38 @@
   #editorWrap{
     position:relative; display:inline-block; max-width:100%;
     border-radius: var(--radius); overflow:hidden; border:1px solid var(--line);
-    background:#0c0b0d;
+    background:#0c0b0d; line-height:0;
   }
-  #bgImage{ display:block; max-width:100%; height:auto; user-select:none; }
+  #bgCanvas{ display:block; max-width:100%; width:100%; height:auto; user-select:none; }
+  .text-item{ position:absolute; }
   .text-box{
-    position:absolute;
+    position:absolute; inset:0;
     outline: 1px dashed rgba(255,207,64,0.5);
     background: transparent;
     line-height: 1.05;
-    white-space: pre-wrap;
-    overflow: hidden;
+    white-space: nowrap;
+    overflow: visible;
     cursor: text;
     padding: 0;
     font-family: 'Inter', sans-serif;
+    transform-origin: left top;
   }
-  .text-box:focus{ outline: 2px solid var(--chroma); background: rgba(0,0,0,0.15); }
-  .text-box:hover{ outline: 2px solid var(--chroma); }
+  .text-box:focus{ outline: 2px solid var(--chroma); background: rgba(0,0,0,0.15); z-index:5; }
+  .text-item:hover .text-box{ outline: 2px solid var(--chroma); }
+  .text-item.excluded .text-box{ display:none; }
+  .exclude-btn{
+    position:absolute; top:-9px; right:-9px;
+    width:18px; height:18px;
+    background:#ff5570; color:#1a0a0d;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700;
+    cursor:pointer; user-select:none;
+    opacity:0; transition:opacity .15s ease;
+    z-index:6;
+  }
+  .text-item:hover .exclude-btn{ opacity:1; }
+  .text-item.excluded .exclude-btn{ opacity:1; background:var(--muted); }
 
   .hint{ color: var(--muted); font-size:0.82rem; margin: 14px 0; line-height:1.5; }
   .hint b{ color: var(--ink); }
@@ -128,10 +144,10 @@
       <div class="bar"><div class="bar-fill" id="barFill"></div></div>
 
       <div id="editorWrap">
-        <img id="bgImage" src="" alt="Fondo reconstruido" />
+        <canvas id="bgCanvas"></canvas>
       </div>
 
-      <p class="hint">💡 Hacé clic en cualquier texto para editarlo. Los cuadros marcan dónde se detectó cada texto — si algo salió mal reconocido, corregilo antes de exportar. La tipografía que ves en pantalla es la detectada automáticamente (de un set de 48 fuentes); el PDF por ahora usa una fuente similar estándar, no la exacta.</p>
+      <p class="hint">💡 Hacé clic en cualquier texto para editarlo. Pasá el mouse por un texto y tocá la ✕ para excluirlo (por ejemplo, letras dentro de un logo que no querés que se toquen) — se restaura tal cual estaba en la imagen original. La tipografía que ves es la detectada automáticamente; al exportar el PDF, se incrusta la fuente real si se puede conseguir.</p>
 
       <div class="actions">
         <button class="primary" id="exportBtn" disabled>Exportar PDF (texto real)</button>
@@ -149,6 +165,7 @@
 <script>
   // 👉 Después de desplegar tu Space en Hugging Face, reemplazá esta URL.
   const SERVER_URL = 'https://zgrafic-remove-bg-api.hf.space/extract-text';
+  const FONT_FILE_URL = 'https://zgrafic-remove-bg-api.hf.space/font-file';
 
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
@@ -157,14 +174,15 @@
   const statusText = document.getElementById('statusText');
   const barFill = document.getElementById('barFill');
   const editorWrap = document.getElementById('editorWrap');
-  const bgImage = document.getElementById('bgImage');
+  const bgCanvas = document.getElementById('bgCanvas');
+  const bgCtx = bgCanvas.getContext('2d');
   const exportBtn = document.getElementById('exportBtn');
   const downloadPngBtn = document.getElementById('downloadPngBtn');
   const resetBtn = document.getElementById('resetBtn');
 
   let naturalWidth = 0, naturalHeight = 0;
-  let textElements = []; // { el, data: {text,x,y,width,height,fontSize,color} }
-  let bgDataUrl = null;
+  let textElements = []; // { item, el, excludeBtn, data, excluded }
+  let originalImg = null; // Image con la foto ORIGINAL subida (para restaurar zonas excluidas)
 
   dropzone.addEventListener('click', () => fileInput.click());
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
@@ -187,7 +205,7 @@
   });
 
   function clearTextBoxes(){
-    textElements.forEach(t => t.el.remove());
+    textElements.forEach(t => t.item.remove());
     textElements = [];
   }
 
@@ -201,7 +219,6 @@
     exportBtn.disabled = true;
     downloadPngBtn.disabled = true;
     clearTextBoxes();
-    bgImage.src = URL.createObjectURL(file);
 
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 180000));
 
@@ -222,10 +239,17 @@
       const data = await res.json();
       naturalWidth = data.width;
       naturalHeight = data.height;
-      bgDataUrl = data.background;
-      bgImage.src = bgDataUrl;
 
-      await new Promise(res => { bgImage.onload = res; });
+      // Cargamos tanto el fondo reconstruido como la imagen ORIGINAL
+      // (esta última la necesitamos para poder "deshacer" una zona si
+      // el usuario excluye un texto).
+      const bgImg = await loadImage(data.background);
+      originalImg = await loadImage(URL.createObjectURL(file));
+
+      bgCanvas.width = naturalWidth;
+      bgCanvas.height = naturalHeight;
+      bgCtx.drawImage(bgImg, 0, 0, naturalWidth, naturalHeight);
+
       renderTextBoxes(data.texts);
 
       barFill.style.width = '100%';
@@ -244,6 +268,16 @@
     }
   }
 
+  function loadImage(src){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
   const loadedFonts = new Set();
 
   function loadGoogleFont(fontName){
@@ -257,6 +291,9 @@
 
   function renderTextBoxes(texts){
     texts.forEach(data => {
+      const item = document.createElement('div');
+      item.className = 'text-item';
+
       const el = document.createElement('div');
       el.className = 'text-box';
       el.contentEditable = 'true';
@@ -267,29 +304,76 @@
         loadGoogleFont(data.font);
         el.style.fontFamily = `'${data.font}', sans-serif`;
       }
-      editorWrap.appendChild(el);
-      textElements.push({ el, data });
+      el.addEventListener('input', () => fitTextBox(entry));
+
+      const excludeBtn = document.createElement('div');
+      excludeBtn.className = 'exclude-btn';
+      excludeBtn.textContent = '✕';
+      excludeBtn.title = 'Excluir este texto (restaurar el original acá)';
+
+      item.appendChild(el);
+      item.appendChild(excludeBtn);
+      editorWrap.appendChild(item);
+
+      const entry = { item, el, excludeBtn, data, excluded: false };
+      textElements.push(entry);
+
+      excludeBtn.addEventListener('click', () => toggleExclude(entry));
     });
 
     positionTextBoxes();
     window.addEventListener('resize', positionTextBoxes);
   }
 
+  function toggleExclude(entry){
+    entry.excluded = !entry.excluded;
+    entry.item.classList.toggle('excluded', entry.excluded);
+    excludeBtnLabel(entry);
+
+    if (entry.excluded && originalImg) {
+      // Restaura los píxeles ORIGINALES en esa zona del canvas.
+      const { x, y, width, height } = entry.data;
+      bgCtx.drawImage(originalImg, x, y, width, height, x, y, width, height);
+    }
+  }
+
+  function excludeBtnLabel(entry){
+    entry.excludeBtn.textContent = entry.excluded ? '↺' : '✕';
+    entry.excludeBtn.title = entry.excluded
+      ? 'Volver a mostrar este texto editable'
+      : 'Excluir este texto (restaurar el original acá)';
+  }
+
   function positionTextBoxes(){
     const scale = editorWrap.getBoundingClientRect().width / naturalWidth;
-    textElements.forEach(({ el, data }) => {
-      el.style.left = (data.x * scale) + 'px';
-      el.style.top = (data.y * scale) + 'px';
-      el.style.width = (data.width * scale) + 'px';
-      el.style.height = (data.height * scale) + 'px';
-      el.style.fontSize = (data.fontSize * scale) + 'px';
+    textElements.forEach(entry => {
+      const { item, data } = entry;
+      item.style.left = (data.x * scale) + 'px';
+      item.style.top = (data.y * scale) + 'px';
+      item.style.width = (data.width * scale) + 'px';
+      item.style.height = (data.height * scale) + 'px';
+      entry.el.style.fontSize = (data.fontSize * scale) + 'px';
+      fitTextBox(entry);
     });
   }
 
+  // Si la fuente sustituta ocupa más ancho que el original, comprime el
+  // texto horizontalmente lo justo para que entre sin recortarse ni
+  // una letra (en vez de recortarlo con overflow:hidden).
+  function fitTextBox(entry){
+    const { el } = entry;
+    el.style.transform = 'scaleX(1)';
+    const targetWidth = el.getBoundingClientRect().width;
+    const natural = el.scrollWidth;
+    if (natural > targetWidth && targetWidth > 0) {
+      const scaleX = Math.max(0.4, targetWidth / natural);
+      el.style.transform = `scaleX(${scaleX})`;
+    }
+  }
+
   downloadPngBtn.addEventListener('click', () => {
-    if (!bgDataUrl) return;
     const a = document.createElement('a');
-    a.href = bgDataUrl;
+    a.href = bgCanvas.toDataURL('image/png');
     a.download = 'fondo-sin-texto.png';
     a.click();
   });
@@ -307,34 +391,78 @@
     exportBtn.textContent = 'Exportar PDF (texto real)';
   });
 
+  // Cachea los archivos de fuente ya conseguidos, para no volver a
+  // pedirlos si hay varios textos con la misma fuente.
+  const fontFileCache = new Map();
+
+  async function getFontBase64(fontName){
+    if (fontFileCache.has(fontName)) return fontFileCache.get(fontName);
+    try {
+      const res = await fetch(FONT_FILE_URL + '?name=' + encodeURIComponent(fontName));
+      if (!res.ok) throw new Error('font fetch failed');
+      const blob = await res.blob();
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      fontFileCache.set(fontName, base64);
+      return base64;
+    } catch (err) {
+      console.warn('No se pudo conseguir la fuente', fontName, err);
+      fontFileCache.set(fontName, null);
+      return null;
+    }
+  }
+
   async function exportToPdf(){
     const { jsPDF } = window.jspdf;
-    const PX_TO_MM = 1 / 3.7795; // ~96dpi
-    const PT_PER_MM = 2.8346;
 
-    const pageWmm = naturalWidth * PX_TO_MM;
-    const pageHmm = naturalHeight * PX_TO_MM;
+    // unit:'px' -> el tamaño de página y las coordenadas de texto/imagen
+    // se manejan en los mismos píxeles de la imagen, sin conversiones
+    // raras que antes hacían que el PDF saliera con el tamaño equivocado.
+    const doc = new jsPDF({ unit: 'px', format: [naturalWidth, naturalHeight] });
 
-    const doc = new jsPDF({ unit: 'mm', format: [pageWmm, pageHmm] });
+    doc.addImage(bgCanvas.toDataURL('image/png'), 'PNG', 0, 0, naturalWidth, naturalHeight);
 
-    // Fondo reconstruido, como imagen de base.
-    doc.addImage(bgDataUrl, 'PNG', 0, 0, pageWmm, pageHmm);
+    const activeElements = textElements.filter(e => !e.excluded);
 
-    // Cada texto, como texto REAL (no imagen) — por eso nunca pierde nitidez.
-    textElements.forEach(({ el, data }) => {
+    // Registra cada fuente distinta una sola vez.
+    const registeredFonts = new Set();
+    for (const entry of activeElements) {
+      const fontName = entry.data.font;
+      if (!fontName || registeredFonts.has(fontName)) continue;
+      registeredFonts.add(fontName);
+
+      const base64 = await getFontBase64(fontName);
+      if (base64) {
+        const vfsName = fontName.replace(/\s+/g, '') + '.ttf';
+        doc.addFileToVFS(vfsName, base64);
+        doc.addFont(vfsName, fontName, 'normal');
+      }
+    }
+
+    activeElements.forEach(({ el, data }) => {
       const currentText = el.textContent;
       if (!currentText.trim()) return;
 
       const [r, g, b] = hexToRgb(data.color);
       doc.setTextColor(r, g, b);
 
-      const fontSizePt = data.fontSize * PX_TO_MM * PT_PER_MM * 0.75; // ajuste de altura de línea a tamaño de fuente
+      if (data.font && registeredFonts.has(data.font) && fontFileCache.get(data.font)) {
+        doc.setFont(data.font, 'normal');
+      } else {
+        doc.setFont('helvetica', 'normal');
+      }
+
+      const fontSizePt = data.fontSize * 0.75; // 96dpi: 1pt = 1.333px
       doc.setFontSize(Math.max(4, fontSizePt));
 
-      const xMm = data.x * PX_TO_MM;
-      const yMm = (data.y + data.height * 0.8) * PX_TO_MM; // aproxima la línea base del texto
+      const xPx = data.x;
+      const yPx = data.y + data.height * 0.8; // aproxima la línea base del texto
 
-      doc.text(currentText, xMm, yMm, { maxWidth: data.width * PX_TO_MM });
+      doc.text(currentText, xPx, yPx, { maxWidth: data.width });
     });
 
     doc.save('diseno-editable.pdf');
