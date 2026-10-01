@@ -249,6 +249,29 @@ async function descargarContenido(fileId) {
   return res.text();
 }
 
+// driveFileId -> URL local (object URL) de una imagen ya descargada, para
+// no volver a pedirle la misma imagen a Drive cada vez que se repinta la
+// pestaña Archivos.
+const cacheImagenesDrive = new Map();
+
+/** Descarga una imagen de la carpeta "PrintCRM imagenes" y la deja lista para usar en un <img src="...">. */
+async function obtenerUrlImagenDrive(driveFileId) {
+  if (cacheImagenesDrive.has(driveFileId)) return cacheImagenesDrive.get(driveFileId);
+  try {
+    const res = await fetch(`${DRIVE_FILES_API}/${driveFileId}?alt=media`, {
+      headers: { Authorization: `Bearer ${state.accessToken}` },
+    });
+    if (!res.ok) throw new Error(`No se pudo descargar la imagen (código ${res.status})`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    cacheImagenesDrive.set(driveFileId, url);
+    return url;
+  } catch (err) {
+    cacheImagenesDrive.set(driveFileId, null);
+    return null;
+  }
+}
+
 async function subirContenido(fileId, jsonTexto) {
   const boundary = `printcrmweb_${Date.now()}`;
   const metadata = { name: NOMBRE_ARCHIVO_BACKUP, mimeType: 'application/json' };
@@ -1096,7 +1119,13 @@ function renderizarTabArchivos(cont, cliente) {
         .map(
           (a) => `
         <div class="archivo-card" data-id="${a.id}">
-          ${a.contenidoBase64 ? `<img src="${a.contenidoBase64}" data-ver="${a.id}" alt="${escaparHtml(a.nombre)}" />` : ''}
+          ${
+            a.contenidoBase64
+              ? `<img src="${a.contenidoBase64}" data-ver="${a.id}" alt="${escaparHtml(a.nombre)}" />`
+              : a.driveFileId
+                ? `<div class="archivo-card__cargando" data-cargar-imagen="${a.id}" data-drive-id="${a.driveFileId}">Cargando...</div>`
+                : ''
+          }
           <div class="archivo-card__nombre">${escaparHtml(a.nombre)}</div>
           <div class="archivo-card__meta">${escaparHtml(a.tipo)} · ${formatearFecha(a.fecha)}</div>
           <button type="button" class="archivo-card__eliminar" data-eliminar-archivo="${a.id}" title="Eliminar">✕</button>
@@ -1116,6 +1145,31 @@ function renderizarTabArchivos(cont, cliente) {
         botones: [{ texto: 'Cerrar', tipo: 'secundario', onClick: cerrarModal }],
       });
     });
+  });
+  // Estas imágenes viven como archivo suelto en la carpeta "PrintCRM
+  // imagenes" de Drive (el JSON, desde julio 2026, ya no las lleva adentro
+  // para no volverse gigante) -- se bajan directo con el mismo token de
+  // esta sesión, y quedan en memoria para no volver a pedirlas si el
+  // usuario entra y sale de la pestaña varias veces.
+  cont.querySelectorAll('[data-cargar-imagen]').forEach(async (div) => {
+    const a = archivos.find((x) => x.id === Number(div.dataset.cargarImagen));
+    const url = await obtenerUrlImagenDrive(div.dataset.driveId);
+    if (!div.isConnected) return; // el usuario ya cambió de pestaña, no tocar un nodo que ya no está
+    if (!url) {
+      div.textContent = '⚠️ No se pudo cargar';
+      return;
+    }
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = a ? a.nombre : '';
+    img.addEventListener('click', () => {
+      abrirModal({
+        titulo: a ? a.nombre : 'Imagen',
+        contenidoHtml: `<img src="${url}" class="preview" alt="Vista previa" />`,
+        botones: [{ texto: 'Cerrar', tipo: 'secundario', onClick: cerrarModal }],
+      });
+    });
+    div.replaceWith(img);
   });
   cont.querySelectorAll('[data-eliminar-archivo]').forEach((btn) => {
     btn.addEventListener('click', () => {

@@ -41,7 +41,7 @@ Para que Google la deje usar ese Client ID desde tu nueva URL de GitHub Pages:
 - **Por cliente**: editar nombre, número, rol de precio y observaciones; eliminar el cliente (y todos sus datos).
 - **Pedidos**: crear, editar (con el mismo cálculo automático Cantidad × Precio unitario que la extensión, y precio final editable a mano) y eliminar.
 - **Pagos**: registrar, editar y eliminar — con el mismo reparto automático entre pedidos pendientes cuando el pago es "general" (sin pedido asociado).
-- **Archivos**: ver las imágenes guardadas (clic para verlas en grande) y eliminarlas. No se pueden agregar archivos nuevos desde acá (eso requiere capturarlos del chat de WhatsApp, que solo la extensión puede hacer).
+- **Archivos**: ver las imágenes guardadas (clic para verlas en grande) y eliminarlas. Desde julio 2026 las imágenes no viven dentro del JSON de respaldo (eso lo haría gigante); viven como archivos sueltos en una carpeta de tu Drive ("PrintCRM imagenes"), y esta página las trae directo de ahí la primera vez que las necesita (puede verse un "Cargando..." un instante). No se pueden agregar archivos nuevos desde acá (eso requiere capturarlos del chat de WhatsApp, que solo la extensión puede hacer).
 - **Historial**: solo lectura.
 
 Todo lo que edites queda en memoria hasta que le des **"💾 Guardar cambios"** arriba — ahí recién se sube a Google Drive. Si cierras la pestaña con cambios sin guardar, el navegador te va a avisar.
