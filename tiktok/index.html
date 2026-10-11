@@ -3,318 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🏗️ Constructor de ZIP · Calculadora TikTok</title>
-<style>
-:root{
-  color-scheme:dark;
-  --bg:#0b0e15;--panel:#151a27;--panel-2:#1a2030;
-  --line:#2a3245;--text:#f4f6fb;--muted:#8f9bb3;--muted-2:#6b7690;
-  --accent:#ff2d70;--accent-2:#ff6ba0;--green:#2ee68a;
-  --yellow:#ffbd69;--blue:#60a5fa;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;padding:24px 16px 60px;min-height:100vh;
-  background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(255,45,112,.12), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(96,165,250,.10), transparent 60%),
-    var(--bg);
-  color:var(--text);
-  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
-}
-.app{max-width:780px;margin:auto}
-.hero{text-align:center;margin-bottom:24px}
-.hero .badge{
-  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;
-  text-transform:uppercase;color:var(--accent-2);
-  background:rgba(255,45,112,.10);border:1px solid rgba(255,45,112,.25);
-  padding:6px 12px;border-radius:999px;margin-bottom:14px;
-}
-.hero h1{
-  font-size:clamp(24px,4.5vw,34px);margin:0 0 8px;font-weight:800;
-  background:linear-gradient(135deg,#fff 0%,#ffd0e0 45%,#60a5fa 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  letter-spacing:-.5px;
-}
-.hero p{margin:0 auto;color:var(--muted);max-width:520px;font-size:15px}
-
-.panel{
-  background:linear-gradient(180deg,var(--panel) 0%,var(--panel-2) 100%);
-  border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;
-  box-shadow:0 8px 30px rgba(0,0,0,.35);
-}
-.panel h2{font-size:16px;margin:0 0 12px;font-weight:700;letter-spacing:-.2px}
-.panel h2 .num{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:22px;height:22px;border-radius:50%;
-  background:var(--accent);color:#fff;font-size:12px;margin-right:8px;
-  font-weight:800;
-}
-.options{display:grid;gap:10px}
-.opt{
-  display:flex;align-items:flex-start;gap:12px;
-  padding:12px;border-radius:12px;
-  background:rgba(10,14,24,.55);border:1px solid var(--line);
-  cursor:pointer;transition:border-color .15s;
-}
-.opt:hover{border-color:var(--accent)}
-.opt input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex-shrink:0}
-.opt-text{flex:1}
-.opt-title{font-size:14px;font-weight:700;margin-bottom:2px}
-.opt-desc{font-size:12px;color:var(--muted)}
-
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:14px 20px;border-radius:12px;
-  font-size:15px;font-weight:700;cursor:pointer;
-  border:none;transition:transform .15s,box-shadow .15s;
-}
-.btn.primary{
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#fff;box-shadow:0 6px 20px rgba(255,45,112,.35);
-}
-.btn.primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,45,112,.45)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
-
-.status{
-  margin-top:14px;padding:14px;border-radius:12px;
-  background:rgba(10,14,24,.55);border:1px solid var(--line);
-  font-size:13px;
-}
-.status-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.status-row:last-child{margin-bottom:0}
-.status-label{color:var(--muted)}
-.status-value{font-weight:700;font-variant-numeric:tabular-nums}
-.status-value.ok{color:var(--green)}
-.status-value.warn{color:var(--yellow)}
-.status-value.err{color:#ff6b6b}
-
-.progress{
-  height:10px;background:var(--bg);border-radius:999px;overflow:hidden;
-  border:1px solid var(--line);margin:12px 0 6px;
-}
-.progress-fill{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,var(--accent),var(--accent-2));
-  border-radius:999px;transition:width .3s ease;
-  box-shadow:0 0 12px rgba(255,45,112,.6);
-}
-.progress-text{
-  display:flex;justify-content:space-between;
-  font-size:11px;color:var(--muted-2);margin-bottom:14px;
-}
-
-.log{
-  max-height:180px;overflow-y:auto;
-  background:#080b12;border:1px solid var(--line);
-  border-radius:10px;padding:12px;margin-top:12px;
-  font:12px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  color:var(--muted);
-}
-.log-line{padding:2px 0}
-.log-line.ok{color:var(--green)}
-.log-line.err{color:#ff6b6b}
-.log-line.info{color:var(--blue)}
-.log-line.warn{color:var(--yellow)}
-
-.info-box{
-  padding:12px 14px;border-radius:10px;
-  background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);
-  font-size:13px;color:#c8d5e8;margin-top:12px;
-}
-.info-box strong{color:#fff}
-
-.final{
-  text-align:center;padding:22px;
-  background:linear-gradient(180deg,rgba(46,230,138,.10),rgba(46,230,138,.03));
-  border:1px solid rgba(46,230,138,.3);border-radius:14px;
-  margin-top:16px;
-}
-.final .emoji{font-size:38px;display:block;margin-bottom:8px}
-.final h3{margin:0 0 6px;color:var(--green);font-size:17px}
-.final p{margin:0;color:var(--muted);font-size:13px}
-</style>
-</head>
-<body>
-<main class="app">
-
-<header class="hero">
-  <span class="badge">🏗️ Constructor offline</span>
-  <h1>Generar ZIP de la calculadora</h1>
-  <p>Descarga todas las imágenes de los regalos y empaqueta la calculadora lista para usar sin internet.</p>
-</header>
-
-<section class="panel">
-  <h2><span class="num">1</span>Opciones</h2>
-  <div class="options">
-    <label class="opt">
-      <input type="checkbox" id="includeImages" checked>
-      <div class="opt-text">
-        <div class="opt-title">Incluir imágenes de los regalos</div>
-        <div class="opt-desc">Descarga las miniaturas reales de TikTok. ZIP de ~10–20 MB.</div>
-      </div>
-    </label>
-    <label class="opt">
-      <input type="checkbox" id="includeFallback" checked>
-      <div class="opt-text">
-        <div class="opt-title">Incluir catálogo de respaldo</div>
-        <div class="opt-desc">Si no hay internet, la calculadora usará emojis como respaldo.</div>
-      </div>
-    </label>
-  </div>
-</section>
-
-<section class="panel">
-  <h2><span class="num">2</span>Generar ZIP</h2>
-  <button class="btn primary" id="startBtn">🚀 Empezar descarga</button>
-
-  <div class="status" id="status" hidden>
-    <div class="status-row">
-      <span class="status-label">Estado</span>
-      <span class="status-value" id="statusText">—</span>
-    </div>
-    <div class="status-row">
-      <span class="status-label">Progreso</span>
-      <span class="status-value" id="statusCount">0 / 0</span>
-    </div>
-    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
-    <div class="progress-text">
-      <span id="progressPct">0%</span>
-      <span id="progressLabel">Iniciando…</span>
-    </div>
-  </div>
-
-  <div class="log" id="log" hidden></div>
-
-  <div class="info-box">
-    💡 Si algunas imágenes fallan por CORS, se descargarán mediante un proxy automáticamente. Si el proxy tampoco funciona, esa imagen se omite y el regalo usa emoji.
-  </div>
-</section>
-
-<section class="panel" id="resultPanel" hidden>
-  <div class="final">
-    <span class="emoji">🎉</span>
-    <h3>¡ZIP listo!</h3>
-    <p>Se descargó <strong id="zipName">calculadora-tiktok.zip</strong> a tu carpeta de descargas.</p>
-    <p style="margin-top:10px;font-size:12px">
-      Descomprímelo y abre <code>index.html</code> directamente en tu navegador. Funciona sin internet.
-    </p>
-  </div>
-</section>
-
-</main>
-
-<!-- Librerías externas -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
-<script>
-(() => {
-'use strict';
-
-// ============================================================================
-// CONFIGURACIÓN
-// ============================================================================
-const CATALOG_URLS = [
-  'https://raw.githubusercontent.com/Bluscream/synchra-api/main/data/tiktok_gifts.json',
-  'https://gist.githubusercontent.com/Bluscream/bc20c5e469eda2129d229242e28abe1c/raw/76d78eb777ca4b44f155aeed0a26f30eb90e8c21/tiktok-gifts-list.json'
-];
-
-const CORS_PROXIES = [
-  url => url,
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://images.weserv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//, ''))}`
-];
-
-// ============================================================================
-// UTILIDADES
-// ============================================================================
-const $ = id => document.getElementById(id);
-
-function normalize(name) {
-  return (name || '')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '') || 'regalo';
-}
-
-function getExtension(url) {
-  const path = url.split('?')[0];
-  const m = path.match(/\.(jpg|jpeg|png|webp|gif)$/i);
-  return m ? '.' + m[1].toLowerCase() : '.webp';
-}
-
-function log(msg, type = '') {
-  const box = $('log');
-  box.hidden = false;
-  const line = document.createElement('div');
-  line.className = 'log-line ' + type;
-  line.textContent = msg;
-  box.appendChild(line);
-  box.scrollTop = box.scrollHeight;
-}
-
-function updateProgress(current, total, label) {
-  const pct = total ? Math.round((current / total) * 100) : 0;
-  $('progressFill').style.width = pct + '%';
-  $('progressPct').textContent = pct + '%';
-  $('statusCount').textContent = `${current} / ${total}`;
-  if (label) $('progressLabel').textContent = label;
-}
-
-function setStatus(text, cls = '') {
-  const el = $('statusText');
-  el.textContent = text;
-  el.className = 'status-value ' + cls;
-}
-
-// ============================================================================
-// DESCARGA DE IMAGEN CON FALLBACK DE PROXIES
-// ============================================================================
-async function fetchImageAsBlob(url) {
-  for (let i = 0; i < CORS_PROXIES.length; i++) {
-    const proxied = CORS_PROXIES[i](url);
-    try {
-      const res = await fetch(proxied, { mode: 'cors' });
-      if (!res.ok) continue;
-      const blob = await res.blob();
-      if (blob.size < 100) continue;
-      return { blob, viaProxy: i > 0 };
-    } catch (e) {
-      // siguiente proxy
-    }
-  }
-  return null;
-}
-
-// ============================================================================
-// CARGA DEL CATÁLOGO
-// ============================================================================
-async function loadCatalog() {
-  for (const url of CATALOG_URLS) {
-    try {
-      log(`📥 Intentando: ${url.split('/').slice(-1)[0]}`, 'info');
-      const res = await fetch(url, { cache: 'no-cache' });
-      if (!res.ok) continue;
-      const raw = await res.json();
-      const list = Array.isArray(raw) ? raw : (raw.gifts || []);
-      if (!list.length) continue;
-      log(`✅ Catálogo obtenido: ${list.length} entradas`, 'ok');
-      return list;
-    } catch (e) {
-      log(`⚠️  Falló: ${e.message}`, 'warn');
-    }
-  }
-  return null;
-}
-
-// ============================================================================
-// GENERAR EL INDEX.HTML OFFLINE
-// ============================================================================
-function buildIndexHtml(hasFallback) {
-  return `<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Calculadora TikTok LIVE</title>
+<title>Calculadora TikTok LIVE</title>
 <style>
 :root{color-scheme:dark;--bg:#0b0e15;--bg-soft:#10141f;--panel:#151a27;--panel-2:#1a2030;--line:#2a3245;--line-soft:#20273a;--text:#f4f6fb;--muted:#8f9bb3;--muted-2:#6b7690;--accent:#ff2d70;--accent-2:#ff6ba0;--green:#2ee68a;--green-soft:#1c3d2c;--yellow:#ffbd69;--purple:#a78bfa;--radius:16px;--radius-sm:12px;--shadow:0 8px 30px rgba(0,0,0,.35)}
 *{box-sizing:border-box}html,body{margin:0;padding:0}
@@ -394,308 +83,443 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
 .metric strong.updated{animation:pulse .35s ease}
 @media(max-width:520px){body{padding:16px 10px 40px}.panel{padding:16px}.toolbar{grid-template-columns:1fr}.toolbar select{width:100%;min-width:0}.giftgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.metric strong{font-size:22px}}
-</style></head><body>
+</style>
+</head>
+<body>
 <main class="app">
-<header class="hero"><span class="badge">✨ TikTok LIVE · Offline</span><h1>Calculadora de regalos</h1><p>Descubre cuánto gastar en monedas para que tu creador reciba el monto que quieres.</p></header>
+<header class="hero">
+  <span class="badge">✨ TikTok LIVE · Estimación</span>
+  <h1>Calculadora de regalos</h1>
+  <p>Descubre cuánto gastar en monedas para que tu creador reciba el monto que quieres, y qué regalos puedes enviarle.</p>
+</header>
+
 <section class="panel">
-<div class="form">
-<div><label for="goal">Meta para el creador</label><div class="input-wrap"><span class="input-prefix">S/</span><input id="goal" class="has-prefix" type="number" min="0" step="0.5" value="50"></div></div>
-<div><label for="share">% estimado para el creador</label><select id="share"><option value="0.4" selected>40% (común)</option><option value="0.5">50% (optimista)</option><option value="0.6">60% (raro)</option></select></div>
-</div>
-<div class="presets" id="presets">
-<button class="preset" data-value="5">S/ 5</button>
-<button class="preset" data-value="10">S/ 10</button>
-<button class="preset" data-value="25">S/ 25</button>
-<button class="preset active" data-value="50">S/ 50</button>
-<button class="preset" data-value="100">S/ 100</button>
-<button class="preset" data-value="200">S/ 200</button>
-<button class="preset" data-value="500">S/ 500</button>
-</div>
+  <div class="form">
+    <div>
+      <label for="goal">Meta para el creador</label>
+      <div class="input-wrap">
+        <span class="input-prefix">S/</span>
+        <input id="goal" class="has-prefix" type="number" min="0" step="0.5" value="50">
+      </div>
+    </div>
+    <div>
+      <label for="share">% estimado para el creador</label>
+      <select id="share">
+        <option value="0.4" selected>40% (común)</option>
+        <option value="0.5">50% (optimista)</option>
+        <option value="0.6">60% (raro)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="presets" id="presets">
+    <button class="preset" data-value="5">S/ 5</button>
+    <button class="preset" data-value="10">S/ 10</button>
+    <button class="preset" data-value="25">S/ 25</button>
+    <button class="preset active" data-value="50">S/ 50</button>
+    <button class="preset" data-value="100">S/ 100</button>
+    <button class="preset" data-value="200">S/ 200</button>
+    <button class="preset" data-value="500">S/ 500</button>
+  </div>
 </section>
+
 <section class="panel">
-<div class="results">
-<div class="metric"><div class="label"><span class="dot"></span>Gasto estimado</div><strong id="spend">S/ 0</strong><small>Lo que pagarías por las monedas</small></div>
-<div class="metric"><div class="label"><span class="dot green"></span>Monedas a recibir</div><strong id="coins">0</strong><small>Saldo total disponible</small></div>
-<div class="metric"><div class="label"><span class="dot purple"></span>Paquetes sugeridos</div><strong id="packsLabel">—</strong><small>Combinación más económica</small></div>
-</div>
-<div class="progress-wrap"><div class="progress-labels"><span>Uso de tu saldo</span><span id="progressLabel">0%</span></div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div></div>
-<div class="cart" id="cartBox" hidden><div class="cart-title">🛒 Carrito sugerido</div><div class="cart-items" id="cartItems"></div></div>
-<div class="actions"><button class="btn primary" id="copyBtn">📋 Copiar resumen</button><button class="btn" id="resetBtn">↺ Reiniciar</button></div>
-<p class="note">Los paquetes de monedas se estiman según precios de referencia. La combinación elegida es la más económica que cubre el gasto estimado.</p>
+  <div class="results">
+    <div class="metric">
+      <div class="label"><span class="dot"></span>Gasto estimado</div>
+      <strong id="spend">S/ 0</strong>
+      <small>Lo que pagarías por las monedas</small>
+    </div>
+    <div class="metric">
+      <div class="label"><span class="dot green"></span>Monedas a recibir</div>
+      <strong id="coins">0</strong>
+      <small>Saldo total disponible</small>
+    </div>
+    <div class="metric">
+      <div class="label"><span class="dot purple"></span>Paquetes sugeridos</div>
+      <strong id="packsLabel">—</strong>
+      <small>Combinación más económica</small>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span>Uso de tu saldo</span>
+      <span id="progressLabel">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="cart" id="cartBox" hidden>
+    <div class="cart-title">🛒 Carrito sugerido</div>
+    <div class="cart-items" id="cartItems"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" id="copyBtn">📋 Copiar resumen</button>
+    <button class="btn" id="resetBtn">↺ Reiniciar</button>
+  </div>
+
+  <p class="note">Los paquetes de monedas se estiman según precios de referencia. La combinación elegida es la más económica que cubre el gasto estimado.</p>
 </section>
+
 <section class="panel">
-<div class="sectionhead"><div><h2>🎁 Regalos recomendados</h2><p id="summary">Cargando catálogo…</p></div><span class="pill" id="count">0 regalos</span></div>
-<div class="filters" id="filters"><button class="filter-tab active" data-filter="all">Todos</button><button class="filter-tab" data-filter="affordable">✅ Alcanzan</button><button class="filter-tab" data-filter="close">⚠️ Casi</button></div>
-<div class="toolbar">
-<input id="search" type="search" placeholder="🔎 Buscar regalo por nombre…" aria-label="Buscar regalo">
-<select id="sort" aria-label="Ordenar regalos"><option value="near">Más cercanos a mi saldo</option><option value="low">Menos monedas primero</option><option value="high">Más monedas primero</option></select>
-</div>
-<div id="giftGrid" class="giftgrid" aria-live="polite"><div class="loading"><div class="spinner"></div>Cargando regalos…</div></div>
-<p class="note">Los precios son referencias y pueden variar por región. Confirma el costo en TikTok antes de enviar. El porcentaje del creador es una hipótesis, no una tasa oficial.</p>
+  <div class="sectionhead">
+    <div>
+      <h2>🎁 Regalos recomendados</h2>
+      <p id="summary">Cargando catálogo…</p>
+    </div>
+    <span class="pill" id="count">0 regalos</span>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-tab active" data-filter="all">Todos</button>
+    <button class="filter-tab" data-filter="affordable">✅ Alcanzan</button>
+    <button class="filter-tab" data-filter="close">⚠️ Casi</button>
+  </div>
+
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="🔎 Buscar regalo por nombre…" aria-label="Buscar regalo">
+    <select id="sort" aria-label="Ordenar regalos">
+      <option value="near">Más cercanos a mi saldo</option>
+      <option value="low">Menos monedas primero</option>
+      <option value="high">Más monedas primero</option>
+    </select>
+  </div>
+
+  <div id="giftGrid" class="giftgrid" aria-live="polite">
+    <div class="loading"><div class="spinner"></div>Cargando regalos…</div>
+  </div>
+
+  <p class="note">Los precios son referencias y pueden variar por región. Confirma el costo en TikTok antes de enviar. El porcentaje del creador es una hipótesis, no una tasa oficial.</p>
 </section>
 </main>
+
 <script>
 (() => {
 'use strict';
-const packs=[{coins:30,price:1.29},{coins:350,price:14.79},{coins:700,price:29.55},{coins:1400,price:59.05},{coins:3500,price:147.59},{coins:7000,price:295.15},{coins:17500,price:737.85}];
-const fallbackGifts=${hasFallback ? JSON.stringify([
-  {name:'Rosa',coins:1,emoji:'🌹'},{name:'TikTok',coins:1,emoji:'🎵'},{name:'Corazón',coins:1,emoji:'❤️'},
-  {name:'Panda',coins:5,emoji:'🐼'},{name:'Dedos corazón',coins:5,emoji:'🫰'},{name:'Perfume',coins:20,emoji:'🧴'},
-  {name:'Donut',coins:30,emoji:'🍩'},{name:'Flor',coins:49,emoji:'🌷'},{name:'Guitarra',coins:99,emoji:'🎸'},
-  {name:'Confeti',coins:100,emoji:'🎉'},{name:'Gafas de sol',coins:199,emoji:'🕶️'},{name:'Mariposa',coins:199,emoji:'🦋'},
-  {name:'Corgi',coins:299,emoji:'🐶'},{name:'Guantes de boxeo',coins:299,emoji:'🥊'},{name:'Coral',coins:499,emoji:'🪸'},
-  {name:'Pistola de dinero',coins:500,emoji:'💸'},{name:'Cisne',coins:699,emoji:'🦢'},{name:'Trofeo',coins:799,emoji:'🏆'},
-  {name:'Tren',coins:899,emoji:'🚂'},{name:'Galaxy',coins:1000,emoji:'🌌'},{name:'Fuegos artificiales',coins:1088,emoji:'🎆'},
-  {name:'Diamante',coins:1099,emoji:'💎'},{name:'Boda',coins:1500,emoji:'💍'},{name:'Ballena',coins:2150,emoji:'🐋'},
-  {name:'Motocicleta',coins:2988,emoji:'🏍️'},{name:'Jet privado',coins:4888,emoji:'🛩️'},{name:'Cohete',coins:5000,emoji:'🚀'},
-  {name:'Auto deportivo',coins:7000,emoji:'🏎️'},{name:'Castillo',coins:20000,emoji:'🏰'},{name:'León',coins:29999,emoji:'🦁'},
-  {name:'Universo TikTok',coins:44999,emoji:'🌌'}
-].map(g=>({...g,imageUrl:null}))) : '[]'};
-let giftCatalog=[],activeFilter='all',lastPurchase=null;
-const $=id=>document.getElementById(id);
-const money=n=>'S/ '+n.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
-const num=n=>n.toLocaleString('es-PE');
-function animateNumber(el,t){if(el.textContent===t)return;el.textContent=t;el.classList.remove('updated');void el.offsetWidth;el.classList.add('updated');}
-async function loadCatalog(){
-  try{
-    const res=await fetch('./gifts.json',{cache:'no-cache'});
-    if(res.ok){
-      giftCatalog=await res.json();
-      console.log('✅ Catálogo local:',giftCatalog.length,'regalos');
+
+const packs = [
+  { coins: 30, price: 1.29 },
+  { coins: 350, price: 14.79 },
+  { coins: 700, price: 29.55 },
+  { coins: 1400, price: 59.05 },
+  { coins: 3500, price: 147.59 },
+  { coins: 7000, price: 295.15 },
+  { coins: 17500, price: 737.85 }
+];
+
+const fallbackGifts = [
+  { name: 'Rosa', coins: 1, emoji: '🌹' },
+  { name: 'TikTok', coins: 1, emoji: '🎵' },
+  { name: 'Corazón', coins: 1, emoji: '❤️' },
+  { name: 'Panda', coins: 5, emoji: '🐼' },
+  { name: 'Dedos corazón', coins: 5, emoji: '🫰' },
+  { name: 'Perfume', coins: 20, emoji: '🧴' },
+  { name: 'Donut', coins: 30, emoji: '🍩' },
+  { name: 'Flor', coins: 49, emoji: '🌷' },
+  { name: 'Guitarra', coins: 99, emoji: '🎸' },
+  { name: 'Confeti', coins: 100, emoji: '🎉' },
+  { name: 'Gafas de sol', coins: 199, emoji: '🕶️' },
+  { name: 'Mariposa', coins: 199, emoji: '🦋' },
+  { name: 'Corgi', coins: 299, emoji: '🐶' },
+  { name: 'Guantes de boxeo', coins: 299, emoji: '🥊' },
+  { name: 'Coral', coins: 499, emoji: '🪸' },
+  { name: 'Pistola de dinero', coins: 500, emoji: '💸' },
+  { name: 'Cisne', coins: 699, emoji: '🦢' },
+  { name: 'Trofeo', coins: 799, emoji: '🏆' },
+  { name: 'Tren', coins: 899, emoji: '🚂' },
+  { name: 'Galaxy', coins: 1000, emoji: '🌌' },
+  { name: 'Fuegos artificiales', coins: 1088, emoji: '🎆' },
+  { name: 'Diamante', coins: 1099, emoji: '💎' },
+  { name: 'Boda', coins: 1500, emoji: '💍' },
+  { name: 'Ballena', coins: 2150, emoji: '🐋' },
+  { name: 'Motocicleta', coins: 2988, emoji: '🏍️' },
+  { name: 'Jet privado', coins: 4888, emoji: '🛩️' },
+  { name: 'Cohete', coins: 5000, emoji: '🚀' },
+  { name: 'Auto deportivo', coins: 7000, emoji: '🏎️' },
+  { name: 'Castillo', coins: 20000, emoji: '🏰' },
+  { name: 'León', coins: 29999, emoji: '🦁' },
+  { name: 'Universo TikTok', coins: 44999, emoji: '🌌' }
+].map(g => ({ ...g, imageUrl: null }));
+
+let giftCatalog = [];
+let activeFilter = 'all';
+let lastPurchase = null;
+
+const $ = id => document.getElementById(id);
+const money = n => 'S/ ' + n.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const num = n => n.toLocaleString('es-PE');
+
+function animateNumber(el, t) {
+  if (el.textContent === t) return;
+  el.textContent = t;
+  el.classList.remove('updated');
+  void el.offsetWidth;
+  el.classList.add('updated');
+}
+
+async function loadCatalog() {
+  // 1) Intentar cargar gifts.json local (versión offline del ZIP)
+  try {
+    const res = await fetch('./gifts.json', { cache: 'no-cache' });
+    if (res.ok) {
+      giftCatalog = await res.json();
+      console.log('✅ Catálogo local:', giftCatalog.length, 'regalos');
       return;
     }
-  }catch(e){console.warn('No hay gifts.json local:',e.message);}
-  giftCatalog=fallbackGifts;
-  console.log('⚠️  Usando respaldo:',giftCatalog.length,'regalos');
+  } catch (e) {
+    console.warn('No hay gifts.json local:', e.message);
+  }
+
+  // 2) Intentar API remota
+  const sources = [
+    'https://raw.githubusercontent.com/Bluscream/synchra-api/main/data/tiktok_gifts.json',
+    'https://gist.githubusercontent.com/Bluscream/bc20c5e469eda2129d229242e28abe1c/raw/76d78eb777ca4b44f155aeed0a26f30eb90e8c21/tiktok-gifts-list.json'
+  ];
+  for (const url of sources) {
+    try {
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) continue;
+      const raw = await res.json();
+      const list = Array.isArray(raw) ? raw : (raw.gifts || []);
+      if (!list.length) continue;
+      giftCatalog = list.map(item => {
+        const names = item.names || {};
+        const name = names.es || names.en || Object.values(names)[0] || item.slug || 'Regalo';
+        const coins = Number(item.diamond_count) || 0;
+        const imageUrl = item.image_url || null;
+        return { name, coins, imageUrl, emoji: '🎁' };
+      }).filter(g => g.coins > 0 && g.name && g.name !== 'Regalo');
+      giftCatalog.sort((a, b) => a.coins - b.coins);
+      console.log('✅ Catálogo remoto:', giftCatalog.length, 'regalos');
+      return;
+    } catch (e) {
+      console.warn('Falló:', url, e.message);
+    }
+  }
+
+  giftCatalog = fallbackGifts;
+  console.warn('⚠️ Usando respaldo:', giftCatalog.length, 'regalos');
 }
-function estimateCoins(spend){
-  const target=Math.min(2000000,Math.max(0,Math.ceil(spend*100-1e-8)));
-  if(target===0)return{cost:0,coins:0,count:0,items:[]};
-  const ps=packs.map((p,i)=>({idx:i,c:Math.round(p.price*100),coins:p.coins}));
-  const maxCoin=Math.max(...ps.map(p=>p.c));
-  const dp=new Array(target+maxCoin+1).fill(Infinity);
-  const prev=new Array(dp.length).fill(-1);dp[0]=0;
-  for(let x=0;x<dp.length;x++){if(!Number.isFinite(dp[x]))continue;for(let i=0;i<ps.length;i++){const nx=x+ps[i].c;if(nx<dp.length&&dp[nx]>dp[x]+ps[i].c){dp[nx]=dp[x]+ps[i].c;prev[nx]=i;}}}
-  let end=target;while(end<dp.length&&!Number.isFinite(dp[end]))end++;
-  if(end>=dp.length)return{cost:spend,coins:0,count:0,items:[]};
-  let coins=0,count=0,x=end;const counts={};
-  while(x>0&&prev[x]>=0){const i=prev[x];coins+=ps[i].coins;count++;counts[i]=(counts[i]||0)+1;x-=ps[i].c;}
-  const items=Object.keys(counts).map(i=>({coins:packs[i].coins,price:packs[i].price,qty:counts[i]}));
-  return{cost:dp[end]/100,coins,count,items};
+
+function estimateCoins(spend) {
+  const target = Math.min(2000000, Math.max(0, Math.ceil(spend * 100 - 1e-8)));
+  if (target === 0) return { cost: 0, coins: 0, count: 0, items: [] };
+  const ps = packs.map((p, i) => ({ idx: i, c: Math.round(p.price * 100), coins: p.coins }));
+  const maxCoin = Math.max(...ps.map(p => p.c));
+  const dp = new Array(target + maxCoin + 1).fill(Infinity);
+  const prev = new Array(dp.length).fill(-1);
+  dp[0] = 0;
+  for (let x = 0; x < dp.length; x++) {
+    if (!Number.isFinite(dp[x])) continue;
+    for (let i = 0; i < ps.length; i++) {
+      const nx = x + ps[i].c;
+      if (nx < dp.length && dp[nx] > dp[x] + ps[i].c) {
+        dp[nx] = dp[x] + ps[i].c;
+        prev[nx] = i;
+      }
+    }
+  }
+  let end = target;
+  while (end < dp.length && !Number.isFinite(dp[end])) end++;
+  if (end >= dp.length) return { cost: spend, coins: 0, count: 0, items: [] };
+  let coins = 0, count = 0, x = end;
+  const counts = {};
+  while (x > 0 && prev[x] >= 0) {
+    const i = prev[x];
+    coins += ps[i].coins;
+    count++;
+    counts[i] = (counts[i] || 0) + 1;
+    x -= ps[i].c;
+  }
+  const items = Object.keys(counts).map(i => ({ coins: packs[i].coins, price: packs[i].price, qty: counts[i] }));
+  return { cost: dp[end] / 100, coins, count, items };
 }
-function updateProgress(balance,maxCoins){const pct=maxCoins?Math.min(100,(balance/maxCoins)*100):0;$('progressFill').style.width=pct+'%';$('progressLabel').textContent=Math.round(pct)+'%';}
-function renderCart(items){const box=$('cartBox'),list=$('cartItems');list.replaceChildren();if(!items||!items.length){box.hidden=true;return;}box.hidden=false;for(const it of items){const el=document.createElement('div');el.className='cart-item';el.innerHTML=\`<span class="coin"></span> \${it.qty}× \${num(it.coins)} <span class="price">(\${money(it.price)})</span>\`;list.appendChild(el);}}
-function calculate(){
-  const goal=Math.max(0,Number($('goal').value)||0);
-  const share=Number($('share').value)||0.4;
-  const purchase=estimateCoins(goal/share);
-  const balance=purchase.coins;lastPurchase=purchase;
-  animateNumber($('spend'),money(purchase.cost));
-  animateNumber($('coins'),num(balance));
-  animateNumber($('packsLabel'),purchase.count?purchase.count+' aprox.':'0');
-  const lower=balance*0.99;
-  const upper=balance*1.25;
-  $('summary').textContent=\`Regalos entre \${num(Math.floor(lower))} y \${num(Math.ceil(upper))} monedas (1% menos a 25% más que tu saldo).\`;
-  const maxCoins=giftCatalog.length?Math.max(...giftCatalog.map(g=>g.coins)):0;
-  updateProgress(balance,maxCoins);
-  renderCart(purchase.items);
-  const q=$('search').value.trim().toLowerCase('es');
-  let list=giftCatalog.filter(g=>{
-    if(g.coins<lower||g.coins>upper)return false;
-    if(q&&!g.name.toLowerCase('es').includes(q))return false;
-    if(activeFilter==='affordable'&&g.coins>balance)return false;
-    if(activeFilter==='close'&&g.coins<=balance)return false;
-    return true;
-  });
-  const sort=$('sort').value;
-  if(sort==='low')list.sort((a,b)=>a.coins-b.coins);
-  else if(sort==='high')list.sort((a,b)=>b.coins-a.coins);
-  else list.sort((a,b)=>Math.abs(a.coins-balance)-Math.abs(b.coins-balance));
-  $('count').textContent=list.length+' regalo'+(list.length===1?'':'s');
-  const grid=$('giftGrid');grid.replaceChildren();
-  if(!list.length){grid.innerHTML='<div class="empty"><span class="emoji">🔍</span>No encontramos regalos con esos filtros.<br>Prueba cambiar el monto, el porcentaje o el buscador.</div>';return;}
-  let bestGift=null,bestDiff=Infinity;
-  for(const g of list){const d=Math.abs(g.coins-balance);if(d<bestDiff){bestDiff=d;bestGift=g;}}
-  for(const g of list){
-    const card=document.createElement('article');
-    const canAfford=g.coins<=balance;
-    const isBest=bestGift===g&&canAfford;
-    card.className='gift'+(canAfford?'':' over')+(isBest?' best':'');
-    if(g.imageUrl){const img=document.createElement('img');img.className='thumb';img.src=g.imageUrl;img.alt='Regalo '+g.name;img.loading='lazy';img.onerror=()=>{const fb=document.createElement('div');fb.className='emoji-fallback';fb.textContent=g.emoji||'🎁';img.replaceWith(fb);};card.appendChild(img);}
-    else{const icon=document.createElement('div');icon.className='emoji-fallback';icon.textContent=g.emoji||'🎁';card.appendChild(icon);}
-    const title=document.createElement('b');title.textContent=g.name;card.appendChild(title);
-    const status=document.createElement('small');status.className='status';status.textContent=canAfford?'Alcanza con tu saldo':\`Faltan \${num(g.coins-balance)} monedas\`;card.appendChild(status);
-    const cost=document.createElement('div');cost.className='cost';cost.innerHTML=\`<span class="coin"></span> \${num(g.coins)}\`;card.appendChild(cost);
-    if(canAfford){const times=Math.floor(balance/g.coins);if(times>1){const mult=document.createElement('div');mult.className='multiplier';mult.innerHTML=\`Puedes enviarlo <span>\${times}×</span>\`;card.appendChild(mult);}}
-    grid.appendChild(card);
+
+function updateProgress(balance, maxCoins) {
+  const pct = maxCoins ? Math.min(100, (balance / maxCoins) * 100) : 0;
+  $('progressFill').style.width = pct + '%';
+  $('progressLabel').textContent = Math.round(pct) + '%';
+}
+
+function renderCart(items) {
+  const box = $('cartBox'), list = $('cartItems');
+  list.replaceChildren();
+  if (!items || !items.length) { box.hidden = true; return; }
+  box.hidden = false;
+  for (const it of items) {
+    const el = document.createElement('div');
+    el.className = 'cart-item';
+    el.innerHTML = `<span class="coin"></span> ${it.qty}× ${num(it.coins)} <span class="price">(${money(it.price)})</span>`;
+    list.appendChild(el);
   }
 }
-function setupEvents(){
-  $('goal').addEventListener('input',()=>{document.querySelectorAll('.preset').forEach(p=>p.classList.remove('active'));calculate();});
-  $('share').addEventListener('change',calculate);
-  $('search').addEventListener('input',calculate);
-  $('sort').addEventListener('change',calculate);
-  document.querySelectorAll('.preset').forEach(btn=>{btn.addEventListener('click',()=>{$('goal').value=btn.dataset.value;document.querySelectorAll('.preset').forEach(p=>p.classList.remove('active'));btn.classList.add('active');calculate();});});
-  document.querySelectorAll('.filter-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');activeFilter=tab.dataset.filter;calculate();});});
-  $('copyBtn').addEventListener('click',async()=>{
-    if(!lastPurchase)return;
-    const goal=$('goal').value,share=Math.round(Number($('share').value)*100);
-    const txt=\`🎁 Calculadora TikTok LIVE\\nMeta: S/ \${goal}\\nPorcentaje: \${share}%\\nGasto: \${money(lastPurchase.cost)}\\nMonedas: \${num(lastPurchase.coins)}\\nPaquetes: \${lastPurchase.count}\`;
-    try{await navigator.clipboard.writeText(txt);$('copyBtn').textContent='✅ ¡Copiado!';setTimeout(()=>$('copyBtn').textContent='📋 Copiar resumen',1600);}catch{alert(txt);}
+
+function calculate() {
+  const goal = Math.max(0, Number($('goal').value) || 0);
+  const share = Number($('share').value) || 0.4;
+  const purchase = estimateCoins(goal / share);
+  const balance = purchase.coins;
+  lastPurchase = purchase;
+
+  animateNumber($('spend'), money(purchase.cost));
+  animateNumber($('coins'), num(balance));
+  animateNumber($('packsLabel'), purchase.count ? purchase.count + ' aprox.' : '0');
+
+  // ✅ Rango: 1% menos a 25% más
+  const lower = balance * 0.99;
+  const upper = balance * 1.25;
+  $('summary').textContent = `Regalos entre ${num(Math.floor(lower))} y ${num(Math.ceil(upper))} monedas (1% menos a 25% más que tu saldo).`;
+
+  const maxCoins = giftCatalog.length ? Math.max(...giftCatalog.map(g => g.coins)) : 0;
+  updateProgress(balance, maxCoins);
+  renderCart(purchase.items);
+
+  const q = $('search').value.trim().toLowerCase('es');
+  let list = giftCatalog.filter(g => {
+    if (g.coins < lower || g.coins > upper) return false;
+    if (q && !g.name.toLowerCase('es').includes(q)) return false;
+    if (activeFilter === 'affordable' && g.coins > balance) return false;
+    if (activeFilter === 'close' && g.coins <= balance) return false;
+    return true;
   });
-  $('resetBtn').addEventListener('click',()=>{$('goal').value=50;$('share').value='0.4';$('search').value='';$('sort').value='near';activeFilter='all';document.querySelectorAll('.filter-tab').forEach(t=>t.classList.toggle('active',t.dataset.filter==='all'));document.querySelectorAll('.preset').forEach(p=>p.classList.toggle('active',p.dataset.value==='50'));calculate();});
-}
-async function init(){setupEvents();$('summary').textContent='Cargando catálogo…';await loadCatalog();calculate();}
-init();
-})();
-<\/script>
-</body></html>`;
-}
 
-// ============================================================================
-// CONSTRUIR Y DESCARGAR EL ZIP
-// ============================================================================
-async function buildZip() {
-  const startBtn = $('startBtn');
-  startBtn.disabled = true;
-  $('status').hidden = false;
-  $('log').hidden = false;
-  $('resultPanel').hidden = true;
-  $('log').innerHTML = '';
+  const sort = $('sort').value;
+  if (sort === 'low') list.sort((a, b) => a.coins - b.coins);
+  else if (sort === 'high') list.sort((a, b) => b.coins - a.coins);
+  else list.sort((a, b) => Math.abs(a.coins - balance) - Math.abs(b.coins - balance));
 
-  setStatus('Cargando catálogo…', 'warn');
-  updateProgress(0, 1, 'Cargando…');
+  $('count').textContent = list.length + ' regalo' + (list.length === 1 ? '' : 's');
+  const grid = $('giftGrid');
+  grid.replaceChildren();
 
-  const rawList = await loadCatalog();
-  if (!rawList) {
-    setStatus('Error: no se pudo cargar el catálogo', 'err');
-    log('❌ No se pudo obtener el catálogo. Verifica tu conexión a internet.', 'err');
-    startBtn.disabled = false;
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty"><span class="emoji">🔍</span>No encontramos regalos con esos filtros.<br>Prueba cambiar el monto, el porcentaje o el buscador.</div>';
     return;
   }
 
-  const gifts = [];
-  const seen = new Set();
-  for (const item of rawList) {
-    const names = item.names || {};
-    const name = names.es || names.en || Object.values(names)[0] || item.slug || 'Regalo';
-    const coins = Number(item.diamond_count) || 0;
-    const imageUrl = item.image_url || null;
-    if (!coins || !name || name === 'Regalo') continue;
-    const slug = normalize(name);
-    if (seen.has(slug)) continue;
-    seen.add(slug);
-    gifts.push({ name, coins, imageUrl, slug });
-  }
-  gifts.sort((a, b) => a.coins - b.coins);
-  log(`✅ ${gifts.length} regalos únicos listos`, 'ok');
-
-  const zip = new JSZip();
-  const imagesFolder = zip.folder('images');
-
-  const includeImages = $('includeImages').checked;
-  const includeFallback = $('includeFallback').checked;
-
-  const catalog = [];
-  if (includeImages) {
-    setStatus('Descargando imágenes…', 'warn');
-    const total = gifts.length;
-    let done = 0, ok = 0, fail = 0, viaProxy = 0;
-
-    for (const g of gifts) {
-      done++;
-      if (!g.imageUrl) {
-        fail++;
-        catalog.push({ name: g.name, coins: g.coins, imageUrl: null, emoji: '🎁' });
-        updateProgress(done, total, `[${done}/${total}] Sin imagen: ${g.name}`);
-        continue;
-      }
-
-      updateProgress(done, total, `[${done}/${total}] ${g.name}`);
-
-      const result = await fetchImageAsBlob(g.imageUrl);
-      if (result) {
-        const ext = getExtension(g.imageUrl);
-        const filename = g.slug + ext;
-        imagesFolder.file(filename, result.blob);
-        catalog.push({ name: g.name, coins: g.coins, imageUrl: `images/${filename}`, emoji: '🎁' });
-        ok++;
-        if (result.viaProxy) viaProxy++;
-        if (done % 20 === 0 || done === total) {
-          log(`  ⬇️  ${done}/${total} · ✅ ${ok} · ❌ ${fail} · 🔄 ${viaProxy} vía proxy`, 'info');
-        }
-      } else {
-        fail++;
-        catalog.push({ name: g.name, coins: g.coins, imageUrl: null, emoji: '🎁' });
-      }
-    }
-
-    log(`\n📸 Imágenes: ${ok} descargadas · ${fail} sin imagen · ${viaProxy} vía proxy`, ok > 0 ? 'ok' : 'warn');
-  } else {
-    for (const g of gifts) {
-      catalog.push({ name: g.name, coins: g.coins, imageUrl: null, emoji: '🎁' });
-    }
-    log('⏭️  Imágenes omitidas por configuración', 'info');
+  let bestGift = null, bestDiff = Infinity;
+  for (const g of list) {
+    const d = Math.abs(g.coins - balance);
+    if (d < bestDiff) { bestDiff = d; bestGift = g; }
   }
 
-  zip.file('gifts.json', JSON.stringify(catalog, null, 2));
-  log('💾 gifts.json añadido', 'ok');
+  for (const g of list) {
+    const card = document.createElement('article');
+    const canAfford = g.coins <= balance;
+    const isBest = bestGift === g && canAfford;
+    card.className = 'gift' + (canAfford ? '' : ' over') + (isBest ? ' best' : '');
 
-  zip.file('index.html', buildIndexHtml(includeFallback));
-  log('📄 index.html añadido', 'ok');
-
-  zip.file('README.txt', `Calculadora TikTok LIVE - Versión offline
-============================================
-
-Cómo usar:
-1. Descomprime este ZIP en cualquier carpeta.
-2. Abre el archivo "index.html" en tu navegador (Chrome, Firefox, Edge, Safari).
-3. ¡Listo! Funciona sin conexión a internet.
-
-Estructura:
-- index.html   → la calculadora
-- gifts.json   → catálogo de regalos (${catalog.length} regalos)
-- images/      → miniaturas de los regalos
-- README.txt   → este archivo
-
-Rango de regalos:
-- Se muestran regalos desde 1% menos hasta 25% más que tu saldo estimado.
-
-Notas:
-- Los precios de las monedas son referenciales en Soles peruanos (PEN).
-- El porcentaje que recibe el creador es una estimación ajustable (40%, 50% o 60%).
-- Los precios reales pueden variar según la región y el método de pago.
-- Generado el ${new Date().toLocaleString('es-PE')}
-`);
-  log('📝 README.txt añadido', 'ok');
-
-  setStatus('Comprimiendo ZIP…', 'warn');
-  updateProgress(0, 1, 'Comprimiendo…');
-
-  const blob = await zip.generateAsync(
-    { type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } },
-    (meta) => {
-      updateProgress(Math.round(meta.percent), 100, `Comprimiendo ${Math.round(meta.percent)}%`);
+    if (g.imageUrl) {
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.src = g.imageUrl;
+      img.alt = 'Regalo ' + g.name;
+      img.loading = 'lazy';
+      img.onerror = () => {
+        const fb = document.createElement('div');
+        fb.className = 'emoji-fallback';
+        fb.textContent = g.emoji || '🎁';
+        img.replaceWith(fb);
+      };
+      card.appendChild(img);
+    } else {
+      const icon = document.createElement('div');
+      icon.className = 'emoji-fallback';
+      icon.textContent = g.emoji || '🎁';
+      card.appendChild(icon);
     }
-  );
 
-  const zipName = `calculadora-tiktok-${new Date().toISOString().slice(0, 10)}.zip`;
-  saveAs(blob, zipName);
+    const title = document.createElement('b');
+    title.textContent = g.name;
+    card.appendChild(title);
 
-  const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
-  setStatus('¡Completado!', 'ok');
-  updateProgress(1, 1, 'Completado');
-  $('zipName').textContent = zipName;
-  $('resultPanel').hidden = false;
-  log(`\n🎉 ZIP generado: ${zipName} (${sizeMB} MB)`, 'ok');
-  log(`   ${catalog.length} regalos · ${Object.keys(imagesFolder.files).length} imágenes`, 'ok');
+    const status = document.createElement('small');
+    status.className = 'status';
+    status.textContent = canAfford ? 'Alcanza con tu saldo' : `Faltan ${num(g.coins - balance)} monedas`;
+    card.appendChild(status);
 
-  startBtn.disabled = false;
-  startBtn.textContent = '🔄 Generar de nuevo';
+    const cost = document.createElement('div');
+    cost.className = 'cost';
+    cost.innerHTML = `<span class="coin"></span> ${num(g.coins)}`;
+    card.appendChild(cost);
+
+    if (canAfford) {
+      const times = Math.floor(balance / g.coins);
+      if (times > 1) {
+        const mult = document.createElement('div');
+        mult.className = 'multiplier';
+        mult.innerHTML = `Puedes enviarlo <span>${times}×</span>`;
+        card.appendChild(mult);
+      }
+    }
+
+    grid.appendChild(card);
+  }
 }
 
-$('startBtn').addEventListener('click', buildZip);
+function setupEvents() {
+  $('goal').addEventListener('input', () => {
+    document.querySelectorAll('.preset').forEach(p => p.classList.remove('active'));
+    calculate();
+  });
+  $('share').addEventListener('change', calculate);
+  $('search').addEventListener('input', calculate);
+  $('sort').addEventListener('change', calculate);
 
+  document.querySelectorAll('.preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('goal').value = btn.dataset.value;
+      document.querySelectorAll('.preset').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      calculate();
+    });
+  });
+
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeFilter = tab.dataset.filter;
+      calculate();
+    });
+  });
+
+  $('copyBtn').addEventListener('click', async () => {
+    if (!lastPurchase) return;
+    const goal = $('goal').value;
+    const share = Math.round(Number($('share').value) * 100);
+    const txt = `🎁 Calculadora TikTok LIVE\nMeta: S/ ${goal}\nPorcentaje: ${share}%\nGasto: ${money(lastPurchase.cost)}\nMonedas: ${num(lastPurchase.coins)}\nPaquetes: ${lastPurchase.count}`;
+    try {
+      await navigator.clipboard.writeText(txt);
+      $('copyBtn').textContent = '✅ ¡Copiado!';
+      setTimeout(() => $('copyBtn').textContent = '📋 Copiar resumen', 1600);
+    } catch {
+      alert(txt);
+    }
+  });
+
+  $('resetBtn').addEventListener('click', () => {
+    $('goal').value = 50;
+    $('share').value = '0.4';
+    $('search').value = '';
+    $('sort').value = 'near';
+    activeFilter = 'all';
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === 'all'));
+    document.querySelectorAll('.preset').forEach(p => p.classList.toggle('active', p.dataset.value === '50'));
+    calculate();
+  });
+}
+
+async function init() {
+  setupEvents();
+  $('summary').textContent = 'Cargando catálogo…';
+  await loadCatalog();
+  calculate();
+}
+
+init();
 })();
 </script>
 </body>
