@@ -1,0 +1,1694 @@
+[
+  {
+    "name": "TikTok",
+    "coins": 1,
+    "imageUrl": "images/tiktok.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Rosa",
+    "coins": 1,
+    "imageUrl": "images/rosa.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Weights",
+    "coins": 1,
+    "imageUrl": "images/weights.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Cono de helado",
+    "coins": 1,
+    "imageUrl": "images/cono_de_helado.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Lion 222",
+    "coins": 1,
+    "imageUrl": "images/lion_222.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Mini Speaker",
+    "coins": 1,
+    "imageUrl": "images/mini_speaker.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "GG",
+    "coins": 1,
+    "imageUrl": "images/gg.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Football",
+    "coins": 1,
+    "imageUrl": "images/football.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Love Letter",
+    "coins": 1,
+    "imageUrl": "images/love_letter.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "OK",
+    "coins": 1,
+    "imageUrl": "images/ok.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Corazón",
+    "coins": 1,
+    "imageUrl": "images/corazon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Rebanada de pastel",
+    "coins": 1,
+    "imageUrl": "images/rebanada_de_pastel.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Glow Stick",
+    "coins": 1,
+    "imageUrl": "images/glow_stick.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Quiéreme",
+    "coins": 1,
+    "imageUrl": "images/quiereme.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Corazón de fuego",
+    "coins": 1,
+    "imageUrl": "images/corazon_de_fuego.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tarta de cumpleaños",
+    "coins": 1,
+    "imageUrl": "images/tarta_de_cumpleanos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Huellas de dinosaurio",
+    "coins": 1,
+    "imageUrl": "images/huellas_de_dinosaurio.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tenis",
+    "coins": 1,
+    "imageUrl": "images/tenis.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pulsera de equipo",
+    "coins": 2,
+    "imageUrl": "images/pulsera_de_equipo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Panda",
+    "coins": 5,
+    "imageUrl": "images/panda.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Corazón coreano",
+    "coins": 5,
+    "imageUrl": "images/corazon_coreano.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Mic",
+    "coins": 5,
+    "imageUrl": "images/mic.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Hi",
+    "coins": 5,
+    "imageUrl": "images/hi.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Patito",
+    "coins": 5,
+    "imageUrl": "images/patito.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Potato",
+    "coins": 5,
+    "imageUrl": "images/potato.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Salchicha ojona",
+    "coins": 5,
+    "imageUrl": "images/salchicha_ojona.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Magic Letter",
+    "coins": 7,
+    "imageUrl": "images/magic_letter.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Hand Wave",
+    "coins": 9,
+    "imageUrl": "images/hand_wave.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Snowboard",
+    "coins": 9,
+    "imageUrl": "images/snowboard.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Apoyo",
+    "coins": 9,
+    "imageUrl": "images/apoyo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Aplauso",
+    "coins": 9,
+    "imageUrl": "images/aplauso.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Lollipop",
+    "coins": 10,
+    "imageUrl": "images/lollipop.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Gamepad",
+    "coins": 10,
+    "imageUrl": "images/gamepad.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pequeño dinosaurio",
+    "coins": 10,
+    "imageUrl": "images/pequeno_dinosaurio.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Polluelo",
+    "coins": 10,
+    "imageUrl": "images/polluelo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Conejo",
+    "coins": 10,
+    "imageUrl": "images/conejo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Hora de ASMR",
+    "coins": 10,
+    "imageUrl": "images/hora_de_asmr.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Herradura",
+    "coins": 10,
+    "imageUrl": "images/herradura.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Zapatillas de deporte",
+    "coins": 10,
+    "imageUrl": "images/zapatillas_de_deporte.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Collar de amistad",
+    "coins": 10,
+    "imageUrl": "images/collar_de_amistad.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Cherry Blossom Bunny",
+    "coins": 10,
+    "imageUrl": "images/cherry_blossom_bunny.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Hora del café",
+    "coins": 15,
+    "imageUrl": "images/hora_del_cafe.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Perfume",
+    "coins": 20,
+    "imageUrl": "images/perfume.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Rosquilla",
+    "coins": 30,
+    "imageUrl": "images/rosquilla.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Mirror",
+    "coins": 30,
+    "imageUrl": "images/mirror.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Te quiero en lengua de signos",
+    "coins": 49,
+    "imageUrl": "images/te_quiero_en_lengua_de_signos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Mariposa",
+    "coins": 88,
+    "imageUrl": "images/mariposa.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Familia",
+    "coins": 90,
+    "imageUrl": "images/familia.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fuerza",
+    "coins": 90,
+    "imageUrl": "images/fuerza.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Choque de puños",
+    "coins": 90,
+    "imageUrl": "images/choque_de_punos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Cisne de papel",
+    "coins": 99,
+    "imageUrl": "images/cisne_de_papel.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pequeña corona",
+    "coins": 99,
+    "imageUrl": "images/pequena_corona.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Gorra",
+    "coins": 99,
+    "imageUrl": "images/gorra.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Sombrero y bigote",
+    "coins": 99,
+    "imageUrl": "images/sombrero_y_bigote.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Estrella",
+    "coins": 99,
+    "imageUrl": "images/estrella.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Persona honorable",
+    "coins": 99,
+    "imageUrl": "images/persona_honorable.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Estrella emergente",
+    "coins": 99,
+    "imageUrl": "images/estrella_emergente.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Beso de corazón",
+    "coins": 99,
+    "imageUrl": "images/beso_de_corazon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Guitarra",
+    "coins": 99,
+    "imageUrl": "images/guitarra.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Metralleta de me gustas",
+    "coins": 99,
+    "imageUrl": "images/metralleta_de_me_gustas.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Corona de cumpleaños",
+    "coins": 99,
+    "imageUrl": "images/corona_de_cumpleanos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Parches de ojos",
+    "coins": 99,
+    "imageUrl": "images/parches_de_ojos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Confeti",
+    "coins": 100,
+    "imageUrl": "images/confeti.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Hand Hearts",
+    "coins": 100,
+    "imageUrl": "images/hand_hearts.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Corazón con las manos",
+    "coins": 100,
+    "imageUrl": "images/corazon_con_las_manos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Confeti de Colores",
+    "coins": 100,
+    "imageUrl": "images/confeti_de_colores.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Osito Mishka",
+    "coins": 100,
+    "imageUrl": "images/osito_mishka.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Calcetines y sandalias",
+    "coins": 150,
+    "imageUrl": "images/calcetines_y_sandalias.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Beso",
+    "coins": 150,
+    "imageUrl": "images/beso.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Music Note",
+    "coins": 169,
+    "imageUrl": "images/music_note.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Wizard Hat",
+    "coins": 177,
+    "imageUrl": "images/wizard_hat.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Gafas de sol",
+    "coins": 199,
+    "imageUrl": "images/gafas_de_sol.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Corazones",
+    "coins": 199,
+    "imageUrl": "images/corazones.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Goggles",
+    "coins": 199,
+    "imageUrl": "images/goggles.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Candado con llave",
+    "coins": 199,
+    "imageUrl": "images/candado_con_llave.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Ski Goggles",
+    "coins": 199,
+    "imageUrl": "images/ski_goggles.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tocado de flores",
+    "coins": 199,
+    "imageUrl": "images/tocado_de_flores.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Te quiero",
+    "coins": 199,
+    "imageUrl": "images/te_quiero.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Me alegro por ti",
+    "coins": 199,
+    "imageUrl": "images/me_alegro_por_ti.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Energía positiva",
+    "coins": 199,
+    "imageUrl": "images/energia_positiva.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Suricata",
+    "coins": 199,
+    "imageUrl": "images/suricata.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Gafas de cumpleaños",
+    "coins": 199,
+    "imageUrl": "images/gafas_de_cumpleanos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Patata en Paris",
+    "coins": 199,
+    "imageUrl": "images/patata_en_paris.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Rock 'n' Roll",
+    "coins": 299,
+    "imageUrl": "images/rock_n_roll.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Guantes de boxeo",
+    "coins": 299,
+    "imageUrl": "images/guantes_de_boxeo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pato",
+    "coins": 299,
+    "imageUrl": "images/pato.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Corgi",
+    "coins": 299,
+    "imageUrl": "images/corgi.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Dash",
+    "coins": 299,
+    "imageUrl": "images/dash.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Superpoder",
+    "coins": 299,
+    "imageUrl": "images/superpoder.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Trompa y orejas de elefante",
+    "coins": 299,
+    "imageUrl": "images/trompa_y_orejas_de_elefante.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Corona de TikTok",
+    "coins": 299,
+    "imageUrl": "images/corona_de_tiktok.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Amigos frutales",
+    "coins": 299,
+    "imageUrl": "images/amigos_frutales.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Esta canción es para ti",
+    "coins": 299,
+    "imageUrl": "images/esta_cancion_es_para_ti.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fake smile",
+    "coins": 299,
+    "imageUrl": "images/fake_smile.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "FrankTástico",
+    "coins": 299,
+    "imageUrl": "images/franktastico.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Air Dancer",
+    "coins": 300,
+    "imageUrl": "images/air_dancer.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Anillo de diamantes de amor",
+    "coins": 300,
+    "imageUrl": "images/anillo_de_diamantes_de_amor.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Singing frogs",
+    "coins": 398,
+    "imageUrl": "images/singing_frogs.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Swing",
+    "coins": 399,
+    "imageUrl": "images/swing.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Sweet dreams",
+    "coins": 399,
+    "imageUrl": "images/sweet_dreams.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Vuelo en flor",
+    "coins": 399,
+    "imageUrl": "images/vuelo_en_flor.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Foca Algodoncito",
+    "coins": 399,
+    "imageUrl": "images/foca_algodoncito.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Rosa de la eternidad",
+    "coins": 399,
+    "imageUrl": "images/rosa_de_la_eternidad.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Singing Mic",
+    "coins": 399,
+    "imageUrl": "images/singing_mic.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Prueba de micrófono",
+    "coins": 399,
+    "imageUrl": "images/prueba_de_microfono.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Ritmo mágico",
+    "coins": 399,
+    "imageUrl": "images/ritmo_magico.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Mucha suerte",
+    "coins": 399,
+    "imageUrl": "images/mucha_suerte.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Auriculares para jugar",
+    "coins": 399,
+    "imageUrl": "images/auriculares_para_jugar.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Necklace",
+    "coins": 400,
+    "imageUrl": "images/necklace.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Venus Flytrap",
+    "coins": 400,
+    "imageUrl": "images/venus_flytrap.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Love Chat",
+    "coins": 400,
+    "imageUrl": "images/love_chat.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Coral",
+    "coins": 499,
+    "imageUrl": "images/coral.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Manos arriba",
+    "coins": 499,
+    "imageUrl": "images/manos_arriba.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pistola de Gemas",
+    "coins": 500,
+    "imageUrl": "images/pistola_de_gemas.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pistola de dinero",
+    "coins": 500,
+    "imageUrl": "images/pistola_de_dinero.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Prince",
+    "coins": 500,
+    "imageUrl": "images/prince.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Melena del león",
+    "coins": 500,
+    "imageUrl": "images/melena_del_leon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Alféizar con flores",
+    "coins": 500,
+    "imageUrl": "images/alfeizar_con_flores.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Equipo de ensueño",
+    "coins": 500,
+    "imageUrl": "images/equipo_de_ensueno.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Mic Drop",
+    "coins": 500,
+    "imageUrl": "images/mic_drop.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Manifestando",
+    "coins": 500,
+    "imageUrl": "images/manifestando.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Dulces recuerdos",
+    "coins": 500,
+    "imageUrl": "images/dulces_recuerdos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Molas un montón",
+    "coins": 500,
+    "imageUrl": "images/molas_un_monton.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Ice Machine",
+    "coins": 538,
+    "imageUrl": "images/ice_machine.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Record Player",
+    "coins": 600,
+    "imageUrl": "images/record_player.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "LOVE Balloon",
+    "coins": 699,
+    "imageUrl": "images/love_balloon.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Cisne",
+    "coins": 699,
+    "imageUrl": "images/cisne.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Heels",
+    "coins": 700,
+    "imageUrl": "images/heels.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pearl",
+    "coins": 800,
+    "imageUrl": "images/pearl.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Máquina de garra",
+    "coins": 800,
+    "imageUrl": "images/maquina_de_garra.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tren",
+    "coins": 899,
+    "imageUrl": "images/tren.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Globo aerostático",
+    "coins": 999,
+    "imageUrl": "images/globo_aerostatico.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Viaje juntos",
+    "coins": 999,
+    "imageUrl": "images/viaje_juntos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Celebridad",
+    "coins": 999,
+    "imageUrl": "images/celebridad.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Lovely Music",
+    "coins": 999,
+    "imageUrl": "images/lovely_music.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Caja de lanzamiento aéreo de la suerte",
+    "coins": 999,
+    "imageUrl": "images/caja_de_lanzamiento_aereo_de_la_suerte.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Mina de oro",
+    "coins": 1000,
+    "imageUrl": "images/mina_de_oro.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Bola de discoteca",
+    "coins": 1000,
+    "imageUrl": "images/bola_de_discoteca.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Team Crown",
+    "coins": 1000,
+    "imageUrl": "images/team_crown.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Email Message",
+    "coins": 1000,
+    "imageUrl": "images/email_message.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Espejo con flores",
+    "coins": 1000,
+    "imageUrl": "images/espejo_con_flores.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Galaxia",
+    "coins": 1000,
+    "imageUrl": "images/galaxia.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Dinosaurio",
+    "coins": 1000,
+    "imageUrl": "images/dinosaurio.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Amor sandía",
+    "coins": 1000,
+    "imageUrl": "images/amor_sandia.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Jirafa Gerry",
+    "coins": 1000,
+    "imageUrl": "images/jirafa_gerry.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Cesta de pícnic",
+    "coins": 1000,
+    "imageUrl": "images/cesta_de_picnic.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Globo Aerostático Brillante",
+    "coins": 1000,
+    "imageUrl": "images/globo_aerostatico_brillante.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tambores",
+    "coins": 1000,
+    "imageUrl": "images/tambores.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Medusa brillante",
+    "coins": 1000,
+    "imageUrl": "images/medusa_brillante.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Cintas florecientes",
+    "coins": 1000,
+    "imageUrl": "images/cintas_florecientes.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fuegos artificiales",
+    "coins": 1088,
+    "imageUrl": "images/fuegos_artificiales.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Árbol de diamantes",
+    "coins": 1088,
+    "imageUrl": "images/arbol_de_diamantes.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Gaming Chair",
+    "coins": 1200,
+    "imageUrl": "images/gaming_chair.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fountain",
+    "coins": 1200,
+    "imageUrl": "images/fountain.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Bumper Cars",
+    "coins": 1288,
+    "imageUrl": "images/bumper_cars.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Flor lunar",
+    "coins": 1400,
+    "imageUrl": "images/flor_lunar.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Guirnalda",
+    "coins": 1500,
+    "imageUrl": "images/guirnalda.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Campeón",
+    "coins": 1500,
+    "imageUrl": "images/campeon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Alfombra roja",
+    "coins": 1500,
+    "imageUrl": "images/alfombra_roja.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Rey de diamantes",
+    "coins": 1500,
+    "imageUrl": "images/rey_de_diamantes.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Todo por un sueño",
+    "coins": 1500,
+    "imageUrl": "images/todo_por_un_sueno.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Oso Pim",
+    "coins": 1500,
+    "imageUrl": "images/oso_pim.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Candado de amor",
+    "coins": 1500,
+    "imageUrl": "images/candado_de_amor.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tarjeta de felicitación",
+    "coins": 1500,
+    "imageUrl": "images/tarjeta_de_felicitacion.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tarjeta de ensueño",
+    "coins": 1500,
+    "imageUrl": "images/tarjeta_de_ensueno.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Kit básico de ASMR",
+    "coins": 1599,
+    "imageUrl": "images/kit_basico_de_asmr.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Teatime",
+    "coins": 1777,
+    "imageUrl": "images/teatime.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Treehouse",
+    "coins": 1799,
+    "imageUrl": "images/treehouse.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Escenario principal",
+    "coins": 1799,
+    "imageUrl": "images/escenario_principal.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Allá vamos",
+    "coins": 1799,
+    "imageUrl": "images/alla_vamos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Sorpresa romántica",
+    "coins": 1800,
+    "imageUrl": "images/sorpresa_romantica.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Atención",
+    "coins": 1800,
+    "imageUrl": "images/atencion.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Speedboat",
+    "coins": 1888,
+    "imageUrl": "images/speedboat.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Estuche de maquillaje",
+    "coins": 1999,
+    "imageUrl": "images/estuche_de_maquillaje.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Magic Album",
+    "coins": 1999,
+    "imageUrl": "images/magic_album.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Spotlight",
+    "coins": 1999,
+    "imageUrl": "images/spotlight.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Aventuras bajo las estrellas",
+    "coins": 1999,
+    "imageUrl": "images/aventuras_bajo_las_estrellas.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Dirigible",
+    "coins": 1999,
+    "imageUrl": "images/dirigible.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Estrella de la alfombra roja",
+    "coins": 1999,
+    "imageUrl": "images/estrella_de_la_alfombra_roja.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Caja de regalo",
+    "coins": 1999,
+    "imageUrl": "images/caja_de_regalo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Cooper vuela a casa",
+    "coins": 1999,
+    "imageUrl": "images/cooper_vuela_a_casa.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fuegos artificiales misteriosos",
+    "coins": 1999,
+    "imageUrl": "images/fuegos_artificiales_misteriosos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Club",
+    "coins": 2000,
+    "imageUrl": "images/club.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Carousel",
+    "coins": 2020,
+    "imageUrl": "images/carousel.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Ballena sumergida",
+    "coins": 2150,
+    "imageUrl": "images/ballena_sumergida.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Cordero",
+    "coins": 2200,
+    "imageUrl": "images/cordero.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Music Box",
+    "coins": 2399,
+    "imageUrl": "images/music_box.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Escenario mágico",
+    "coins": 2599,
+    "imageUrl": "images/escenario_magico.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Travel",
+    "coins": 2888,
+    "imageUrl": "images/travel.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Concierto",
+    "coins": 2888,
+    "imageUrl": "images/concierto.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Moto",
+    "coins": 2988,
+    "imageUrl": "images/moto.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Osito rítmico",
+    "coins": 2999,
+    "imageUrl": "images/osito_ritmico.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Noria",
+    "coins": 3000,
+    "imageUrl": "images/noria.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Lluvia de meteoritos",
+    "coins": 3000,
+    "imageUrl": "images/lluvia_de_meteoritos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Drifting",
+    "coins": 3000,
+    "imageUrl": "images/drifting.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Ositos bailarines",
+    "coins": 3000,
+    "imageUrl": "images/ositos_bailarines.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fiesta de oro",
+    "coins": 3000,
+    "imageUrl": "images/fiesta_de_oro.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tren primaveral",
+    "coins": 3999,
+    "imageUrl": "images/tren_primaveral.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Explosión floral",
+    "coins": 4000,
+    "imageUrl": "images/explosion_floral.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Restaurants",
+    "coins": 4000,
+    "imageUrl": "images/restaurants.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Mike",
+    "coins": 4000,
+    "imageUrl": "images/mike.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Teclado para jugar",
+    "coins": 4000,
+    "imageUrl": "images/teclado_para_jugar.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Superestrella",
+    "coins": 4088,
+    "imageUrl": "images/superestrella.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Tractor",
+    "coins": 4099,
+    "imageUrl": "images/tractor.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Jet privado",
+    "coins": 4888,
+    "imageUrl": "images/jet_privado.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pirate Ship",
+    "coins": 4888,
+    "imageUrl": "images/pirate_ship.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "León el gatito",
+    "coins": 4888,
+    "imageUrl": "images/leon_el_gatito.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Dynamic Music",
+    "coins": 4888,
+    "imageUrl": "images/dynamic_music.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pool Party",
+    "coins": 4999,
+    "imageUrl": "images/pool_party.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Noqueo",
+    "coins": 4999,
+    "imageUrl": "images/noqueo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Elefanta Ellie",
+    "coins": 5000,
+    "imageUrl": "images/elefanta_ellie.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Ellie the Elephant",
+    "coins": 5000,
+    "imageUrl": "images/ellie_the_elephant.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Unicornio de fantasía",
+    "coins": 5000,
+    "imageUrl": "images/unicornio_de_fantasia.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Susurrador de aves",
+    "coins": 5000,
+    "imageUrl": "images/susurrador_de_aves.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Coche deportivo plateado",
+    "coins": 5000,
+    "imageUrl": "images/coche_deportivo_plateado.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Alien DJ",
+    "coins": 5000,
+    "imageUrl": "images/alien_dj.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Aviones volando",
+    "coins": 5000,
+    "imageUrl": "images/aviones_volando.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Viaje en moto",
+    "coins": 5000,
+    "imageUrl": "images/viaje_en_moto.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "1.er aniversario",
+    "coins": 5000,
+    "imageUrl": "images/1_er_aniversario.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Submarine",
+    "coins": 5199,
+    "imageUrl": "images/submarine.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Lobo",
+    "coins": 5500,
+    "imageUrl": "images/lobo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Jet plane",
+    "coins": 6000,
+    "imageUrl": "images/jet_plane.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Leoparda Lili",
+    "coins": 6599,
+    "imageUrl": "images/leoparda_lili.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Hora de la celebración",
+    "coins": 6999,
+    "imageUrl": "images/hora_de_la_celebracion.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fiesta animada",
+    "coins": 6999,
+    "imageUrl": "images/fiesta_animada.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fiesta de cumpleaños",
+    "coins": 6999,
+    "imageUrl": "images/fiesta_de_cumpleanos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Coche deportivo",
+    "coins": 7000,
+    "imageUrl": "images/coche_deportivo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Team Trophy",
+    "coins": 7000,
+    "imageUrl": "images/team_trophy.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "2.º aniversario",
+    "coins": 7000,
+    "imageUrl": "images/2_aniversario.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Creator of the week",
+    "coins": 7000,
+    "imageUrl": "images/creator_of_the_week.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Match Trophy",
+    "coins": 7999,
+    "imageUrl": "images/match_trophy.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Trono estelar",
+    "coins": 7999,
+    "imageUrl": "images/trono_estelar.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Saxofón",
+    "coins": 9000,
+    "imageUrl": "images/saxofon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Leoncito y Lili",
+    "coins": 9699,
+    "imageUrl": "images/leoncito_y_lili.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Aventura por el desierto",
+    "coins": 9699,
+    "imageUrl": "images/aventura_por_el_desierto.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Interestelar",
+    "coins": 10000,
+    "imageUrl": "images/interestelar.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Bulevar del ocaso",
+    "coins": 10000,
+    "imageUrl": "images/bulevar_del_ocaso.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Festival Flags",
+    "coins": 10000,
+    "imageUrl": "images/festival_flags.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Octopus",
+    "coins": 10000,
+    "imageUrl": "images/octopus.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Halcón",
+    "coins": 10999,
+    "imageUrl": "images/halcon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "LIVE Fest Grand Finale",
+    "coins": 10999,
+    "imageUrl": "images/live_fest_grand_finale.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Coche de carreras",
+    "coins": 12000,
+    "imageUrl": "images/coche_de_carreras.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Relámpago rojo",
+    "coins": 12000,
+    "imageUrl": "images/relampago_rojo.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "3.er aniversario",
+    "coins": 12000,
+    "imageUrl": "images/3_er_aniversario.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Planet",
+    "coins": 15000,
+    "imageUrl": "images/planet.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pirate’s Ship",
+    "coins": 15000,
+    "imageUrl": "images/pirate_s_ship.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Maggie",
+    "coins": 15000,
+    "imageUrl": "images/maggie.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "peacock",
+    "coins": 15000,
+    "imageUrl": "images/peacock.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pyramids",
+    "coins": 15000,
+    "imageUrl": "images/pyramids.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Supervelocidad",
+    "coins": 15000,
+    "imageUrl": "images/supervelocidad.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Rosa cósmica",
+    "coins": 15000,
+    "imageUrl": "images/rosa_cosmica.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Big Ben",
+    "coins": 15000,
+    "imageUrl": "images/big_ben.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Berlín",
+    "coins": 15000,
+    "imageUrl": "images/berlin.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "¡Mira! Lluvia de meteoritos",
+    "coins": 15000,
+    "imageUrl": "images/mira_lluvia_de_meteoritos.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Dulcetopia",
+    "coins": 15000,
+    "imageUrl": "images/dulcetopia.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Parque de atracciones",
+    "coins": 17000,
+    "imageUrl": "images/parque_de_atracciones.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Amor en el aire",
+    "coins": 19999,
+    "imageUrl": "images/amor_en_el_aire.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Rocket",
+    "coins": 20000,
+    "imageUrl": "images/rocket.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Transbordador",
+    "coins": 20000,
+    "imageUrl": "images/transbordador.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Castillo de fantasía",
+    "coins": 20000,
+    "imageUrl": "images/castillo_de_fantasia.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Transbordador Premium",
+    "coins": 20000,
+    "imageUrl": "images/transbordador_premium.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Yate",
+    "coins": 20000,
+    "imageUrl": "images/yate.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Spark",
+    "coins": 20000,
+    "imageUrl": "images/spark.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Carruaje de rosas",
+    "coins": 25000,
+    "imageUrl": "images/carruaje_de_rosas.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Turismo en una noche estrellada",
+    "coins": 25000,
+    "imageUrl": "images/turismo_en_una_noche_estrellada.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fénix",
+    "coins": 25999,
+    "imageUrl": "images/fenix.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "El sueño de Adam",
+    "coins": 25999,
+    "imageUrl": "images/el_sueno_de_adam.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "T-Rex",
+    "coins": 25999,
+    "imageUrl": "images/t_rex.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Llama de dragón",
+    "coins": 26999,
+    "imageUrl": "images/llama_de_dragon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "León",
+    "coins": 29999,
+    "imageUrl": "images/leon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Auto deportivo de oro",
+    "coins": 29999,
+    "imageUrl": "images/auto_deportivo_de_oro.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Hall of Glory",
+    "coins": 30000,
+    "imageUrl": "images/hall_of_glory.png",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Ballena Sam",
+    "coins": 30000,
+    "imageUrl": "images/ballena_sam.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Gorila",
+    "coins": 30000,
+    "imageUrl": "images/gorila.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Leoncito y León",
+    "coins": 34000,
+    "imageUrl": "images/leoncito_y_leon.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Zeus",
+    "coins": 34000,
+    "imageUrl": "images/zeus.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Foca y ballena",
+    "coins": 34500,
+    "imageUrl": "images/foca_y_ballena.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "TikTok Universe+",
+    "coins": 34999,
+    "imageUrl": "images/tiktok_universe.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "TikTok Stars",
+    "coins": 39999,
+    "imageUrl": "images/tiktok_stars.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Halcón de trueno",
+    "coins": 39999,
+    "imageUrl": "images/halcon_de_trueno.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Fénix de fuego",
+    "coins": 41999,
+    "imageUrl": "images/fenix_de_fuego.webp",
+    "emoji": "🎁"
+  },
+  {
+    "name": "Pegaso",
+    "coins": 42999,
+    "imageUrl": "images/pegaso.webp",
+    "emoji": "🎁"
+  }
+]
