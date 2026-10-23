@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PrintCRM Web — Ver y editar tus datos</title>
+<title>PrintCRM Web — Pedidos y deudas</title>
 
 <!-- Google Identity Services: maneja el login con Google desde el navegador
      (sin backend propio). No requiere "Client Secret" -- ese flujo es solo
@@ -438,6 +438,66 @@
   .pantalla-inicial h2 { margin-bottom: 8px; }
   .pantalla-inicial p { color: var(--pcrm-texto-sec); font-size: 14px; line-height: 1.5; }
 
+
+  /* ---------- Versión resumida ---------- */
+  .pagina { max-width: 760px; margin: 0 auto; padding: 16px 14px 60px; }
+  .filtros { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chip {
+    font-family: var(--pcrm-fuente); font-size: 13px; padding: 7px 12px; border-radius: 999px;
+    border: 1px solid var(--pcrm-borde); background: #fff; cursor: pointer; color: var(--pcrm-texto);
+  }
+  .chip--activo { background: var(--pcrm-verde); border-color: var(--pcrm-verde); color: #fff; }
+  .buscador {
+    width: 100%; padding: 10px 12px; border-radius: var(--pcrm-radio); border: 1px solid var(--pcrm-borde);
+    font-family: var(--pcrm-fuente); font-size: 14px; margin-bottom: 12px;
+  }
+  .tarjeta-cliente {
+    background: #fff; border: 1px solid var(--pcrm-borde); border-radius: var(--pcrm-radio);
+    padding: 12px 14px; margin-bottom: 10px; cursor: pointer;
+  }
+  .tarjeta-cliente:hover { border-color: var(--pcrm-verde); }
+  .tarjeta-cliente__top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .tarjeta-cliente__nombre { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tarjeta-cliente__num { font-size: 12px; color: var(--pcrm-texto-sec); }
+  .badge--grande { font-size: 12px; padding: 4px 10px; }
+  .pedido-mini { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-top: 1px solid var(--pcrm-borde); font-size: 13px; }
+  .pedido-mini__nombre { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pedido-mini__debe { color: var(--pcrm-rojo); font-weight: 700; font-size: 12px; white-space: nowrap; }
+  .pedido-mini__ok { color: #1c8a52; font-size: 12px; white-space: nowrap; }
+  .pedido-mini__mas { font-size: 12px; color: var(--pcrm-texto-sec); padding-top: 4px; }
+  .cliente-cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin: 14px 0 12px; }
+  .cliente-cab .titulo-cliente { overflow-wrap: anywhere; }
+  .seccion { margin-bottom: 12px; }
+  .seccion > summary { cursor: pointer; font-weight: 600; font-size: 14px; padding: 8px 0; }
+  .pedido-fila {
+    display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid var(--pcrm-borde);
+    border-radius: var(--pcrm-radio); padding: 8px; margin-bottom: 8px;
+  }
+  .pedido-fila__img {
+    width: 56px; height: 56px; flex: none; border-radius: 6px; object-fit: cover; background: var(--pcrm-fondo-alt);
+    display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer;
+  }
+  .pedido-fila__img--vacia { cursor: default; }
+  .pedido-fila__info { flex: 1; min-width: 0; }
+  .pedido-fila__nombre { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+  .pedido-fila__meta { font-size: 11px; color: var(--pcrm-texto-sec); margin: 2px 0 3px; }
+  .pedido-fila__monto { text-align: right; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .archivo-card img { height: 110px; width: 100%; object-fit: cover; }
+  .modal--ancho { max-width: 560px; }
+  .captura-seccion { font-size: 12px; font-weight: 700; color: var(--pcrm-texto-sec); text-transform: uppercase; margin: 12px 0 6px; }
+  .captura-seccion:first-child { margin-top: 0; }
+  .captura-imgs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+  .captura-img {
+    flex: none; width: 64px; height: 64px; border-radius: 8px; border: 2px solid var(--pcrm-borde);
+    background: var(--pcrm-fondo-alt) center/cover no-repeat; cursor: pointer; font-size: 11px; color: var(--pcrm-texto-sec);
+    display: flex; align-items: center; justify-content: center; text-align: center; font-family: var(--pcrm-fuente);
+  }
+  .captura-img--activa { border-color: var(--pcrm-verde); box-shadow: 0 0 0 2px rgba(0,128,105,.25); }
+  .captura-check { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 5px 0; }
+  .captura-check span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .captura-previa { border: 1px solid var(--pcrm-borde); border-radius: 8px; overflow: hidden; background: var(--pcrm-fondo-alt); text-align: center; font-size: 13px; color: var(--pcrm-texto-sec); }
+  .modal__footer { flex-wrap: wrap; }
+
   @media (max-width: 720px) {
     .layout { flex-direction: column; }
     .sidebar { width: 100%; max-height: 240px; position: static; }
@@ -452,7 +512,6 @@
     <span class="estado" id="estadoConexion">No conectado con Google Drive</span>
     <button class="btn btn--claro" id="btnConectar">🔗 Conectar con Google</button>
     <button class="btn" id="btnRecargar" style="display:none;">🔄 Recargar</button>
-    <button class="btn btn--claro" id="btnGuardar" style="display:none;" disabled>💾 Guardar cambios</button>
   </header>
 
   <div id="appRoot"></div>
