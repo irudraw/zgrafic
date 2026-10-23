@@ -512,21 +512,68 @@ function ajustarTexto(ctx, texto, anchoMax) {
 }
 
 /**
- * Reparte el área del collage en celdas [x,y,w,h] (relativas al área) según cuántas imágenes hay:
- * 2 → lado a lado · 3 → una grande a la izquierda y dos a la derecha · 4+ → cuadrícula.
+ * Acomoda las imágenes SIN recortar nada (cada una se ve completa) y aprovechando
+ * al máximo el espacio. Prueba todas las formas de repartirlas en filas (una encima
+ * de otra) y en columnas (una al costado de otra), respetando el orden elegido, y se
+ * queda con la que deja las imágenes más grandes. Así, dos imágenes anchas quedan
+ * una arriba y otra abajo; dos altas, una al lado de la otra; etc.
+ * Devuelve { w, h, cells: [[x, y, w, h], ...] } (en el mismo orden de entrada).
  */
-function celdasCollage(n, w, h, gap) {
-  if (n === 2) { const cw = (w - gap) / 2; return [[0, 0, cw, h], [cw + gap, 0, cw, h]]; }
-  if (n === 3) {
-    const cw = (w - gap) / 2, ch = (h - gap) / 2;
-    return [[0, 0, cw, h], [cw + gap, 0, cw, ch], [cw + gap, ch + gap, cw, ch]];
+function layoutCollage(ars, W, H, gap) {
+  const n = ars.length;
+  // Todas las formas de cortar la lista, en orden, en grupos consecutivos (filas).
+  function particiones(i, actual, salida) {
+    if (i === n) { salida.push(actual.map((g) => g.slice())); return; }
+    if (actual.length) { actual[actual.length - 1].push(i); particiones(i + 1, actual, salida); actual[actual.length - 1].pop(); }
+    actual.push([i]); particiones(i + 1, actual, salida); actual.pop();
   }
-  const cols = n <= 4 ? 2 : 3;
-  const filas = Math.ceil(n / cols);
-  const cw = (w - gap * (cols - 1)) / cols, ch = (h - gap * (filas - 1)) / filas;
-  const out = [];
-  for (let i = 0; i < n; i++) out.push([(i % cols) * (cw + gap), Math.floor(i / cols) * (ch + gap), cw, ch]);
-  return out;
+  let todas = [];
+  if (n <= 10) particiones(0, [], todas);
+  else {
+    const filas = Math.ceil(Math.sqrt(n)), porFila = Math.ceil(n / filas), g = [];
+    for (let i = 0; i < n; i += porFila) g.push(Array.from({ length: Math.min(porFila, n - i) }, (_, k) => i + k));
+    todas = [g];
+  }
+  // Reparte en filas dentro de una región (RW x RH); los 'ratios' son ancho/alto de cada imagen.
+  function enFilas(ratios, RW, RH) {
+    let mejor = null;
+    todas.forEach((grupos) => {
+      const hs = grupos.map((g) => (RW - gap * (g.length - 1)) / g.reduce((a, i) => a + ratios[i], 0));
+      const total = hs.reduce((a, b) => a + b, 0) + gap * (grupos.length - 1);
+      const k = Math.min(1, RH / total);
+      let area = 0; // se mide por la imagen MÁS CHICA (para que ninguna quede diminuta), y el total desempata
+      let menor = Infinity;
+      const celdas = new Array(n);
+      let y = 0;
+      grupos.forEach((g, gi) => {
+        const h = hs[gi] * k;
+        let x = (RW - RW * k) / 2;
+        g.forEach((i) => {
+          const w = ratios[i] * h;
+          celdas[i] = [x, y, w, h];
+          x += w + gap;
+          area += w * h;
+          menor = Math.min(menor, w * h);
+        });
+        y += h + gap;
+      });
+      const cand = { area: menor + area / 1000, w: RW * k, h: total * k, celdas };
+      if (!mejor || cand.area > mejor.area + 1e-6) mejor = cand;
+    });
+    return mejor;
+  }
+  const filas = enFilas(ars, W, H);
+  // Columnas = lo mismo con los ejes intercambiados.
+  const t = enFilas(ars.map((r) => 1 / r), H, W);
+  const columnas = { area: t.area, w: t.h, h: t.w, celdas: t.celdas.map(([x, y, w, h]) => [y, x, h, w]) };
+  const elegido = columnas.area > filas.area * 1.02 ? columnas : filas;
+  // Se pega al borde superior-izquierdo y se centra a lo ancho.
+  const minX = Math.min(...elegido.celdas.map((c) => c[0]));
+  const minY = Math.min(...elegido.celdas.map((c) => c[1]));
+  const maxX = Math.max(...elegido.celdas.map((c) => c[0] + c[2]));
+  const maxY = Math.max(...elegido.celdas.map((c) => c[1] + c[3]));
+  const dx = (W - (maxX - minX)) / 2 - minX;
+  return { w: maxX - minX, h: maxY - minY, cells: elegido.celdas.map(([x, y, w, h]) => [x + dx, y - minY, w, h]) };
 }
 
 /** Dibuja la tarjeta y devuelve el canvas. datos: {negocio, nombre, numero, imagenes:[Image], items:[{texto,monto}], total, deudaTotal, moneda} */
@@ -539,9 +586,8 @@ function dibujarCaptura(d) {
   const bloques = d.items.map((it) => ({ it, lineas: ajustarTexto(medir, it.texto, W - M * 2 - 190) }));
   const altoItems = bloques.reduce((a, b) => a + Math.max(b.lineas.length, 1) * 36 + 14, 0);
   const aw = W - M * 2;
-  let altoImg = 0;
-  if (imgs.length === 1) altoImg = Math.min(Math.round((imgs[0].height / imgs[0].width) * aw), 620);
-  else if (imgs.length > 1) altoImg = imgs.length <= 4 ? 560 : Math.min(Math.ceil(imgs.length / 3) * 260, 800);
+  const lay = imgs.length ? layoutCollage(imgs.map((im) => im.width / im.height), aw, imgs.length === 1 ? 700 : 900, 8) : null;
+  const altoImg = lay ? Math.ceil(lay.h) : 0;
   const hayExtra = d.deudaTotal !== null;
   const H = 96 + (altoImg ? altoImg + 24 : 0) + 120 + altoItems + 130 + (hayExtra ? 44 : 0) + 30;
   const cv = document.createElement('canvas');
@@ -556,24 +602,9 @@ function dibujarCaptura(d) {
   ctx.textBaseline = 'middle';
   ctx.fillText(d.negocio, M, 40);
   let y = 96;
-  if (imgs.length === 1) {
-    const im = imgs[0];
-    const escala = Math.min(aw / im.width, altoImg / im.height);
-    const iw = im.width * escala, ih = im.height * escala;
-    ctx.fillStyle = C.panel;
-    ctx.fillRect(M, y, aw, altoImg);
-    ctx.drawImage(im, M + (aw - iw) / 2, y + (altoImg - ih) / 2, iw, ih);
-    y += altoImg + 24;
-  } else if (imgs.length > 1) {
-    celdasCollage(imgs.length, aw, altoImg, 8).forEach(([cx, cy, cw, ch], i) => {
-      const im = imgs[i];
-      ctx.save();
-      ctx.beginPath(); ctx.rect(M + cx, y + cy, cw, ch); ctx.clip();
-      const escala = Math.max(cw / im.width, ch / im.height); // rellena la celda (recorta lo que sobre)
-      const iw = im.width * escala, ih = im.height * escala;
-      ctx.drawImage(im, M + cx + (cw - iw) / 2, y + cy + (ch - ih) / 2, iw, ih);
-      ctx.restore();
-    });
+  if (lay) {
+    // Cada imagen entera (sin recortar), acomodada según su forma.
+    lay.cells.forEach(([cx, cy, cw, ch], i) => ctx.drawImage(imgs[i], M + cx, y + cy, cw, ch));
     y += altoImg + 24;
   }
   ctx.textBaseline = 'alphabetic';
