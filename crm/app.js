@@ -511,71 +511,102 @@ function ajustarTexto(ctx, texto, anchoMax) {
   return lineas;
 }
 
-/** Dibuja la tarjeta y devuelve el canvas. datos: {negocio, nombre, numero, imagen(Image|null), items:[{texto,monto}], total, deudaTotal, moneda} */
+/**
+ * Reparte el área del collage en celdas [x,y,w,h] (relativas al área) según cuántas imágenes hay:
+ * 2 → lado a lado · 3 → una grande a la izquierda y dos a la derecha · 4+ → cuadrícula.
+ */
+function celdasCollage(n, w, h, gap) {
+  if (n === 2) { const cw = (w - gap) / 2; return [[0, 0, cw, h], [cw + gap, 0, cw, h]]; }
+  if (n === 3) {
+    const cw = (w - gap) / 2, ch = (h - gap) / 2;
+    return [[0, 0, cw, h], [cw + gap, 0, cw, ch], [cw + gap, ch + gap, cw, ch]];
+  }
+  const cols = n <= 4 ? 2 : 3;
+  const filas = Math.ceil(n / cols);
+  const cw = (w - gap * (cols - 1)) / cols, ch = (h - gap * (filas - 1)) / filas;
+  const out = [];
+  for (let i = 0; i < n; i++) out.push([(i % cols) * (cw + gap), Math.floor(i / cols) * (ch + gap), cw, ch]);
+  return out;
+}
+
+/** Dibuja la tarjeta y devuelve el canvas. datos: {negocio, nombre, numero, imagenes:[Image], items:[{texto,monto}], total, deudaTotal, moneda} */
 function dibujarCaptura(d) {
+  const C = { fondo: '#111b21', cab: '#005c4b', panel: '#1f2c34', texto: '#e9edef', sec: '#8696a0', linea: '#2a3942', rojo: '#ff6b6b', rojoFondo: '#3b2327', verde: '#4ade80', verdeFondo: '#183a2c' };
   const W = 800, M = 36;
+  const imgs = d.imagenes || [];
   const medir = document.createElement('canvas').getContext('2d');
   medir.font = '600 28px "Segoe UI", Arial, sans-serif';
   const bloques = d.items.map((it) => ({ it, lineas: ajustarTexto(medir, it.texto, W - M * 2 - 190) }));
   const altoItems = bloques.reduce((a, b) => a + Math.max(b.lineas.length, 1) * 36 + 14, 0);
-  const altoImg = d.imagen ? Math.min(Math.round((d.imagen.height / d.imagen.width) * (W - M * 2)), 620) : 0;
+  const aw = W - M * 2;
+  let altoImg = 0;
+  if (imgs.length === 1) altoImg = Math.min(Math.round((imgs[0].height / imgs[0].width) * aw), 620);
+  else if (imgs.length > 1) altoImg = imgs.length <= 4 ? 560 : Math.min(Math.ceil(imgs.length / 3) * 260, 800);
   const hayExtra = d.deudaTotal !== null;
   const H = 96 + (altoImg ? altoImg + 24 : 0) + 120 + altoItems + 130 + (hayExtra ? 44 : 0) + 30;
   const cv = document.createElement('canvas');
   cv.width = W; cv.height = H;
   const ctx = cv.getContext('2d');
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = C.fondo;
   ctx.fillRect(0, 0, W, H);
-  // Cabecera
-  ctx.fillStyle = '#008069';
+  ctx.fillStyle = C.cab;
   ctx.fillRect(0, 0, W, 76);
   ctx.fillStyle = '#fff';
   ctx.font = '700 32px "Segoe UI", Arial, sans-serif';
   ctx.textBaseline = 'middle';
   ctx.fillText(d.negocio, M, 40);
   let y = 96;
-  if (d.imagen) {
-    const aw = W - M * 2;
-    const escala = Math.min(aw / d.imagen.width, altoImg / d.imagen.height);
-    const iw = d.imagen.width * escala, ih = d.imagen.height * escala;
-    ctx.fillStyle = '#f0f2f5';
+  if (imgs.length === 1) {
+    const im = imgs[0];
+    const escala = Math.min(aw / im.width, altoImg / im.height);
+    const iw = im.width * escala, ih = im.height * escala;
+    ctx.fillStyle = C.panel;
     ctx.fillRect(M, y, aw, altoImg);
-    ctx.drawImage(d.imagen, M + (aw - iw) / 2, y + (altoImg - ih) / 2, iw, ih);
+    ctx.drawImage(im, M + (aw - iw) / 2, y + (altoImg - ih) / 2, iw, ih);
+    y += altoImg + 24;
+  } else if (imgs.length > 1) {
+    celdasCollage(imgs.length, aw, altoImg, 8).forEach(([cx, cy, cw, ch], i) => {
+      const im = imgs[i];
+      ctx.save();
+      ctx.beginPath(); ctx.rect(M + cx, y + cy, cw, ch); ctx.clip();
+      const escala = Math.max(cw / im.width, ch / im.height); // rellena la celda (recorta lo que sobre)
+      const iw = im.width * escala, ih = im.height * escala;
+      ctx.drawImage(im, M + cx + (cw - iw) / 2, y + cy + (ch - ih) / 2, iw, ih);
+      ctx.restore();
+    });
     y += altoImg + 24;
   }
   ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#111b21';
+  ctx.fillStyle = C.texto;
   ctx.font = '700 38px "Segoe UI", Arial, sans-serif';
   ctx.fillText(d.nombre, M, y + 38, W - M * 2);
   y += 38;
   if (d.numero) {
-    ctx.fillStyle = '#667781';
+    ctx.fillStyle = C.sec;
     ctx.font = '600 30px "Segoe UI", Arial, sans-serif';
     ctx.fillText(d.numero, M, y + 44);
   }
   y += 80;
-  // Pedidos
   ctx.font = '600 28px "Segoe UI", Arial, sans-serif';
   bloques.forEach(({ it, lineas }) => {
-    ctx.fillStyle = '#111b21';
+    ctx.fillStyle = C.texto;
     ctx.textAlign = 'left';
     lineas.forEach((l, i) => ctx.fillText(l, M, y + 28 + i * 36));
     ctx.textAlign = 'right';
-    ctx.fillStyle = it.monto > 0 ? '#c22' : '#1c8a52';
+    ctx.fillStyle = it.monto > 0 ? C.rojo : C.verde;
     ctx.fillText(it.monto > 0 ? formatearMoneda(it.monto, d.moneda) : 'Pagado', W - M, y + 28);
     ctx.textAlign = 'left';
     y += Math.max(lineas.length, 1) * 36 + 14;
-    ctx.strokeStyle = '#e9edef';
+    ctx.strokeStyle = C.linea;
     ctx.beginPath(); ctx.moveTo(M, y - 7); ctx.lineTo(W - M, y - 7); ctx.stroke();
   });
-  // Total
   y += 16;
   const debe = d.total > 0;
-  ctx.fillStyle = debe ? '#fbe5e5' : '#e3f6ec';
+  ctx.fillStyle = debe ? C.rojoFondo : C.verdeFondo;
   ctx.beginPath();
   if (ctx.roundRect) ctx.roundRect(M, y, W - M * 2, 96, 16); else ctx.rect(M, y, W - M * 2, 96);
   ctx.fill();
-  ctx.fillStyle = debe ? '#c22' : '#1c8a52';
+  ctx.fillStyle = debe ? C.rojo : C.verde;
   ctx.font = '600 28px "Segoe UI", Arial, sans-serif';
   ctx.fillText(debe ? 'Debe' : 'Al día', M + 24, y + 58);
   ctx.textAlign = 'right';
@@ -584,7 +615,7 @@ function dibujarCaptura(d) {
   ctx.textAlign = 'left';
   y += 96;
   if (hayExtra) {
-    ctx.fillStyle = '#667781';
+    ctx.fillStyle = C.sec;
     ctx.font = '500 24px "Segoe UI", Arial, sans-serif';
     ctx.fillText(`Deuda total del cliente: ${formatearMoneda(d.deudaTotal, d.moneda)}`, M, y + 36);
   }
@@ -596,7 +627,9 @@ function abrirCaptura(c) {
   const imagenes = archivosDeCliente(c.id).filter(esImagen);
   // Imagen inicial: la del primer pedido activo que tenga, o la última guardada.
   const delPedido = f.activos.map(archivoDePedido).find(Boolean);
-  const sel = { archivoId: (delPedido || imagenes[0] || {}).id || null, url: null, subida: null };
+  // Selección múltiple (en orden de toque): clave 'a<id>' = archivo guardado, 'u<n>' = imagen subida ahora.
+  const sel = { claves: (delPedido || imagenes[0]) ? ['a' + (delPedido || imagenes[0]).id] : [] };
+  const subidas = new Map(); // 'u0' → object URL
   const pedidos = f.activos.concat(
     pedidosDeCliente(c.id).filter((t) => esPedidoConfirmado(t) && t.estado === 'entregado' && (f.pendientes.get(t.id) || 0) > 0)
   );
@@ -606,11 +639,11 @@ function abrirCaptura(c) {
   const modal = abrirModal({
     titulo: '📸 Captura rápida',
     contenidoHtml: `
-      <div class="captura-seccion">Imagen</div>
+      <div class="captura-seccion">Imágenes (toca varias para hacer un collage)</div>
       <div class="captura-imgs" id="capImgs">
         <button type="button" class="captura-img captura-img--sin" data-sin>Sin imagen</button>
-        <label class="captura-img captura-img--sin" style="cursor:pointer">📂 Subir<input type="file" accept="image/*" id="capArchivo" hidden /></label>
-        ${imagenes.map((a) => `<div class="captura-img" data-sel-archivo="${a.id}" title="${escaparHtml(a.nombre)}">…</div>`).join('')}
+        <label class="captura-img captura-img--sin" style="cursor:pointer">📂 Subir<input type="file" accept="image/*" multiple id="capArchivo" hidden /></label>
+        ${imagenes.map((a) => `<div class="captura-img" data-clave="a${a.id}" title="${escaparHtml(a.nombre)}">…</div>`).join('')}
       </div>
       <div class="captura-seccion">Pedidos que aparecen</div>
       <div id="capPedidos">${pedidos.length ? pedidos.map((t) => `
@@ -632,12 +665,15 @@ function abrirCaptura(c) {
   let numeroGen = 0;
   async function regenerar() {
     const mi = ++numeroGen;
-    let url = sel.subida;
-    if (!url && sel.archivoId) {
-      const a = datos().archivos.find((x) => x.id === sel.archivoId);
-      url = a ? await urlDeArchivo(a) : null;
-    }
-    const imagen = await cargarImagen(url);
+    const imagenesCargadas = (await Promise.all(sel.claves.map(async (k) => {
+      let url = null;
+      if (k[0] === 'u') url = subidas.get(k);
+      else {
+        const a = datos().archivos.find((x) => x.id === Number(k.slice(1)));
+        url = a ? await urlDeArchivo(a) : null;
+      }
+      return cargarImagen(url);
+    }))).filter(Boolean);
     if (mi !== numeroGen) return;
     const elegidos = pedidos.filter((t) => marcados.has(t.id));
     const items = elegidos.map((t) => ({ texto: t.nombre || t.descripcion || 'Pedido', monto: f.pendientes.get(t.id) || 0 }));
@@ -648,7 +684,7 @@ function abrirCaptura(c) {
       negocio: cfg.nombreNegocio || 'PrintCRM',
       nombre: c.nombre,
       numero: formatearNumero(c),
-      imagen,
+      imagenes: imagenesCargadas,
       items,
       total,
       deudaTotal: items.length && Math.abs(f.deuda - total) > 0.005 ? f.deuda : null,
@@ -663,29 +699,45 @@ function abrirCaptura(c) {
 
   function marcarImagenActiva() {
     modal.querySelectorAll('.captura-img').forEach((el) => {
-      const activo = el.hasAttribute('data-sin') ? (!sel.archivoId && !sel.subida) : (sel.archivoId && Number(el.dataset.selArchivo) === sel.archivoId && !sel.subida);
-      el.classList.toggle('captura-img--activa', !!activo);
+      if (el.hasAttribute('data-sin')) { el.classList.toggle('captura-img--activa', !sel.claves.length); return; }
+      const pos = sel.claves.indexOf(el.dataset.clave);
+      el.classList.toggle('captura-img--activa', pos >= 0);
+      if (pos >= 0 && sel.claves.length > 1) el.setAttribute('data-orden', String(pos + 1)); else el.removeAttribute('data-orden');
     });
   }
-  // Miniaturas de la galería (cargan una por una desde Drive)
-  modal.querySelectorAll('[data-sel-archivo]').forEach(async (el) => {
-    const a = datos().archivos.find((x) => x.id === Number(el.dataset.selArchivo));
-    const url = a ? await urlDeArchivo(a) : null;
+  function ponerMiniatura(el, url) {
     if (url) { el.textContent = ''; el.style.backgroundImage = `url("${url}")`; } else el.textContent = '⚠️';
+  }
+  // Miniaturas de la galería (cargan una por una desde Drive)
+  modal.querySelectorAll('[data-clave]').forEach(async (el) => {
+    const a = datos().archivos.find((x) => x.id === Number(el.dataset.clave.slice(1)));
+    ponerMiniatura(el, a ? await urlDeArchivo(a) : null);
   });
   modal.querySelector('#capImgs').addEventListener('click', (e) => {
     const el = e.target.closest('.captura-img');
     if (!el || el.tagName === 'LABEL') return;
-    sel.subida = null;
-    sel.archivoId = el.hasAttribute('data-sin') ? null : Number(el.dataset.selArchivo);
+    if (el.hasAttribute('data-sin')) sel.claves = [];
+    else {
+      const k = el.dataset.clave;
+      sel.claves = sel.claves.includes(k) ? sel.claves.filter((x) => x !== k) : sel.claves.concat(k);
+    }
     marcarImagenActiva();
     regenerar();
   });
   modal.querySelector('#capArchivo').addEventListener('change', (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    sel.subida = URL.createObjectURL(file);
-    sel.archivoId = null;
+    Array.from(e.target.files || []).forEach((file) => {
+      const k = 'u' + subidas.size;
+      const url = URL.createObjectURL(file);
+      subidas.set(k, url);
+      const el = document.createElement('div');
+      el.className = 'captura-img';
+      el.dataset.clave = k;
+      el.title = file.name;
+      ponerMiniatura(el, url);
+      modal.querySelector('#capImgs').appendChild(el);
+      sel.claves.push(k);
+    });
+    e.target.value = '';
     marcarImagenActiva();
     regenerar();
   });
